@@ -3,6 +3,7 @@ import './index.css'
 import HomePage          from './pages/HomePage.jsx'
 import PosterSignupPage  from './pages/PosterSignupPage.jsx'
 import WorkerSignupPage  from './pages/WorkerSignupPage.jsx'
+import LoginPage         from './pages/LoginPage.jsx'
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/"               element={<HomePage />} />
         <Route path="/signup/poster"  element={<PosterSignupPage />} />
         <Route path="/signup/worker"  element={<WorkerSignupPage />} />
+        <Route path="/login"           element={<LoginPage />} />
       </Routes>
     </Router>
   )

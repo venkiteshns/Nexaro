@@ -1,0 +1,40 @@
+.lfl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.lfl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.lfl-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: rgba(10, 110, 92, 0.1);
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lfl-text {
+  padding-top: 2px;
+}
+
+.lfl-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-heading);
+  margin-bottom: 4px;
+}
+
+.lfl-desc {
+  font-size: 14px;
+  color: var(--color-muted);
+  line-height: 1.5;
+}

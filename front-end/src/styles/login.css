@@ -1,0 +1,26 @@
+/* login.css */
+@import '../components/login/LoginBrandSection/LoginBrandSection.css';
+@import '../components/login/LoginFormCard/LoginFormCard.css';
+@import '../components/login/FeatureList/FeatureList.css';
+@import '../components/login/SocialLoginButton/SocialLoginButton.css';
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+}
+
+.login-page__left {
+  flex: 1 1 45%;
+}
+
+.login-page__right {
+  flex: 1 1 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  background-color: var(--color-surface);
+}
