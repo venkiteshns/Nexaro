@@ -1,0 +1,137 @@
+/* ─── AudienceSplit ──────────────────────────────────────────────────────── */
+
+.audience {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.audience__grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ── Shared panel ── */
+.audience__panel {
+  padding: clamp(48px, 5vw, 88px) clamp(32px, 4vw, 80px);
+}
+
+/* ── Requester panel (light) ── */
+.audience__panel--requester {
+  border-right: 1px solid var(--color-border);
+}
+
+.audience__eyebrow {
+  font-size: 11px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-subtle);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.audience__title {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 400;
+  color: var(--color-heading);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+}
+
+.audience__title-italic {
+  font-style: italic;
+}
+
+.audience__desc {
+  font-size: 15px;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  max-width: 320px;
+  margin-bottom: 36px;
+}
+
+/* Requester CTA button */
+.audience__btn-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 13px 26px;
+  background-color: var(--color-dark);
+  color: white;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 9px;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+  transition: background var(--transition-base), transform var(--transition-fast);
+}
+
+.audience__btn-dark:hover {
+  background-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+/* ── Professional panel (dark) ── */
+.audience__panel--professional {
+  background-color: var(--color-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dot pattern overlay */
+.audience__dot-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.audience__panel-inner {
+  position: relative;
+}
+
+/* Override colors for dark panel */
+.audience__panel--professional .audience__eyebrow {
+  color: #4B5563;
+}
+
+.audience__panel--professional .audience__title {
+  color: white;
+}
+
+.audience__panel--professional .audience__title-accent {
+  color: var(--color-accent3);
+  font-style: italic;
+}
+
+.audience__panel--professional .audience__desc {
+  color: var(--color-subtle);
+}
+
+/* Professional CTA button */
+.audience__btn-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 13px 26px;
+  background-color: var(--color-accent);
+  color: white;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 9px;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+  transition: background var(--transition-base), transform var(--transition-fast);
+}
+
+.audience__btn-accent:hover {
+  background-color: #0D8A74;
+  transform: translateY(-1px);
+}
