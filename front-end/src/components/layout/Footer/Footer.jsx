@@ -28,7 +28,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <p className="footer__copy">
-          © 2025 NEXARO Editorial Premium. All rights reserved.
+          © 2026 NEXARO Editorial Premium. All rights reserved.
         </p>
       </div>
     </footer>

@@ -1,0 +1,30 @@
+/* front-end/src/components/signup/FeatureList/FeatureList.css */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  box-shadow: 0 2px 8px rgba(10, 110, 92, 0.08);
+}
+
+.feature-item span {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-body);
+}
