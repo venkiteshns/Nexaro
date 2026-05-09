@@ -1,7 +1,123 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import './SignupForm.css';
+import { Link } from 'react-router-dom';
+import './PosterSignupPage.css';
 
+// ─────────────────────────────────────────────
+// FloatingCards
+// ─────────────────────────────────────────────
+const FloatingCards = () => {
+  return (
+    <div className="floating-cards-container">
+      <div className="float-card card-task">
+        <div className="card-header">
+          <span className="badge">ACTIVE TASK</span>
+          <span className="price">₹500</span>
+        </div>
+        <h4 className="card-title">Fix bathroom water leakage</h4>
+        <p className="card-location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          Dwarka, Sector 12
+        </p>
+        <div className="card-footer">
+          <div className="avatar-group">
+            <div className="avatar bg-blue"></div>
+            <div className="avatar bg-green"></div>
+            <div className="avatar bg-purple"></div>
+            <div className="avatar-more">+1</div>
+          </div>
+          <span className="status"><span className="dot"></span> 4 workers bidding</span>
+        </div>
+      </div>
+
+      <div className="float-card card-bid">
+        <div className="bid-icon-wrapper">
+          <div className="bid-icon">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+              <circle cx="12" cy="12" r="2"></circle>
+              <path d="M6 12h.01M18 12h.01"></path>
+            </svg>
+          </div>
+        </div>
+        <div className="bid-info">
+          <p className="bid-title">New bid received — ₹420</p>
+          <p className="bid-sub">from Ravi Kumar</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────
+// FeatureList
+// ─────────────────────────────────────────────
+const FeatureList = () => {
+  return (
+    <div className="feature-list">
+      <div className="feature-item">
+        <div className="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+          </svg>
+        </div>
+        <span>Get Bids in Minutes</span>
+      </div>
+      <div className="feature-item">
+        <div className="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <span>Pay Only When Done</span>
+      </div>
+      <div className="feature-item">
+        <div className="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <circle cx="12" cy="12" r="4"></circle>
+          </svg>
+        </div>
+        <span>Verified Workers Only</span>
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────
+// SignupBrandPanel
+// ─────────────────────────────────────────────
+const SignupBrandPanel = () => {
+  return (
+    <div className="brand-panel">
+      <div className="brand-content">
+        <div className="brand-logo-area">
+          <img src="/Logo_Nex.png" alt="NEXARO" style={{ height: "32px", width: "auto" }} />
+          <span className="logo-text">NEXARO</span>
+        </div>
+        <h1 className="brand-tagline">Skills Meet Needs. Instantly.</h1>
+        
+        <div className="brand-visuals">
+          <FloatingCards />
+        </div>
+        
+        <FeatureList />
+        
+        <div className="brand-footer">
+          <p>TRUSTED BY 10,000+ PEOPLE</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────
+// SignupForm
+// ─────────────────────────────────────────────
 const SignupForm = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +134,7 @@ const SignupForm = () => {
     <div className="signup-form-container">
       <div className="form-header">
         <div className="login-link">
-          Already have an account? <a href="/login">Login →</a>
+          Already have an account? <Link to="/login" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Login →</Link>
         </div>
         <h2>Create Your <span className="text-accent">Poster</span> Account</h2>
         <p className="subtitle">Join India's most trusted hyperlocal task marketplace.</p>
@@ -204,15 +320,31 @@ const SignupForm = () => {
         </button>
 
         <div className="worker-link">
-          Looking to earn? <a href="/worker-signup">Register as a Worker →</a>
+          Looking to earn? <Link to="/signup/worker" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Register as a Worker →</Link>
         </div>
       </form>
 
       <div className="form-footer-text">
-        © 2024 NEXARO. ALL RIGHTS RESERVED.
+        © 2026 NEXARO. ALL RIGHTS RESERVED.
       </div>
     </div>
   );
 };
 
-export default SignupForm;
+// ─────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────
+const PosterSignupPage = () => {
+  return (
+    <div className="signup-page">
+      <div className="signup-left">
+        <SignupBrandPanel />
+      </div>
+      <div className="signup-right">
+        <SignupForm />
+      </div>
+    </div>
+  );
+};
+
+export default PosterSignupPage;
