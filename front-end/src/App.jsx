@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css'
-import HomePage          from './pages/HomePage.jsx'
-import PosterSignupPage  from './pages/PosterSignupPage.jsx'
-import WorkerSignupPage  from './pages/WorkerSignupPage.jsx'
-import LoginPage         from './pages/LoginPage.jsx'
+import HomePage          from './pages/HomePage/HomePage.jsx'
+import PosterSignupPage  from './pages/PosterSignupPage/PosterSignupPage.jsx'
+import WorkerSignupPage  from './pages/WorkerSignupPage/WorkerSignupPage.jsx'
+import LoginPage         from './pages/LoginPage/LoginPage.jsx'
 
 function App() {
   return (
