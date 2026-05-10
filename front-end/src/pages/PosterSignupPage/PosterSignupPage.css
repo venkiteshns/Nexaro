@@ -818,4 +818,19 @@ input[type="password"]:focus,
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  position: relative;
+  z-index: 50;
 }
+
+/* Fix Dropdown Overlap by assigning descending z-index */
+.form-row { position: relative; }
+.form-row:nth-child(1) { z-index: 40; }
+.form-row:nth-child(2) { z-index: 30; }
+.form-row:nth-child(3) { z-index: 20; }
+.form-row:nth-child(4) { z-index: 10; }
+
+.form-group { position: relative; }
+.form-group:nth-child(1) { z-index: 10; }
+.form-group:nth-child(2) { z-index: 9; }
+.form-group:nth-child(3) { z-index: 8; }
+
