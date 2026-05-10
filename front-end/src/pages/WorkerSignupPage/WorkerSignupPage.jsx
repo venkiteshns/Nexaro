@@ -46,24 +46,39 @@ function CustomSelect({ name, options, placeholder, rules }) {
   }, []);
 
   return (
-    <div style={{ position: 'relative' }} ref={dropdownRef}>
+    // z-index elevation: when open, lift this whole stacking context above sibling sections
+    <div
+      ref={dropdownRef}
+      className={`ws-custom-select-wrap${isOpen ? ' ws-custom-select-wrap--open' : ''}`}
+    >
       <input type="hidden" {...register(name, rules)} />
-      <div 
+      <div
         className={`ws-custom-select ${errors[name] ? 'error' : ''} ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOpen(o => !o); } if (e.key === 'Escape') setIsOpen(false); }}
       >
         <span style={{ color: selectedValue ? 'var(--color-heading)' : 'var(--color-muted)' }}>
           {selectedValue || placeholder}
         </span>
-        <svg className="ws-custom-select-icon" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className={`ws-custom-select-icon${isOpen ? ' ws-custom-select-icon--open' : ''}`}
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          aria-hidden="true"
+        >
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </div>
-      <div className={`ws-custom-dropdown ${isOpen ? 'open' : ''}`}>
+      <div className={`ws-custom-dropdown${isOpen ? ' open' : ''}`} role="listbox">
         {options.map(option => (
-          <div 
-            key={option} 
-            className={`ws-custom-option ${selectedValue === option ? 'selected' : ''}`}
+          <div
+            key={option}
+            className={`ws-custom-option${selectedValue === option ? ' selected' : ''}`}
+            role="option"
+            aria-selected={selectedValue === option}
             onClick={() => {
               setValue(name, option, { shouldValidate: true });
               setIsOpen(false);
@@ -71,7 +86,7 @@ function CustomSelect({ name, options, placeholder, rules }) {
           >
             {option}
             {selectedValue === option && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" aria-hidden="true">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
             )}
@@ -81,6 +96,7 @@ function CustomSelect({ name, options, placeholder, rules }) {
     </div>
   );
 }
+
 
 const IconUpload = () => (
   <svg width="20" height="20" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -95,47 +111,65 @@ const IconCheck = () => (
   </svg>
 );
 
-function UploadCard({ label, hint, onFile }) {
-  const [file, setFile] = useState(null);
+function UploadCard({ name, label, hint, rules, onFile }) {
+  const { register, setValue, watch, formState: { errors } } = useFormContext();
+  const file = watch(name);
   const [drag, setDrag] = useState(false);
+
+  useEffect(() => {
+    register(name, rules);
+  }, [name, register, rules]);
+
+  function handleFile(f) {
+    if (f) {
+      setValue(name, f, { shouldValidate: true });
+      onFile && onFile(f);
+    }
+  }
 
   function handleChange(e) {
     const f = e.target.files[0];
-    if (f) { setFile(f); onFile && onFile(f); }
+    handleFile(f);
   }
 
   function handleDrop(e) {
     e.preventDefault();
     setDrag(false);
     const f = e.dataTransfer.files[0];
-    if (f) { setFile(f); onFile && onFile(f); }
+    handleFile(f);
   }
 
+  const hasError = errors && errors[name];
+
   return (
-    <div
-      className={`ws-upload-card${drag ? " dragover" : ""}${file ? " has-file" : ""}`}
-      onDragOver={e => { e.preventDefault(); setDrag(true); }}
-      onDragLeave={() => setDrag(false)}
-      onDrop={handleDrop}
-    >
-      <input type="file" accept="image/png,image/jpeg" onChange={handleChange} />
-      {file ? (
-        <>
-          {file.type.startsWith("image/") && (
-            <img className="ws-upload-card__preview" src={URL.createObjectURL(file)} alt="preview" />
-          )}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-            <IconCheck />
-            <span className="ws-upload-card__filename">{file.name}</span>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="ws-upload-card__icon"><IconUpload /></div>
-          <div className="ws-upload-card__label">{label}</div>
-          <div className="ws-upload-card__hint">{hint || "PNG, JPG up to 5MB"}</div>
-        </>
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div
+        className={`ws-upload-card${drag ? " dragover" : ""}${file ? " has-file" : ""}`}
+        style={hasError ? { borderColor: "#EF4444", background: "#FEF2F2" } : {}}
+        onDragOver={e => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={handleDrop}
+      >
+        <input type="file" accept="image/png,image/jpeg" onChange={handleChange} />
+        {file ? (
+          <>
+            {file.type.startsWith("image/") && (
+              <img className="ws-upload-card__preview" src={URL.createObjectURL(file)} alt="preview" />
+            )}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <IconCheck />
+              <span className="ws-upload-card__filename">{file.name}</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="ws-upload-card__icon"><IconUpload /></div>
+            <div className="ws-upload-card__label">{label} <span style={{ color: "#EF4444" }}>*</span></div>
+            <div className="ws-upload-card__hint">{hint || "PNG, JPG up to 5MB"}</div>
+          </>
+        )}
+      </div>
+      {hasError && <span className="ws-error" style={{ justifyContent: "center" }}>⚠ {errors[name].message}</span>}
     </div>
   );
 }
@@ -179,15 +213,17 @@ function PersonalInfoSection() {
 
 // --- Skills ---
 const SKILLS = ["Electrician", "Plumber", "Carpenter", "Painter", "Gardener", "Mason", "AC Technician", "Welder", "Tiler", "Handyman", "Cleaner", "Driver"];
-function SkillsSection({ onChange }) {
+function SkillsSection() {
+  const { register, setValue, formState: { errors } } = useFormContext();
   const [selected, setSelected] = useState([]);
   function toggle(skill) {
     const next = selected.includes(skill) ? selected.filter(s => s !== skill) : [...selected, skill];
     setSelected(next);
-    onChange(next);
+    setValue("skills", next, { shouldValidate: true });
   }
   return (
     <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>} title="Your Skills">
+      <input type="hidden" {...register("skills", { validate: v => (Array.isArray(v) && v.length > 0) || "Please select at least one skill" })} />
       <div className="ws-chips">
         {SKILLS.map(skill => (
           <button key={skill} type="button" className={`ws-chip${selected.includes(skill) ? " active" : ""}`} onClick={() => toggle(skill)}>
@@ -196,21 +232,24 @@ function SkillsSection({ onChange }) {
           </button>
         ))}
       </div>
+      {errors.skills && <span className="ws-error" style={{ marginTop: 8, display: 'block' }}>⚠ {errors.skills.message}</span>}
     </SectionCard>
   );
 }
 
 // --- Languages ---
 const LANGUAGES = ["English", "Hindi", "Malayalam", "Tamil", "Telugu", "Kannada", "Bengali", "Marathi"];
-function LanguageSection({ onChange }) {
+function LanguageSection() {
+  const { register, setValue, formState: { errors } } = useFormContext();
   const [selected, setSelected] = useState(["English"]);
   function toggle(lang) {
     const next = selected.includes(lang) ? selected.filter(l => l !== lang) : [...selected, lang];
     setSelected(next);
-    onChange(next);
+    setValue("languages", next, { shouldValidate: true });
   }
   return (
     <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h8" /><circle cx="18" cy="16" r="3" /></svg>} title="Languages">
+      <input type="hidden" {...register("languages", { validate: v => (Array.isArray(v) && v.length > 0) || "Please select at least one language" })} />
       <div className="ws-chips">
         {LANGUAGES.map(lang => (
           <button key={lang} type="button" className={`ws-chip${selected.includes(lang) ? " active" : ""}`} onClick={() => toggle(lang)}>
@@ -218,6 +257,7 @@ function LanguageSection({ onChange }) {
           </button>
         ))}
       </div>
+      {errors.languages && <span className="ws-error" style={{ marginTop: 8, display: 'block' }}>⚠ {errors.languages.message}</span>}
     </SectionCard>
   );
 }
@@ -227,52 +267,102 @@ function isInsecureNetworkOrigin() {
   return window.location.protocol === "http:" && !["localhost", "127.0.0.1"].includes(window.location.hostname);
 }
 
-function LocationFields({ register, banner }) {
+// All Kerala districts
+const KERALA_DISTRICTS = [
+  "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
+  "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad",
+  "Malappuram", "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
+];
+
+// District → major service areas
+const DISTRICT_AREAS = {
+  "Thiruvananthapuram": ["Kazhakootam", "Kowdiar", "Pattom", "Vattiyoorkavu", "Nemom", "Attingal", "Neyyattinkara"],
+  "Ernakulam":          ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom", "Angamaly"],
+  "Kozhikode":          ["Nadakkavu", "Mavoor Road", "Meenchanda", "Elathur", "Beypore", "Feroke"],
+  "Thrissur":           ["Poonkunnam", "Ollur", "Chalakudy", "Guruvayur", "Irinjalakuda", "Kunnamkulam"],
+  "Malappuram":         ["Manjeri", "Tirur", "Perinthalmanna", "Ponnani", "Kottakkal", "Tirurrangadi"],
+  "Kannur":             ["Thalassery", "Taliparamba", "Payyanur", "Mattannur", "Koothuparamba", "Iritty"],
+  "Kollam":             ["Karunagappally", "Punalur", "Kottarakkara", "Paravur", "Kundara", "Chavara"],
+  "Palakkad":           ["Ottapalam", "Shornur", "Chittur", "Pattambi", "Mannarkkad", "Alathur"],
+  "Alappuzha":          ["Cherthala", "Kayamkulam", "Chengannur", "Mavelikkara", "Harippad", "Haripad"],
+  "Kottayam":           ["Changanassery", "Pala", "Ettumanoor", "Vaikom", "Erattupetta", "Kanjirappally"],
+  "Kasaragod":          ["Kanhangad", "Nileshwaram", "Uppala", "Kumbla", "Manjeshwar", "Cheruvathur"],
+  "Pathanamthitta":     ["Thiruvalla", "Adoor", "Pandalam", "Ranni", "Konni", "Kozhencherry"],
+  "Idukki":             ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam", "Painavu"],
+  "Wayanad":            ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri", "Ambalavayal"]
+};
+
+function LocationFields({ register, setValue, banner, district, areas, errors }) {
+  const prevDistrictRef = useRef(district);
+  useEffect(() => {
+    if (prevDistrictRef.current !== district) {
+      setValue("serviceArea", "", { shouldValidate: false });
+      setValue("city", "", { shouldValidate: false });
+      prevDistrictRef.current = district;
+    }
+  }, [district, setValue]);
+
   return (
     <div className="ws-loc-fields">
       {banner}
       <div className="ws-grid-2">
-        {[
-          { name: "country", label: "Country" },
-          { name: "state", label: "State" },
-          { name: "district", label: "District" },
-          { name: "city", label: "City / Place" },
-        ].map(({ name, label }) => (
-          <div key={name} className="ws-field">
-            <label className="ws-label">{label}</label>
-            <input className="ws-input" placeholder={`Enter ${label.toLowerCase()}`} {...register(name)} />
-          </div>
-        ))}
+        <div className="ws-field">
+          <label className="ws-label">Country<span style={{ color: "#EF4444" }}>*</span></label>
+          <input className={`ws-input${errors.country ? " error" : ""}`} placeholder="Enter country" defaultValue="India" {...register("country", { required: "Country is required" })} />
+          {errors.country && <span className="ws-error">⚠ {errors.country.message}</span>}
+        </div>
+        <div className="ws-field">
+          <label className="ws-label">State<span style={{ color: "#EF4444" }}>*</span></label>
+          <input className={`ws-input${errors.state ? " error" : ""}`} placeholder="Enter state" defaultValue="Kerala" {...register("state", { required: "State is required" })} />
+          {errors.state && <span className="ws-error">⚠ {errors.state.message}</span>}
+        </div>
+        <div className="ws-field">
+          <label className="ws-label">District<span style={{ color: "#EF4444" }}>*</span></label>
+          <CustomSelect
+            name="district"
+            options={KERALA_DISTRICTS}
+            placeholder="Select district…"
+            rules={{ required: "Please select a district" }}
+          />
+          {errors.district && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.district.message}</span>}
+        </div>
+        <div className="ws-field">
+          <label className="ws-label">City / Place<span style={{ color: "#EF4444" }}>*</span></label>
+          <CustomSelect
+            name="city"
+            options={areas}
+            placeholder={district ? `Select city in ${district}` : "Select district first"}
+            rules={{ required: "City / Place is required" }}
+          />
+          {errors.city && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.city.message}</span>}
+        </div>
       </div>
+      {district && (
+        <div style={{ marginTop: 20 }}>
+          <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area<span style={{ color: "#EF4444" }}>*</span></label>
+          <CustomSelect
+            name="serviceArea"
+            options={areas}
+            placeholder={`Select a major city/area in ${district}`}
+            rules={{ required: "Please select a service area" }}
+          />
+          {errors.serviceArea && <span className="ws-error" style={{ marginTop: 6, display: 'block' }}>⚠ {errors.serviceArea.message}</span>}
+        </div>
+      )}
     </div>
   );
 }
 
+const MAX_GEO_RETRIES = 3;
+
 function ServiceLocationSection() {
   const { register, setValue, watch, formState: { errors } } = useFormContext();
+  // geoState: "idle" | "loading" | "failed" | "exhausted" | "manual" | "granted"
   const [geoState, setGeoState] = useState("idle");
-  const [coords, setCoords] = useState(null);
-  
+  const [attempts, setAttempts] = useState(0);
+
   const district = watch("district");
-  
-  const DISTRICT_AREAS = {
-    "Thiruvananthapuram": ["Kazhakootam", "Kowdiar", "Pattom", "Vattiyoorkavu", "Nemom", "Attingal"],
-    "Ernakulam": ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom"],
-    "Kozhikode": ["Nadakkavu", "Mavoor Road", "Meenchanda", "Elathur", "Beypore"],
-    "Thrissur": ["Poonkunnam", "Ollur", "Chalakudy", "Guruvayur", "Irinjalakuda"],
-    "Malappuram": ["Manjeri", "Tirur", "Perinthalmanna", "Ponnani", "Kottakkal"],
-    "Kannur": ["Thalassery", "Taliparamba", "Payyanur", "Mattannur", "Koothuparamba"],
-    "Kollam": ["Karunagappally", "Punalur", "Kottarakkara", "Paravur", "Kundara"],
-    "Palakkad": ["Ottapalam", "Shornur", "Chittur", "Pattambi", "Mannarkkad"],
-    "Alappuzha": ["Cherthala", "Kayamkulam", "Chengannur", "Mavelikkara", "Harippad"],
-    "Kottayam": ["Changanassery", "Pala", "Ettumanoor", "Vaikom", "Erattupetta"],
-    "Kasaragod": ["Kanhangad", "Nileshwaram", "Uppala", "Kumbla", "Manjeshwar"],
-    "Pathanamthitta": ["Thiruvalla", "Adoor", "Pandalam", "Ranni", "Konni"],
-    "Idukki": ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam"],
-    "Wayanad": ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri"]
-  };
-  
-  const areas = DISTRICT_AREAS[district] || ["City Center", "North Zone", "South Zone", "East Zone", "West Zone"];
+  const areas = DISTRICT_AREAS[district] || [];
 
   async function requestLocation() {
     if (isInsecureNetworkOrigin()) {
@@ -282,18 +372,28 @@ function ServiceLocationSection() {
     setGeoState("loading");
     try {
       const pos = await getCurrentPosition();
-      setCoords(pos);
       const addr = await reverseGeocode(pos);
-      setValue("country", addr.country, { shouldValidate: true });
-      setValue("state", addr.state, { shouldValidate: true });
-      setValue("district", addr.district, { shouldValidate: true });
-      setValue("city", addr.city, { shouldValidate: true });
+      setValue("exactLat", pos.lat);
+      setValue("exactLng", pos.lng);
+      setValue("country",  addr.country,  { shouldValidate: true });
+      setValue("state",    addr.state,    { shouldValidate: true });
+      const matched = KERALA_DISTRICTS.find(
+        d => d.toLowerCase() === (addr.district || "").toLowerCase()
+      );
+      setValue("district", matched || addr.district, { shouldValidate: true });
+      setValue("city",     addr.city,     { shouldValidate: true });
       setGeoState("granted");
-    } catch {
-      setGeoState("denied");
+    } catch (err) {
+      console.warn("GPS failed:", err.message);
+      const next = attempts + 1;
+      setAttempts(next);
+      if (next >= MAX_GEO_RETRIES) {
+        setGeoState("exhausted");
+      } else {
+        setGeoState("failed");
+      }
     }
   }
-
 
   const SuccessBanner = (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, padding: "10px 14px", background: "var(--color-accent2)", borderRadius: 10, border: "1px solid #A7F3D0" }}>
@@ -308,7 +408,16 @@ function ServiceLocationSection() {
     <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 20, padding: "10px 14px", background: "#FFF7ED", borderRadius: 10, border: "1px solid #FCD34D" }}>
       <span style={{ fontSize: 14, marginTop: 1 }}>✏️</span>
       <span style={{ fontSize: 13, color: "#92400E", fontFamily: "var(--font-sans)", lineHeight: 1.5 }}>
-        Location access isn't available here — please enter your location manually.
+        Enter your location manually — select your district to see service area options.
+      </span>
+    </div>
+  );
+
+  const ExhaustedBanner = (
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 20, padding: "10px 14px", background: "#FEF2F2", borderRadius: 10, border: "1px solid #FECACA" }}>
+      <span style={{ fontSize: 14, marginTop: 1 }}>📍</span>
+      <span style={{ fontSize: 13, color: "#991B1B", fontFamily: "var(--font-sans)", lineHeight: 1.5 }}>
+        Location access failed after {MAX_GEO_RETRIES} attempts. Please fill in your details below.
       </span>
     </div>
   );
@@ -316,6 +425,7 @@ function ServiceLocationSection() {
   return (
     <>
       <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>} title="Service Location">
+        {/* ── Initial prompt ── */}
         {geoState === "idle" && (
           <div className="ws-loc-card">
             <div className="ws-loc-icon">
@@ -335,41 +445,55 @@ function ServiceLocationSection() {
             </p>
           </div>
         )}
+
+        {/* ── Detecting spinner ── */}
         {geoState === "loading" && (
-          <div className="ws-loc-card" style={{ opacity: 0.75 }}>
-            <div className="ws-loc-icon"><svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" strokeDasharray="4 2" /></svg></div>
+          <div className="ws-loc-card ws-loc-card--loading">
+            <div className="ws-loc-icon ws-loc-icon--spin">
+              <svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" strokeDasharray="4 2" /></svg>
+            </div>
             <div className="ws-loc-card__title">Detecting your location…</div>
             <div className="ws-loc-card__sub">Please allow the browser permission popup.</div>
           </div>
         )}
-        {geoState === "denied" && (
-          <>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 14 }}>🚫</span><span style={{ fontSize: 13, color: "#DC2626", fontFamily: "var(--font-sans)", fontWeight: 500 }}>Location access was denied.</span>
-              </div>
-              <button type="button" onClick={requestLocation} style={{ background: "none", border: "1px solid var(--color-border)", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontFamily: "var(--font-sans)", color: "var(--color-body)", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><circle cx="12" cy="12" r="8" strokeDasharray="2 2" /><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="2" y1="12" x2="6" y2="12" /><line x1="18" y1="12" x2="22" y2="12" /></svg>
-                Retry
-              </button>
-            </div>
-            <LocationFields register={register} banner={ManualBanner} />
-          </>
-        )}
-        {geoState === "manual" && <LocationFields register={register} banner={ManualBanner} />}
-        {geoState === "granted" && <LocationFields register={register} banner={SuccessBanner} />}
 
-        {(geoState === "granted" || geoState === "denied" || geoState === "manual") && (
-          <div style={{ marginTop: 24 }}>
-            <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area</label>
-            <CustomSelect 
-              name="serviceArea" 
-              options={areas} 
-              placeholder={`Select a major city/area in ${district || "your district"}`} 
-              rules={{ required: "Please select a service area" }} 
-            />
-            {errors.serviceArea && <span className="ws-error" style={{ marginTop: '6px' }}>{errors.serviceArea.message}</span>}
+        {/* ── Retry card (1st & 2nd failure) ── */}
+        {geoState === "failed" && (
+          <div className="ws-loc-card ws-loc-card--error">
+            <div className="ws-loc-icon ws-loc-icon--error">
+              <svg width="26" height="26" fill="none" stroke="#DC2626" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            </div>
+            <div className="ws-loc-card__title" style={{ color: "#DC2626" }}>Location Access Failed</div>
+            <div className="ws-loc-card__sub">
+              Attempt <strong>{attempts}</strong> of <strong>{MAX_GEO_RETRIES}</strong> failed. Please allow location permission in your browser and try again.
+            </div>
+            <div className="ws-loc-retry-pills">
+              {Array.from({ length: MAX_GEO_RETRIES }).map((_, i) => (
+                <span key={i} className={`ws-loc-retry-dot${i < attempts ? " ws-loc-retry-dot--used" : ""}`} />
+              ))}
+            </div>
+            <button type="button" className="ws-loc-btn ws-loc-btn--retry" onClick={requestLocation}>
+              <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-3.35" /></svg>
+              Retry ({MAX_GEO_RETRIES - attempts} left)
+            </button>
+            <p style={{ marginTop: 14, fontSize: 12, color: "var(--color-subtle)", fontFamily: "var(--font-sans)" }}>
+              <button type="button" onClick={() => setGeoState("manual")} style={{ background: "none", border: "none", color: "var(--color-accent)", fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" }}>
+                Skip and enter manually
+              </button>
+            </p>
           </div>
+        )}
+
+        {/* ── Manual form: after 3 failures or explicit skip ── */}
+        {(geoState === "exhausted" || geoState === "manual" || geoState === "granted") && (
+          <LocationFields
+            register={register}
+            setValue={setValue}
+            banner={geoState === "granted" ? SuccessBanner : geoState === "exhausted" ? ExhaustedBanner : ManualBanner}
+            district={district}
+            areas={areas}
+            errors={errors}
+          />
         )}
       </SectionCard>
     </>
@@ -378,29 +502,29 @@ function ServiceLocationSection() {
 
 // --- Identity Verification ---
 const ID_TYPES = ["Aadhaar Card", "PAN Card", "Passport", "Voter ID", "Driving Licence"];
-function IdentityVerificationSection({ onFilesChange }) {
+function IdentityVerificationSection() {
   const { register, formState: { errors } } = useFormContext();
   return (
     <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>} title="Identity Verification">
       <div className="ws-field" style={{ marginBottom: 20 }}>
         <label className="ws-label">Government ID Type<span style={{ color: "#EF4444" }}>*</span></label>
-        <CustomSelect 
-          name="idType" 
-          options={ID_TYPES} 
-          placeholder="Select ID type…" 
-          rules={{ required: "Please select an ID type" }} 
+        <CustomSelect
+          name="idType"
+          options={ID_TYPES}
+          placeholder="Select ID type…"
+          rules={{ required: "Please select an ID type" }}
         />
         {errors.idType && <span className="ws-error" style={{ marginTop: '6px' }}>⚠ {errors.idType.message}</span>}
       </div>
       <div className="ws-upload-grid" style={{ marginBottom: 16 }}>
-        <UploadCard label="Upload Front Side" hint="Clear photo of the front — PNG, JPG" onFile={f => onFilesChange?.("idFront", f)} />
-        <UploadCard label="Upload Back Side" hint="Clear photo of the back — PNG, JPG" onFile={f => onFilesChange?.("idBack", f)} />
+        <UploadCard name="idFront" label="Upload Front Side" hint="Clear photo of the front — PNG, JPG" rules={{ required: "Front side is required" }} />
+        <UploadCard name="idBack" label="Upload Back Side" hint="Clear photo of the back — PNG, JPG" rules={{ required: "Back side is required" }} />
       </div>
       <p style={{ fontSize: 13, color: "var(--color-muted)", fontFamily: "var(--font-sans)", marginBottom: 12, lineHeight: 1.5 }}>
         Upload a clear selfie for identity matching. Make sure your face is fully visible.
       </p>
       <div className="ws-upload-grid ws-upload-grid--single">
-        <UploadCard label="Upload Selfie Photo" hint="Make sure face is clearly visible" onFile={f => onFilesChange?.("selfie", f)} />
+        <UploadCard name="selfie" label="Upload Selfie Photo" hint="Make sure face is clearly visible" rules={{ required: "Selfie is required" }} />
       </div>
     </SectionCard>
   );
@@ -486,35 +610,44 @@ function AccountSecuritySection() {
 // Main Page Component
 // ─────────────────────────────────────────────
 export default function WorkerSignupPage() {
-  const methods = useForm({ mode: "onTouched" });
+  const methods = useForm({
+    mode: "onTouched",
+    defaultValues: { languages: ["English"] }
+  });
   const { handleSubmit, formState: { isSubmitting } } = methods;
-
-  const selectedSkillsRef = useRef([]);
-  const selectedLanguagesRef = useRef(["English"]);
-  const uploadedFilesRef = useRef({});
 
   async function onSubmit(data) {
     const formData = new FormData();
 
-    // 1. Append standard text fields
-    Object.keys(data).forEach(key => formData.append(key, data[key]));
+    // 1. Append standard text fields (skip arrays and files)
+    const skipKeys = ["skills", "languages", "idFront", "idBack", "selfie", "exactLat", "exactLng"];
+    Object.keys(data).forEach(key => {
+      if (!skipKeys.includes(key)) {
+        formData.append(key, data[key]);
+      }
+    });
 
     // 2. Append arrays (sending as JSON strings)
-    formData.append("skills", JSON.stringify(selectedSkillsRef.current));
-    formData.append("languages", JSON.stringify(selectedLanguagesRef.current));
+    if (data.skills) formData.append("skills", JSON.stringify(data.skills));
+    if (data.languages) formData.append("languages", JSON.stringify(data.languages));
 
     // 3. Append actual File objects
-    if (uploadedFilesRef.current.idFront) formData.append("idFront", uploadedFilesRef.current.idFront);
-    if (uploadedFilesRef.current.idBack) formData.append("idBack", uploadedFilesRef.current.idBack);
-    if (uploadedFilesRef.current.selfie) formData.append("selfie", uploadedFilesRef.current.selfie);
+    if (data.idFront) formData.append("idFront", data.idFront);
+    if (data.idBack) formData.append("idBack", data.idBack);
+    if (data.selfie) formData.append("selfie", data.selfie);
 
     // 4. Geocode location and service area into coordinates
     try {
-      const locationAddress = `${data.city}, ${data.district}, ${data.state}, ${data.country}`;
-      const locationCoords = await geocode(locationAddress);
-      if (locationCoords) {
-        formData.append("locationLat", locationCoords.lat);
-        formData.append("locationLng", locationCoords.lng);
+      if (data.exactLat && data.exactLng) {
+        formData.append("locationLat", data.exactLat);
+        formData.append("locationLng", data.exactLng);
+      } else {
+        const locationAddress = `${data.city}, ${data.district}, ${data.state}, ${data.country}`;
+        const locationCoords = await geocode(locationAddress);
+        if (locationCoords) {
+          formData.append("locationLat", locationCoords.lat);
+          formData.append("locationLng", locationCoords.lng);
+        }
       }
 
       if (data.serviceArea && data.district) {
@@ -533,8 +666,12 @@ export default function WorkerSignupPage() {
       const res = await api.post("/auth/signup/worker", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
+      if (!res.data.success) {
+        throw new Error(res.data.message);
+      }
       console.log("Worker signup response →", res.data);
       alert("Registration successful!");
+
     } catch (err) {
       console.error("Worker signup error →", err);
       alert("Registration failed!");
@@ -568,10 +705,10 @@ export default function WorkerSignupPage() {
       <FormProvider {...methods}>
         <form className="ws-body" onSubmit={handleSubmit(onSubmit)} noValidate>
           <PersonalInfoSection />
-          <SkillsSection onChange={v => { selectedSkillsRef.current = v; }} />
-          <LanguageSection onChange={v => { selectedLanguagesRef.current = v; }} />
+          <SkillsSection />
+          <LanguageSection />
           <ServiceLocationSection />
-          <IdentityVerificationSection onFilesChange={(key, file) => { uploadedFilesRef.current[key] = file; }} />
+          <IdentityVerificationSection />
           <AccountSecuritySection />
 
           <div className="ws-section" style={{ background: "transparent", border: "none", boxShadow: "none", padding: "8px 0 0" }}>
