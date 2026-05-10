@@ -3,7 +3,9 @@ import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { getCurrentPosition } from "../../services/geolocationService.js";
 import { reverseGeocode } from "../../services/reverseGeocodeService.js";
+import { geocode } from "../../services/geocodeService.js";
 import "./WorkerSignupPage.css";
+import { api } from "../../services/api.js";
 
 // ─────────────────────────────────────────────
 // Shared UI Elements
@@ -310,7 +312,6 @@ function ServiceLocationSection() {
     }
   }
 
-  // Map logic removed
 
   const SuccessBanner = (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, padding: "10px 14px", background: "var(--color-accent2)", borderRadius: 10, border: "1px solid #A7F3D0" }}>
@@ -414,7 +415,7 @@ function IdentityVerificationSection({ onFilesChange }) {
         <UploadCard label="Upload Back Side" hint="Clear photo of the back — PNG, JPG" onFile={f => onFilesChange?.("idBack", f)} />
       </div>
       <p style={{ fontSize: 13, color: "var(--color-muted)", fontFamily: "var(--font-sans)", marginBottom: 12, lineHeight: 1.5 }}>
-        📸 Upload a clear selfie for identity matching. Make sure your face is fully visible.
+        Upload a clear selfie for identity matching. Make sure your face is fully visible.
       </p>
       <div className="ws-upload-grid ws-upload-grid--single">
         <UploadCard label="Upload Selfie Photo" hint="Make sure face is clearly visible" onFile={f => onFilesChange?.("selfie", f)} />
@@ -506,19 +507,57 @@ export default function WorkerSignupPage() {
   const methods = useForm({ mode: "onTouched" });
   const { handleSubmit, formState: { isSubmitting } } = methods;
 
-  let selectedSkills = [];
-  let selectedLanguages = ["English"];
-  const uploadedFiles = {};
+  const selectedSkillsRef = useRef([]);
+  const selectedLanguagesRef = useRef(["English"]);
+  const uploadedFilesRef = useRef({});
 
-  function onSubmit(data) {
-    const payload = {
-      ...data,
-      skills: selectedSkills,
-      languages: selectedLanguages,
-      uploads: uploadedFiles,
-    };
-    console.log("Worker signup payload →", payload);
-    alert("Registration submitted! Check console for payload.");
+  async function onSubmit(data) {
+    const formData = new FormData();
+
+    // 1. Append standard text fields
+    Object.keys(data).forEach(key => formData.append(key, data[key]));
+
+    // 2. Append arrays (sending as JSON strings)
+    formData.append("skills", JSON.stringify(selectedSkillsRef.current));
+    formData.append("languages", JSON.stringify(selectedLanguagesRef.current));
+
+    // 3. Append actual File objects
+    if (uploadedFilesRef.current.idFront) formData.append("idFront", uploadedFilesRef.current.idFront);
+    if (uploadedFilesRef.current.idBack) formData.append("idBack", uploadedFilesRef.current.idBack);
+    if (uploadedFilesRef.current.selfie) formData.append("selfie", uploadedFilesRef.current.selfie);
+
+    // 4. Geocode location and service area into coordinates
+    try {
+      const locationAddress = `${data.city}, ${data.district}, ${data.state}, ${data.country}`;
+      const locationCoords = await geocode(locationAddress);
+      if (locationCoords) {
+        formData.append("locationLat", locationCoords.lat);
+        formData.append("locationLng", locationCoords.lng);
+      }
+
+      if (data.serviceArea && data.district) {
+        const serviceAreaAddress = `${data.serviceArea}, ${data.district}, ${data.state}, ${data.country}`;
+        const serviceAreaCoords = await geocode(serviceAreaAddress);
+        if (serviceAreaCoords) {
+          formData.append("serviceAreaLat", serviceAreaCoords.lat);
+          formData.append("serviceAreaLng", serviceAreaCoords.lng);
+        }
+      }
+    } catch (geoErr) {
+      console.warn("Geocoding failed, submitting without coordinates:", geoErr);
+    }
+
+    console.log("Worker signup payload →", Object.fromEntries(formData));
+    try {
+      const res = await api.post("/auth/signup/worker", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      console.log("Worker signup response →", res.data);
+      alert("Registration successful!");
+    } catch (err) {
+      console.error("Worker signup error →", err);
+      alert("Registration failed!");
+    }
   }
 
   return (
@@ -548,10 +587,10 @@ export default function WorkerSignupPage() {
       <FormProvider {...methods}>
         <form className="ws-body" onSubmit={handleSubmit(onSubmit)} noValidate>
           <PersonalInfoSection />
-          <SkillsSection onChange={v => { selectedSkills = v; }} />
-          <LanguageSection onChange={v => { selectedLanguages = v; }} />
+          <SkillsSection onChange={v => { selectedSkillsRef.current = v; }} />
+          <LanguageSection onChange={v => { selectedLanguagesRef.current = v; }} />
           <ServiceLocationSection />
-          <IdentityVerificationSection onFilesChange={(key, file) => { uploadedFiles[key] = file; }} />
+          <IdentityVerificationSection onFilesChange={(key, file) => { uploadedFilesRef.current[key] = file; }} />
           <AccountSecuritySection />
 
           <div className="ws-section" style={{ background: "transparent", border: "none", boxShadow: "none", padding: "8px 0 0" }}>
