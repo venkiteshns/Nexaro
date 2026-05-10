@@ -1,7 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import './PosterSignupPage.css';
+
+// ─────────────────────────────────────────────
+// CustomSelect Component
+// ─────────────────────────────────────────────
+function CustomSelect({ name, options, placeholder, rules, register, setValue, watch, errors }) {
+  const selectedValue = watch(name);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div style={{ position: 'relative', width: '100%', zIndex: isOpen ? 100 : 1 }} ref={dropdownRef}>
+      <input type="hidden" {...register(name, rules)} />
+      <div 
+        className={`custom-select-trigger ${errors[name] ? 'error-input' : ''} ${isOpen ? 'open' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          width: '100%', padding: '14px 18px', background: '#F8FAFC',
+          border: `1.5px solid ${errors[name] ? '#EF4444' : '#E2E8F0'}`,
+          borderRadius: '12px', fontSize: '15px', color: selectedValue ? '#0F172A' : '#94A3B8',
+          cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+        }}
+      >
+        <span>{selectedValue || placeholder}</span>
+        <svg style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      <div className={`custom-dropdown-menu ${isOpen ? 'open' : ''}`} style={{
+        position: 'absolute', top: '100%', left: 0, width: '100%',
+        marginTop: '8px', background: '#ffffff', borderRadius: '12px',
+        boxShadow: '0 12px 32px rgba(0,0,0,0.08)', border: '1px solid #E2E8F0',
+        zIndex: 50, maxHeight: '240px', overflowY: 'auto',
+        opacity: isOpen ? 1 : 0, visibility: isOpen ? 'visible' : 'hidden',
+        transform: isOpen ? 'translateY(0)' : 'translateY(-8px)',
+        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}>
+        {options.map(option => (
+          <div 
+            key={option} 
+            onClick={() => {
+              setValue(name, option, { shouldValidate: true });
+              setIsOpen(false);
+            }}
+            style={{
+              padding: '12px 18px', fontSize: '14px', color: '#1E293B', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              background: selectedValue === option ? '#F1F5F9' : 'transparent',
+              transition: 'background 0.15s'
+            }}
+            onMouseEnter={(e) => { if(selectedValue !== option) e.currentTarget.style.background = '#F8FAFC' }}
+            onMouseLeave={(e) => { if(selectedValue !== option) e.currentTarget.style.background = 'transparent' }}
+          >
+            {option}
+            {selectedValue === option && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A6E5C" strokeWidth="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────
 // FloatingCards
