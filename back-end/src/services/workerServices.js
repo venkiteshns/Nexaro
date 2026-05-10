@@ -10,6 +10,20 @@ export const workerSignupService = async ({ files, data }) => {
             throw new Error("User Already Exists")
         }
 
+        // Parse coordinate values — must be finite numbers for 2dsphere index
+        const locationLat = parseFloat(data.locationLat);
+        const locationLng = parseFloat(data.locationLng);
+        const hasValidLocation = isFinite(locationLat) && isFinite(locationLng);
+
+        const serviceAreaLat = parseFloat(data.serviceAreaLat);
+        const serviceAreaLng = parseFloat(data.serviceAreaLng);
+        const hasValidServiceArea = isFinite(serviceAreaLat) && isFinite(serviceAreaLng);
+
+        let parsedSkills = [];
+        let parsedLanguages = [];
+        try { parsedSkills = typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills; } catch(e) {}
+        try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch(e) {}
+
         let payLoad = {
             name: data.fullName,
             email: data.email,
@@ -19,30 +33,38 @@ export const workerSignupService = async ({ files, data }) => {
             state: data.state,
             district: data.district,
             city: data.city,
-            serviceArea: {
-                area: data.serviceArea,
-                type: 'Point',
-                coordinates: [data.serviceAreaLng, data.serviceAreaLat]
-            },
             bio: data.bio,
             verificationDocuments: {
                 idType: data.idType
             },
-            skills: data.skills,
-            languages: data.languages,
+            skills: parsedSkills,
+            languages: parsedLanguages,
             isVerified: false,
             isDeleted: false,
             isSuspended: false,
             role: "worker",
             activeRole: "worker",
-            location: {
-                type: "Point",
-                coordinates: [data.locationLng, data.locationLat]
-            },
             worker: {
                 isLive: false,
                 rating: "0"
             }
+        };
+
+        // Only attach location when we have real coordinates
+        if (hasValidLocation) {
+            payLoad.location = {
+                type: "Point",
+                coordinates: [locationLng, locationLat]
+            };
+        }
+
+        // Only attach serviceArea when we have real coordinates
+        if (hasValidServiceArea) {
+            payLoad.serviceArea = {
+                area: data.serviceArea,
+                type: "Point",
+                coordinates: [serviceAreaLng, serviceAreaLat]
+            };
         }
         const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 

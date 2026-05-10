@@ -132,6 +132,21 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
+/* Enterprise Stacking Context Strategy:
+   Automatically assign descending z-indexes to sections.
+   This guarantees that any dropdown opening from an earlier section
+   will flawlessly overlay all subsequent sections. */
+.ws-body > .ws-section:nth-child(1) { position: relative; z-index: 20; }
+.ws-body > .ws-section:nth-child(2) { position: relative; z-index: 19; }
+.ws-body > .ws-section:nth-child(3) { position: relative; z-index: 18; }
+.ws-body > .ws-section:nth-child(4) { position: relative; z-index: 17; }
+.ws-body > .ws-section:nth-child(5) { position: relative; z-index: 16; }
+.ws-body > .ws-section:nth-child(6) { position: relative; z-index: 15; }
+.ws-body > .ws-section:nth-child(7) { position: relative; z-index: 14; }
+.ws-body > .ws-section:nth-child(8) { position: relative; z-index: 13; }
+.ws-body > .ws-section:nth-child(9) { position: relative; z-index: 12; }
+.ws-body > .ws-section:nth-child(10) { position: relative; z-index: 11; }
+
 .ws-section__header {
   display: flex;
   align-items: center;
@@ -633,6 +648,19 @@
 }
 
 /* ── Custom Select / Dropdown ── */
+
+/* Wrapper — the positioning anchor */
+.ws-custom-select-wrap {
+  position: relative;
+  /* Safe localized elevation within its own section */
+  z-index: 10;
+}
+
+/* When open: lift above all other fields in the SAME section */
+.ws-custom-select-wrap--open {
+  z-index: 100;
+}
+
 .ws-custom-select {
   width: 100%;
   padding: 14px 16px;
@@ -648,6 +676,8 @@
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   user-select: none;
+  /* No outline — we handle focus via box-shadow */
+  outline: none;
 }
 
 .ws-custom-select:hover {
@@ -656,33 +686,66 @@
 
 .ws-custom-select.open {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 4px rgba(10, 110, 92, 0.08);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.1);
+}
+
+.ws-custom-select:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.1);
 }
 
 .ws-custom-select.error {
   border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
 }
 
+/* Chevron — CSS rotation avoids inline transform stacking context */
 .ws-custom-select-icon {
   color: var(--color-muted);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ws-custom-select-icon--open {
+  transform: rotate(180deg);
 }
 
 .ws-custom-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   left: 0;
   width: 100%;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  z-index: 100;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07),
+    0 10px 25px -5px rgba(0, 0, 0, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  /* Scroll inside panel — no overflow:hidden on the panel itself */
+  overflow-y: auto;
+  max-height: 240px;
+  z-index: 200;
   opacity: 0;
-  transform: translateY(-8px) scale(0.98);
+  transform: translateY(-6px) scale(0.98);
   pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.ws-custom-dropdown::-webkit-scrollbar {
+  width: 5px;
+}
+.ws-custom-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ws-custom-dropdown::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
 }
 
 .ws-custom-dropdown.open {
@@ -711,4 +774,64 @@
   background: var(--color-accent2);
   color: var(--color-accent);
   font-weight: 500;
+}
+
+/* ── Location Retry Flow ── */
+
+/* Error card variant */
+.ws-loc-card--error {
+  border-color: #FECACA;
+  background: #FEF2F2;
+}
+.ws-loc-card--error:hover {
+  border-color: #DC2626;
+}
+
+/* Loading card variant */
+.ws-loc-card--loading {
+  opacity: 0.82;
+}
+
+/* Error icon background */
+.ws-loc-icon--error {
+  background: #FEE2E2;
+}
+
+/* Spinning animation for loading icon */
+@keyframes ws-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.ws-loc-icon--spin svg {
+  animation: ws-spin 1.4s linear infinite;
+}
+
+/* Retry button (orange-red) */
+.ws-loc-btn--retry {
+  background: #DC2626;
+}
+.ws-loc-btn--retry:hover {
+  background: #B91C1C;
+}
+
+/* Attempt progress dots */
+.ws-loc-retry-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 20px;
+}
+
+.ws-loc-retry-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.ws-loc-retry-dot--used {
+  background: #DC2626;
+  transform: scale(1.2);
 }
