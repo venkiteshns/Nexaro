@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import './PosterSignupPage.css';
-import axios from 'axios';
+import { api } from '../../services/api.js';
 import { getCurrentPosition } from '../../services/geolocationService.js';
 import { reverseGeocode } from '../../services/reverseGeocodeService.js';
+import { geocode } from '../../services/geocodeService.js';
 
 // ─────────────────────────────────────────────
 // Utility
@@ -34,7 +35,7 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
   return (
     <div style={{ position: 'relative', width: '100%', zIndex: isOpen ? 100 : 1 }} ref={dropdownRef}>
       <input type="hidden" {...register(name, rules)} />
-      <div 
+      <div
         className={`custom-select-trigger ${errors[name] ? 'error-input' : ''} ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -60,8 +61,8 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
       }}>
         {options.map(option => (
-          <div 
-            key={option} 
+          <div
+            key={option}
             onClick={() => {
               setValue(name, option, { shouldValidate: true });
               setIsOpen(false);
@@ -72,8 +73,8 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
               background: selectedValue === option ? '#F1F5F9' : 'transparent',
               transition: 'background 0.15s'
             }}
-            onMouseEnter={(e) => { if(selectedValue !== option) e.currentTarget.style.background = '#F8FAFC' }}
-            onMouseLeave={(e) => { if(selectedValue !== option) e.currentTarget.style.background = 'transparent' }}
+            onMouseEnter={(e) => { if (selectedValue !== option) e.currentTarget.style.background = '#F8FAFC' }}
+            onMouseLeave={(e) => { if (selectedValue !== option) e.currentTarget.style.background = 'transparent' }}
           >
             {option}
             {selectedValue === option && (
@@ -207,9 +208,9 @@ const SignupForm = () => {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const [geoState, setGeoState] = useState("idle");
-  const [coords, setCoords] = useState(null);
+  const coordsRef = useRef(null); // persist GPS coords across re-renders
 
   const requestLocation = async () => {
     if (isInsecureNetworkOrigin()) {
@@ -219,7 +220,7 @@ const SignupForm = () => {
     setGeoState("loading");
     try {
       const pos = await getCurrentPosition();
-      setCoords(pos);
+      coordsRef.current = pos; // store GPS coords
       const addr = await reverseGeocode(pos);
       setValue("country", addr.country, { shouldValidate: true });
       setValue("state", addr.state, { shouldValidate: true });
@@ -233,18 +234,39 @@ const SignupForm = () => {
 
   const password = watch('password');
 
-  const onSubmit = (data) => {
-    console.log('Form Submitted', data);
-    axios.post('http://localhost:8000/api/auth/poster-signup', data)
+  const onSubmit = async (data) => {
+    let locationLat = null;
+    let locationLng = null;
+
+    // Use GPS coords if available, otherwise geocode from the address fields
+    if (coordsRef.current) {
+      locationLat = coordsRef.current.lat;
+      locationLng = coordsRef.current.lng;
+    } else if (data.city && data.district) {
+      try {
+        const locationAddress = `${data.city}, ${data.district}, ${data.state}, ${data.country}`;
+        const resolved = await geocode(locationAddress);
+        if (resolved) {
+          locationLat = resolved.lat;
+          locationLng = resolved.lng;
+        }
+      } catch (geoErr) {
+        console.warn("Geocoding failed, submitting without coordinates:", geoErr);
+      }
+    }
+
+    const payload = { ...data, locationLat, locationLng };
+    console.log('Form Submitted', payload);
+
+    api.post('/auth/signup/poster', payload)
       .then(response => {
         console.log(response);
-        alert('Signup Successfull');
+        alert('Signup Successful');
       })
       .catch(error => {
         console.log(error);
         alert('Error');
-      })
-    // Handle submission logic here
+      });
   };
 
   return (
@@ -329,7 +351,8 @@ const SignupForm = () => {
               className={errors.password ? 'error-input' : ''}
               {...register('password', {
                 required: 'Password is required',
-                minLength: { value: 8, message: 'Minimum 8 characters' }
+                minLength: { value: 8, message: 'Minimum 8 characters' },
+                pattern: { value: /^(?=.*[A-Z])(?=.*[0-9])/, message: 'Include at least one uppercase letter and one number' }
               })}
             />
             <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
@@ -384,10 +407,12 @@ const SignupForm = () => {
 
         <div className="location-section-container">
           <label style={{ marginBottom: '12px', display: 'block' }}>LOCATION</label>
-          
+
           {geoState === "idle" && (
             <div className="location-detect-card">
-              <div className="loc-icon">📍</div>
+              <div className="ws-loc-icon">
+                <svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+              </div>
               <div className="loc-title">Enable Location Access</div>
               <div className="loc-sub">Allow Nexaro to detect your location to post tasks in your area.</div>
               <button type="button" className="btn-loc" onClick={requestLocation}>
@@ -439,19 +464,19 @@ const SignupForm = () => {
                 <div className="form-group half">
                   <label>DISTRICT</label>
                   <div className="input-wrapper" style={{ padding: 0, border: 'none', background: 'transparent' }}>
-                    <CustomSelect 
-                      name="district" 
+                    <CustomSelect
+                      name="district"
                       options={[
-                        "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha", 
-                        "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad", 
+                        "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
+                        "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad",
                         "Malappuram", "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
-                      ]} 
-                      placeholder="Select District" 
-                      rules={{ required: 'Required' }} 
-                      register={register} 
-                      setValue={setValue} 
-                      watch={watch} 
-                      errors={errors} 
+                      ]}
+                      placeholder="Select District"
+                      rules={{ required: 'Required' }}
+                      register={register}
+                      setValue={setValue}
+                      watch={watch}
+                      errors={errors}
                     />
                   </div>
                   {errors.district && <span className="error-text">{errors.district.message}</span>}
