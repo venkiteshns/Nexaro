@@ -46,7 +46,7 @@ function CustomSelect({ name, options, placeholder, rules }) {
   return (
     <div style={{ position: 'relative' }} ref={dropdownRef}>
       <input type="hidden" {...register(name, rules)} />
-      <div
+      <div 
         className={`ws-custom-select ${errors[name] ? 'error' : ''} ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -59,8 +59,8 @@ function CustomSelect({ name, options, placeholder, rules }) {
       </div>
       <div className={`ws-custom-dropdown ${isOpen ? 'open' : ''}`}>
         {options.map(option => (
-          <div
-            key={option}
+          <div 
+            key={option} 
             className={`ws-custom-option ${selectedValue === option ? 'selected' : ''}`}
             onClick={() => {
               setValue(name, option, { shouldValidate: true });
@@ -226,14 +226,6 @@ function isInsecureNetworkOrigin() {
 }
 
 function LocationFields({ register, banner }) {
-  const { watch, setValue, formState: { errors } } = useFormContext();
-
-  const KERALA_DISTRICTS = [
-    "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
-    "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad",
-    "Malappuram", "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
-  ];
-
   return (
     <div className="ws-loc-fields">
       {banner}
@@ -246,17 +238,7 @@ function LocationFields({ register, banner }) {
         ].map(({ name, label }) => (
           <div key={name} className="ws-field">
             <label className="ws-label">{label}</label>
-            {name === "district" ? (
-              <CustomSelect
-                name="district"
-                options={KERALA_DISTRICTS}
-                placeholder="Select District"
-                rules={{ required: "District is required" }}
-              />
-            ) : (
-              <input className="ws-input" placeholder={`Enter ${label.toLowerCase()}`} {...register(name)} />
-            )}
-            {errors[name] && <span className="ws-error" style={{ marginTop: '6px' }}>{errors[name].message}</span>}
+            <input className="ws-input" placeholder={`Enter ${label.toLowerCase()}`} {...register(name)} />
           </div>
         ))}
       </div>
@@ -268,9 +250,9 @@ function ServiceLocationSection() {
   const { register, setValue, watch, formState: { errors } } = useFormContext();
   const [geoState, setGeoState] = useState("idle");
   const [coords, setCoords] = useState(null);
-
+  
   const district = watch("district");
-
+  
   const DISTRICT_AREAS = {
     "Thiruvananthapuram": ["Kazhakootam", "Kowdiar", "Pattom", "Vattiyoorkavu", "Nemom", "Attingal"],
     "Ernakulam": ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom"],
@@ -287,7 +269,7 @@ function ServiceLocationSection() {
     "Idukki": ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam"],
     "Wayanad": ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri"]
   };
-
+  
   const areas = DISTRICT_AREAS[district] || ["City Center", "North Zone", "South Zone", "East Zone", "West Zone"];
 
   async function requestLocation() {
@@ -379,11 +361,11 @@ function ServiceLocationSection() {
         {(geoState === "granted" || geoState === "denied" || geoState === "manual") && (
           <div style={{ marginTop: 24 }}>
             <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area</label>
-            <CustomSelect
-              name="serviceArea"
-              options={areas}
-              placeholder={`Select a major city/area in ${district || "your district"}`}
-              rules={{ required: "Please select a service area" }}
+            <CustomSelect 
+              name="serviceArea" 
+              options={areas} 
+              placeholder={`Select a major city/area in ${district || "your district"}`} 
+              rules={{ required: "Please select a service area" }} 
             />
             {errors.serviceArea && <span className="ws-error" style={{ marginTop: '6px' }}>{errors.serviceArea.message}</span>}
           </div>
@@ -401,11 +383,11 @@ function IdentityVerificationSection({ onFilesChange }) {
     <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>} title="Identity Verification">
       <div className="ws-field" style={{ marginBottom: 20 }}>
         <label className="ws-label">Government ID Type<span style={{ color: "#EF4444" }}>*</span></label>
-        <CustomSelect
-          name="idType"
-          options={ID_TYPES}
-          placeholder="Select ID type…"
-          rules={{ required: "Please select an ID type" }}
+        <CustomSelect 
+          name="idType" 
+          options={ID_TYPES} 
+          placeholder="Select ID type…" 
+          rules={{ required: "Please select an ID type" }} 
         />
         {errors.idType && <span className="ws-error" style={{ marginTop: '6px' }}>⚠ {errors.idType.message}</span>}
       </div>
