@@ -24,7 +24,7 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
   return (
     <div style={{ position: 'relative', width: '100%', zIndex: isOpen ? 100 : 1 }} ref={dropdownRef}>
       <input type="hidden" {...register(name, rules)} />
-      <div 
+      <div
         className={`custom-select-trigger ${errors[name] ? 'error-input' : ''} ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -50,8 +50,8 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
       }}>
         {options.map(option => (
-          <div 
-            key={option} 
+          <div
+            key={option}
             onClick={() => {
               setValue(name, option, { shouldValidate: true });
               setIsOpen(false);
@@ -62,8 +62,8 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
               background: selectedValue === option ? '#F1F5F9' : 'transparent',
               transition: 'background 0.15s'
             }}
-            onMouseEnter={(e) => { if(selectedValue !== option) e.currentTarget.style.background = '#F8FAFC' }}
-            onMouseLeave={(e) => { if(selectedValue !== option) e.currentTarget.style.background = 'transparent' }}
+            onMouseEnter={(e) => { if (selectedValue !== option) e.currentTarget.style.background = '#F8FAFC' }}
+            onMouseLeave={(e) => { if (selectedValue !== option) e.currentTarget.style.background = 'transparent' }}
           >
             {option}
             {selectedValue === option && (
@@ -287,7 +287,8 @@ const SignupForm = () => {
               className={errors.password ? 'error-input' : ''}
               {...register('password', { 
                 required: 'Password is required',
-                minLength: { value: 8, message: 'Minimum 8 characters' }
+                minLength: { value: 8, message: 'Minimum 8 characters' },
+                pattern: { value: /^(?=.*[A-Z])(?=.*[0-9])/, message: 'Include at least one uppercase letter and one number' }
               })}
             />
             <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
