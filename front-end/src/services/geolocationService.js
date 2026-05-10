@@ -1,7 +1,4 @@
-/**
- * Requests the browser's geolocation permission and resolves with coords.
- * Returns { lat, lng } or throws an Error.
- */
+
 export function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {

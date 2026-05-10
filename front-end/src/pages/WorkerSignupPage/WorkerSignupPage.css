@@ -13,7 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250, 250, 248, 0.95);
+  background: rgba(250,250,248,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
 }
@@ -62,10 +62,7 @@
   transition: border-color 0.15s;
 }
 
-.ws-nav__login:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
+.ws-nav__login:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
 /* ── Hero ── */
 .ws-hero {
@@ -132,7 +129,7 @@
   border-radius: 16px;
   padding: 32px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
 .ws-section__header {
@@ -168,16 +165,10 @@
   gap: 16px;
 }
 
-.ws-grid-full {
-  grid-column: 1 / -1;
-}
+.ws-grid-full { grid-column: 1 / -1; }
 
 /* ── Field ── */
-.ws-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.ws-field { display: flex; flex-direction: column; gap: 6px; }
 
 .ws-label {
   font-size: 13px;
@@ -186,10 +177,7 @@
   letter-spacing: -0.1px;
 }
 
-.ws-label span {
-  color: #EF4444;
-  margin-left: 2px;
-}
+.ws-label span { color: #EF4444; margin-left: 2px; }
 
 .ws-input,
 .ws-textarea,
@@ -211,25 +199,17 @@
 .ws-textarea:focus,
 .ws-select:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.08);
+  box-shadow: 0 0 0 3px rgba(10,110,92,0.08);
   background: #fff;
 }
 
 .ws-input.error,
 .ws-textarea.error,
-.ws-select.error {
-  border-color: #EF4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
-}
+.ws-select.error { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }
 
-.ws-textarea {
-  resize: vertical;
-  min-height: 90px;
-}
+.ws-textarea { resize: vertical; min-height: 90px; }
 
-.ws-select {
-  cursor: pointer;
-}
+.ws-select { cursor: pointer; }
 
 .ws-error {
   font-size: 12px;
@@ -240,11 +220,7 @@
 }
 
 /* Phone row */
-.ws-phone-row {
-  display: flex;
-  gap: 8px;
-}
-
+.ws-phone-row { display: flex; gap: 8px; }
 .ws-phone-prefix {
   width: 80px;
   flex-shrink: 0;
@@ -259,11 +235,7 @@
 }
 
 /* ── Chips (Skills / Languages) ── */
-.ws-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+.ws-chips { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .ws-chip {
   padding: 8px 16px;
@@ -294,9 +266,7 @@
   color: white;
 }
 
-.ws-chip.active svg {
-  stroke: white;
-}
+.ws-chip.active svg { stroke: white; }
 
 /* ── Location Permission Card ── */
 .ws-loc-card {
@@ -307,9 +277,7 @@
   transition: border-color 0.2s;
 }
 
-.ws-loc-card:hover {
-  border-color: var(--color-accent);
-}
+.ws-loc-card:hover { border-color: var(--color-accent); }
 
 .ws-loc-icon {
   width: 56px;
@@ -353,16 +321,8 @@
   transition: background 0.15s, transform 0.15s;
 }
 
-.ws-loc-btn:hover {
-  background: #0D8A74;
-  transform: translateY(-1px);
-}
-
-.ws-loc-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+.ws-loc-btn:hover { background: #0D8A74; transform: translateY(-1px); }
+.ws-loc-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .ws-loc-error {
   margin-top: 12px;
@@ -372,17 +332,10 @@
 }
 
 /* Location form fields (revealed after permission) */
-.ws-loc-fields {
-  animation: fadeInUp 0.3s ease-out forwards;
-}
+.ws-loc-fields { animation: fadeInUp 0.3s ease-out forwards; }
 
 /* Selected service areas */
-.ws-area-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
+.ws-area-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
 .ws-area-chip {
   display: inline-flex;
@@ -413,9 +366,7 @@
   transition: opacity 0.15s;
 }
 
-.ws-area-chip__remove:hover {
-  opacity: 1;
-}
+.ws-area-chip__remove:hover { opacity: 1; }
 
 /* Open map button */
 .ws-map-trigger {
@@ -443,17 +394,8 @@
 }
 
 /* ── Upload Card ── */
-.ws-upload-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.ws-upload-grid--single {
-  grid-template-columns: 1fr;
-  max-width: 320px;
-  margin: 0 auto;
-}
+.ws-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ws-upload-grid--single { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; }
 
 .ws-upload-card {
   border: 1.5px dashed var(--color-border);
@@ -497,7 +439,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .ws-upload-card__label {
@@ -531,13 +473,9 @@
 }
 
 /* ── Password Field ── */
-.ws-password-wrap {
-  position: relative;
-}
+.ws-password-wrap { position: relative; }
 
-.ws-password-wrap .ws-input {
-  padding-right: 42px;
-}
+.ws-password-wrap .ws-input { padding-right: 42px; }
 
 .ws-password-toggle {
   position: absolute;
@@ -554,9 +492,7 @@
   transition: color 0.15s;
 }
 
-.ws-password-toggle:hover {
-  color: var(--color-accent);
-}
+.ws-password-toggle:hover { color: var(--color-accent); }
 
 /* Password strength */
 .ws-strength-bar {
@@ -581,11 +517,7 @@
 }
 
 /* ── Terms Checkbox ── */
-.ws-checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.ws-checkbox-group { display: flex; flex-direction: column; gap: 12px; }
 
 .ws-checkbox-item {
   display: flex;
@@ -616,14 +548,10 @@
   font-weight: 500;
 }
 
-.ws-checkbox-item__text a:hover {
-  text-decoration: underline;
-}
+.ws-checkbox-item__text a:hover { text-decoration: underline; }
 
 /* ── Submit Button ── */
-.ws-submit-wrap {
-  padding: 8px 0 0;
-}
+.ws-submit-wrap { padding: 8px 0 0; }
 
 .ws-submit {
   width: 100%;
@@ -642,20 +570,16 @@
   justify-content: center;
   gap: 8px;
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(10, 110, 92, 0.25);
+  box-shadow: 0 4px 16px rgba(10,110,92,0.25);
 }
 
 .ws-submit:hover {
   background: #0D8A74;
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(10, 110, 92, 0.3);
+  box-shadow: 0 8px 24px rgba(10,110,92,0.3);
 }
 
-.ws-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+.ws-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .ws-login-link {
   text-align: center;
@@ -665,15 +589,8 @@
   font-family: var(--font-sans);
 }
 
-.ws-login-link a {
-  color: var(--color-accent);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.ws-login-link a:hover {
-  text-decoration: underline;
-}
+.ws-login-link a { color: var(--color-accent); font-weight: 500; text-decoration: none; }
+.ws-login-link a:hover { text-decoration: underline; }
 
 /* ── Footer ── */
 .ws-footer {
@@ -690,81 +607,29 @@
 /* ─── Worker Signup — Responsive CSS ────────────────────────────────────── */
 
 @media (max-width: 700px) {
-  .ws-grid-2 {
-    grid-template-columns: 1fr;
-  }
-
-  .ws-section {
-    padding: 22px 18px;
-  }
-
-  .ws-hero {
-    padding: 40px 20px 28px;
-  }
-
-  .ws-hero__title {
-    font-size: 28px;
-  }
-
-  .ws-body {
-    width: 96%;
-  }
-
-  .ws-upload-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ws-phone-row {
-    flex-direction: row;
-  }
+  .ws-grid-2 { grid-template-columns: 1fr; }
+  .ws-section { padding: 22px 18px; }
+  .ws-hero { padding: 40px 20px 28px; }
+  .ws-hero__title { font-size: 28px; }
+  .ws-body { width: 96%; }
+  .ws-upload-grid { grid-template-columns: 1fr; }
+  .ws-phone-row { flex-direction: row; }
 }
 
 @media (max-width: 480px) {
-  .ws-section {
-    padding: 18px 14px;
-    border-radius: 12px;
-  }
-
-  .ws-loc-card {
-    padding: 24px 16px;
-  }
-
-  .ws-upload-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ws-hero__title {
-    font-size: 24px;
-  }
-
-  .ws-hero__subtitle {
-    font-size: 14px;
-  }
-
-  .ws-chips {
-    gap: 8px;
-  }
-
-  .ws-chip {
-    padding: 7px 13px;
-    font-size: 12px;
-  }
-
-  .map-modal {
-    max-height: 95vh;
-    border-radius: 14px 14px 0 0;
-    align-self: flex-end;
-  }
-
-  .map-modal__map-wrap {
-    height: 280px;
-  }
+  .ws-section { padding: 18px 14px; border-radius: 12px; }
+  .ws-loc-card { padding: 24px 16px; }
+  .ws-upload-grid { grid-template-columns: 1fr; }
+  .ws-hero__title { font-size: 24px; }
+  .ws-hero__subtitle { font-size: 14px; }
+  .ws-chips { gap: 8px; }
+  .ws-chip { padding: 7px 13px; font-size: 12px; }
+  .map-modal { max-height: 95vh; border-radius: 14px 14px 0 0; align-self: flex-end; }
+  .map-modal__map-wrap { height: 280px; }
 }
 
 @media (min-width: 901px) {
-  .ws-body {
-    padding-bottom: 100px;
-  }
+  .ws-body { padding-bottom: 100px; }
 }
 
 /* ── Custom Select / Dropdown ── */
@@ -847,23 +712,3 @@
   color: var(--color-accent);
   font-weight: 500;
 }
-/* Fix Dropdown Overlap by assigning descending z-index */
-.ws-section { position: relative; }
-.ws-section:nth-child(1) { z-index: 50; }
-.ws-section:nth-child(2) { z-index: 40; }
-.ws-section:nth-child(3) { z-index: 30; }
-.ws-section:nth-child(4) { z-index: 20; }
-.ws-section:nth-child(5) { z-index: 10; }
-
-.ws-loc-fields { position: relative; z-index: 60; }
-
-.ws-field { position: relative; }
-.ws-field:nth-child(1) { z-index: 10; }
-.ws-field:nth-child(2) { z-index: 9; }
-.ws-field:nth-child(3) { z-index: 8; }
-.ws-field:nth-child(4) { z-index: 7; }
-.ws-field:nth-child(5) { z-index: 6; }
-.ws-field:nth-child(6) { z-index: 5; }
-
-/* Preferred Service Area wrapper */
-.preferred-service-area-wrapper { position: relative; z-index: 55; }
