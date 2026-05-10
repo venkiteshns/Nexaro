@@ -1,19 +1,13 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { getCurrentPosition } from "../../services/geolocationService.js";
 import { reverseGeocode } from "../../services/reverseGeocodeService.js";
-import ServiceAreaMap from "../../components/map/ServiceAreaMap/ServiceAreaMap.jsx";
 import "./WorkerSignupPage.css";
 
 // ─────────────────────────────────────────────
 // Shared UI Elements
 // ─────────────────────────────────────────────
-const LogoMark = () => (
-  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-    <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 const IconSend = () => (
   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -29,6 +23,59 @@ function SectionCard({ icon, title, children }) {
         <h3 className="ws-section__title">{title}</h3>
       </div>
       {children}
+    </div>
+  );
+}
+
+function CustomSelect({ name, options, placeholder, rules }) {
+  const { register, setValue, watch, formState: { errors } } = useFormContext();
+  const selectedValue = watch(name);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div style={{ position: 'relative' }} ref={dropdownRef}>
+      <input type="hidden" {...register(name, rules)} />
+      <div 
+        className={`ws-custom-select ${errors[name] ? 'error' : ''} ${isOpen ? 'open' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span style={{ color: selectedValue ? 'var(--color-heading)' : 'var(--color-muted)' }}>
+          {selectedValue || placeholder}
+        </span>
+        <svg className="ws-custom-select-icon" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      <div className={`ws-custom-dropdown ${isOpen ? 'open' : ''}`}>
+        {options.map(option => (
+          <div 
+            key={option} 
+            className={`ws-custom-option ${selectedValue === option ? 'selected' : ''}`}
+            onClick={() => {
+              setValue(name, option, { shouldValidate: true });
+              setIsOpen(false);
+            }}
+          >
+            {option}
+            {selectedValue === option && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -103,7 +150,7 @@ function PersonalInfoSection() {
       <div className="ws-grid-2">
         <div className="ws-field">
           <label className="ws-label">Full Name<span>*</span></label>
-          <input className={`ws-input${errors.fullName ? " error" : ""}`} placeholder="Enter your full name" {...register("fullName", { required: "Full name is required" })} />
+          <input className={`ws-input${errors.fullName ? " error" : ""}`} placeholder="Enter your full name" {...register("fullName", { required: "Full name is required", pattern: { value: /^(?=.*[A-Za-z]{2,})[A-Za-z]+(?: [A-Za-z]+)*$/, message: "Please enter a valid name, No Numbers or Special Characters Allowed" } })} />
           {errors.fullName && <span className="ws-error">⚠ {errors.fullName.message}</span>}
         </div>
         <div className="ws-field">
@@ -200,11 +247,30 @@ function LocationFields({ register, banner }) {
 }
 
 function ServiceLocationSection() {
-  const { register, setValue } = useFormContext();
+  const { register, setValue, watch, formState: { errors } } = useFormContext();
   const [geoState, setGeoState] = useState("idle");
   const [coords, setCoords] = useState(null);
-  const [showMap, setShowMap] = useState(false);
-  const [serviceAreas, setServiceAreas] = useState([]);
+  
+  const district = watch("district");
+  
+  const DISTRICT_AREAS = {
+    "Thiruvananthapuram": ["Kazhakootam", "Kowdiar", "Pattom", "Vattiyoorkavu", "Nemom", "Attingal"],
+    "Ernakulam": ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom"],
+    "Kozhikode": ["Nadakkavu", "Mavoor Road", "Meenchanda", "Elathur", "Beypore"],
+    "Thrissur": ["Poonkunnam", "Ollur", "Chalakudy", "Guruvayur", "Irinjalakuda"],
+    "Malappuram": ["Manjeri", "Tirur", "Perinthalmanna", "Ponnani", "Kottakkal"],
+    "Kannur": ["Thalassery", "Taliparamba", "Payyanur", "Mattannur", "Koothuparamba"],
+    "Kollam": ["Karunagappally", "Punalur", "Kottarakkara", "Paravur", "Kundara"],
+    "Palakkad": ["Ottapalam", "Shornur", "Chittur", "Pattambi", "Mannarkkad"],
+    "Alappuzha": ["Cherthala", "Kayamkulam", "Chengannur", "Mavelikkara", "Harippad"],
+    "Kottayam": ["Changanassery", "Pala", "Ettumanoor", "Vaikom", "Erattupetta"],
+    "Kasaragod": ["Kanhangad", "Nileshwaram", "Uppala", "Kumbla", "Manjeshwar"],
+    "Pathanamthitta": ["Thiruvalla", "Adoor", "Pandalam", "Ranni", "Konni"],
+    "Idukki": ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam"],
+    "Wayanad": ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri"]
+  };
+  
+  const areas = DISTRICT_AREAS[district] || ["City Center", "North Zone", "South Zone", "East Zone", "West Zone"];
 
   async function requestLocation() {
     if (isInsecureNetworkOrigin()) {
@@ -226,17 +292,7 @@ function ServiceLocationSection() {
     }
   }
 
-  function addServiceArea(area) {
-    setServiceAreas(prev => {
-      if (prev.find(a => a.label === area.label && a.lat === area.lat)) return prev;
-      return [...prev, area];
-    });
-    setShowMap(false);
-  }
-
-  function removeArea(idx) {
-    setServiceAreas(prev => prev.filter((_, i) => i !== idx));
-  }
+  // Map logic removed
 
   const SuccessBanner = (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, padding: "10px 14px", background: "var(--color-accent2)", borderRadius: 10, border: "1px solid #A7F3D0" }}>
@@ -304,27 +360,17 @@ function ServiceLocationSection() {
 
         {(geoState === "granted" || geoState === "denied" || geoState === "manual") && (
           <div style={{ marginTop: 24 }}>
-            <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Areas</label>
-            <button type="button" className="ws-map-trigger" onClick={() => setShowMap(true)}>
-              <svg width="16" height="16" fill="none" stroke="var(--color-muted)" strokeWidth="1.5" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
-              Click to select service area on map
-            </button>
-            {serviceAreas.length > 0 && (
-              <div className="ws-area-chips">
-                {serviceAreas.map((area, i) => (
-                  <span key={i} className="ws-area-chip">
-                    📍 {area.label}
-                    <button type="button" className="ws-area-chip__remove" onClick={() => removeArea(i)}>
-                      <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
+            <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area</label>
+            <CustomSelect 
+              name="serviceArea" 
+              options={areas} 
+              placeholder={`Select a major city/area in ${district || "your district"}`} 
+              rules={{ required: "Please select a service area" }} 
+            />
+            {errors.serviceArea && <span className="ws-error" style={{ marginTop: '6px' }}>{errors.serviceArea.message}</span>}
           </div>
         )}
       </SectionCard>
-      {showMap && <ServiceAreaMap center={coords} onConfirm={addServiceArea} onClose={() => setShowMap(false)} />}
     </>
   );
 }
@@ -337,11 +383,13 @@ function IdentityVerificationSection({ onFilesChange }) {
     <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>} title="Identity Verification">
       <div className="ws-field" style={{ marginBottom: 20 }}>
         <label className="ws-label">Government ID Type<span style={{ color: "#EF4444" }}>*</span></label>
-        <select className={`ws-select${errors.idType ? " error" : ""}`} {...register("idType", { required: "Please select an ID type" })}>
-          <option value="">Select ID type…</option>
-          {ID_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-        {errors.idType && <span className="ws-error">⚠ {errors.idType.message}</span>}
+        <CustomSelect 
+          name="idType" 
+          options={ID_TYPES} 
+          placeholder="Select ID type…" 
+          rules={{ required: "Please select an ID type" }} 
+        />
+        {errors.idType && <span className="ws-error" style={{ marginTop: '6px' }}>⚠ {errors.idType.message}</span>}
       </div>
       <div className="ws-upload-grid" style={{ marginBottom: 16 }}>
         <UploadCard label="Upload Front Side" hint="Clear photo of the front — PNG, JPG" onFile={f => onFilesChange?.("idFront", f)} />
