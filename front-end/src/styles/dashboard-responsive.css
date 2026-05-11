@@ -1,0 +1,127 @@
+/* ─── NEXARO Worker Dashboard Responsive Styles ──────────────────────────── */
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-sidebar {
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+    /* In mobile/tablet, restore normal width if it was collapsed */
+    width: var(--sidebar-width) !important;
+  }
+
+  .dashboard-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .dashboard-main-wrapper {
+    padding-left: 0 !important;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .dashboard-header {
+    padding: 0 var(--space-lg);
+  }
+
+  .dashboard-content {
+    padding: var(--space-lg);
+  }
+}
+
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .task-card {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .task-header {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .task-price {
+    align-self: flex-start;
+  }
+  
+  .task-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+  }
+
+  .btn-bid {
+    width: 100%;
+  }
+
+  /* Filter chips scrollable without scrollbar */
+  .filter-chips {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .greeting-subtitle {
+    display: none;
+  }
+  
+  .header-actions {
+    gap: var(--space-sm);
+  }
+  
+  .dashboard-header {
+    padding: 0 var(--space-md);
+  }
+  
+  .dashboard-content {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 420px) {
+  .greeting-title {
+    font-size: 18px;
+  }
+}
+
+/* Mobile Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 24, 39, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 95;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.sidebar-overlay.visible {
+  display: block;
+  opacity: 1;
+}

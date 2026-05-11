@@ -7,6 +7,7 @@ import { geocode } from "../../services/geocodeService.js";
 import "./WorkerSignupPage.css";
 import { api } from "../../services/api.js";
 import { useToast } from "../../hooks/useToast.js";
+import LocationAccessModal from "../../components/location/LocationAccessModal/LocationAccessModal.jsx";
 
 // ─────────────────────────────────────────────
 // Shared UI Elements
@@ -270,10 +271,12 @@ export default function WorkerSignupPage() {
 
   const [geoState, setGeoState] = useState("idle");
   const [attempts, setAttempts] = useState(0);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   async function requestLocation() {
     if (isInsecureNetworkOrigin()) {
       setGeoState("manual");
+      setIsLocationModalOpen(false);
       return;
     }
     setGeoState("loading");
@@ -288,6 +291,7 @@ export default function WorkerSignupPage() {
       setValue("district", matched || addr.district, { shouldValidate: true });
       setValue("city", addr.city, { shouldValidate: true });
       setGeoState("granted");
+      setIsLocationModalOpen(false);
     } catch (err) {
       const next = attempts + 1;
       setAttempts(next);
@@ -402,7 +406,7 @@ export default function WorkerSignupPage() {
         headers: { "Content-Type": "multipart/form-data" }
       });
       if (!res.data.success) throw new Error(res.data.message);
-      navigate("/login");
+      navigate("/worker/dashboard");
     } catch (err) {
       console.error("Worker signup error →", err);
       toast.error("Registration failed! " + (err?.response?.data?.message || err?.message));
@@ -525,7 +529,7 @@ export default function WorkerSignupPage() {
               </div>
               <div className="ws-loc-card__title">Enable Location Access</div>
               <div className="ws-loc-card__sub">Allow Nexaro to detect your location for precise hyperlocal matching.</div>
-              <button type="button" className="ws-loc-btn" onClick={requestLocation}>
+              <button type="button" className="ws-loc-btn" onClick={() => setIsLocationModalOpen(true)}>
                 Allow Location Access
               </button>
               <p style={{ marginTop: 14, fontSize: 12 }}>
@@ -535,22 +539,16 @@ export default function WorkerSignupPage() {
               </p>
             </div>
           )}
-          {geoState === "loading" && (
-            <div className="ws-loc-card ws-loc-card--loading">
-              <div className="ws-loc-card__title">Detecting your location…</div>
-            </div>
-          )}
-          {geoState === "failed" && (
-            <div className="ws-loc-card ws-loc-card--error">
-              <div className="ws-loc-card__title" style={{ color: "#DC2626" }}>Location Access Failed</div>
-              <button type="button" className="ws-loc-btn ws-loc-btn--retry" onClick={requestLocation}>Retry</button>
-              <p style={{ marginTop: 14, fontSize: 12 }}>
-                <button type="button" onClick={() => setGeoState("manual")} style={{ background: "none", border: "none", color: "var(--color-accent)", cursor: "pointer", textDecoration: "underline" }}>
-                  Skip and enter manually
-                </button>
-              </p>
-            </div>
-          )}
+
+          <LocationAccessModal 
+            isOpen={isLocationModalOpen}
+            onClose={() => setIsLocationModalOpen(false)}
+            onAllow={requestLocation}
+            onManual={() => { setGeoState("manual"); setIsLocationModalOpen(false); }}
+            geoState={geoState}
+            attempts={attempts}
+            maxAttempts={MAX_GEO_RETRIES}
+          />
           {(geoState === "exhausted" || geoState === "manual" || geoState === "granted") && (
             <div className="ws-loc-fields">
               {geoState === "granted" && <div style={{ marginBottom: 20, padding: 10, background: "#E6F4F1", color: "#0A6E5C" }}>Location detected — fields auto-filled.</div>}
