@@ -7,8 +7,7 @@ import { geocode } from "../../services/geocodeService.js";
 import "./WorkerSignupPage.css";
 import { api } from "../../services/api.js";
 import { useToast } from "../../hooks/useToast.js";
-import LocationAccessModal from "../../components/location/LocationAccessModal/LocationAccessModal.jsx";
-
+import { motion, AnimatePresence } from "framer-motion";
 // ─────────────────────────────────────────────
 // Shared UI Elements
 // ─────────────────────────────────────────────
@@ -271,12 +270,10 @@ export default function WorkerSignupPage() {
 
   const [geoState, setGeoState] = useState("idle");
   const [attempts, setAttempts] = useState(0);
-  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   async function requestLocation() {
     if (isInsecureNetworkOrigin()) {
       setGeoState("manual");
-      setIsLocationModalOpen(false);
       return;
     }
     setGeoState("loading");
@@ -291,7 +288,6 @@ export default function WorkerSignupPage() {
       setValue("district", matched || addr.district, { shouldValidate: true });
       setValue("city", addr.city, { shouldValidate: true });
       setGeoState("granted");
-      setIsLocationModalOpen(false);
     } catch (err) {
       const next = attempts + 1;
       setAttempts(next);
@@ -522,68 +518,116 @@ export default function WorkerSignupPage() {
 
         {/* Location Section */}
         <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>} title="Service Location">
-          {geoState === "idle" && (
-            <div className="ws-loc-card">
-              <div className="ws-loc-icon">
-                <svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
-              </div>
-              <div className="ws-loc-card__title">Enable Location Access</div>
-              <div className="ws-loc-card__sub">Allow Nexaro to detect your location for precise hyperlocal matching.</div>
-              <button type="button" className="ws-loc-btn" onClick={() => setIsLocationModalOpen(true)}>
-                Allow Location Access
-              </button>
-              <p style={{ marginTop: 14, fontSize: 12 }}>
-                <button type="button" onClick={() => setGeoState("manual")} style={{ background: "none", border: "none", color: "var(--color-accent)", cursor: "pointer", textDecoration: "underline" }}>
-                  Enter manually
+          <AnimatePresence mode="wait">
+            {["idle", "loading", "failed"].includes(geoState) && (
+              <motion.div
+                key="loc-request"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="ws-loc-card"
+              >
+                <div className="ws-loc-icon" style={{ borderColor: geoState === "failed" ? "#EF4444" : "#E5E7EB", background: geoState === "failed" ? "#FEF2F2" : "#FFFFFF" }}>
+                  {geoState === "failed" ? (
+                    <svg width="26" height="26" fill="none" stroke="#EF4444" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+                  ) : (
+                    <svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+                  )}
+                </div>
+                
+                <div className="ws-loc-card__title" style={{ color: geoState === "failed" ? "#EF4444" : "var(--color-text)" }}>
+                  {geoState === "loading" ? "Detecting Location..." : 
+                   geoState === "failed" ? "Location Access Failed" : 
+                   "Enable Location Access"}
+                </div>
+                
+                <div className="ws-loc-card__sub" style={{ color: geoState === "failed" ? "#EF4444" : "var(--color-muted)" }}>
+                  {geoState === "loading" ? "Please wait while we securely determine your location." : 
+                   geoState === "failed" ? `Unable to detect your location. ${MAX_GEO_RETRIES - attempts} attempts remaining.` : 
+                   "Allow Nexaro to detect your location for precise hyperlocal matching."}
+                </div>
+                
+                <button 
+                  type="button" 
+                  className="ws-loc-btn" 
+                  onClick={requestLocation}
+                  disabled={geoState === "loading"}
+                  style={{
+                    background: geoState === "failed" ? "#EF4444" : "var(--color-accent)",
+                    opacity: geoState === "loading" ? 0.7 : 1,
+                    cursor: geoState === "loading" ? "wait" : "pointer"
+                  }}
+                >
+                  {geoState === "loading" ? "Detecting..." : geoState === "failed" ? "Retry Access" : "Allow Location Access"}
                 </button>
-              </p>
-            </div>
-          )}
+                
+                <p style={{ marginTop: 14, fontSize: 12 }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setGeoState("manual")} 
+                    disabled={geoState === "loading"}
+                    style={{ background: "none", border: "none", color: "var(--color-muted)", cursor: geoState === "loading" ? "wait" : "pointer", textDecoration: "underline" }}
+                  >
+                    Skip and enter manually
+                  </button>
+                </p>
+              </motion.div>
+            )}
 
-          <LocationAccessModal 
-            isOpen={isLocationModalOpen}
-            onClose={() => setIsLocationModalOpen(false)}
-            onAllow={requestLocation}
-            onManual={() => { setGeoState("manual"); setIsLocationModalOpen(false); }}
-            geoState={geoState}
-            attempts={attempts}
-            maxAttempts={MAX_GEO_RETRIES}
-          />
-          {(geoState === "exhausted" || geoState === "manual" || geoState === "granted") && (
-            <div className="ws-loc-fields">
-              {geoState === "granted" && <div style={{ marginBottom: 20, padding: 10, background: "#E6F4F1", color: "#0A6E5C" }}>Location detected — fields auto-filled.</div>}
-              {geoState === "exhausted" && <div style={{ marginBottom: 20, padding: 10, background: "#FEF2F2", color: "#DC2626" }}>Location access failed. Please enter manually.</div>}
-              <div className="ws-grid-2">
-                <div className="ws-field">
-                  <label className="ws-label">Country<span style={{ color: "#EF4444" }}>*</span></label>
-                  <input className={`ws-input${errors.country ? " error" : ""}`} placeholder="Enter country" defaultValue="India" {...register("country", { required: "Country is required" })} />
-                  {errors.country && <span className="ws-error">⚠ {errors.country.message}</span>}
+            {["exhausted", "manual", "granted"].includes(geoState) && (
+              <motion.div
+                key="loc-fields"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                transition={{ duration: 0.4 }}
+                className="ws-loc-fields"
+                style={{ overflow: 'hidden' }}
+              >
+                {geoState === "granted" && (
+                  <div style={{ marginBottom: 20, padding: 12, background: "#ECFDF5", color: "#065F46", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500 }}>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    Location detected successfully. Fields auto-filled.
+                  </div>
+                )}
+                {geoState === "exhausted" && (
+                  <div style={{ marginBottom: 20, padding: 12, background: "#FEF2F2", color: "#991B1B", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500 }}>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Location access failed after multiple attempts. Please enter manually.
+                  </div>
+                )}
+                <div className="ws-grid-2">
+                  <div className="ws-field">
+                    <label className="ws-label">Country<span style={{ color: "#EF4444" }}>*</span></label>
+                    <input className={`ws-input${errors.country ? " error" : ""}`} placeholder="Enter country" defaultValue="India" {...register("country", { required: "Country is required" })} />
+                    {errors.country && <span className="ws-error">⚠ {errors.country.message}</span>}
+                  </div>
+                  <div className="ws-field">
+                    <label className="ws-label">State<span style={{ color: "#EF4444" }}>*</span></label>
+                    <input className={`ws-input${errors.state ? " error" : ""}`} placeholder="Enter state" defaultValue="Kerala" {...register("state", { required: "State is required" })} />
+                    {errors.state && <span className="ws-error">⚠ {errors.state.message}</span>}
+                  </div>
+                  <div className="ws-field">
+                    <label className="ws-label">District<span style={{ color: "#EF4444" }}>*</span></label>
+                    <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="district" options={KERALA_DISTRICTS} placeholder="Select district…" rules={{ required: "Please select a district" }} />
+                    {errors.district && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.district.message}</span>}
+                  </div>
+                  <div className="ws-field">
+                    <label className="ws-label">City / Place<span style={{ color: "#EF4444" }}>*</span></label>
+                    <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="city" options={areas} placeholder={district ? `Select city in ${district}` : "Select district first"} rules={{ required: "City / Place is required" }} />
+                    {errors.city && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.city.message}</span>}
+                  </div>
                 </div>
-                <div className="ws-field">
-                  <label className="ws-label">State<span style={{ color: "#EF4444" }}>*</span></label>
-                  <input className={`ws-input${errors.state ? " error" : ""}`} placeholder="Enter state" defaultValue="Kerala" {...register("state", { required: "State is required" })} />
-                  {errors.state && <span className="ws-error">⚠ {errors.state.message}</span>}
-                </div>
-                <div className="ws-field">
-                  <label className="ws-label">District<span style={{ color: "#EF4444" }}>*</span></label>
-                  <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="district" options={KERALA_DISTRICTS} placeholder="Select district…" rules={{ required: "Please select a district" }} />
-                  {errors.district && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.district.message}</span>}
-                </div>
-                <div className="ws-field">
-                  <label className="ws-label">City / Place<span style={{ color: "#EF4444" }}>*</span></label>
-                  <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="city" options={areas} placeholder={district ? `Select city in ${district}` : "Select district first"} rules={{ required: "City / Place is required" }} />
-                  {errors.city && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.city.message}</span>}
-                </div>
-              </div>
-              {district && (
-                <div style={{ marginTop: 20 }}>
-                  <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area<span style={{ color: "#EF4444" }}>*</span></label>
-                  <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="serviceArea" options={areas} placeholder={`Select a major city/area in ${district}`} rules={{ required: "Please select a service area" }} />
-                  {errors.serviceArea && <span className="ws-error" style={{ marginTop: 6, display: 'block' }}>⚠ {errors.serviceArea.message}</span>}
-                </div>
-              )}
-            </div>
-          )}
+                {district && (
+                  <div style={{ marginTop: 20 }}>
+                    <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area<span style={{ color: "#EF4444" }}>*</span></label>
+                    <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="serviceArea" options={areas} placeholder={`Select a major city/area in ${district}`} rules={{ required: "Please select a service area" }} />
+                    {errors.serviceArea && <span className="ws-error" style={{ marginTop: 6, display: 'block' }}>⚠ {errors.serviceArea.message}</span>}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </SectionCard>
 
         {/* Identity Section */}
