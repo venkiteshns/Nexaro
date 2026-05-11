@@ -10,26 +10,35 @@ import PrivateRoute from './components/Routing/PrivateRoute.jsx'
 import PublicRoute from './components/Routing/PublicRoute.jsx'
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx'
 
+import { NotificationProvider } from './context/NotificationContext.jsx';
+import ToastContainer from './components/feedback/Toast/ToastContainer.jsx';
+import ModalContainer from './components/feedback/ModalContainer/ModalContainer.jsx';
+import './styles/feedback.css';
+
 function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <Routes>
+      <NotificationProvider>
+        <Router>
+          <Routes>
 
-          <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage />} />
 
-          <Route element={<PublicRoute />}>
-            <Route path="/signup/poster" element={<PosterSignupPage />} />
-            <Route path="/signup/worker" element={<WorkerSignupPage />} />
-            <Route path="/login" element={<LoginPage />} />
-          </Route>
+            <Route element={<PublicRoute />}>
+              <Route path="/signup/poster" element={<PosterSignupPage />} />
+              <Route path="/signup/worker" element={<WorkerSignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
 
-          <Route element={<PrivateRoute />}>
+            <Route element={<PrivateRoute />}>
 
-          </Route>
+            </Route>
 
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+        <ToastContainer />
+        <ModalContainer />
+      </NotificationProvider>
     </ErrorBoundary>
   )
 }
