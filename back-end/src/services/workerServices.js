@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import { hashPassword } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 
 export const workerSignupService = async ({ files, data }) => {
@@ -21,14 +22,16 @@ export const workerSignupService = async ({ files, data }) => {
 
         let parsedSkills = [];
         let parsedLanguages = [];
-        try { parsedSkills = typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills; } catch(e) {}
-        try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch(e) {}
+        try { parsedSkills = typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills; } catch (e) { }
+        try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch (e) { }
+
+        const hashedPassword = await hashPassword(data.password);
 
         let payLoad = {
             name: data.fullName,
             email: data.email,
             phone: data.phone,
-            password: data.password,
+            password: hashedPassword,
             country: data.country,
             state: data.state,
             district: data.district,
@@ -83,8 +86,8 @@ export const workerSignupService = async ({ files, data }) => {
 
         createdUser.refreshToken = refreshToken;
         await createdUser.save({ validateBeforeSave: false });
-        const { _id, name, email, verificationDocuments } = createdUser;
-        const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url };
+        const { _id, name, email, verificationDocuments, role } = createdUser;
+        const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role };
         console.log(responseUser);
         return { responseUser, accessToken, refreshToken };
 

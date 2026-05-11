@@ -77,10 +77,6 @@ const userSchema = new mongoose.Schema({
     bio: {
         type: String,
     },
-    displayPicture: {
-        type: String,
-        default: ""
-    },
     isVerified: {
         type: Boolean,
         default: false
