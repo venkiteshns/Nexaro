@@ -59,10 +59,12 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, isCollapsed, setIsCollapsed })
         </div>
 
         <div className="sidebar-profile">
-          <div className="profile-avatar">A</div>
+          <div className="profile-avatar">
+            {user?.selfie ? <img src={user.selfie} alt="" /> : (user?.name?.charAt(0).toUpperCase() || 'W')}
+          </div>
           {!isCollapsed && (
             <div className="profile-info">
-              <span className="profile-name">{user.name} <br />Elite {user.role}</span>
+              <span className="profile-name">{user?.name} <br />Elite {user?.role}</span>
             </div>
           )}
         </div>
