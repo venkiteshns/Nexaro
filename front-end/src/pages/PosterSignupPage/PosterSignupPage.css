@@ -1,5 +1,15 @@
 /* --- src/components/signup/SignupBrandPanel/SignupBrandPanel.css --- */
 /* front-end/src/components/signup/SignupBrandPanel/SignupBrandPanel.css */
+
+/* Add this to PosterSignupPage.css */
+.ws-body > .ws-section:nth-child(1) { position: relative; z-index: 20; }
+.ws-body > .ws-section:nth-child(2) { position: relative; z-index: 19; }
+.ws-body > .ws-section:nth-child(3) { position: relative; z-index: 18; }
+.ws-body > .ws-section:nth-child(4) { position: relative; z-index: 17; }
+/* (Make sure the class names match what you use in PosterSignupPage) */
+
+
+
 .brand-panel {
   width: 100%;
   height: 100%;

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { getCurrentPosition } from "../../services/geolocationService.js";
 import { reverseGeocode } from "../../services/reverseGeocodeService.js";
 import { geocode } from "../../services/geocodeService.js";
@@ -10,6 +10,9 @@ import { api } from "../../services/api.js";
 // ─────────────────────────────────────────────
 // Shared UI Elements
 // ─────────────────────────────────────────────
+
+
+
 
 const IconSend = () => (
   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -277,19 +280,19 @@ const KERALA_DISTRICTS = [
 // District → major service areas
 const DISTRICT_AREAS = {
   "Thiruvananthapuram": ["Kazhakootam", "Kowdiar", "Pattom", "Vattiyoorkavu", "Nemom", "Attingal", "Neyyattinkara"],
-  "Ernakulam":          ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom", "Angamaly"],
-  "Kozhikode":          ["Nadakkavu", "Mavoor Road", "Meenchanda", "Elathur", "Beypore", "Feroke"],
-  "Thrissur":           ["Poonkunnam", "Ollur", "Chalakudy", "Guruvayur", "Irinjalakuda", "Kunnamkulam"],
-  "Malappuram":         ["Manjeri", "Tirur", "Perinthalmanna", "Ponnani", "Kottakkal", "Tirurrangadi"],
-  "Kannur":             ["Thalassery", "Taliparamba", "Payyanur", "Mattannur", "Koothuparamba", "Iritty"],
-  "Kollam":             ["Karunagappally", "Punalur", "Kottarakkara", "Paravur", "Kundara", "Chavara"],
-  "Palakkad":           ["Ottapalam", "Shornur", "Chittur", "Pattambi", "Mannarkkad", "Alathur"],
-  "Alappuzha":          ["Cherthala", "Kayamkulam", "Chengannur", "Mavelikkara", "Harippad", "Haripad"],
-  "Kottayam":           ["Changanassery", "Pala", "Ettumanoor", "Vaikom", "Erattupetta", "Kanjirappally"],
-  "Kasaragod":          ["Kanhangad", "Nileshwaram", "Uppala", "Kumbla", "Manjeshwar", "Cheruvathur"],
-  "Pathanamthitta":     ["Thiruvalla", "Adoor", "Pandalam", "Ranni", "Konni", "Kozhencherry"],
-  "Idukki":             ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam", "Painavu"],
-  "Wayanad":            ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri", "Ambalavayal"]
+  "Ernakulam": ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom", "Angamaly"],
+  "Kozhikode": ["Nadakkavu", "Mavoor Road", "Meenchanda", "Elathur", "Beypore", "Feroke"],
+  "Thrissur": ["Poonkunnam", "Ollur", "Chalakudy", "Guruvayur", "Irinjalakuda", "Kunnamkulam"],
+  "Malappuram": ["Manjeri", "Tirur", "Perinthalmanna", "Ponnani", "Kottakkal", "Tirurrangadi"],
+  "Kannur": ["Thalassery", "Taliparamba", "Payyanur", "Mattannur", "Koothuparamba", "Iritty"],
+  "Kollam": ["Karunagappally", "Punalur", "Kottarakkara", "Paravur", "Kundara", "Chavara"],
+  "Palakkad": ["Ottapalam", "Shornur", "Chittur", "Pattambi", "Mannarkkad", "Alathur"],
+  "Alappuzha": ["Cherthala", "Kayamkulam", "Chengannur", "Mavelikkara", "Harippad", "Haripad"],
+  "Kottayam": ["Changanassery", "Pala", "Ettumanoor", "Vaikom", "Erattupetta", "Kanjirappally"],
+  "Kasaragod": ["Kanhangad", "Nileshwaram", "Uppala", "Kumbla", "Manjeshwar", "Cheruvathur"],
+  "Pathanamthitta": ["Thiruvalla", "Adoor", "Pandalam", "Ranni", "Konni", "Kozhencherry"],
+  "Idukki": ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam", "Painavu"],
+  "Wayanad": ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri", "Ambalavayal"]
 };
 
 function LocationFields({ register, setValue, banner, district, areas, errors }) {
@@ -375,13 +378,13 @@ function ServiceLocationSection() {
       const addr = await reverseGeocode(pos);
       setValue("exactLat", pos.lat);
       setValue("exactLng", pos.lng);
-      setValue("country",  addr.country,  { shouldValidate: true });
-      setValue("state",    addr.state,    { shouldValidate: true });
+      setValue("country", addr.country, { shouldValidate: true });
+      setValue("state", addr.state, { shouldValidate: true });
       const matched = KERALA_DISTRICTS.find(
         d => d.toLowerCase() === (addr.district || "").toLowerCase()
       );
       setValue("district", matched || addr.district, { shouldValidate: true });
-      setValue("city",     addr.city,     { shouldValidate: true });
+      setValue("city", addr.city, { shouldValidate: true });
       setGeoState("granted");
     } catch (err) {
       console.warn("GPS failed:", err.message);
@@ -610,6 +613,7 @@ function AccountSecuritySection() {
 // Main Page Component
 // ─────────────────────────────────────────────
 export default function WorkerSignupPage() {
+  const navigate = useNavigate();
   const methods = useForm({
     mode: "onTouched",
     defaultValues: { languages: ["English"] }
@@ -670,11 +674,17 @@ export default function WorkerSignupPage() {
         throw new Error(res.data.message);
       }
       console.log("Worker signup response →", res.data);
-      alert("Registration successful!");
+      // Storing an indicator in sessionStorage so OtpProtectRoute allows access
+      sessionStorage.setItem("otpToken", "pending_verification");
+      // If your API returns a specific OTP token or email, you should store that here instead:
+      // sessionStorage.setItem("otpEmail", data.email);
+      
+      navigate("/verify-otp");
+      return;
 
     } catch (err) {
       console.error("Worker signup error →", err);
-      alert("Registration failed!");
+      alert("Registration failed!" + err?.response?.data?.message || err?.message);
     }
   }
 
