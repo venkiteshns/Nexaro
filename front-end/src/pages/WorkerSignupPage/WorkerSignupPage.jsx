@@ -8,6 +8,7 @@ import "./WorkerSignupPage.css";
 import { api } from "../../services/api.js";
 import { useToast } from "../../hooks/useToast.js";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 // ─────────────────────────────────────────────
 // Shared UI Elements
 // ─────────────────────────────────────────────
@@ -33,12 +34,38 @@ function SectionCard({ icon, title, children }) {
 function CustomSelect({ name, options, placeholder, rules, register, setValue, watch, errors }) {
   const selectedValue = watch(name);
   const [isOpen, setIsOpen] = useState(false);
+  const [coords, setCoords] = useState(null);
   const dropdownRef = useRef(null);
+
+  const updateCoords = useCallback(() => {
+    if (dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setCoords({
+        left: rect.left,
+        top: rect.bottom + window.scrollY,
+        width: rect.width
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      updateCoords();
+      window.addEventListener("scroll", updateCoords, true);
+      window.addEventListener("resize", updateCoords);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateCoords, true);
+      window.removeEventListener("resize", updateCoords);
+    };
+  }, [isOpen, updateCoords]);
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+        if (!event.target.closest('.ws-custom-dropdown')) {
+          setIsOpen(false);
+        }
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -71,27 +98,55 @@ function CustomSelect({ name, options, placeholder, rules, register, setValue, w
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </div>
-      <div className={`ws-custom-dropdown${isOpen ? ' open' : ''}`} role="listbox">
-        {options.map(option => (
-          <div
-            key={option}
-            className={`ws-custom-option${selectedValue === option ? ' selected' : ''}`}
-            role="option"
-            aria-selected={selectedValue === option}
-            onClick={() => {
-              setValue(name, option, { shouldValidate: true });
-              setIsOpen(false);
-            }}
-          >
-            {option}
-            {selectedValue === option && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" aria-hidden="true">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            )}
-          </div>
-        ))}
-      </div>
+
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && coords && (
+            <motion.div
+              initial={{ opacity: 0, y: -6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="ws-custom-dropdown"
+              style={{
+                position: 'absolute',
+                top: coords.top + 6,
+                left: coords.left,
+                width: coords.width,
+                zIndex: 99999,
+              }}
+              role="listbox"
+            >
+              {options && options.length > 0 ? (
+                options.map(option => (
+                  <div
+                    key={option}
+                    className={`ws-custom-option${selectedValue === option ? ' selected' : ''}`}
+                    role="option"
+                    aria-selected={selectedValue === option}
+                    onClick={() => {
+                      setValue(name, option, { shouldValidate: true });
+                      setIsOpen(false);
+                    }}
+                  >
+                    {option}
+                    {selectedValue === option && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="ws-custom-option" style={{ color: 'var(--color-muted)', cursor: 'default', justifyContent: 'center' }}>
+                  No options available, Please select District first
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
@@ -535,22 +590,22 @@ export default function WorkerSignupPage() {
                     <svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
                   )}
                 </div>
-                
+
                 <div className="ws-loc-card__title" style={{ color: geoState === "failed" ? "#EF4444" : "var(--color-text)" }}>
-                  {geoState === "loading" ? "Detecting Location..." : 
-                   geoState === "failed" ? "Location Access Failed" : 
-                   "Enable Location Access"}
+                  {geoState === "loading" ? "Detecting Location..." :
+                    geoState === "failed" ? "Location Access Failed" :
+                      "Enable Location Access"}
                 </div>
-                
+
                 <div className="ws-loc-card__sub" style={{ color: geoState === "failed" ? "#EF4444" : "var(--color-muted)" }}>
-                  {geoState === "loading" ? "Please wait while we securely determine your location." : 
-                   geoState === "failed" ? `Unable to detect your location. ${MAX_GEO_RETRIES - attempts} attempts remaining.` : 
-                   "Allow Nexaro to detect your location for precise hyperlocal matching."}
+                  {geoState === "loading" ? "Please wait while we securely determine your location." :
+                    geoState === "failed" ? `Unable to detect your location. ${MAX_GEO_RETRIES - attempts} attempts remaining.` :
+                      "Allow Nexaro to detect your location for precise hyperlocal matching."}
                 </div>
-                
-                <button 
-                  type="button" 
-                  className="ws-loc-btn" 
+
+                <button
+                  type="button"
+                  className="ws-loc-btn"
                   onClick={requestLocation}
                   disabled={geoState === "loading"}
                   style={{
@@ -561,11 +616,11 @@ export default function WorkerSignupPage() {
                 >
                   {geoState === "loading" ? "Detecting..." : geoState === "failed" ? "Retry Access" : "Allow Location Access"}
                 </button>
-                
+
                 <p style={{ marginTop: 14, fontSize: 12 }}>
-                  <button 
-                    type="button" 
-                    onClick={() => setGeoState("manual")} 
+                  <button
+                    type="button"
+                    onClick={() => setGeoState("manual")}
                     disabled={geoState === "loading"}
                     style={{ background: "none", border: "none", color: "var(--color-muted)", cursor: geoState === "loading" ? "wait" : "pointer", textDecoration: "underline" }}
                   >
@@ -586,13 +641,13 @@ export default function WorkerSignupPage() {
               >
                 {geoState === "granted" && (
                   <div style={{ marginBottom: 20, padding: 12, background: "#ECFDF5", color: "#065F46", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500 }}>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
                     Location detected successfully. Fields auto-filled.
                   </div>
                 )}
                 {geoState === "exhausted" && (
                   <div style={{ marginBottom: 20, padding: 12, background: "#FEF2F2", color: "#991B1B", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500 }}>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                     Location access failed after multiple attempts. Please enter manually.
                   </div>
                 )}

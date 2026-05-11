@@ -712,9 +712,6 @@
 
 .ws-custom-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  width: 100%;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
@@ -725,13 +722,6 @@
   /* Scroll inside panel — no overflow:hidden on the panel itself */
   overflow-y: auto;
   max-height: 240px;
-  z-index: 200;
-  opacity: 0;
-  transform: translateY(-6px) scale(0.98);
-  pointer-events: none;
-  transition:
-    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   /* Scrollbar styling */
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
@@ -746,12 +736,6 @@
 .ws-custom-dropdown::-webkit-scrollbar-thumb {
   background-color: var(--color-border);
   border-radius: 4px;
-}
-
-.ws-custom-dropdown.open {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
 }
 
 .ws-custom-option {
