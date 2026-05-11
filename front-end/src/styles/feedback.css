@@ -1,0 +1,275 @@
+/* ─── Premium Feedback System ─── */
+
+:root {
+  --feedback-surface: #ffffff;
+  --feedback-surface-dim: #f9fafb;
+  --feedback-text-primary: #111827;
+  --feedback-text-secondary: #6b7280;
+  
+  --feedback-border: #e5e7eb;
+  
+  --feedback-success: #10B981;
+  --feedback-success-bg: #ECFDF5;
+  
+  --feedback-error: #EF4444;
+  --feedback-error-bg: #FEF2F2;
+  
+  --feedback-warning: #F59E0B;
+  --feedback-warning-bg: #FFFBEB;
+  
+  --feedback-info: #3B82F6;
+  --feedback-info-bg: #EFF6FF;
+  
+  --feedback-radius-md: 12px;
+  --feedback-radius-lg: 16px;
+  --feedback-radius-full: 9999px;
+  
+  --feedback-shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --feedback-shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+  
+  --feedback-overlay: rgba(17, 24, 39, 0.4);
+}
+
+/* ── TOAST CONTAINER ── */
+.nx-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .nx-toast-container {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    align-items: center;
+  }
+}
+
+/* ── TOAST ── */
+.nx-toast {
+  pointer-events: auto;
+  background: var(--feedback-surface);
+  border: 1px solid var(--feedback-border);
+  border-radius: var(--feedback-radius-md);
+  padding: 16px;
+  box-shadow: var(--feedback-shadow-lg);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 340px;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.nx-toast__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.nx-toast__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nx-toast__title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--feedback-text-primary);
+  margin: 0;
+}
+
+.nx-toast__message {
+  font-size: 13px;
+  color: var(--feedback-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.nx-toast__close {
+  background: transparent;
+  border: none;
+  color: var(--feedback-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  margin: -4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.nx-toast__close:hover {
+  background: var(--feedback-surface-dim);
+  color: var(--feedback-text-primary);
+}
+
+/* Toast Variants */
+.nx-toast--success .nx-toast__icon { color: var(--feedback-success); background: var(--feedback-success-bg); }
+.nx-toast--error .nx-toast__icon { color: var(--feedback-error); background: var(--feedback-error-bg); }
+.nx-toast--warning .nx-toast__icon { color: var(--feedback-warning); background: var(--feedback-warning-bg); }
+.nx-toast--info .nx-toast__icon { color: var(--feedback-info); background: var(--feedback-info-bg); }
+
+
+/* ── MODAL OVERLAY ── */
+.nx-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--feedback-overlay);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+/* ── MODAL ── */
+.nx-modal {
+  background: var(--feedback-surface);
+  border-radius: var(--feedback-radius-lg);
+  box-shadow: var(--feedback-shadow-lg);
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.nx-modal__body {
+  padding: 32px 32px 24px;
+}
+
+.nx-modal__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--feedback-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.nx-modal__icon--danger { background: var(--feedback-error-bg); color: var(--feedback-error); }
+.nx-modal__icon--info { background: var(--feedback-info-bg); color: var(--feedback-info); }
+.nx-modal__icon--success { background: var(--feedback-success-bg); color: var(--feedback-success); }
+.nx-modal__icon--warning { background: var(--feedback-warning-bg); color: var(--feedback-warning); }
+
+
+.nx-modal__title {
+  font-family: var(--font-serif, serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--feedback-text-primary);
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
+}
+
+.nx-modal__description {
+  font-family: var(--font-sans, sans-serif);
+  font-size: 15px;
+  color: var(--feedback-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Input Modal Additions */
+.nx-modal__input {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--feedback-border);
+  border-radius: 8px;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.nx-modal__input:focus {
+  border-color: var(--feedback-success);
+  box-shadow: 0 0 0 3px var(--feedback-success-bg);
+}
+
+.nx-modal__input--error {
+  border-color: var(--feedback-error);
+}
+
+.nx-modal__error-text {
+  color: var(--feedback-error);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* ── MODAL FOOTER ── */
+.nx-modal__footer {
+  padding: 16px 32px 32px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.nx-modal__btn {
+  padding: 10px 20px;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.nx-modal__btn--secondary {
+  background: var(--feedback-surface);
+  color: var(--feedback-text-primary);
+  border-color: var(--feedback-border);
+}
+
+.nx-modal__btn--secondary:hover {
+  background: var(--feedback-surface-dim);
+}
+
+.nx-modal__btn--primary {
+  background: var(--feedback-success);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.nx-modal__btn--primary:hover {
+  background: #059669; /* Slightly darker */
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.nx-modal__btn--danger {
+  background: var(--feedback-error);
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.nx-modal__btn--danger:hover {
+  background: #DC2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.nx-modal__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}

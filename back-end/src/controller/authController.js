@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
+import { createOtp } from '../services/authServices.js';
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -27,5 +28,21 @@ export const refreshAccessToken = async (req, res) => {
     } catch (error) {
         console.error("Refresh token error:", error.message);
         return res.status(403).json({ success: false, message: "Invalid or expired refresh token" });
+    }
+};
+
+
+export const getOtpForSignUp = async (req, res) => {
+    try {
+        let response = await createOtp(req.body.email);
+        // if (response.success) {
+        //     return res.status(200).json({ success: true, message: "OTP sent successfully" });
+        // } else {
+        return res.status(400).json({ success: false, message: "response.message" });
+        // }
+
+    } catch (error) {
+        console.error("OTP send error:", error.message);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };

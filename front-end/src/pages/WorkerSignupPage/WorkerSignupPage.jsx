@@ -6,6 +6,7 @@ import { reverseGeocode } from "../../services/reverseGeocodeService.js";
 import { geocode } from "../../services/geocodeService.js";
 import "./WorkerSignupPage.css";
 import { api } from "../../services/api.js";
+import { useToast } from "../../hooks/useToast.js";
 
 // ─────────────────────────────────────────────
 // Shared UI Elements
@@ -223,11 +224,12 @@ const DISTRICT_AREAS = {
 };
 const MAX_GEO_RETRIES = 3;
 
-// ─────────────────────────────────────────────
+
 // Main Page Component
-// ─────────────────────────────────────────────
+
 export default function WorkerSignupPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     mode: "onTouched",
     defaultValues: { languages: ["English"] }
@@ -240,7 +242,7 @@ export default function WorkerSignupPage() {
   const [otpDigits, setOtpDigits] = useState(Array(6).fill(''));
   const [otpStatus, setOtpStatus] = useState('idle');
 
-  // Specific state for sections that were previously broken out
+
   const [selectedSkills, setSelectedSkills] = useState([]);
   function toggleSkill(skill) {
     const next = selectedSkills.includes(skill) ? selectedSkills.filter(s => s !== skill) : [...selectedSkills, skill];
@@ -305,7 +307,6 @@ export default function WorkerSignupPage() {
   useEffect(() => {
     let timeoutId;
     if (showOtpModal) {
-      // Delay overflow:hidden slightly so the smooth scroll animation can complete
       timeoutId = setTimeout(() => {
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
@@ -321,14 +322,21 @@ export default function WorkerSignupPage() {
     };
   }, [showOtpModal]);
 
+  // Otp Modal Handler
   async function onFormSubmit(data) {
-    setFormDataCache(data);
-    setShowOtpModal(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const res = await api.post('/auth/get-otp', { email: data.email });
+    if (res.data.success) {
+      setFormDataCache(data);
+      setShowOtpModal(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      console.log(res.data.message)
+      toast.error(res.data.message);
+    }
   }
 
   const handleDigitChange = useCallback((index, digit) => {
-    if (!/^\d*$/.test(digit)) return; // Ensure it's a number
+    if (!/^\d*$/.test(digit)) return;
     setOtpDigits((prev) => {
       const next = [...prev];
       next[index] = digit;
@@ -384,26 +392,26 @@ export default function WorkerSignupPage() {
         headers: { "Content-Type": "multipart/form-data" }
       });
       if (!res.data.success) throw new Error(res.data.message);
-      
-      // Successfully registered after OTP verification
+
       navigate("/login");
     } catch (err) {
       console.error("Worker signup error →", err);
-      alert("Registration failed! " + (err?.response?.data?.message || err?.message));
+      toast.error("Registration failed! " + (err?.response?.data?.message || err?.message));
     } finally {
       setIsSubmittingForm(false);
       setShowOtpModal(false);
     }
   }
 
+  // Otp Verfication Handler`
   async function handleVerifyOtp(e) {
     e?.preventDefault();
     const code = otpDigits.join('');
     if (code.length < 6) return;
-    
+
     setOtpStatus('submitting');
     await new Promise(r => setTimeout(r, 900));
-    
+
     if (code === '123456') {
       setOtpStatus('success');
       await sendDataToBackend(formDataCache);
@@ -521,15 +529,15 @@ export default function WorkerSignupPage() {
             </div>
           )}
           {geoState === "failed" && (
-             <div className="ws-loc-card ws-loc-card--error">
-               <div className="ws-loc-card__title" style={{ color: "#DC2626" }}>Location Access Failed</div>
-               <button type="button" className="ws-loc-btn ws-loc-btn--retry" onClick={requestLocation}>Retry</button>
-               <p style={{ marginTop: 14, fontSize: 12 }}>
+            <div className="ws-loc-card ws-loc-card--error">
+              <div className="ws-loc-card__title" style={{ color: "#DC2626" }}>Location Access Failed</div>
+              <button type="button" className="ws-loc-btn ws-loc-btn--retry" onClick={requestLocation}>Retry</button>
+              <p style={{ marginTop: 14, fontSize: 12 }}>
                 <button type="button" onClick={() => setGeoState("manual")} style={{ background: "none", border: "none", color: "var(--color-accent)", cursor: "pointer", textDecoration: "underline" }}>
                   Skip and enter manually
                 </button>
               </p>
-             </div>
+            </div>
           )}
           {(geoState === "exhausted" || geoState === "manual" || geoState === "granted") && (
             <div className="ws-loc-fields">
@@ -638,7 +646,7 @@ export default function WorkerSignupPage() {
         <div className="ws-modal-overlay">
           <div className="ws-modal-content votp-card">
             <div className="ws-modal-close" onClick={() => !isSubmittingForm && setShowOtpModal(false)}>✕</div>
-            
+
             <header className="votp-card__header">
               <h2 className="votp-card__title">Verify Your Email</h2>
               <p className="votp-card__subtitle">
@@ -674,13 +682,13 @@ export default function WorkerSignupPage() {
                   />
                 ))}
               </div>
-              
+
               {otpStatus === 'error' && (
                 <p style={{ color: '#EF4444', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
                   Invalid code. Please try again.
                 </p>
               )}
-              
+
               {otpStatus === 'success' && (
                 <p style={{ color: '#10B981', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
                   Verified successfully! Submitting registration...
@@ -695,7 +703,7 @@ export default function WorkerSignupPage() {
               >
                 {(otpStatus === 'submitting' || isSubmittingForm) ? 'Verifying...' : 'Verify & Register'}
               </button>
-              
+
               <p style={{ textAlign: 'center', marginTop: 15, fontSize: 12, color: 'var(--color-muted)' }}>
                 For demo: Use 123456
               </p>
