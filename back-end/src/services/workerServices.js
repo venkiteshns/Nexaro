@@ -1,5 +1,5 @@
 import User from "../models/userSchema.js";
-import { hashPassword } from "../utils/hasing.js";
+import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 
 export const workerSignupService = async ({ files, data }) => {
@@ -25,7 +25,7 @@ export const workerSignupService = async ({ files, data }) => {
         try { parsedSkills = typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills; } catch (e) { }
         try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch (e) { }
 
-        const hashedPassword = await hashPassword(data.password);
+        const hashedPassword = await hashData(data.password);
 
         let payLoad = {
             name: data.fullName,

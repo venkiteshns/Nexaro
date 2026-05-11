@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
-import { createOtp } from '../services/authServices.js';
+import { createOtp, verifyOtp } from '../services/authServices.js';
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -31,18 +31,32 @@ export const refreshAccessToken = async (req, res) => {
     }
 };
 
-
 export const getOtpForSignUp = async (req, res) => {
     try {
         let response = await createOtp(req.body.email);
-        // if (response.success) {
-        //     return res.status(200).json({ success: true, message: "OTP sent successfully" });
-        // } else {
-        return res.status(400).json({ success: false, message: "response.message" });
-        // }
+        if (response.success) {
+            return res.status(200).json({ success: true, message: "OTP sent successfully" });
+        } else {
+            return res.status(400).json({ success: false, message: response.message });
+        }
 
     } catch (error) {
         console.error("OTP send error:", error.message);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export const verifySignUpOtp = async (req, res) => {
+    try {
+        let response = await verifyOtp(req.body.email, req.body.otp);
+        if (response.success) {
+            return res.status(200).json({ success: true, message: "OTP verified successfully" });
+        } else {
+            return res.status(400).json({ success: false, message: response.message });
+        }
+
+    } catch (error) {
+        console.error("OTP verify error:", error.message);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
