@@ -27,19 +27,18 @@ api.interceptors.response.use(
     (response) => {
 
         if (response.data) {
-            const { accessToken, refreshToken, responseUser, otpToken } = response.data;
+            const { accessToken, refreshToken, responseUser, user } = response.data;
 
             if (accessToken) {
                 useAuthStore.getState().setToken(accessToken);
             }
-            if (responseUser) {
-                useAuthStore.getState().setUser(responseUser);
+            
+            const actualUser = user || responseUser;
+            if (actualUser) {
+                useAuthStore.getState().setUser(actualUser);
             }
             if (refreshToken) {
                 localStorage.setItem('refreshToken', refreshToken);
-            }
-            if (otpToken) {
-                sessionStorage.setItem('otpToken', otpToken);
             }
         }
         return response;

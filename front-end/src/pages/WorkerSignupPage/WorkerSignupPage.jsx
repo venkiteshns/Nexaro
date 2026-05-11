@@ -324,17 +324,25 @@ export default function WorkerSignupPage() {
 
   // Otp Modal Handler
   async function onFormSubmit(data) {
-    const res = await api.post('/auth/get-otp', { email: data.email });
-    if (res.data.success) {
-      setFormDataCache(data);
-      setShowOtpModal(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      console.log(res.data.message)
-      toast.error(res.data.message);
+    console.log(data);
+    setIsSubmittingForm(true);
+    try {
+      const res = await api.post('/auth/get-otp', { email: data.email });
+      if (res.data.success) {
+        setIsSubmittingForm(false);
+        setFormDataCache(data);
+        setShowOtpModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (err) {
+      setIsSubmittingForm(false);
+      const errorMessage = err?.response?.data?.message || err?.message || "Failed to send OTP";
+      console.log(errorMessage);
+      toast.error(errorMessage);
     }
   }
 
+  // handle digit change in otp modal
   const handleDigitChange = useCallback((index, digit) => {
     if (!/^\d*$/.test(digit)) return;
     setOtpDigits((prev) => {
@@ -345,6 +353,8 @@ export default function WorkerSignupPage() {
     if (otpStatus === 'error') setOtpStatus('idle');
   }, [otpStatus]);
 
+
+  // send data to backend
   async function sendDataToBackend(data) {
     setIsSubmittingForm(true);
     const formData = new FormData();
@@ -392,7 +402,6 @@ export default function WorkerSignupPage() {
         headers: { "Content-Type": "multipart/form-data" }
       });
       if (!res.data.success) throw new Error(res.data.message);
-
       navigate("/login");
     } catch (err) {
       console.error("Worker signup error →", err);
@@ -403,7 +412,7 @@ export default function WorkerSignupPage() {
     }
   }
 
-  // Otp Verfication Handler`
+  // Otp Verfication Handle
   async function handleVerifyOtp(e) {
     e?.preventDefault();
     const code = otpDigits.join('');
@@ -412,10 +421,13 @@ export default function WorkerSignupPage() {
     setOtpStatus('submitting');
     await new Promise(r => setTimeout(r, 900));
 
-    if (code === '123456') {
-      setOtpStatus('success');
-      await sendDataToBackend(formDataCache);
-    } else {
+    try {
+      const res = await api.post('/auth/verify-otp', { email: formDataCache.email, otp: code });
+      if (res.data.success) {
+        setOtpStatus('success');
+        sendDataToBackend(formDataCache);
+      }
+    } catch (err) {
       setOtpStatus('error');
       setTimeout(() => {
         setOtpStatus('idle');
@@ -631,7 +643,7 @@ export default function WorkerSignupPage() {
         </SectionCard>
 
         <div className="ws-section" style={{ background: "transparent", border: "none", boxShadow: "none", padding: "8px 0 0" }}>
-          <button type="submit" className="ws-submit" disabled={isSubmittingForm}>
+          <button type="submit" className="ws-submit" disabled={isSubmittingForm} >
             <IconSend />
             {isSubmittingForm ? "Submitting…" : "Complete Registration"}
           </button>
@@ -690,7 +702,7 @@ export default function WorkerSignupPage() {
               )}
 
               {otpStatus === 'success' && (
-                <p style={{ color: '#10B981', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
+                <p style={{ color: '#036947ff', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
                   Verified successfully! Submitting registration...
                 </p>
               )}
@@ -701,11 +713,10 @@ export default function WorkerSignupPage() {
                 disabled={otpDigits.join('').length < 6 || otpStatus === 'submitting' || isSubmittingForm}
                 style={{ background: (otpStatus === 'success' || isSubmittingForm) ? '#10B981' : 'var(--color-accent)' }}
               >
-                {(otpStatus === 'submitting' || isSubmittingForm) ? 'Verifying...' : 'Verify & Register'}
+                {(otpStatus === 'submitting' || isSubmittingForm && otpStatus != 'success') ? 'Verifying...' : otpStatus === 'success' ? 'Verified! Registering...' : 'Verify & Register'}
               </button>
 
               <p style={{ textAlign: 'center', marginTop: 15, fontSize: 12, color: 'var(--color-muted)' }}>
-                For demo: Use 123456
               </p>
             </form>
           </div>
