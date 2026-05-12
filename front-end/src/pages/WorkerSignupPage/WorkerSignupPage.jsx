@@ -489,30 +489,55 @@ export default function WorkerSignupPage() {
               </p>
             </header>
 
-            <form onSubmit={handleVerifyOtp} className="votp-form" style={{ marginTop: 20 }}>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 20 }}>
+            <form onSubmit={handleVerifyOtp} className="votp-form">
+              <div className="votp-input-group">
                 {otpDigits.map((digit, idx) => (
                   <input
                     key={idx}
                     id={`otp-${idx}`}
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete={idx === 0 ? "one-time-code" : "off"}
                     maxLength={1}
                     value={digit}
+                    className={`votp-input ${otpStatus === 'error' ? 'error' : ''}`}
+                    onFocus={(e) => e.target.select()}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6).split('');
+                      if (pastedData.length > 0) {
+                        setOtpDigits((prev) => {
+                           const next = [...prev];
+                           pastedData.forEach((d, i) => {
+                             if (i < 6) next[i] = d;
+                           });
+                           return next;
+                        });
+                        if (otpStatus === 'error') setOtpStatus('idle');
+                        const focusIndex = Math.min(pastedData.length, 5);
+                        setTimeout(() => document.getElementById(`otp-${focusIndex}`)?.focus(), 10);
+                      }
+                    }}
                     onChange={(e) => {
-                      handleDigitChange(idx, e.target.value);
-                      if (e.target.value && idx < 5) {
-                        document.getElementById(`otp-${idx + 1}`)?.focus();
+                      const val = e.target.value.replace(/\D/g, '');
+                      handleDigitChange(idx, val.slice(-1));
+                      if (val && idx < 5) {
+                        setTimeout(() => document.getElementById(`otp-${idx + 1}`)?.focus(), 10);
                       }
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Backspace' && !digit && idx > 0) {
-                        document.getElementById(`otp-${idx - 1}`)?.focus();
+                        e.preventDefault();
+                        handleDigitChange(idx - 1, "");
+                        setTimeout(() => document.getElementById(`otp-${idx - 1}`)?.focus(), 10);
+                      } else if (e.key === 'ArrowLeft' && idx > 0) {
+                        e.preventDefault();
+                        setTimeout(() => document.getElementById(`otp-${idx - 1}`)?.focus(), 10);
+                      } else if (e.key === 'ArrowRight' && idx < 5) {
+                        e.preventDefault();
+                        setTimeout(() => document.getElementById(`otp-${idx + 1}`)?.focus(), 10);
                       }
-                    }}
-                    style={{
-                      width: 46, height: 52, fontSize: 22, textAlign: 'center', padding: 0, boxSizing: 'border-box',
-                      border: otpStatus === 'error' ? '1px solid #EF4444' : '1px solid var(--color-border)',
-                      borderRadius: 8, outline: 'none'
                     }}
                   />
                 ))}
