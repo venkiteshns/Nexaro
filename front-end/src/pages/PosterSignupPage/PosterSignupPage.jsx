@@ -242,6 +242,8 @@ const SignupForm = () => {
     if (code.length < 6) return;
 
     setOtpStatus('submitting');
+    setOtpDigits(Array(6).fill(''));
+
     await new Promise(r => setTimeout(r, 900));
 
     try {
@@ -254,8 +256,9 @@ const SignupForm = () => {
       setOtpStatus('error');
       setTimeout(() => {
         setOtpStatus('idle');
-        setOtpDigits(Array(6).fill(''));
       }, 1800);
+    } finally {
+      setOtpStatus('idle');
     }
   }
 
@@ -280,7 +283,7 @@ const SignupForm = () => {
   const onSubmit = async (data) => {
     setIsSubmittingForm(true);
     try {
-      const response = await api.post("/auth/get-otp", { email: data.email });
+      const response = await api.post("/auth/get-otp", { email: data.email, phone: data.phone });
       if (response.data.success) {
         setIsSubmittingForm(false);
         setFormDataCache(data);
@@ -485,7 +488,16 @@ const SignupForm = () => {
       {showOtpModal && (
         <div className="ws-modal-overlay">
           <div className="ws-modal-content votp-card">
-            <div className="ws-modal-close" onClick={() => !isSubmittingForm && setShowOtpModal(false)}>✕</div>
+            <div className="ws-modal-close" onClick={() => {
+              if (!isSubmittingForm) {
+                setShowOtpModal(false);
+                setOtpDigits(Array(6).fill(''));
+                setOtpStatus('idle');
+                setTimer(60);
+                setResendAttempts(0);
+                setIsResending(false);
+              }
+            }}>✕</div>
 
             <header className="votp-card__header">
               <h2 className="votp-card__title">Verify Your Email</h2>

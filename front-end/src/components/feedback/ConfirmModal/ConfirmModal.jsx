@@ -9,7 +9,7 @@ const iconMap = {
   success: <CheckCircle size={24} strokeWidth={2} />
 };
 
-const ConfirmModal = ({ id, title, description, confirmText = 'Confirm', cancelText = 'Cancel', type = 'info', onClose }) => {
+const ConfirmModal = ({ id, title, description, confirmText = 'Confirm', cancelText = 'Cancel', variant = 'info', onClose }) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -22,8 +22,8 @@ const ConfirmModal = ({ id, title, description, confirmText = 'Confirm', cancelT
       aria-labelledby={`modal-title-${id}`}
     >
       <div className="nx-modal__body">
-        <div className={`nx-modal__icon nx-modal__icon--${type}`}>
-          {iconMap[type]}
+        <div className={`nx-modal__icon nx-modal__icon--${variant}`}>
+          {iconMap[variant]}
         </div>
         <h2 id={`modal-title-${id}`} className="nx-modal__title">{title}</h2>
         {description && <p className="nx-modal__description">{description}</p>}
@@ -37,7 +37,7 @@ const ConfirmModal = ({ id, title, description, confirmText = 'Confirm', cancelT
         </button>
         <button 
           onClick={() => onClose(true)} 
-          className={`nx-modal__btn nx-modal__btn--${type === 'danger' ? 'danger' : 'primary'}`}
+          className={`nx-modal__btn nx-modal__btn--${variant === 'danger' ? 'danger' : 'primary'}`}
         >
           {confirmText}
         </button>

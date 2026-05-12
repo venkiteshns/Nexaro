@@ -34,7 +34,7 @@ export const refreshAccessToken = async (req, res) => {
 
 export const getOtpForSignUp = async (req, res) => {
     try {
-        let response = await createOtp(req.body.email);
+        let response = await createOtp(req.body.email, req.body.phone);
         if (response.success) {
             return res.status(200).json({ success: true, message: "OTP sent successfully" });
         } else {
@@ -62,21 +62,25 @@ export const verifySignUpOtp = async (req, res) => {
     }
 };
 
-export const posterSignup = async (req, res) => {
+export const logout = async (req, res) => {
     try {
-        const response = await posterSignupService(req.body);
-
-        if (response.error) {
-            return res.status(400).json({ success: false, message: response.error });
+        // Extract user ID from Authorization header if present
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            // Wipe refresh token in DB so it can never be reused
+            await User.findByIdAndUpdate(decoded._id, { refreshToken: '' });
         }
-
-        const { responseUser, accessToken, refreshToken } = response;
-
-        return res
-            .status(201)
-            .json({ success: true, message: "Poster registered successfully", user: responseUser, accessToken, refreshToken });
-    } catch (error) {
-        console.error("Poster signup error:", error.message);
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        return res.status(200)
+            .clearCookie('accessToken')
+            .clearCookie('refreshToken')
+            .json({ success: true, message: 'Logged out successfully' });
+    } catch {
+        // Even if token is invalid/expired, we still clear cookies client-side
+        return res.status(200)
+            .clearCookie('accessToken')
+            .clearCookie('refreshToken')
+            .json({ success: true, message: 'Logged out' });
     }
 };
