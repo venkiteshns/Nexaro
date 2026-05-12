@@ -275,6 +275,9 @@ export default function WorkerSignupPage() {
     if (code.length < 6) return;
 
     setOtpStatus('submitting');
+    // Security: Immediately clear OTP from memory once submitted
+    setOtpDigits(Array(6).fill(''));
+    
     await new Promise(r => setTimeout(r, 900));
 
     try {
@@ -287,7 +290,6 @@ export default function WorkerSignupPage() {
       setOtpStatus('error');
       setTimeout(() => {
         setOtpStatus('idle');
-        setOtpDigits(Array(6).fill(''));
       }, 1800);
     }
   }
@@ -480,7 +482,16 @@ export default function WorkerSignupPage() {
       {showOtpModal && (
         <div className="ws-modal-overlay">
           <div className="ws-modal-content votp-card">
-            <div className="ws-modal-close" onClick={() => !isSubmittingForm && setShowOtpModal(false)}>✕</div>
+            <div className="ws-modal-close" onClick={() => {
+              if (!isSubmittingForm) {
+                setShowOtpModal(false);
+                setOtpDigits(Array(6).fill(''));
+                setOtpStatus('idle');
+                setTimer(60);
+                setResendAttempts(0);
+                setIsResending(false);
+              }
+            }}>✕</div>
 
             <header className="votp-card__header">
               <h2 className="votp-card__title">Verify Your Email</h2>

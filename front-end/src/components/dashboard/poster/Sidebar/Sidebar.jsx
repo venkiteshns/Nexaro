@@ -11,6 +11,8 @@ import {
   FiLogOut
 } from 'react-icons/fi';
 import useAuthStore from '../../../../store/store';
+import { useLogout } from '../../../../hooks/useLogout.js';
+import { useModal } from '../../../../hooks/useModal.js';
 
 const navItems = [
   { icon: FiHome, label: 'Dashboard', path: '/poster/dashboard' },
@@ -23,6 +25,8 @@ const navItems = [
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, isCollapsed, setIsCollapsed }) => {
   const user = useAuthStore((state) => state.user);
+  const { logout, isLoggingOut } = useLogout();
+  const { confirm } = useModal();
 
   useEffect(() => {
     if (isMobileOpen && window.innerWidth <= 1024) {
@@ -85,9 +89,26 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, isCollapsed, setIsCollapsed })
               {!isCollapsed && <span>Collapse Sidebar</span>}
             </button>
           )}
-          <button className="poster-nav-item" title={isCollapsed ? "Logout" : ""}>
-            <FiLogOut className="poster-nav-icon" />
-            {!isCollapsed && <span>Logout</span>}
+          <button
+            className="poster-nav-item"
+            title={isCollapsed ? "Logout" : ""}
+            onClick={async () => {
+              const isConfirmed = await confirm({
+                title: 'Confirm Logout',
+                description: 'Are you sure you want to log out of your account?',
+                confirmText: 'Log Out',
+                cancelText: 'Cancel',
+                variant: 'danger'
+              });
+              if (isConfirmed) {
+                logout();
+              }
+            }}
+            disabled={isLoggingOut}
+            style={{ opacity: isLoggingOut ? 0.6 : 1, cursor: isLoggingOut ? 'not-allowed' : 'pointer' }}
+          >
+            <FiLogOut className="poster-nav-icon" style={{ animation: isLoggingOut ? 'spin 1s linear infinite' : 'none' }} />
+            {!isCollapsed && <span>{isLoggingOut ? 'Signing out...' : 'Logout'}</span>}
           </button>
         </div>
       </aside>

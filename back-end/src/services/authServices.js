@@ -5,9 +5,9 @@ import Otp from "../models/otpSchems.js";
 import user from "../models/userSchema.js";
 import { hashData, compareHash } from "../utils/hasing.js";
 
-export const createOtp = async (email) => {
+export const createOtp = async (email, phone) => {
     try {
-        const userData = await user.findOne({ email });
+        const userData = await user.findOne({ $or: [{ email }, { phone }] });
         if (userData) {
             return { success: false, message: "User already exists" };
         }

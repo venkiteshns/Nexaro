@@ -14,6 +14,8 @@ import {
   FiMenu
 } from 'react-icons/fi';
 import useAuthStore from '../../../store/store';
+import { useLogout } from '../../../hooks/useLogout.js';
+import { useModal } from '../../../hooks/useModal.js';
 
 const navItems = [
   { icon: FiHome, label: 'Dashboard', path: '/worker/dashboard' },
@@ -28,7 +30,8 @@ const navItems = [
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, isCollapsed, setIsCollapsed }) => {
   const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
-
+  const { logout, isLoggingOut } = useLogout();
+  const { confirm } = useModal();
   const user = useAuthStore((state) => state.user);
 
   React.useEffect(() => {
@@ -108,9 +111,26 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, isCollapsed, setIsCollapsed })
               {!isCollapsed && <span>Collapse</span>}
             </button>
           )}
-          <button className={`nav-item ${isCollapsed ? 'collapsed-item' : ''}`} title={isCollapsed ? "Logout" : ""}>
-            <FiLogOut className="nav-icon" />
-            {!isCollapsed && <span>Logout</span>}
+          <button 
+            className={`nav-item ${isCollapsed ? 'collapsed-item' : ''}`} 
+            title={isCollapsed ? "Logout" : ""}
+            onClick={async () => {
+              const isConfirmed = await confirm({
+                title: 'Confirm Logout',
+                description: 'Are you sure you want to log out of your account?',
+                confirmText: 'Log Out',
+                cancelText: 'Cancel',
+                variant: 'danger'
+              });
+              if (isConfirmed) {
+                logout();
+              }
+            }}
+            disabled={isLoggingOut}
+            style={{ opacity: isLoggingOut ? 0.6 : 1, cursor: isLoggingOut ? 'not-allowed' : 'pointer' }}
+          >
+            <FiLogOut className="nav-icon" style={{ animation: isLoggingOut ? 'spin 1s linear infinite' : 'none' }} />
+            {!isCollapsed && <span>{isLoggingOut ? 'Signing out...' : 'Logout'}</span>}
           </button>
         </div>
       </motion.aside>
