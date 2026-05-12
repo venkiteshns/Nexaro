@@ -4,6 +4,7 @@ import otpTemplate from "../utils/otpTemplate.js";
 import Otp from "../models/otpSchems.js";
 import user from "../models/userSchema.js";
 import { hashData, compareHash } from "../utils/hasing.js";
+import User from "../models/userSchema.js";
 
 export const createOtp = async (email, phone) => {
     try {
@@ -87,6 +88,22 @@ export const verifyOtp = async (email, otp) => {
         return { success: true, message: "OTP verified successfully" };
     } catch (error) {
         console.log(error);
+        throw error;
+    }
+}
+
+export const loginService = async ({ email, password }) => {
+    try {
+        const existingUser = await User.findOne({ email });
+        if (!existingUser) {
+            return { success: false, message: "User not found" };
+        }
+        const isPasswordValid = await compareHash(password, existingUser.password);
+        if (!isPasswordValid) {
+            return { success: false, message: "Invalid password" };
+        }
+        return { success: true, message: "Login successful", user };
+    } catch (error) {
         throw error;
     }
 }

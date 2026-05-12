@@ -2,7 +2,7 @@ import express from "express";
 import upload from "../middlewares/upload.js";
 import { workerSignup } from "../controller/WorkerControllers/workerController.js";
 import { posterSignup } from "../controller/PosterControllers/posterController.js";
-import { getOtpForSignUp, logout, refreshAccessToken, verifySignUpOtp } from "../controller/authController.js";
+import { getOtpForSignUp, login, logout, refreshAccessToken, verifySignUpOtp } from "../controller/authController.js";
 
 const router = express.Router();
 
@@ -15,6 +15,8 @@ router.post("/refresh-token", refreshAccessToken);
 router.post("/get-otp", getOtpForSignUp)
 
 router.post("/verify-otp", verifySignUpOtp);
+
+router.post("/login", login);
 
 router.post("/logout", logout);
 
