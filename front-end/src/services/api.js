@@ -1,7 +1,7 @@
 import axios from 'axios';
 import useAuthStore from '../store/store.js';
 
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:8000/api";
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
@@ -32,7 +32,7 @@ api.interceptors.response.use(
             if (accessToken) {
                 useAuthStore.getState().setToken(accessToken);
             }
-            
+
             const actualUser = user || responseUser;
             if (actualUser) {
                 useAuthStore.getState().setUser(actualUser);
