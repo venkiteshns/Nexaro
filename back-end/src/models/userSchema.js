@@ -40,19 +40,19 @@ const userSchema = new mongoose.Schema({
     serviceArea: {
         type: {
             type: String,
-            enum: ["Point"]
+            enum: ["Point"],
+            default: undefined
         },
         coordinates: {
-            type: [Number]
+            type: [Number],
+            default: undefined
         }
     },
     skills: {
-        type: [String],
-        required: true
+        type: [String]
     },
     languages: {
-        type: [String],
-        required: true
+        type: [String]
     },
     verificationDocuments: {
         idType: {
@@ -97,10 +97,12 @@ const userSchema = new mongoose.Schema({
     location: {
         type: {
             type: String,
-            enum: ["Point"]
+            enum: ["Point"],
+            default: undefined
         },
         coordinates: {
-            type: [Number]
+            type: [Number],
+            default: undefined
         }
     },
     worker: {
@@ -159,6 +161,8 @@ userSchema.methods.generateRefreshToken = function () {
 // Sparse 2dsphere index: documents without a location field are skipped,
 // preventing the "Point must only contain numeric elements" error on signup.
 userSchema.index({ location: "2dsphere" }, { sparse: true });
+userSchema.index({ serviceArea: "2dsphere" }, { sparse: true });
+
 
 const user = mongoose.model("User", userSchema);
 

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../../components/shared/PasswordInput/PasswordInput.jsx';
 import LocationAccessCard from '../../components/location/LocationAccessCard/LocationAccessCard.jsx';
 import { useLocationAccess } from '../../hooks/useLocationAccess.js';
 import './PosterSignupPage.css';
+import { api } from '../../services/api.js';
+import { useToast } from '../../hooks/useToast.js';
 
 // ─────────────────────────────────────────────
 // CustomSelect Component
@@ -15,8 +17,6 @@ const IconSend = () => (
     <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
   </svg>
 );
-
-// CustomSelect is handled inside shared LocationAccessCard where needed
 
 // ─────────────────────────────────────────────
 // FloatingCards
@@ -137,18 +137,169 @@ const SignupForm = () => {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
   const password = watch('password');
   const { geoState, setGeoState, attempts, requestLocation, maxRetries } = useLocationAccess(setValue);
+  const toast = useToast();
 
-  const onSubmit = (data) => {
-    console.log('Form Submitted', data);
-    // Handle submission logic here
+  const navigate = useNavigate();
+
+  const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
+  const [showOtpModal, setShowOtpModal] = React.useState(false);
+  const [formDataCache, setFormDataCache] = React.useState(null);
+  const [otpDigits, setOtpDigits] = React.useState(Array(6).fill(''));
+  const [otpStatus, setOtpStatus] = React.useState('idle');
+
+  const [timer, setTimer] = React.useState(60);
+  const [resendAttempts, setResendAttempts] = React.useState(0);
+  const [isResending, setIsResending] = React.useState(false);
+
+  React.useEffect(() => {
+    let interval = null;
+    if (showOtpModal && timer > 0 && resendAttempts < 3) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [showOtpModal, timer, resendAttempts]);
+
+  React.useEffect(() => {
+    let timeoutId;
+    if (showOtpModal) {
+      timeoutId = setTimeout(() => {
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+      }, 600);
+    } else {
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+    }
+    return () => {
+      clearTimeout(timeoutId);
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+    };
+  }, [showOtpModal]);
+
+  const handleDigitChange = React.useCallback((index, digit) => {
+    if (!/^\d*$/.test(digit)) return;
+    setOtpDigits((prev) => {
+      const next = [...prev];
+      next[index] = digit;
+      return next;
+    });
+    if (otpStatus === 'error') setOtpStatus('idle');
+  }, [otpStatus]);
+
+  async function sendDataToBackend(data) {
+    setIsSubmittingForm(true);
+    try {
+      // Strip frontend-only fields — keep only what the backend needs
+      const { exactLat, exactLng, location_check, confirmPassword, terms, fullName, ...cleanData } = data;
+
+      // Map exactLat/exactLng → locationLat/locationLng (they are the same values)
+      // LocationAccessCard sets both; ensure they survive the strip above
+      if (!cleanData.locationLat && exactLat) cleanData.locationLat = exactLat;
+      if (!cleanData.locationLng && exactLng) cleanData.locationLng = exactLng;
+
+      // Validate coordinates are present before sending
+      if (!cleanData.locationLat || !cleanData.locationLng) {
+        toast.error("Location is required. Please allow location access and try again.");
+        setIsSubmittingForm(false);
+        setShowOtpModal(false);
+        return;
+      }
+
+      const res = await api.post("/auth/signup/poster", cleanData);
+      if (!res.data.success) throw new Error(res.data.message);
+      navigate("/poster/dashboard");
+    } catch (err) {
+      const raw = err?.response?.data?.message || err?.message || "";
+
+      // Map backend/network errors to friendly messages
+      let friendlyMessage = "Something went wrong. Please try again.";
+      if (raw.toLowerCase().includes("already exists") || raw.toLowerCase().includes("duplicate")) {
+        friendlyMessage = "An account with this email already exists. Please log in instead.";
+      } else if (raw.toLowerCase().includes("network") || !err?.response) {
+        friendlyMessage = "Network error. Please check your connection and try again.";
+      } else if (raw.toLowerCase().includes("password")) {
+        friendlyMessage = "Password does not meet requirements. Please try a stronger password.";
+      } else if (err?.response?.status === 500) {
+        friendlyMessage = "Our servers are having trouble. Please try again in a moment.";
+      }
+
+      toast.error(friendlyMessage);
+      console.error("Poster signup error →", err);
+    } finally {
+      setIsSubmittingForm(false);
+      setShowOtpModal(false);
+    }
+  }
+
+  async function handleVerifyOtp(e) {
+    e?.preventDefault();
+    const code = otpDigits.join('');
+    if (code.length < 6) return;
+
+    setOtpStatus('submitting');
+    await new Promise(r => setTimeout(r, 900));
+
+    try {
+      const res = await api.post('/auth/verify-otp', { email: formDataCache.email, otp: code });
+      if (res.data.success) {
+        setOtpStatus('success');
+        sendDataToBackend(formDataCache);
+      }
+    } catch (err) {
+      setOtpStatus('error');
+      setTimeout(() => {
+        setOtpStatus('idle');
+        setOtpDigits(Array(6).fill(''));
+      }, 1800);
+    }
+  }
+
+  const handleResendOtp = async () => {
+    if (resendAttempts >= 3 || timer > 0 || isResending) return;
+    setIsResending(true);
+    try {
+      const response = await api.post("/auth/get-otp", { email: formDataCache.email });
+      if (response.data.success) {
+        setTimer(60);
+        setResendAttempts(prev => prev + 1);
+        toast.success("Verification code resent successfully");
+      }
+    } catch (error) {
+      console.error("Resend OTP Error:", error);
+      toast.error(error?.response?.data?.message || "Failed to resend OTP");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setIsSubmittingForm(true);
+    try {
+      const response = await api.post("/auth/get-otp", { email: data.email });
+      if (response.data.success) {
+        setIsSubmittingForm(false);
+        setFormDataCache(data);
+        setTimer(60);
+        setResendAttempts(0);
+        setShowOtpModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (error) {
+      setIsSubmittingForm(false);
+      console.error("OTP Error:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || "An error occurred";
+      toast.error(errorMessage);
+    }
   };
 
   return (
     <div className="signup-form-container">
       <div className="form-header">
-        <div className="login-link">
-          Already have an account? <Link to="/login" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Login →</Link>
-        </div>
         <h2>Create Your <span className="text-accent">Poster</span> Account</h2>
         <p className="subtitle">Join India's most trusted hyperlocal task marketplace.</p>
       </div>
@@ -160,15 +311,22 @@ const SignupForm = () => {
             <input
               type="text"
               placeholder="e.g. Rahul Sharma"
-              className={errors.fullName ? 'error-input' : ''}
-              {...register('fullName', { required: 'Full name is required' })}
+              className={errors.name ? 'error-input' : ''}
+              {...register('name', {
+                required: 'Full name is required',
+                minLength: { value: 2, message: 'Name must be at least 2 characters long' },
+                pattern: {
+                  value: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+                  message: 'Only letters are allowed, with a single space between words'
+                }
+              })}
             />
             <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </div>
-          {errors.fullName && <span className="error-text">{errors.fullName.message}</span>}
+          {errors.name && <span className="error-text">{errors.name.message}</span>}
         </div>
 
         <div className="form-row">
@@ -218,7 +376,7 @@ const SignupForm = () => {
 
         <div className="form-group">
           <label>CREATE PASSWORD</label>
-          <PasswordInput 
+          <PasswordInput
             name="password"
             register={register}
             rules={{ required: "Password is required", minLength: { value: 8, message: "Minimum 8 characters" }, pattern: { value: /^(?=.*[A-Z])(?=.*[0-9])/, message: "Include at least one uppercase letter and one number" } }}
@@ -231,7 +389,7 @@ const SignupForm = () => {
 
         <div className="form-group">
           <label>CONFIRM PASSWORD</label>
-          <PasswordInput 
+          <PasswordInput
             name="confirmPassword"
             register={register}
             rules={{ required: "Please confirm your password", validate: value => value === password || "Passwords do not match" }}
@@ -244,7 +402,7 @@ const SignupForm = () => {
         <div className="form-group">
           <label>YOUR LOCATION</label>
           <div style={{ marginTop: '6px' }}>
-            <LocationAccessCard 
+            <LocationAccessCard
               geoState={geoState}
               attempts={attempts}
               maxRetries={maxRetries}
@@ -256,6 +414,8 @@ const SignupForm = () => {
               errors={errors}
               requireServiceArea={false}
             />
+            <input type="hidden" {...register("location_check", { validate: () => ["manual", "granted", "exhausted"].includes(geoState) || "Location is compulsory. Please allow access or enter manually." })} />
+            {errors.location_check && <span className="error-text" style={{ display: 'block', marginTop: '6px' }}>{errors.location_check.message}</span>}
           </div>
         </div>
 
@@ -270,8 +430,8 @@ const SignupForm = () => {
           {errors.terms && <span className="error-text">{errors.terms.message}</span>}
         </div>
 
-        <button type="submit" className="btn-primary">
-          <span className="btn-icon"><IconSend /></span> Create My Account
+        <button type="submit" className="btn-primary" disabled={isSubmittingForm}>
+          <span className="btn-icon"><IconSend /></span> {isSubmittingForm ? "Submitting..." : "Create My Account"}
         </button>
 
         <div className="divider">
@@ -320,6 +480,145 @@ const SignupForm = () => {
       <div className="form-footer-text">
         © 2026 NEXARO. ALL RIGHTS RESERVED.
       </div>
+
+      {/* OTP Verification Modal */}
+      {showOtpModal && (
+        <div className="ws-modal-overlay">
+          <div className="ws-modal-content votp-card">
+            <div className="ws-modal-close" onClick={() => !isSubmittingForm && setShowOtpModal(false)}>✕</div>
+
+            <header className="votp-card__header">
+              <h2 className="votp-card__title">Verify Your Email</h2>
+              <p className="votp-card__subtitle">
+                We sent a 6-digit verification code to <b>{formDataCache?.email}</b>
+              </p>
+            </header>
+
+            <form onSubmit={handleVerifyOtp} className="votp-form">
+              <div className="votp-input-group">
+                {otpDigits.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    id={`otp-${idx}`}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete={idx === 0 ? "one-time-code" : "off"}
+                    maxLength={1}
+                    value={digit}
+                    className={`votp-input ${otpStatus === 'error' ? 'error' : ''}`}
+                    onFocus={(e) => e.target.select()}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6).split('');
+                      if (pastedData.length > 0) {
+                        setOtpDigits((prev) => {
+                          const next = [...prev];
+                          pastedData.forEach((d, i) => {
+                            if (i < 6) next[i] = d;
+                          });
+                          return next;
+                        });
+                        if (otpStatus === 'error') setOtpStatus('idle');
+                        const focusIndex = Math.min(pastedData.length, 5);
+                        setTimeout(() => document.getElementById(`otp-${focusIndex}`)?.focus(), 10);
+                      }
+                    }}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      handleDigitChange(idx, val.slice(-1));
+                      if (val && idx < 5) {
+                        setTimeout(() => document.getElementById(`otp-${idx + 1}`)?.focus(), 10);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !digit && idx > 0) {
+                        e.preventDefault();
+                        handleDigitChange(idx - 1, "");
+                        setTimeout(() => document.getElementById(`otp-${idx - 1}`)?.focus(), 10);
+                      } else if (e.key === 'ArrowLeft' && idx > 0) {
+                        e.preventDefault();
+                        setTimeout(() => document.getElementById(`otp-${idx - 1}`)?.focus(), 10);
+                      } else if (e.key === 'ArrowRight' && idx < 5) {
+                        e.preventDefault();
+                        setTimeout(() => document.getElementById(`otp-${idx + 1}`)?.focus(), 10);
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+
+              {otpStatus === 'error' && (
+                <p style={{ color: '#EF4444', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
+                  Invalid code. Please try again.
+                </p>
+              )}
+
+              {otpStatus === 'success' && (
+                <p style={{ color: '#036947ff', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
+                  Verified successfully! Submitting registration...
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={otpDigits.join('').length < 6 || otpStatus === 'submitting' || isSubmittingForm}
+                style={{ background: (otpStatus === 'success' || isSubmittingForm) ? '#10B981' : '', width: '100%', justifyContent: 'center', marginTop: '16px' }}
+              >
+                {(otpStatus === 'submitting' || isSubmittingForm && otpStatus != 'success') ? 'Verifying...' : otpStatus === 'success' ? 'Verified! Registering...' : 'Verify & Register'}
+              </button>
+
+              <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                {resendAttempts >= 3 ? (
+                  <div style={{
+                    padding: '12px 16px',
+                    background: '#FEF2F2',
+                    borderRadius: '8px',
+                    color: '#991B1B',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    border: '1px solid #FEE2E2',
+                    fontWeight: '500'
+                  }}>
+                    For security reasons, OTP requests have been temporarily limited. Please try again shortly.
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={timer > 0 || isResending}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: timer > 0 ? '#6B7280' : 'var(--color-accent, #0A6E5C)',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: timer > 0 ? 'not-allowed' : 'pointer',
+                      opacity: timer > 0 ? 0.6 : 1,
+                      transition: 'all 0.3s ease',
+                      padding: '8px 16px',
+                      borderRadius: '6px'
+                    }}
+                    onMouseOver={(e) => {
+                      if (timer === 0 && !isResending) {
+                        e.target.style.background = 'rgba(10, 110, 92, 0.05)';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (timer === 0) {
+                        e.target.style.background = 'none';
+                      }
+                    }}
+                  >
+                    {isResending ? 'Sending...' : timer > 0 ? `Resend available in 00:${timer.toString().padStart(2, '0')}` : 'Resend OTP'}
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

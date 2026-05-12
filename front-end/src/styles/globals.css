@@ -157,3 +157,24 @@ main {
   transform: translateX(4px);
 }
 
+/* ── GLOBAL INPUT OVERFLOW FIX (Trailing Icons) ── */
+.input-wrapper input:not([type="tel"]),
+.lfc-input-wrapper input:not([type="tel"]),
+.nx-password-wrap input {
+  padding-right: 48px !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+.input-icon,
+.lfc-input-icon,
+.auth-input-icon {
+  position: absolute !important;
+  right: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
