@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    workPlaces: {
+    serviceArea: {
         type: {
             type: String,
             enum: ["Point"]
@@ -94,11 +94,6 @@ const userSchema = new mongoose.Schema({
         enum: ["poster", "worker", "admin"],
         default: "poster"
     },
-    role: {
-        type: String,
-        enum: ["poster", "worker", "admin"],
-        required: true
-    },
     location: {
         type: {
             type: String,
@@ -111,10 +106,11 @@ const userSchema = new mongoose.Schema({
     worker: {
         isLive: {
             type: Boolean,
-            required: true
+            default: true
         },
         rating: {
-            type: String
+            type: Number,
+            default: 0
         }
     },
     poster: {

@@ -86,8 +86,8 @@ export const workerSignupService = async ({ files, data }) => {
 
         createdUser.refreshToken = refreshToken;
         await createdUser.save({ validateBeforeSave: false });
-        const { _id, name, email, verificationDocuments, role } = createdUser;
-        const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role };
+        const { _id, name, email, verificationDocuments, activeRole } = createdUser;
+        const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role: activeRole };
         console.log(responseUser);
         return { responseUser, accessToken, refreshToken };
 
