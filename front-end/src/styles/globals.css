@@ -45,3 +45,115 @@ main {
   width: var(--container-width-text);
   margin: 0 auto;
 }
+
+/* ── Premium Auth CTA Cards ── */
+.auth-cta-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.auth-cta-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-cta-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, rgba(10, 110, 92, 0.03), rgba(10, 110, 92, 0));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.auth-cta-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 12px 24px -8px rgba(10, 110, 92, 0.15);
+}
+
+.auth-cta-card:hover::before {
+  opacity: 1;
+}
+
+.auth-cta-icon-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0A6E5C;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.auth-cta-card:hover .auth-cta-icon-wrapper {
+  background: #0A6E5C;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(10, 110, 92, 0.25);
+}
+
+.auth-cta-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  text-align: left;
+}
+
+.auth-cta-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-cta-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: color 0.2s ease;
+  margin: 0;
+}
+
+.auth-cta-card:hover .auth-cta-title {
+  color: #0A6E5C;
+}
+
+.auth-cta-arrow {
+  color: #94A3B8;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateX(0);
+}
+
+.auth-cta-card:hover .auth-cta-arrow {
+  color: #0A6E5C;
+  transform: translateX(4px);
+}
+

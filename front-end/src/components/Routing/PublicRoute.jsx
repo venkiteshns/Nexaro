@@ -5,7 +5,8 @@ const PublicRoute = () => {
   const { user, token } = useAuthStore((state) => state);
 
   if (user && token) {
-    return <Navigate to="/" replace />;
+    if (user.role === "worker") return <Navigate to="/worker/dashboard" replace />;
+    if (user.role === "poster") return <Navigate to="/poster/dashboard" replace />;
   }
 
   return <Outlet />;
