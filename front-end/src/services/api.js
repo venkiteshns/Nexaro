@@ -1,7 +1,7 @@
 import axios from 'axios';
 import useAuthStore from '../store/store.js';
 
-const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "https://nexaro-or84.onrender.com/api";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:8000/api";
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
