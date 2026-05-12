@@ -190,10 +190,33 @@ const LoginFormCard = () => {
 
         <SocialLoginButton />
 
-        <p className="lfc-register">
-          Don't have an account?{' '}
-          <Link to="/signup/poster" className="lfc-register__link" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Register</Link>
-        </p>
+        <div className="auth-cta-container">
+          <Link to="/signup/worker" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="auth-cta-icon-wrapper">
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div className="auth-cta-content">
+              <span className="auth-cta-subtitle">Looking to earn?</span>
+              <h3 className="auth-cta-title">
+                Register as a Worker
+                <svg className="auth-cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </h3>
+            </div>
+          </Link>
+
+          <Link to="/signup/poster" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="auth-cta-icon-wrapper">
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div className="auth-cta-content">
+              <span className="auth-cta-subtitle">Need to hire someone?</span>
+              <h3 className="auth-cta-title">
+                Register as a Poster
+                <svg className="auth-cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </h3>
+            </div>
+          </Link>
+        </div>
       </form>
 
       <div className="lfc-footer-links">

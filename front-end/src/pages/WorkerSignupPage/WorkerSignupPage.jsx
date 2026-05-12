@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { getCurrentPosition } from "../../services/geolocationService.js";
-import { reverseGeocode } from "../../services/reverseGeocodeService.js";
 import { geocode } from "../../services/geocodeService.js";
 import "./WorkerSignupPage.css";
 import { api } from "../../services/api.js";
 import { useToast } from "../../hooks/useToast.js";
-import { motion, AnimatePresence } from "framer-motion";
-import { createPortal } from "react-dom";
+import CustomSelect from "../../components/shared/CustomSelect/CustomSelect.jsx";
+import PasswordInput from "../../components/shared/PasswordInput/PasswordInput.jsx";
+import LocationAccessCard from "../../components/location/LocationAccessCard/LocationAccessCard.jsx";
+import { useLocationAccess } from "../../hooks/useLocationAccess.js";
+import { SKILLS, LANGUAGES, ID_TYPES, DISTRICT_AREAS } from "../../utils/constants.js";
+
 // ─────────────────────────────────────────────
 // Shared UI Elements
 // ─────────────────────────────────────────────
@@ -31,125 +33,7 @@ function SectionCard({ icon, title, children }) {
   );
 }
 
-function CustomSelect({ name, options, placeholder, rules, register, setValue, watch, errors }) {
-  const selectedValue = watch(name);
-  const [isOpen, setIsOpen] = useState(false);
-  const [coords, setCoords] = useState(null);
-  const dropdownRef = useRef(null);
-
-  const updateCoords = useCallback(() => {
-    if (dropdownRef.current) {
-      const rect = dropdownRef.current.getBoundingClientRect();
-      setCoords({
-        left: rect.left,
-        top: rect.bottom + window.scrollY,
-        width: rect.width
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      updateCoords();
-      window.addEventListener("scroll", updateCoords, true);
-      window.addEventListener("resize", updateCoords);
-    }
-    return () => {
-      window.removeEventListener("scroll", updateCoords, true);
-      window.removeEventListener("resize", updateCoords);
-    };
-  }, [isOpen, updateCoords]);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        if (!event.target.closest('.ws-custom-dropdown')) {
-          setIsOpen(false);
-        }
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div
-      ref={dropdownRef}
-      className={`ws-custom-select-wrap${isOpen ? ' ws-custom-select-wrap--open' : ''}`}
-    >
-      <input type="hidden" {...register(name, rules)} />
-      <div
-        className={`ws-custom-select ${errors[name] ? 'error' : ''} ${isOpen ? 'open' : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
-        role="combobox"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOpen(o => !o); } if (e.key === 'Escape') setIsOpen(false); }}
-      >
-        <span style={{ color: selectedValue ? 'var(--color-heading)' : 'var(--color-muted)' }}>
-          {selectedValue || placeholder}
-        </span>
-        <svg
-          className={`ws-custom-select-icon${isOpen ? ' ws-custom-select-icon--open' : ''}`}
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-          aria-hidden="true"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-
-      {createPortal(
-        <AnimatePresence>
-          {isOpen && coords && (
-            <motion.div
-              initial={{ opacity: 0, y: -6, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.98 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="ws-custom-dropdown"
-              style={{
-                position: 'absolute',
-                top: coords.top + 6,
-                left: coords.left,
-                width: coords.width,
-                zIndex: 99999,
-              }}
-              role="listbox"
-            >
-              {options && options.length > 0 ? (
-                options.map(option => (
-                  <div
-                    key={option}
-                    className={`ws-custom-option${selectedValue === option ? ' selected' : ''}`}
-                    role="option"
-                    aria-selected={selectedValue === option}
-                    onClick={() => {
-                      setValue(name, option, { shouldValidate: true });
-                      setIsOpen(false);
-                    }}
-                  >
-                    {option}
-                    {selectedValue === option && (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" aria-hidden="true">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="ws-custom-option" style={{ color: 'var(--color-muted)', cursor: 'default', justifyContent: 'center' }}>
-                  No options available, Please select District first
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-    </div>
-  );
-}
+// CustomSelect moved to shared components
 
 const IconUpload = () => (
   <svg width="20" height="20" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -226,58 +110,7 @@ function UploadCard({ name, label, hint, rules, register, setValue, watch, error
   );
 }
 
-const IconEye = ({ off }) => off ? (
-  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
-) : (
-  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-);
-
-function getStrength(pw) {
-  if (!pw) return { score: 0, label: "", color: "" };
-  let s = 0;
-  if (pw.length >= 8) s++;
-  if (/[A-Z]/.test(pw)) s++;
-  if (/[0-9]/.test(pw)) s++;
-  if (/[^A-Za-z0-9]/.test(pw)) s++;
-  const map = [
-    { label: "Too short", color: "#EF4444" },
-    { label: "Weak", color: "#F59E0B" },
-    { label: "Fair", color: "#F59E0B" },
-    { label: "Good", color: "#10B981" },
-    { label: "Strong", color: "#0A6E5C" },
-  ];
-  return { score: s, ...map[s] };
-}
-
-function isInsecureNetworkOrigin() {
-  return window.location.protocol === "http:" && !["localhost", "127.0.0.1"].includes(window.location.hostname);
-}
-
-const SKILLS = ["Electrician", "Plumber", "Carpenter", "Painter", "Gardener", "Mason", "AC Technician", "Welder", "Tiler", "Handyman", "Cleaner", "Driver"];
-const LANGUAGES = ["English", "Hindi", "Malayalam", "Tamil", "Telugu", "Kannada", "Bengali", "Marathi"];
-const ID_TYPES = ["Aadhaar Card", "PAN Card", "Passport", "Voter ID", "Driving Licence"];
-const KERALA_DISTRICTS = [
-  "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
-  "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad",
-  "Malappuram", "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
-];
-const DISTRICT_AREAS = {
-  "Thiruvananthapuram": ["Kazhakootam", "Kowdiar", "Pattom", "Vattiyoorkavu", "Nemom", "Attingal", "Neyyattinkara"],
-  "Ernakulam": ["Kochi", "Kakkanad", "Edappally", "Fort Kochi", "Aluva", "Vyttila", "Palarivattom", "Angamaly"],
-  "Kozhikode": ["Nadakkavu", "Mavoor Road", "Meenchanda", "Elathur", "Beypore", "Feroke"],
-  "Thrissur": ["Poonkunnam", "Ollur", "Chalakudy", "Guruvayur", "Irinjalakuda", "Kunnamkulam"],
-  "Malappuram": ["Manjeri", "Tirur", "Perinthalmanna", "Ponnani", "Kottakkal", "Tirurrangadi"],
-  "Kannur": ["Thalassery", "Taliparamba", "Payyanur", "Mattannur", "Koothuparamba", "Iritty"],
-  "Kollam": ["Karunagappally", "Punalur", "Kottarakkara", "Paravur", "Kundara", "Chavara"],
-  "Palakkad": ["Ottapalam", "Shornur", "Chittur", "Pattambi", "Mannarkkad", "Alathur"],
-  "Alappuzha": ["Cherthala", "Kayamkulam", "Chengannur", "Mavelikkara", "Harippad", "Haripad"],
-  "Kottayam": ["Changanassery", "Pala", "Ettumanoor", "Vaikom", "Erattupetta", "Kanjirappally"],
-  "Kasaragod": ["Kanhangad", "Nileshwaram", "Uppala", "Kumbla", "Manjeshwar", "Cheruvathur"],
-  "Pathanamthitta": ["Thiruvalla", "Adoor", "Pandalam", "Ranni", "Konni", "Kozhencherry"],
-  "Idukki": ["Thodupuzha", "Munnar", "Kumily", "Adimali", "Nedumkandam", "Painavu"],
-  "Wayanad": ["Kalpetta", "Sulthan Bathery", "Mananthavady", "Meenangadi", "Vythiri", "Ambalavayal"]
-};
-const MAX_GEO_RETRIES = 3;
+// Helpers and constants moved to utils
 
 
 // Main Page Component
@@ -323,41 +156,9 @@ export default function WorkerSignupPage() {
     }
   }, [district, setValue]);
 
-  const [geoState, setGeoState] = useState("idle");
-  const [attempts, setAttempts] = useState(0);
+  const { geoState, setGeoState, attempts, requestLocation, maxRetries } = useLocationAccess(setValue);
 
-  async function requestLocation() {
-    if (isInsecureNetworkOrigin()) {
-      setGeoState("manual");
-      return;
-    }
-    setGeoState("loading");
-    try {
-      const pos = await getCurrentPosition();
-      const addr = await reverseGeocode(pos);
-      setValue("exactLat", pos.lat);
-      setValue("exactLng", pos.lng);
-      setValue("country", addr.country, { shouldValidate: true });
-      setValue("state", addr.state, { shouldValidate: true });
-      const matched = KERALA_DISTRICTS.find(d => d.toLowerCase() === (addr.district || "").toLowerCase());
-      setValue("district", matched || addr.district, { shouldValidate: true });
-      setValue("city", addr.city, { shouldValidate: true });
-      setGeoState("granted");
-    } catch (err) {
-      const next = attempts + 1;
-      setAttempts(next);
-      if (next >= MAX_GEO_RETRIES) {
-        setGeoState("exhausted");
-      } else {
-        setGeoState("failed");
-      }
-    }
-  }
-
-  const [showPw, setShowPw] = useState(false);
-  const [showCf, setShowCf] = useState(false);
   const password = watch("password", "");
-  const strength = getStrength(password);
 
   useEffect(() => {
     let timeoutId;
@@ -573,116 +374,18 @@ export default function WorkerSignupPage() {
 
         {/* Location Section */}
         <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>} title="Service Location">
-          <AnimatePresence mode="wait">
-            {["idle", "loading", "failed"].includes(geoState) && (
-              <motion.div
-                key="loc-request"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="ws-loc-card"
-              >
-                <div className="ws-loc-icon" style={{ borderColor: geoState === "failed" ? "#EF4444" : "#E5E7EB", background: geoState === "failed" ? "#FEF2F2" : "#FFFFFF" }}>
-                  {geoState === "failed" ? (
-                    <svg width="26" height="26" fill="none" stroke="#EF4444" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
-                  ) : (
-                    <svg width="26" height="26" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
-                  )}
-                </div>
-
-                <div className="ws-loc-card__title" style={{ color: geoState === "failed" ? "#EF4444" : "var(--color-text)" }}>
-                  {geoState === "loading" ? "Detecting Location..." :
-                    geoState === "failed" ? "Location Access Failed" :
-                      "Enable Location Access"}
-                </div>
-
-                <div className="ws-loc-card__sub" style={{ color: geoState === "failed" ? "#EF4444" : "var(--color-muted)" }}>
-                  {geoState === "loading" ? "Please wait while we securely determine your location." :
-                    geoState === "failed" ? `Unable to detect your location. ${MAX_GEO_RETRIES - attempts} attempts remaining.` :
-                      "Allow Nexaro to detect your location for precise hyperlocal matching."}
-                </div>
-
-                <button
-                  type="button"
-                  className="ws-loc-btn"
-                  onClick={requestLocation}
-                  disabled={geoState === "loading"}
-                  style={{
-                    background: geoState === "failed" ? "#EF4444" : "var(--color-accent)",
-                    opacity: geoState === "loading" ? 0.7 : 1,
-                    cursor: geoState === "loading" ? "wait" : "pointer"
-                  }}
-                >
-                  {geoState === "loading" ? "Detecting..." : geoState === "failed" ? "Retry Access" : "Allow Location Access"}
-                </button>
-
-                <p style={{ marginTop: 14, fontSize: 12 }}>
-                  <button
-                    type="button"
-                    onClick={() => setGeoState("manual")}
-                    disabled={geoState === "loading"}
-                    style={{ background: "none", border: "none", color: "var(--color-muted)", cursor: geoState === "loading" ? "wait" : "pointer", textDecoration: "underline" }}
-                  >
-                    Skip and enter manually
-                  </button>
-                </p>
-              </motion.div>
-            )}
-
-            {["exhausted", "manual", "granted"].includes(geoState) && (
-              <motion.div
-                key="loc-fields"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                transition={{ duration: 0.4 }}
-                className="ws-loc-fields"
-                style={{ overflow: 'hidden' }}
-              >
-                {geoState === "granted" && (
-                  <div style={{ marginBottom: 20, padding: 12, background: "#ECFDF5", color: "#065F46", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500 }}>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
-                    Location detected successfully. Fields auto-filled.
-                  </div>
-                )}
-                {geoState === "exhausted" && (
-                  <div style={{ marginBottom: 20, padding: 12, background: "#FEF2F2", color: "#991B1B", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500 }}>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                    Location access failed after multiple attempts. Please enter manually.
-                  </div>
-                )}
-                <div className="ws-grid-2">
-                  <div className="ws-field">
-                    <label className="ws-label">Country<span style={{ color: "#EF4444" }}>*</span></label>
-                    <input className={`ws-input${errors.country ? " error" : ""}`} placeholder="Enter country" defaultValue="India" {...register("country", { required: "Country is required" })} />
-                    {errors.country && <span className="ws-error">⚠ {errors.country.message}</span>}
-                  </div>
-                  <div className="ws-field">
-                    <label className="ws-label">State<span style={{ color: "#EF4444" }}>*</span></label>
-                    <input className={`ws-input${errors.state ? " error" : ""}`} placeholder="Enter state" defaultValue="Kerala" {...register("state", { required: "State is required" })} />
-                    {errors.state && <span className="ws-error">⚠ {errors.state.message}</span>}
-                  </div>
-                  <div className="ws-field">
-                    <label className="ws-label">District<span style={{ color: "#EF4444" }}>*</span></label>
-                    <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="district" options={KERALA_DISTRICTS} placeholder="Select district…" rules={{ required: "Please select a district" }} />
-                    {errors.district && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.district.message}</span>}
-                  </div>
-                  <div className="ws-field">
-                    <label className="ws-label">City / Place<span style={{ color: "#EF4444" }}>*</span></label>
-                    <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="city" options={areas} placeholder={district ? `Select city in ${district}` : "Select district first"} rules={{ required: "City / Place is required" }} />
-                    {errors.city && <span className="ws-error" style={{ marginTop: 4 }}>⚠ {errors.city.message}</span>}
-                  </div>
-                </div>
-                {district && (
-                  <div style={{ marginTop: 20 }}>
-                    <label className="ws-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area<span style={{ color: "#EF4444" }}>*</span></label>
-                    <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="serviceArea" options={areas} placeholder={`Select a major city/area in ${district}`} rules={{ required: "Please select a service area" }} />
-                    {errors.serviceArea && <span className="ws-error" style={{ marginTop: 6, display: 'block' }}>⚠ {errors.serviceArea.message}</span>}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <LocationAccessCard
+            geoState={geoState}
+            attempts={attempts}
+            maxRetries={maxRetries}
+            requestLocation={requestLocation}
+            setGeoState={setGeoState}
+            register={register}
+            setValue={setValue}
+            watch={watch}
+            errors={errors}
+            requireServiceArea={true}
+          />
         </SectionCard>
 
         {/* Identity Section */}
@@ -707,27 +410,26 @@ export default function WorkerSignupPage() {
           <div className="ws-grid-2">
             <div className="ws-field">
               <label className="ws-label">Password<span style={{ color: "#EF4444" }}>*</span></label>
-              <div className="ws-password-wrap">
-                <input type={showPw ? "text" : "password"} className={`ws-input${errors.password ? " error" : ""}`} placeholder="Create a password" {...register("password", { required: "Password is required", minLength: { value: 8, message: "Minimum 8 characters" }, pattern: { value: /^(?=.*[A-Z])(?=.*[0-9])/, message: "Include at least one uppercase letter and one number" } })} />
-                <button type="button" className="ws-password-toggle" onClick={() => setShowPw(v => !v)}><IconEye off={showPw} /></button>
-              </div>
-              {password && (
-                <>
-                  <div className="ws-strength-bar">
-                    <div className="ws-strength-fill" style={{ width: `${strength.score * 25}%`, background: strength.color }} />
-                  </div>
-                  <span className="ws-strength-label" style={{ color: strength.color }}>{strength.label}</span>
-                </>
-              )}
-              {errors.password && <span className="ws-error">⚠ {errors.password.message}</span>}
+              <PasswordInput
+                name="password"
+                register={register}
+                rules={{ required: "Password is required", minLength: { value: 8, message: "Minimum 8 characters" }, pattern: { value: /^(?=.*[A-Z])(?=.*[0-9])/, message: "Include at least one uppercase letter and one number" } }}
+                error={errors.password}
+                placeholder="Create a password"
+                watch={watch}
+                showStrength={true}
+              />
             </div>
             <div className="ws-field">
               <label className="ws-label">Confirm Password<span style={{ color: "#EF4444" }}>*</span></label>
-              <div className="ws-password-wrap">
-                <input type={showCf ? "text" : "password"} className={`ws-input${errors.confirmPassword ? " error" : ""}`} placeholder="Repeat your password" {...register("confirmPassword", { required: "Please confirm your password", validate: v => v === password || "Passwords do not match" })} />
-                <button type="button" className="ws-password-toggle" onClick={() => setShowCf(v => !v)}><IconEye off={showCf} /></button>
-              </div>
-              {errors.confirmPassword && <span className="ws-error">⚠ {errors.confirmPassword.message}</span>}
+              <PasswordInput
+                name="confirmPassword"
+                register={register}
+                rules={{ required: "Please confirm your password", validate: v => v === password || "Passwords do not match" }}
+                error={errors.confirmPassword}
+                placeholder="Repeat your password"
+                watch={watch}
+              />
             </div>
           </div>
           <div className="ws-checkbox-group" style={{ marginTop: 24 }}>
@@ -744,9 +446,33 @@ export default function WorkerSignupPage() {
             <IconSend />
             {isSubmittingForm ? "Submitting…" : "Complete Registration"}
           </button>
-          <p className="ws-login-link">
-            Already have an account? <Link to="/login" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Log in here</Link>
-          </p>
+          <div className="auth-cta-container" style={{ marginTop: 24 }}>
+            <Link to="/login" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <div className="auth-cta-icon-wrapper">
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
+              </div>
+              <div className="auth-cta-content">
+                <span className="auth-cta-subtitle">Already have an account?</span>
+                <h3 className="auth-cta-title">
+                  Log in to Nexaro
+                  <svg className="auth-cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </h3>
+              </div>
+            </Link>
+
+            <Link to="/signup/poster" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <div className="auth-cta-icon-wrapper">
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+              </div>
+              <div className="auth-cta-content">
+                <span className="auth-cta-subtitle">Need to hire someone?</span>
+                <h3 className="auth-cta-title">
+                  Register as a Poster
+                  <svg className="auth-cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </h3>
+              </div>
+            </Link>
+          </div>
         </div>
       </form>
 

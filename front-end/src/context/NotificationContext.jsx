@@ -6,12 +6,10 @@ export const NotificationProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const [modals, setModals] = useState([]);
 
-  // Toast Methods
   const addToast = useCallback((toast) => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
     setToasts((prev) => [...prev, { id, ...toast }]);
-    
-    // Auto-remove after duration
+
     if (toast.duration !== Infinity) {
       setTimeout(() => {
         removeToast(id);
@@ -24,11 +22,9 @@ export const NotificationProvider = ({ children }) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  // Modal Methods
   const addModal = useCallback((modalParams) => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-    
-    // Return a promise that resolves when the modal is closed/confirmed
+
     return new Promise((resolve) => {
       setModals((prev) => [
         ...prev,

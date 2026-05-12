@@ -1,0 +1,106 @@
+/* ── Custom Select / Dropdown ── */
+
+/* Wrapper — the positioning anchor */
+.nx-custom-select-wrap {
+  position: relative;
+  z-index: 10;
+}
+
+.nx-custom-select-wrap--open {
+  z-index: 100;
+}
+
+.nx-custom-select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface, #ffffff);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  user-select: none;
+  outline: none;
+}
+
+.nx-custom-select:hover {
+  border-color: var(--color-accent);
+}
+
+.nx-custom-select.open {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.1);
+}
+
+.nx-custom-select:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.1);
+}
+
+.nx-custom-select.error {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
+.nx-custom-select-icon {
+  color: var(--color-muted);
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nx-custom-select-icon--open {
+  transform: rotate(180deg);
+}
+
+.nx-custom-dropdown {
+  position: absolute;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07),
+    0 10px 25px -5px rgba(0, 0, 0, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  overflow-y: auto;
+  max-height: 240px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.nx-custom-dropdown::-webkit-scrollbar {
+  width: 5px;
+}
+.nx-custom-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nx-custom-dropdown::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+.nx-custom-option {
+  padding: 12px 16px;
+  font-size: 14.5px;
+  font-family: var(--font-sans);
+  color: var(--color-heading);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.nx-custom-option:hover {
+  background: var(--color-bg, #F8FAFC);
+}
+
+.nx-custom-option.selected {
+  background: var(--color-accent2, #ECFDF5);
+  color: var(--color-accent, #0A6E5C);
+  font-weight: 500;
+}
