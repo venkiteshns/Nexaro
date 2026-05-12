@@ -41,24 +41,33 @@ export const createOtp = async (email) => {
 
 export const sendOtp = async (email, otp) => {
     try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: false,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "api-key": process.env.BREVO_API_KEY
             },
+            body: JSON.stringify({
+                sender: {
+                    name: "NEXARO",
+                    email: process.env.BREVO_USER
+                },
+                to: [{ email: email }],
+                subject: "NEXARO Verification Code",
+                htmlContent: otpTemplate(otp)
+            })
         });
 
-        await transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to: email,
-            subject: "NEXARO Verification Code",
-            html: otpTemplate(otp),
-        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Brevo API Error:", errorData);
+            throw new Error("Failed to send email via Brevo API");
+        }
+
         return true;
     } catch (error) {
+        console.error("sendOtp error:", error);
         throw error;
     }
 }
