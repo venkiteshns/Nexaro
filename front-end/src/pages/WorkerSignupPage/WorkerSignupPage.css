@@ -854,6 +854,68 @@
   color: var(--color-muted);
   line-height: 1.5;
 }
+
+/* ── OTP Form & Responsive Inputs ── */
+.votp-form {
+  margin-top: 24px;
+}
+
+.votp-input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(4px, 2vw, 12px);
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.votp-input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  height: clamp(44px, 12vw, 56px);
+  font-size: clamp(20px, 5.5vw, 24px);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-align: center;
+  padding: 0 !important;
+  margin: 0;
+  line-height: 1 !important;
+  box-sizing: border-box;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-heading);
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  appearance: none;
+  -moz-appearance: textfield;
+  -webkit-appearance: none;
+}
+
+.votp-input::-webkit-outer-spin-button,
+.votp-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.votp-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.15);
+  transform: translateY(-2px);
+  background: #ffffff;
+}
+
+.votp-input.error {
+  border-color: #EF4444;
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.votp-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
 @keyframes ws-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
