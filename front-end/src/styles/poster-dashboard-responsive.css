@@ -1,0 +1,85 @@
+/* Responsive Styles for Poster Dashboard */
+
+@media (max-width: 1200px) {
+  .poster-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .poster-content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Sidebar Mobile Behavior */
+  .poster-sidebar {
+    transform: translateX(-100%);
+    width: 280px !important;
+  }
+  
+  .poster-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  
+  .poster-main-wrapper {
+    margin-left: 0 !important;
+  }
+  
+  .poster-mobile-menu-btn {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .poster-dashboard-content {
+    padding: 20px;
+    gap: 24px;
+  }
+  
+  .poster-top-navbar {
+    padding: 0 20px;
+  }
+  
+  .poster-stats-grid {
+    gap: 16px;
+  }
+  
+  .poster-btn-primary {
+    padding: 8px 16px;
+  }
+  
+  .poster-btn-primary span {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .poster-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .poster-date {
+    display: none;
+  }
+  
+  .poster-greeting h1 {
+    font-size: 16px;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .poster-task-top {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .poster-task-meta {
+    flex-wrap: wrap;
+  }
+  
+  .poster-section-content {
+    padding: 16px;
+  }
+}

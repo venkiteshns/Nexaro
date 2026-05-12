@@ -5,6 +5,7 @@ import PosterSignupPage from './pages/PosterSignupPage/PosterSignupPage.jsx'
 import WorkerSignupPage from './pages/WorkerSignupPage/WorkerSignupPage.jsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
 import WorkerDashboard from './pages/WorkerDashboard/WorkerDashboard.jsx'
+import PosterDashboard from './pages/PosterDashboard/PosterDashboard.jsx'
 
 // Protected Route Components
 import PrivateRoute from './components/Routing/PrivateRoute.jsx'
@@ -33,6 +34,7 @@ function App() {
 
             <Route element={<PrivateRoute />}>
               <Route path="/worker/dashboard" element={<WorkerDashboard />} />
+              <Route path="/poster/dashboard" element={<PosterDashboard />} />
             </Route>
 
           </Routes>

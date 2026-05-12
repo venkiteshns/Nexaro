@@ -20,7 +20,7 @@ export const createOtp = async (email) => {
         }
 
         const hashedOtp = await hashData(otp);
-
+        console.log(email);
         const otpRecord = await Otp.create({
             email,
             otp: hashedOtp,
