@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
-import { createOtp, verifyOtp } from '../services/authServices.js';
-import { posterSignupService } from '../services/posterServices.js';
+import { createOtp, loginService, verifyOtp } from '../services/authServices.js';
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -62,25 +61,35 @@ export const verifySignUpOtp = async (req, res) => {
     }
 };
 
+export const login = async (req, res) => {
+    console.log(req.body);
+
+    try {
+        let response = await loginService(req.body);
+        console.log(response);
+
+        if (response.success) {
+            return res.status(200).json({ success: true, message: "Login successful" });
+        } else {
+            return res.status(400).json({ success: false, message: response.message });
+        }
+
+    } catch (error) {
+        console.error("Login error:", error.message);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
 export const logout = async (req, res) => {
     try {
-        // Extract user ID from Authorization header if present
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.split(' ')[1];
             const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-            // Wipe refresh token in DB so it can never be reused
             await User.findByIdAndUpdate(decoded._id, { refreshToken: '' });
         }
-        return res.status(200)
-            .clearCookie('accessToken')
-            .clearCookie('refreshToken')
-            .json({ success: true, message: 'Logged out successfully' });
+        return res.status(200).json({ success: true, message: 'Logged out successfully' });
     } catch {
-        // Even if token is invalid/expired, we still clear cookies client-side
-        return res.status(200)
-            .clearCookie('accessToken')
-            .clearCookie('refreshToken')
-            .json({ success: true, message: 'Logged out' });
+        return res.status(200).json({ success: true, message: 'Logged out' });
     }
 };

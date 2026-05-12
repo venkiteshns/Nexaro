@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { api } from '../../services/api.js';
 import './LoginPage.css';
 
-// ─────────────────────────────────────────────
 // FeatureList
-// ─────────────────────────────────────────────
 const features = [
   {
     icon: (
@@ -52,9 +51,7 @@ const FeatureList = () => (
   </div>
 );
 
-// ─────────────────────────────────────────────
 // LoginBrandSection
-// ─────────────────────────────────────────────
 const LoginBrandSection = () => (
   <div className="lbs-panel">
     <div className="lbs-blob lbs-blob--1" aria-hidden="true" />
@@ -86,9 +83,7 @@ const LoginBrandSection = () => (
   </div>
 );
 
-// ─────────────────────────────────────────────
 // SocialLoginButton
-// ─────────────────────────────────────────────
 const SocialLoginButton = ({ onClick }) => (
   <button type="button" className="slb-btn" onClick={onClick}>
     <svg viewBox="0 0 24 24" width="20" height="20" className="slb-icon">
@@ -101,9 +96,7 @@ const SocialLoginButton = ({ onClick }) => (
   </button>
 );
 
-// ─────────────────────────────────────────────
 // LoginFormCard
-// ─────────────────────────────────────────────
 const EyeIcon = ({ open }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     {open ? (
@@ -126,8 +119,16 @@ const LoginFormCard = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
   const onSubmit = async (data) => {
-    await new Promise((r) => setTimeout(r, 600));
-    console.log('Login data:', data);
+    try {
+      let response = await api.post('/auth/login', data)
+      if (response.data.success) {
+        console.log(response.data.message)
+      } else {
+        console.log(response.data.message)
+      }
+    } catch (error) {
+      console.log(error.response.data.message)
+    }
   };
 
   return (
@@ -193,7 +194,7 @@ const LoginFormCard = () => {
         <div className="auth-cta-container">
           <Link to="/signup/worker" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="auth-cta-icon-wrapper">
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
             </div>
             <div className="auth-cta-content">
               <span className="auth-cta-subtitle">Looking to earn?</span>
@@ -206,7 +207,7 @@ const LoginFormCard = () => {
 
           <Link to="/signup/poster" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="auth-cta-icon-wrapper">
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
             </div>
             <div className="auth-cta-content">
               <span className="auth-cta-subtitle">Need to hire someone?</span>
