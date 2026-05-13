@@ -6,8 +6,6 @@ export function getCurrentPosition() {
       return;
     }
 
-    // Check permission state first (where supported) so we can fail fast
-    // instead of waiting for the full timeout on a previously denied permission.
     if (navigator.permissions) {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         if (result.state === "denied") {
@@ -16,7 +14,7 @@ export function getCurrentPosition() {
         }
         _doGetPosition(resolve, reject);
       }).catch(() => {
-        // permissions API not supported fully — proceed normally
+
         _doGetPosition(resolve, reject);
       });
     } else {
@@ -38,8 +36,8 @@ function _doGetPosition(resolve, reject) {
     },
     {
       timeout: 8000,
-      maximumAge: 300000,   // accept a cached position up to 5 min old (much faster)
-      enableHighAccuracy: false  // false = faster response, avoids silent hangs
+      maximumAge: 300000,   
+      enableHighAccuracy: false 
     }
   );
 }

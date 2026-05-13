@@ -123,12 +123,21 @@ export default function WorkerSignupPage() {
     defaultValues: { languages: ["English"] }
   });
 
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [formDataCache, setFormDataCache] = useState(null);
-
   const [otpDigits, setOtpDigits] = useState(Array(6).fill(''));
-  const [otpStatus, setOtpStatus] = useState('idle');
+
+  // ── OTP State Machine ──────────────────────────────────────────────────────
+  // States: idle | verifying | invalid | success | registering | completed | failed
+  const [verificationStatus, setVerificationStatus] = useState('idle');
+  const [otpErrorMsg, setOtpErrorMsg] = useState('');
+  const isSubmittingForm = verificationStatus === 'registering' || verificationStatus === 'completed';
+
+  // ── Resend Timer ───────────────────────────────────────────────────────────
+  const [timer, setTimer] = useState(60);
+  const [resendAttempts, setResendAttempts] = useState(0);
+  const [isResending, setIsResending] = useState(false);
+  const MAX_RESEND = 3;
 
 
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -156,8 +165,15 @@ export default function WorkerSignupPage() {
     }
   }, [district, setValue]);
 
-  const { geoState, setGeoState, attempts, requestLocation, maxRetries } = useLocationAccess(setValue);
-
+  const { 
+    locationState, 
+    setLocationState, 
+    attempts, 
+    requestLocation, 
+    maxRetries,
+    resolveManualCoords,
+    retryManual
+  } = useLocationAccess(setValue);
   const password = watch("password", "");
 
   useEffect(() => {
@@ -178,27 +194,41 @@ export default function WorkerSignupPage() {
     };
   }, [showOtpModal]);
 
-  // Otp Modal Handler
+  // ── Main form submit → trigger OTP send 
+  const [isFormSending, setIsFormSending] = useState(false);
   async function onFormSubmit(data) {
-    console.log(data);
-    setIsSubmittingForm(true);
+    setIsFormSending(true);
     try {
       const res = await api.post('/auth/get-otp', { email: data.email });
       if (res.data.success) {
-        setIsSubmittingForm(false);
         setFormDataCache(data);
+        setTimer(60);
+        setResendAttempts(0);
+        setVerificationStatus('idle');
+        setOtpDigits(Array(6).fill(''));
         setShowOtpModal(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
-      setIsSubmittingForm(false);
       const errorMessage = err?.response?.data?.message || err?.message || "Failed to send OTP";
-      console.log(errorMessage);
       toast.error(errorMessage);
+    } finally {
+      setIsFormSending(false);
     }
   }
 
-  // handle digit change in otp modal
+  // ── Resend timer tick ──────────────────────────────────────────────────────
+  useEffect(() => {
+    let interval = null;
+    if (showOtpModal && timer > 0 && resendAttempts < MAX_RESEND) {
+      interval = setInterval(() => setTimer(prev => prev - 1), 1000);
+    } else if (timer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [showOtpModal, timer, resendAttempts]);
+
+  // ── Handle digit change ────────────────────────────────────────────────────
   const handleDigitChange = useCallback((index, digit) => {
     if (!/^\d*$/.test(digit)) return;
     setOtpDigits((prev) => {
@@ -206,25 +236,45 @@ export default function WorkerSignupPage() {
       next[index] = digit;
       return next;
     });
-    if (otpStatus === 'error') setOtpStatus('idle');
-  }, [otpStatus]);
+    // Typing clears an invalid state so user can retry
+    if (verificationStatus === 'invalid') {
+      setVerificationStatus('idle');
+      setOtpErrorMsg('');
+    }
+  }, [verificationStatus]);
+
+  // ── Resend OTP ─────────────────────────────────────────────────────────────
+  async function handleResendOtp() {
+    if (resendAttempts >= MAX_RESEND || timer > 0 || isResending) return;
+    setIsResending(true);
+    try {
+      const res = await api.post('/auth/get-otp', { email: formDataCache.email });
+      if (res.data.success) {
+        setTimer(60);
+        setResendAttempts(prev => prev + 1);
+        setOtpDigits(Array(6).fill(''));
+        setVerificationStatus('idle');
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to resend OTP');
+    } finally {
+      setIsResending(false);
+    }
+  }
 
 
-  // send data to backend
+  // ── Send registration data to backend ─────────────────────────────────────
   async function sendDataToBackend(data) {
-    setIsSubmittingForm(true);
+    setVerificationStatus('registering');
     const formData = new FormData();
 
     const skipKeys = ["skills", "languages", "idFront", "idBack", "selfie", "exactLat", "exactLng"];
     Object.keys(data).forEach(key => {
-      if (!skipKeys.includes(key)) {
-        formData.append(key, data[key]);
-      }
+      if (!skipKeys.includes(key)) formData.append(key, data[key]);
     });
 
     if (data.skills) formData.append("skills", JSON.stringify(data.skills));
     if (data.languages) formData.append("languages", JSON.stringify(data.languages));
-
     if (data.idFront) formData.append("idFront", data.idFront);
     if (data.idBack) formData.append("idBack", data.idBack);
     if (data.selfie) formData.append("selfie", data.selfie);
@@ -258,40 +308,59 @@ export default function WorkerSignupPage() {
         headers: { "Content-Type": "multipart/form-data" }
       });
       if (!res.data.success) throw new Error(res.data.message);
+      setVerificationStatus('completed');
+      // Brief celebratory pause before navigating away
+      await new Promise(r => setTimeout(r, 900));
       navigate("/worker/dashboard");
     } catch (err) {
       console.error("Worker signup error →", err);
+      setVerificationStatus('failed');
       toast.error("Registration failed! " + (err?.response?.data?.message || err?.message));
-    } finally {
-      setIsSubmittingForm(false);
-      setShowOtpModal(false);
+      // Let user see the failure then return to idle so they can retry
+      setTimeout(() => {
+        setVerificationStatus('idle');
+        setShowOtpModal(false);
+      }, 2500);
     }
   }
 
-  // Otp Verfication Handle
+  // ── OTP Verification (state-machine driven) ────────────────────────────────
   async function handleVerifyOtp(e) {
     e?.preventDefault();
     const code = otpDigits.join('');
     if (code.length < 6) return;
+    // Guard: only fire from idle state
+    if (!['idle', 'invalid'].includes(verificationStatus)) return;
 
-    setOtpStatus('submitting');
-    // Security: Immediately clear OTP from memory once submitted
-    setOtpDigits(Array(6).fill(''));
-    
-    await new Promise(r => setTimeout(r, 900));
+    setVerificationStatus('verifying');
+    setOtpErrorMsg('');
 
     try {
       const res = await api.post('/auth/verify-otp', { email: formDataCache.email, otp: code });
       if (res.data.success) {
-        setOtpStatus('success');
-        sendDataToBackend(formDataCache);
+        // Stay in 'success' until registration finishes — do NOT reset digits
+        setVerificationStatus('success');
+        await sendDataToBackend(formDataCache);
+      } else {
+        handleOtpError(res.data.message || "Incorrect verification code. Please try again.");
       }
     } catch (err) {
-      setOtpStatus('error');
-      setTimeout(() => {
-        setOtpStatus('idle');
-      }, 1800);
+      handleOtpError(err?.response?.data?.message || "Verification could not be completed right now. Please retry.");
     }
+  }
+
+  function handleOtpError(msg) {
+    setVerificationStatus('invalid');
+    setOtpErrorMsg(msg);
+    setTimeout(() => {
+      setVerificationStatus(prev => {
+        if (prev === 'invalid') {
+          setOtpDigits(Array(6).fill(''));
+          setTimeout(() => document.getElementById('otp-0')?.focus(), 10);
+        }
+        return prev;
+      });
+    }, 800);
   }
 
   return (
@@ -377,17 +446,30 @@ export default function WorkerSignupPage() {
         {/* Location Section */}
         <SectionCard icon={<svg width="16" height="16" fill="none" stroke="#0A6E5C" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>} title="Service Location">
           <LocationAccessCard
-            geoState={geoState}
+            locationState={locationState}
             attempts={attempts}
             maxRetries={maxRetries}
             requestLocation={requestLocation}
-            setGeoState={setGeoState}
+            setLocationState={setLocationState}
+            resolveManualCoords={resolveManualCoords}
+            retryManual={retryManual}
             register={register}
             setValue={setValue}
             watch={watch}
             errors={errors}
             requireServiceArea={true}
           />
+          <input
+            type="hidden"
+            {...register("location_check", {
+              validate: () =>
+                ["granted", "autoDetected", "resolved"].includes(locationState) ||
+                "Location is compulsory. Please allow access or confirm coordinates.",
+            })}
+          />
+          {errors.location_check && (
+            <span className="ws-error" style={{ marginTop: 8, display: 'block' }}>⚠ {errors.location_check.message}</span>
+          )}
         </SectionCard>
 
         {/* Identity Section */}
@@ -444,9 +526,9 @@ export default function WorkerSignupPage() {
         </SectionCard>
 
         <div className="ws-section" style={{ background: "transparent", border: "none", boxShadow: "none", padding: "8px 0 0" }}>
-          <button type="submit" className="ws-submit" disabled={isSubmittingForm} >
+          <button type="submit" className="ws-submit" disabled={isFormSending}>
             <IconSend />
-            {isSubmittingForm ? "Submitting…" : "Complete Registration"}
+            {isFormSending ? "Sending OTP…" : "Complete Registration"}
           </button>
           <div className="auth-cta-container" style={{ marginTop: 24 }}>
             <Link to="/login" className="auth-cta-card" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -478,30 +560,73 @@ export default function WorkerSignupPage() {
         </div>
       </form>
 
-      {/* OTP Verification Modal */}
+      {/* OTP Verification Modal — State Machine UI */}
       {showOtpModal && (
         <div className="ws-modal-overlay">
-          <div className="ws-modal-content votp-card">
-            <div className="ws-modal-close" onClick={() => {
-              if (!isSubmittingForm) {
-                setShowOtpModal(false);
-                setOtpDigits(Array(6).fill(''));
-                setOtpStatus('idle');
-                setTimer(60);
-                setResendAttempts(0);
-                setIsResending(false);
-              }
-            }}>✕</div>
+          <div className={`ws-modal-content votp-card${verificationStatus === 'invalid' ? ' votp-card--shake' : ''}${verificationStatus === 'completed' ? ' votp-card--success-flash' : ''}`}>
 
+            {/* Close — locked during processing */}
+            <div
+              className="ws-modal-close"
+              onClick={() => {
+                if (['idle', 'invalid', 'failed'].includes(verificationStatus)) {
+                  setShowOtpModal(false);
+                  setOtpDigits(Array(6).fill(''));
+                  setVerificationStatus('idle');
+                  setOtpErrorMsg('');
+                  setTimer(60);
+                  setResendAttempts(0);
+                  setIsResending(false);
+                }
+              }}
+              style={{
+                opacity: ['idle', 'invalid', 'failed'].includes(verificationStatus) ? 1 : 0.3,
+                pointerEvents: ['idle', 'invalid', 'failed'].includes(verificationStatus) ? 'auto' : 'none',
+              }}
+            >✕</div>
+
+            {/* Status icon */}
+            <div className={`votp-status-icon votp-status-icon--${
+              verificationStatus === 'invalid' || verificationStatus === 'failed' ? 'error' :
+              ['success','registering','completed'].includes(verificationStatus) ? 'success' :
+              verificationStatus === 'verifying' ? 'loading' : 'default'
+            }`}>
+              {['success','registering','completed'].includes(verificationStatus) ? (
+                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              ) : verificationStatus === 'invalid' || verificationStatus === 'failed' ? (
+                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              ) : verificationStatus === 'verifying' ? (
+                <svg className="votp-spinner" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+              ) : (
+                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+              )}
+            </div>
+
+            {/* Header */}
             <header className="votp-card__header">
-              <h2 className="votp-card__title">Verify Your Email</h2>
+              <h2 className="votp-card__title">
+                {verificationStatus === 'completed' ? 'Account Created!' :
+                 verificationStatus === 'failed' ? 'Registration Failed' :
+                 verificationStatus === 'registering' ? 'Creating Account…' :
+                 verificationStatus === 'success' ? 'Code Verified!' :
+                 'Verify Your Email'}
+              </h2>
               <p className="votp-card__subtitle">
-                We sent a 6-digit verification code to <b>{formDataCache?.email}</b>
+                {verificationStatus === 'completed' ? 'Welcome to NEXARO. Redirecting you now…' :
+                 verificationStatus === 'failed' ? 'Something went wrong. Please try again.' :
+                 verificationStatus === 'registering' ? 'Creating your account securely. Please wait…' :
+                 verificationStatus === 'success' ? 'OTP verified. Submitting your registration…' :
+                 <><span>We sent a 6-digit code to </span><b>{formDataCache?.email}</b></>}
               </p>
             </header>
 
             <form onSubmit={handleVerifyOtp} className="votp-form">
-              <div className="votp-input-group">
+
+              {/* OTP digit inputs */}
+              <div className={`votp-input-group${
+                verificationStatus === 'invalid' ? ' votp-input-group--error-glow' :
+                ['success','registering','completed'].includes(verificationStatus) ? ' votp-input-group--success-glow' : ''
+              }`}>
                 {otpDigits.map((digit, idx) => (
                   <input
                     key={idx}
@@ -509,38 +634,40 @@ export default function WorkerSignupPage() {
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    autoComplete={idx === 0 ? "one-time-code" : "off"}
+                    autoComplete={idx === 0 ? 'one-time-code' : 'off'}
                     maxLength={1}
                     value={digit}
-                    className={`votp-input ${otpStatus === 'error' ? 'error' : ''}`}
+                    disabled={!['idle', 'invalid'].includes(verificationStatus)}
+                    className={`votp-input ${
+                      verificationStatus === 'invalid' ? 'error' :
+                      ['success','registering','completed'].includes(verificationStatus) ? 'success' : ''
+                    }`}
                     onFocus={(e) => e.target.select()}
                     onPaste={(e) => {
                       e.preventDefault();
                       const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6).split('');
                       if (pastedData.length > 0) {
-                        setOtpDigits((prev) => {
-                           const next = [...prev];
-                           pastedData.forEach((d, i) => {
-                             if (i < 6) next[i] = d;
-                           });
-                           return next;
+                        setOtpDigits(prev => {
+                          const next = [...prev];
+                          pastedData.forEach((d, i) => { if (i < 6) next[i] = d; });
+                          return next;
                         });
-                        if (otpStatus === 'error') setOtpStatus('idle');
-                        const focusIndex = Math.min(pastedData.length, 5);
-                        setTimeout(() => document.getElementById(`otp-${focusIndex}`)?.focus(), 10);
+                        if (verificationStatus === 'invalid') {
+                          setVerificationStatus('idle');
+                          setOtpErrorMsg('');
+                        }
+                        setTimeout(() => document.getElementById(`otp-${Math.min(pastedData.length, 5)}`)?.focus(), 10);
                       }
                     }}
                     onChange={(e) => {
                       const val = e.target.value.replace(/\D/g, '');
                       handleDigitChange(idx, val.slice(-1));
-                      if (val && idx < 5) {
-                        setTimeout(() => document.getElementById(`otp-${idx + 1}`)?.focus(), 10);
-                      }
+                      if (val && idx < 5) setTimeout(() => document.getElementById(`otp-${idx + 1}`)?.focus(), 10);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Backspace' && !digit && idx > 0) {
                         e.preventDefault();
-                        handleDigitChange(idx - 1, "");
+                        handleDigitChange(idx - 1, '');
                         setTimeout(() => document.getElementById(`otp-${idx - 1}`)?.focus(), 10);
                       } else if (e.key === 'ArrowLeft' && idx > 0) {
                         e.preventDefault();
@@ -554,29 +681,81 @@ export default function WorkerSignupPage() {
                 ))}
               </div>
 
-              {otpStatus === 'error' && (
-                <p style={{ color: '#EF4444', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
-                  Invalid code. Please try again.
-                </p>
+              {/* State feedback banner */}
+              {verificationStatus === 'invalid' && (
+                <div className="votp-feedback votp-feedback--error">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  {otpErrorMsg || "Invalid verification code. Please try again."}
+                </div>
+              )}
+              {verificationStatus === 'verifying' && (
+                <div className="votp-feedback votp-feedback--loading">
+                  <svg className="votp-spinner-sm" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                  Verifying your code…
+                </div>
+              )}
+              {(verificationStatus === 'success' || verificationStatus === 'registering') && (
+                <div className="votp-feedback votp-feedback--success">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                  {verificationStatus === 'registering' ? 'Creating your account securely…' : 'Verification successful! Setting up your profile…'}
+                </div>
+              )}
+              {verificationStatus === 'completed' && (
+                <div className="votp-feedback votp-feedback--success">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                  Account created successfully. Welcome to NEXARO!
+                </div>
+              )}
+              {verificationStatus === 'failed' && (
+                <div className="votp-feedback votp-feedback--error">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  Registration failed. Please check your details and retry.
+                </div>
               )}
 
-              {otpStatus === 'success' && (
-                <p style={{ color: '#036947ff', textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
-                  Verified successfully! Submitting registration...
-                </p>
-              )}
-
+              {/* Submit button */}
               <button
                 type="submit"
-                className="ws-submit"
-                disabled={otpDigits.join('').length < 6 || otpStatus === 'submitting' || isSubmittingForm}
-                style={{ background: (otpStatus === 'success' || isSubmittingForm) ? '#10B981' : 'var(--color-accent)' }}
+                className={`ws-submit votp-btn${
+                  ['success','registering','completed'].includes(verificationStatus) ? ' votp-btn--success' :
+                  verificationStatus === 'invalid' ? ' votp-btn--error' :
+                  verificationStatus === 'verifying' ? ' votp-btn--loading' : ''
+                }`}
+                disabled={otpDigits.join('').length < 6 || !['idle', 'invalid'].includes(verificationStatus)}
               >
-                {(otpStatus === 'submitting' || isSubmittingForm && otpStatus != 'success') ? 'Verifying...' : otpStatus === 'success' ? 'Verified! Registering...' : 'Verify & Register'}
+                {verificationStatus === 'verifying' && (
+                  <svg className="votp-spinner-sm" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeOpacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/></svg>
+                )}
+                {verificationStatus === 'completed' ? 'Registration Complete ✓' :
+                 verificationStatus === 'registering' ? 'Creating Account…' :
+                 verificationStatus === 'success' ? 'Verified! Setting up…' :
+                 verificationStatus === 'verifying' ? 'Verifying OTP…' :
+                 'Verify & Register'}
               </button>
 
-              <p style={{ textAlign: 'center', marginTop: 15, fontSize: 12, color: 'var(--color-muted)' }}>
-              </p>
+              {/* Resend row */}
+              {['idle', 'invalid'].includes(verificationStatus) && (
+                <p className="votp-resend">
+                  {resendAttempts >= MAX_RESEND ? (
+                    <span className="votp-resend__limit">Resend limit reached. Please start over.</span>
+                  ) : timer > 0 ? (
+                    <span className="votp-resend__timer">Resend code in <b>{timer}s</b></span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="votp-resend__btn"
+                      onClick={handleResendOtp}
+                      disabled={isResending}
+                    >
+                      {isResending ? 'Sending…' : 'Resend verification code'}
+                    </button>
+                  )}
+                  {resendAttempts > 0 && resendAttempts < MAX_RESEND && (
+                    <span className="votp-resend__count"> ({MAX_RESEND - resendAttempts} left)</span>
+                  )}
+                </p>
+              )}
+
             </form>
           </div>
         </div>
