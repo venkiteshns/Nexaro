@@ -154,16 +154,6 @@ export default function WorkerSignupPage() {
     setValue("languages", next, { shouldValidate: true });
   }
 
-  const district = watch("district");
-  const areas = DISTRICT_AREAS[district] || [];
-  const prevDistrictRef = useRef(district);
-  useEffect(() => {
-    if (prevDistrictRef.current !== district) {
-      setValue("serviceArea", "", { shouldValidate: false });
-      setValue("city", "", { shouldValidate: false });
-      prevDistrictRef.current = district;
-    }
-  }, [district, setValue]);
 
   const { 
     locationState, 
