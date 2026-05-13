@@ -40,6 +40,38 @@ export default function LocationAccessCard({
     }
   };
 
+  const prevStateRef = React.useRef(stateVal);
+  const prevDistrictRef = React.useRef(district);
+  const prevCityRef = React.useRef(city);
+  
+  React.useEffect(() => {
+    if (prevStateRef.current !== stateVal) {
+      setValue("district", "", { shouldValidate: false });
+      setValue("city", "", { shouldValidate: false });
+      setValue("serviceArea", "", { shouldValidate: false });
+      prevStateRef.current = stateVal;
+    }
+  }, [stateVal, setValue]);
+
+  React.useEffect(() => {
+    if (prevDistrictRef.current !== district) {
+      setValue("city", "", { shouldValidate: false });
+      setValue("serviceArea", "", { shouldValidate: false });
+      prevDistrictRef.current = district;
+    }
+  }, [district, setValue]);
+
+  // Auto-regenerate coordinates when city changes
+  useEffect(() => {
+    if (district && city && city !== prevCityRef.current) {
+      prevCityRef.current = city;
+      // Only auto-resolve if we are not actively auto-detecting
+      if (["autoDetected", "resolved", "manualMode", "coordFailed", "idle", "granted"].includes(currentState)) {
+        handleResolveCoords();
+      }
+    }
+  }, [city, district, stateVal, country]);
+
   const isResolving = currentState === "resolvingCoords";
   const isResolved = currentState === "resolved" || currentState === "autoDetected" || currentState === "granted";
   const isCoordFailed = currentState === "coordFailed";
@@ -113,9 +145,14 @@ export default function LocationAccessCard({
             style={{ overflow: 'hidden' }}
           >
             {(currentState === "autoDetected" || currentState === "granted") && (
-              <div className="nx-loc-status nx-loc-status--success">
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
-                Location detected successfully. Fields auto-filled.
+              <div className="nx-loc-status nx-loc-status--success" style={{ flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
+                  Location detected successfully.
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--color-muted)', opacity: 0.9, marginLeft: 26, fontWeight: 400 }}>
+                  Auto-detected location. You can modify it manually.
+                </div>
               </div>
             )}
             {currentState === "resolved" && (
@@ -140,28 +177,28 @@ export default function LocationAccessCard({
             <div className="nx-loc-grid">
               <div className="nx-field">
                 <label className="nx-label">Country<span className="nx-required">*</span></label>
-                <div className={isResolving || isResolved ? "nx-field-disabled" : ""}>
-                  <input className={`nx-input${errors.country ? " error" : ""}`} placeholder="Enter country" defaultValue="India" {...register("country", { required: "Country is required" })} />
+                <div className={isResolving ? "nx-field-disabled" : ""}>
+                  <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="country" options={["India"]} placeholder="Select country…" rules={{ required: "Country is required" }} />
                 </div>
                 {errors.country && <span className="nx-error" style={{ marginTop: 4 }}>⚠ {errors.country.message}</span>}
               </div>
               <div className="nx-field">
                 <label className="nx-label">State<span className="nx-required">*</span></label>
-                <div className={isResolving || isResolved ? "nx-field-disabled" : ""}>
-                  <input className={`nx-input${errors.state ? " error" : ""}`} placeholder="Enter state" defaultValue="Kerala" {...register("state", { required: "State is required" })} />
+                <div className={isResolving ? "nx-field-disabled" : ""}>
+                  <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="state" options={["Kerala"]} placeholder="Select state…" rules={{ required: "State is required" }} />
                 </div>
                 {errors.state && <span className="nx-error" style={{ marginTop: 4 }}>⚠ {errors.state.message}</span>}
               </div>
               <div className="nx-field">
                 <label className="nx-label">District<span className="nx-required">*</span></label>
-                <div className={isResolving || isResolved ? "nx-field-disabled" : ""}>
+                <div className={isResolving ? "nx-field-disabled" : ""}>
                   <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="district" options={KERALA_DISTRICTS} placeholder="Select district…" rules={{ required: "Please select a district" }} />
                 </div>
                 {errors.district && <span className="nx-error" style={{ marginTop: 4 }}>⚠ {errors.district.message}</span>}
               </div>
               <div className="nx-field">
                 <label className="nx-label">City / Place<span className="nx-required">*</span></label>
-                <div className={isResolving || isResolved || !district ? "nx-field-disabled" : ""}>
+                <div className={isResolving || !district ? "nx-field-disabled" : ""}>
                   <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="city" options={areas} placeholder={district ? `Select city in ${district}` : "Select district first"} rules={{ required: "City / Place is required" }} />
                 </div>
                 {errors.city && <span className="nx-error" style={{ marginTop: 4 }}>⚠ {errors.city.message}</span>}
@@ -171,52 +208,12 @@ export default function LocationAccessCard({
             {requireServiceArea && district && (
               <div style={{ marginTop: 20 }}>
                 <label className="nx-label" style={{ marginBottom: 10, display: "block" }}>Preferred Service Area<span className="nx-required">*</span></label>
-                <div className={isResolving || isResolved ? "nx-field-disabled" : ""}>
+                <div className={isResolving ? "nx-field-disabled" : ""}>
                   <CustomSelect register={register} setValue={setValue} watch={watch} errors={errors} name="serviceArea" options={areas} placeholder={`Select a major city/area in ${district}`} rules={{ required: "Please select a service area" }} />
                 </div>
                 {errors.serviceArea && <span className="nx-error" style={{ marginTop: 6, display: 'block' }}>⚠ {errors.serviceArea.message}</span>}
               </div>
             )}
-
-            {/* Action buttons for manual mode */}
-            {["manualMode", "coordFailed"].includes(currentState) && district && city && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="nx-loc-actions"
-                style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}
-              >
-                <button
-                  type="button"
-                  className="nx-loc-btn"
-                  onClick={handleResolveCoords}
-                >
-                  Verify Location
-                </button>
-              </motion.div>
-            )}
-
-            {isResolved && currentState === "resolved" && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="nx-loc-actions"
-                style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}
-              >
-                <button
-                  type="button"
-                  className="nx-loc-skip-btn"
-                  onClick={() => {
-                    if (retryManual) retryManual();
-                    else setState("manualMode");
-                  }}
-                  style={{ textDecoration: 'none', color: 'var(--color-accent)' }}
-                >
-                  Change Location
-                </button>
-              </motion.div>
-            )}
-
           </motion.div>
         )}
       </AnimatePresence>
