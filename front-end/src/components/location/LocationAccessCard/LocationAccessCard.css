@@ -83,6 +83,9 @@
   border: none; 
   color: var(--color-muted); 
   text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .nx-loc-fields { animation: fadeInUp 0.3s ease-out forwards; }
@@ -106,6 +109,25 @@
 .nx-loc-status--error {
   background: #FEF2F2; 
   color: #991B1B;
+}
+
+.nx-loc-status--loading {
+  background: #F0F9FF;
+  color: #0369A1;
+}
+
+.nx-spinner-sm {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.nx-field-disabled {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .nx-loc-grid {
@@ -147,6 +169,21 @@
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(10,110,92,0.08);
   background: #fff;
+}
+
+.nx-input--readonly {
+  background-color: #F8FAFC;
+  color: #64748B;
+  border-color: #E2E8F0;
+  font-weight: 500;
+  cursor: default;
+  user-select: none;
+}
+
+.nx-input--readonly:focus {
+  border-color: #E2E8F0;
+  box-shadow: none;
+  background-color: #F8FAFC;
 }
 
 .nx-input.error { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }

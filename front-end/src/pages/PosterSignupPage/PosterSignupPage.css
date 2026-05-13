@@ -736,3 +736,114 @@ input[type="password"]:focus,
 }
 
 
+/* ── Shared OTP Modal ────────────────────────────────────────────────────── */
+.ws-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.ws-modal-content {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  position: relative;
+}
+.ws-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.ws-modal-close:hover { background: #FEE2E2; color: #DC2626; }
+.votp-card__header    { text-align: center; margin-bottom: 20px; }
+.votp-card__title     { font-size: 22px; font-weight: 700; color: var(--color-heading); margin-bottom: 6px; }
+.votp-card__subtitle  { font-size: 14px; color: var(--color-muted); line-height: 1.5; }
+.votp-form            { margin-top: 20px; }
+.votp-input-group     { display: flex; justify-content: space-between; align-items: center; gap: clamp(4px,2vw,12px); margin-bottom: 20px; width: 100%; }
+.votp-input {
+  flex: 1 1 0; min-width: 0; width: 100%;
+  height: clamp(44px,12vw,56px);
+  font-size: clamp(20px,5.5vw,24px);
+  font-family: var(--font-sans); font-weight: 600;
+  text-align: center; padding: 0 !important; margin: 0; line-height: 1 !important;
+  box-sizing: border-box;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 10px; color: var(--color-heading); outline: none;
+  transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+  appearance: none; -moz-appearance: textfield; -webkit-appearance: none;
+}
+.votp-input::-webkit-outer-spin-button,
+.votp-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.votp-input:focus  { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(10,110,92,0.15); transform: translateY(-2px); background: #fff; }
+.votp-input.error  { border-color: #EF4444; background: #FEF2F2; color: #DC2626; }
+.votp-input.success{ border-color: #10B981; background: #ECFDF5; color: #059669; box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+
+/* State machine animations */
+@keyframes votp-shake {
+  0%,100% { transform: translateX(0); }
+  15%     { transform: translateX(-8px); }
+  30%     { transform: translateX(7px); }
+  45%     { transform: translateX(-5px); }
+  60%     { transform: translateX(4px); }
+  75%     { transform: translateX(-2px); }
+}
+@keyframes votp-success-flash {
+  0%,100% { box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+  40%     { box-shadow: 0 0 0 6px rgba(16,185,129,0.18), 0 10px 40px rgba(0,0,0,0.1); }
+}
+@keyframes votp-spin    { to { transform: rotate(360deg); } }
+@keyframes votp-shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+@keyframes fadeInUp     { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.votp-card--shake         { animation: votp-shake 0.45s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+.votp-card--success-flash { animation: votp-success-flash 0.7s ease-out; }
+
+.votp-status-icon          { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; transition:background 0.3s,color 0.3s; }
+.votp-status-icon--default { background:var(--color-accent2,#ECFDF5); color:var(--color-accent,#0A6E5C); }
+.votp-status-icon--loading { background:#EFF6FF; color:#3B82F6; }
+.votp-status-icon--error   { background:#FEF2F2; color:#DC2626; }
+.votp-status-icon--success { background:#ECFDF5; color:#059669; }
+
+.votp-spinner    { animation:votp-spin 1s linear infinite; transform-origin:center; }
+.votp-spinner-sm { animation:votp-spin 0.9s linear infinite; transform-origin:center; display:inline-block; flex-shrink:0; }
+
+.votp-input-group--error-glow   { filter: drop-shadow(0 0 8px rgba(239,68,68,0.25)); }
+.votp-input-group--success-glow { filter: drop-shadow(0 0 8px rgba(16,185,129,0.2)); }
+
+.votp-feedback          { display:flex; align-items:center; gap:7px; padding:10px 14px; border-radius:8px; font-size:13px; font-weight:500; font-family:var(--font-sans); margin-bottom:16px; line-height:1.45; animation:fadeInUp 0.2s ease-out both; }
+.votp-feedback--error   { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; }
+.votp-feedback--success { background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; }
+.votp-feedback--loading { background:#EFF6FF; color:#1E40AF; border:1px solid #BFDBFE; }
+
+.votp-btn              { transition:background 0.25s,box-shadow 0.25s,transform 0.15s; }
+.votp-btn--success     { background:#10B981 !important; box-shadow:0 4px 16px rgba(16,185,129,0.3) !important; }
+.votp-btn--error       { background:var(--color-accent) !important; animation:votp-shake 0.3s ease both; }
+.votp-btn--loading     { background:linear-gradient(90deg,var(--color-accent) 0%,#0D8A74 50%,var(--color-accent) 100%) !important; background-size:200% auto !important; animation:votp-shimmer 1.4s linear infinite !important; cursor:not-allowed !important; }
+
+.votp-resend           { text-align:center; margin-top:18px; font-size:13px; color:var(--color-muted); font-family:var(--font-sans); display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px; }
+.votp-resend__timer    { color:var(--color-muted); }
+.votp-resend__timer b  { color:var(--color-body); font-weight:600; }
+.votp-resend__btn      { background:none; border:none; color:var(--color-accent); font-family:var(--font-sans); font-size:13px; font-weight:600; cursor:pointer; padding:2px 6px; border-radius:4px; transition:background 0.15s,color 0.15s; }
+.votp-resend__btn:hover    { background:var(--color-accent2); text-decoration:underline; }
+.votp-resend__btn:disabled { opacity:0.55; cursor:not-allowed; text-decoration:none; }
+.votp-resend__limit    { color:#DC2626; font-weight:500; }
+.votp-resend__count    { color:var(--color-muted); font-weight:400; }

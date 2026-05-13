@@ -953,3 +953,222 @@
   background: #DC2626;
   transform: scale(1.2);
 }
+
+/* ── OTP State Machine — Premium Styles ─────────────────────────────────── */
+
+/* Shake animation for invalid OTP */
+@keyframes votp-shake {
+  0%, 100% { transform: translateX(0); }
+  15%       { transform: translateX(-8px); }
+  30%       { transform: translateX(7px); }
+  45%       { transform: translateX(-5px); }
+  60%       { transform: translateX(4px); }
+  75%       { transform: translateX(-2px); }
+}
+
+/* Success flash pulse */
+@keyframes votp-success-flash {
+  0%, 100% { box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+  40%       { box-shadow: 0 0 0 6px rgba(16,185,129,0.18), 0 10px 40px rgba(0,0,0,0.1); }
+}
+
+/* Spinner rotation */
+@keyframes votp-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Shimmer for loading button */
+@keyframes votp-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Card modifier classes */
+.votp-card--shake {
+  animation: votp-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.votp-card--success-flash {
+  animation: votp-success-flash 0.7s ease-out;
+}
+
+/* ── Status icon above header ── */
+.votp-status-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.votp-status-icon--default {
+  background: var(--color-accent2, #ECFDF5);
+  color: var(--color-accent, #0A6E5C);
+}
+
+.votp-status-icon--loading {
+  background: #EFF6FF;
+  color: #3B82F6;
+}
+
+.votp-status-icon--error {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.votp-status-icon--success {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+/* Spinner on status icon */
+.votp-spinner {
+  animation: votp-spin 1s linear infinite;
+  transform-origin: center;
+}
+
+/* Small inline spinner */
+.votp-spinner-sm {
+  animation: votp-spin 0.9s linear infinite;
+  transform-origin: center;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Digit group glow modifier ── */
+.votp-input-group--error-glow {
+  filter: drop-shadow(0 0 8px rgba(239,68,68,0.25));
+}
+
+.votp-input-group--success-glow {
+  filter: drop-shadow(0 0 8px rgba(16,185,129,0.2));
+}
+
+/* ── Success state on digit inputs ── */
+.votp-input.success {
+  border-color: #10B981;
+  background: #ECFDF5;
+  color: #059669;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+}
+
+/* ── State feedback banner ── */
+.votp-feedback {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  margin-bottom: 16px;
+  line-height: 1.45;
+  animation: fadeInUp 0.2s ease-out both;
+}
+
+.votp-feedback--error {
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.votp-feedback--success {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.votp-feedback--loading {
+  background: #EFF6FF;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
+}
+
+/* ── Submit button state modifiers ── */
+.votp-btn {
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+.votp-btn--success {
+  background: #10B981 !important;
+  box-shadow: 0 4px 16px rgba(16,185,129,0.3) !important;
+}
+
+.votp-btn--error {
+  background: var(--color-accent) !important;
+  animation: votp-shake 0.3s ease both;
+}
+
+.votp-btn--loading {
+  background: linear-gradient(
+    90deg,
+    var(--color-accent) 0%,
+    #0D8A74 50%,
+    var(--color-accent) 100%
+  ) !important;
+  background-size: 200% auto !important;
+  animation: votp-shimmer 1.4s linear infinite !important;
+  cursor: not-allowed !important;
+}
+
+/* ── Resend row ── */
+.votp-resend {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.votp-resend__timer {
+  color: var(--color-muted);
+}
+
+.votp-resend__timer b {
+  color: var(--color-body);
+  font-weight: 600;
+}
+
+.votp-resend__btn {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.votp-resend__btn:hover {
+  background: var(--color-accent2);
+  text-decoration: underline;
+}
+
+.votp-resend__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.votp-resend__limit {
+  color: #DC2626;
+  font-weight: 500;
+}
+
+.votp-resend__count {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+

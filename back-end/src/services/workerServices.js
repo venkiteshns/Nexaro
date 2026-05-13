@@ -11,7 +11,6 @@ export const workerSignupService = async ({ files, data }) => {
             throw new Error("User Already Exists")
         }
 
-        // Parse coordinate values — must be finite numbers for 2dsphere index
         const locationLat = parseFloat(data.locationLat);
         const locationLng = parseFloat(data.locationLng);
         const hasValidLocation = isFinite(locationLat) && isFinite(locationLng);
@@ -94,8 +93,6 @@ export const workerSignupService = async ({ files, data }) => {
 
     } catch (error) {
         console.log(error)
-        return { error: error.message };
+        return { error: "User with same credentials exists, Try with different mobile number" };
     }
-
-
 }
