@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../middlewares/upload.js";
-import { workerSignup } from "../controller/WorkerControllers/workerController.js";
+import { getWorkers, workerSignup } from "../controller/WorkerControllers/workerController.js";
 import { posterSignup } from "../controller/PosterControllers/posterController.js";
 import { getOtpForSignUp, login, logout, refreshAccessToken, verifySignUpOtp } from "../controller/authController.js";
 
@@ -15,6 +15,8 @@ router.post("/refresh-token", refreshAccessToken);
 router.post("/get-otp", getOtpForSignUp)
 
 router.post("/verify-otp", verifySignUpOtp);
+
+router.get("/workers/:skill", getWorkers)
 
 router.post("/login", login);
 
