@@ -9,7 +9,6 @@ import { api } from "../../services/api.js";
 import { useToast } from "../../hooks/useToast.js";
 
 // CustomSelect Component
-
 const IconSend = () => (
   <svg
     width="18"
@@ -199,7 +198,7 @@ const SignupForm = () => {
   const [formDataCache, setFormDataCache] = React.useState(null);
   const [otpDigits, setOtpDigits] = React.useState(Array(6).fill(""));
 
-  // ── OTP State Machine ──────────────────────────────────────────────────────
+  // ── OTP State 
   // States: idle | verifying | invalid | success | registering | completed | failed
   const [verificationStatus, setVerificationStatus] = React.useState("idle");
   const [otpErrorMsg, setOtpErrorMsg] = React.useState("");
@@ -926,9 +925,7 @@ const SignupForm = () => {
   );
 };
 
-// ─────────────────────────────────────────────
 // Page
-// ─────────────────────────────────────────────
 const PosterSignupPage = () => {
   return (
     <div className="signup-page">

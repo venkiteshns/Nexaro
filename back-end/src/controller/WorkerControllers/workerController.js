@@ -26,3 +26,7 @@ export const workerSignup = async (req, res) => {
     }
 
 };
+
+export const getWorkers =  async (req,res) => {
+    let response = await getWorkersWithSkills(req.params.skill)
+}

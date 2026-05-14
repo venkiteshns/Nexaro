@@ -5,7 +5,7 @@ import { KERALA_DISTRICTS, DISTRICT_AREAS } from "../../../utils/constants";
 import "./LocationAccessCard.css";
 
 export default function LocationAccessCard({ 
-  locationState, // Use new state property
+  locationState, 
   attempts, 
   maxRetries, 
   requestLocation, 
@@ -17,7 +17,6 @@ export default function LocationAccessCard({
   watch, 
   errors,
   requireServiceArea = false,
-  // Fallback aliases for components that still pass geoState
   geoState,
   setGeoState
 }) {
@@ -30,9 +29,6 @@ export default function LocationAccessCard({
   const country = watch("country") || "India";
 
   const areas = district ? (DISTRICT_AREAS[district] || []) : [];
-
-  // When in manual mode and fields change, we don't auto-resolve immediately.
-  // Instead, wait for a button click to "Confirm Location".
 
   const handleResolveCoords = async () => {
     if (resolveManualCoords) {
@@ -61,11 +57,9 @@ export default function LocationAccessCard({
     }
   }, [district, setValue]);
 
-  // Auto-regenerate coordinates when city changes
   useEffect(() => {
     if (district && city && city !== prevCityRef.current) {
       prevCityRef.current = city;
-      // Only auto-resolve if we are not actively auto-detecting
       if (["autoDetected", "resolved", "manualMode", "coordFailed", "idle", "granted"].includes(currentState)) {
         handleResolveCoords();
       }

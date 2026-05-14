@@ -15,13 +15,11 @@ import { KERALA_DISTRICTS, MAX_GEO_RETRIES } from '../utils/constants';
 //   resolvingCoords   – geocoding the manually selected place
 //   resolved          – manual place geocoded, coords ready
 //   coordFailed       – geocoding the manual place failed
-// ──────────────────────────────────────────────────────────────────────────────
 
 export function useLocationAccess(setValue) {
   const [locationState, setLocationState] = useState('idle');
   const [attempts, setAttempts] = useState(0);
 
-  // Legacy alias so LocationAccessCard can still consume it
   const geoState = locationState;
   const setGeoState = setLocationState;
 
@@ -49,7 +47,6 @@ export function useLocationAccess(setValue) {
       const next = attempts + 1;
       setAttempts(next);
       if (next >= MAX_GEO_RETRIES) {
-        // Exhausted all retries → force manual mode
         setLocationState('manualMode');
       } else {
         setLocationState('failed');
@@ -73,21 +70,19 @@ export function useLocationAccess(setValue) {
       return coords;
     } catch {
       setLocationState('coordFailed');
-      // Clear any stale coords so the form cannot be submitted with bad data
+
       setValue('exactLat', '');
       setValue('exactLng', '');
       return null;
     }
   }, [setValue]);
 
-  // ── Expose a method to reset back to manual selection after coordFailed ─────
   const retryManual = useCallback(() => {
     setValue('exactLat', '');
     setValue('exactLng', '');
     setLocationState('manualMode');
   }, [setValue]);
 
-  // ── Full reset (on logout / form reset) ────────────────────────────────────
   const clearLocationState = useCallback(() => {
     setLocationState('idle');
     setAttempts(0);
@@ -108,7 +103,6 @@ export function useLocationAccess(setValue) {
     resolveManualCoords,
     retryManual,
     clearLocationState,
-    // Legacy aliases kept for backward-compat:
     geoState,
     setGeoState,
   };
