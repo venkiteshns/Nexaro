@@ -1,6 +1,6 @@
 /* @import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap'); */
-@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap");
-
+/* @import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"); */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 :root {
   --surface: #ffffff;
   --logo: #0a6e5c;
@@ -15,6 +15,7 @@
   font-family: "PT Serif", serif;
   background-color: var(--bg);
   position: fixed;
+  z-index: 999;
 }
 
 .lh-logo {
@@ -28,6 +29,11 @@
   flex-wrap: nowrap;
 }
 
+.auth{
+  font-family:"DM Sans", sans-serif ;
+}
+
+
 /* 
 ------------  Hero Section   ----------------
 */
@@ -40,7 +46,7 @@
 
 .hero p {
   color: #6b7280;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 
@@ -126,3 +132,35 @@
   font-family: "DM Serif Display", serif;
 
 }
+
+/* 
+-----------------  Workflow Section   ----------------
+*/
+
+.w-head h2{
+  font-family: "DM Serif Display", serif ;
+}
+
+.w-head p {
+  font-family: "DM Sans", sans-serif;
+}
+
+.work-flow{
+  font-family: "DM Sans", sans-serif;
+}
+
+.work-flow h2{
+  font-family: "DM Serif Display", serif;
+}
+
+/* -------------   Getting Started    ------------ */
+
+.get-start{
+  font-family: "DM Sans", sans-serif;
+}
+
+.get-start h2{
+  font-family: "DM Serif Display", serif ;
+}
+
+/* footer */

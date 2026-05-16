@@ -10,9 +10,9 @@ const STATS = [
 const Status = () => {
   return (
     <div>
-      <div className="status grid grid-cols-2  md:grid-cols-4">
+      <div className="status grid grid-cols-2 md:grid-cols-4">
         {STATS.map((stats) => (
-          <div key={stats.label} className="stats-cont border border-t-0 border-s-0  border-gray-500 py-8 text-xl flex flex-col items-center justify-center">
+          <div key={stats.label} className="stats-cont sm:border-t-1 border border-green-700/15 py-8 text-md text-center flex flex-col items-center justify-center">
             <div>{stats.value}</div>
             <div>{stats.label}</div>
           </div>
