@@ -4,7 +4,7 @@ import "./Landing.css";
 
 const Hero = () => {
   return (
-    <div className="w-full pt-20 flex flex-col md:grid md:grid-cols-3 py-5 bg-green-700/20">
+    <div className="w-full pt-20 flex flex-col md:grid md:grid-cols-3 py-5 bg-green-700/10">
       {/* left hero */}
       <div className="hero p-10 h-full flex flex-col justify-center">
         <h1 className="title-text -tracking-[0.00em] mb-6">
@@ -48,7 +48,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="hero-bid rounded-2xl p-5 card-com w-full max-w-sm  lg:ms-32">
+        <div className="hero-bid rounded-2xl p-5 card-com w-full max-w-sm lg:ms-32">
           <div className="bid-head text-md font-bold mb-2 tracking-[0.09em]">
             NEW BID RECEIVED
           </div>
