@@ -9,7 +9,7 @@ import Footer from '../../components/Landing/Footer'
 const Landing = () => {
   return (
     <>
-      <Header/>
+      <Header Landing = {true}/>
       <Hero/>
       <Status/>
       <Workflow/>

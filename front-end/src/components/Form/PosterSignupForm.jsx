@@ -38,7 +38,7 @@ const PosterSignupForm = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-[#0a6e5c] hover:bg-green-700 transition text-white font-semibold py-3.5 rounded-xl"
+              className="w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-3.5 rounded-xl"
             >
               Create Account
             </button>

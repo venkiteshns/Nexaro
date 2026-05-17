@@ -2,15 +2,13 @@ import React from "react";
 
 const Location = (props) => {
   const worker = props?.worker;
-  console.log(worker);
-  
   return (
     <div className="mt-2" >
       {/* Country / State */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <label className="text-xs text-gray-700/80">
-            Country
+            Country <span className="text-red-500">*</span>
           </label>
 
           <select defaultValue="" className="w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800 bg-white">
@@ -22,7 +20,7 @@ const Location = (props) => {
 
         <div>
           <label className="text-xs text-gray-700/80">
-            State
+            State <span className="text-red-500">*</span>
           </label>
 
           <select defaultValue="" className="w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800 bg-white">
@@ -36,7 +34,7 @@ const Location = (props) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
         <div>
           <label className="text-xs text-gray-700/80">
-            District
+            District <span className="text-red-500">*</span>
           </label>
 
           <select defaultValue="" className="w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800 bg-white">
@@ -47,7 +45,7 @@ const Location = (props) => {
 
         <div>
           <label className="text-xs text-gray-700/80">
-            City / Place
+            City / Place <span className="text-red-500">*</span>
           </label>
 
           <input
@@ -58,7 +56,7 @@ const Location = (props) => {
         </div>
         {worker && <div>
           <label className="text-xs text-gray-700/80">
-            Work Place
+            Work Place <span className="text-red-500">*</span>
           </label>
 
           <input
