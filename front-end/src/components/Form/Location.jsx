@@ -1,6 +1,9 @@
 import React from "react";
 
-const Location = () => {
+const Location = (props) => {
+  const worker = props?.worker;
+  console.log(worker);
+  
   return (
     <div className="mt-2" >
       {/* Country / State */}
@@ -53,6 +56,17 @@ const Location = () => {
             className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
           />
         </div>
+        {worker && <div>
+          <label className="text-xs text-gray-700/80">
+            Work Place
+          </label>
+
+          <input
+            type="text"
+            placeholder="Enter city your Work Place"
+            className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
+          />
+        </div>}
       </div>
     </div>
   );

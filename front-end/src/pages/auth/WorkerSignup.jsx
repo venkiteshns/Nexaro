@@ -1,8 +1,11 @@
 import React from 'react'
+import HeaderWorkerSignup from '../../components/Worker/HeaderWorkerSignup'
 
 const WorkerSignup = () => {
   return (
-    <div>WorkerSignup</div>
+    <div>
+      <HeaderWorkerSignup/>
+    </div>
   )
 }
 
