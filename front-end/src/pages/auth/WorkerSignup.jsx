@@ -6,9 +6,11 @@ import WorkerSignupForm from '../../components/Form/WorkerSignupForm'
 
 const WorkerSignup = () => {
   const methods = useForm()
+  
   return (
     <div>
       <Header landing ={false} />
+
       <HeaderWorkerSignup/>
       <FormProvider {...methods} >
         <WorkerSignupForm/>
