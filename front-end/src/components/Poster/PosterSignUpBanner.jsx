@@ -8,7 +8,7 @@ const Taskcard = () => {
   return (
     <div className=" flex flex-col w-[90%] ps-5 mt-5">
       {/* card1 */}
-      <div className=" max-w-5/6 grid grid-cols-2 bg-white/80 p-5 rounded-2xl -rotate-6 animate-[bounce_5s_ease-in-out_infinite]">
+      <div className=" max-w-4/6 grid grid-cols-2 bg-white/80 p-5 rounded-2xl -rotate-6 animate-[bounce_5s_ease-in-out_infinite]">
         <div className="text-green-700/80 bg-green-500/9 text-center pt-1 pb-1 py-2 font-semibold rounded-xl text-sm">
           Active Task
         </div>
@@ -28,7 +28,7 @@ const Taskcard = () => {
       </div>
 
       {/* card2 */}
-      <div className=" max-w-5/6 bg-white/80 flex px-3 py-3 rounded-2xl mt-1 w-[85%] self-end rotate-3 animate-[bounce_5s_ease-in-out_infinite] ">
+      <div className=" max-w-3/6 bg-white/80 flex px-3 py-3 rounded-2xl mt-1 w-[85%] self-end rotate-3 animate-[bounce_5s_ease-in-out_infinite] ">
         <div className=" flex items-center justify-center text-green-700/80 bg-green-500/9 text-center py-3 px-3 rounded-3xl me-3">
           <Wallet className="w-5 h-5" />
         </div>
