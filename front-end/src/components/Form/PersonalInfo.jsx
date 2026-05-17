@@ -10,10 +10,12 @@ const PersonalInfo = (props) => {
   const worker = props?.worker;
 
   return (
-    <div>
+    <div className="mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm">
       {/* Name */}
       <div>
-        <label className="text-xs text-gray-700/80">Name <span className="text-red-500">*</span></label>
+        <label className="text-xs text-gray-700/80">
+          Name <span className="text-red-500">*</span>
+        </label>
 
         <input
           {...register("name", {
@@ -33,7 +35,9 @@ const PersonalInfo = (props) => {
       <div className="flex gap-3">
         {/* Email */}
         <div>
-          <label className="text-xs text-gray-700/80">Email <span className="text-red-500">*</span></label>
+          <label className="text-xs text-gray-700/80">
+            Email <span className="text-red-500">*</span>
+          </label>
 
           <input
             {...register("email", {
@@ -56,7 +60,9 @@ const PersonalInfo = (props) => {
 
         {/* Phone */}
         <div>
-          <label className="text-xs text-gray-700/80">Phone <span className="text-red-500">*</span></label>
+          <label className="text-xs text-gray-700/80">
+            Phone <span className="text-red-500">*</span>
+          </label>
 
           <input
             {...register("phone", {

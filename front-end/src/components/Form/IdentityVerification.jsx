@@ -79,10 +79,12 @@ const IdentityVerification = () => {
 };
 
 const UploadCard = ({ title, subtitle, type }) => {
+  
   const {
     register,
     formState: { errors },
   } = useFormContext();
+
   const uploadMessage = {
     selfie: "your selfie",
     id_back: "the back side of document",
@@ -105,7 +107,7 @@ const UploadCard = ({ title, subtitle, type }) => {
         </div>
 
         <h3 className="text-sm font-semibold text-gray-900">
-          {title} {type}
+          {title}
           <span className="text-red-500">*</span>
         </h3>
 
