@@ -10,7 +10,7 @@ const TermsAndConditions = () => {
         <p className="text-xs text-gray-600 leading-relaxed">
           I agree to the{" "}
           <span className="text-[#0a6e5c] font-medium cursor-pointer">
-            Terms & Conditions
+            Terms & Conditions <span className="text-red-500">*</span>
           </span>
         </p>
       </div>

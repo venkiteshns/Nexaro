@@ -2,11 +2,13 @@ import React from "react";
 import PosterSignUpBanner from "../../components/Poster/PosterSignUpBanner";
 import PosterSignupForm from "../../components/Form/PosterSignupForm";
 import Logo from "../../components/Logo/Logo";
+import Header from "../../components/Landing/Header";
 
 const PosterSignup = () => {
   return (
     <div className="grid grid-cols-16">
-      <span className="hidden md:block col-span-7">
+      <Header landing={false} />
+      <span className="hidden md:block col-span-7 mt-15">
         <PosterSignUpBanner />
       </span>
         <div className="md:hidden col-span-16 justify-items-center mt-10"><Logo/>
@@ -15,7 +17,7 @@ const PosterSignup = () => {
           <span className="italic text-[#0A6E5C]"> Instantly.</span>
         </h1>
         </div>
-      <span className="col-span-16 md:col-span-9">
+      <span className="col-span-16 md:col-span-9 mt-15">
         <PosterSignupForm />
       </span>
     </div>

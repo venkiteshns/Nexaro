@@ -1,17 +1,19 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 
-const PersonalInfo = () => {
+const PersonalInfo = (props) => {
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
+  const worker = props?.worker;
+
   return (
     <div>
       {/* Name */}
       <div>
-        <label className="text-xs text-gray-700/80">Name</label>
+        <label className="text-xs text-gray-700/80">Name <span className="text-red-500">*</span></label>
 
         <input
           {...register("name", {
@@ -31,9 +33,7 @@ const PersonalInfo = () => {
       <div className="flex gap-3">
         {/* Email */}
         <div>
-          <label className="text-xs text-gray-700/80">
-            Email
-          </label>
+          <label className="text-xs text-gray-700/80">Email <span className="text-red-500">*</span></label>
 
           <input
             {...register("email", {
@@ -56,9 +56,7 @@ const PersonalInfo = () => {
 
         {/* Phone */}
         <div>
-          <label className="text-xs text-gray-700/80">
-            Phone
-          </label>
+          <label className="text-xs text-gray-700/80">Phone <span className="text-red-500">*</span></label>
 
           <input
             {...register("phone", {
@@ -79,6 +77,43 @@ const PersonalInfo = () => {
           )}
         </div>
       </div>
+
+      {worker && (
+        <div>
+          <label className="text-xs text-gray-700/80">Bio</label>
+          <textarea
+            placeholder="Write something..."
+            {...register("bio", {
+              pattern: {
+                value: /^(?=.{2,}$)[A-Za-z0-9]+(?: [A-Za-z0-9]+)*$/,
+                message:
+                  "No special characters are allowded. Please enter atleast 2 / more letters.",
+              },
+            })}
+            rows={5}
+            className="
+                w-full
+                rounded-xl
+                border
+                border-gray-300
+                bg-white
+                px-4
+                py-3
+                text-sm
+                text-gray-800
+               outline-none
+                focus:border-green-600
+                focus:ring-1 focus:ring-green-800
+                placeholder:text-gray-400
+              "
+          />
+          {errors.bio && (
+            <span className="italic text-red-400/90 text-xs">
+              {errors.bio.message}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
