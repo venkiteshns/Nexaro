@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../middlewares/upload.js";
-import { getWorkers, workerSignup } from "../controller/WorkerControllers/workerController.js";
+import { workerSignup } from "../controller/WorkerControllers/workerController.js";
 import { posterSignup } from "../controller/PosterControllers/posterController.js";
 import { getOtpForSignUp, login, logout, refreshAccessToken, verifySignUpOtp } from "../controller/authController.js";
 
