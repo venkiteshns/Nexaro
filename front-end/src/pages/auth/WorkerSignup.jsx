@@ -10,7 +10,6 @@ const WorkerSignup = () => {
   return (
     <div>
       <Header landing ={false} />
-
       <HeaderWorkerSignup/>
       <FormProvider {...methods} >
         <WorkerSignupForm/>

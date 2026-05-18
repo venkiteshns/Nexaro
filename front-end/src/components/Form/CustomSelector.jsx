@@ -56,7 +56,7 @@ const CustomSelector = ( props ) => {
           ))}
         </div>
         {errors[`${section}`] && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="italic text-red-400/90 text-xs">
             {errors[`${section}`].message}
           </p>
         )}

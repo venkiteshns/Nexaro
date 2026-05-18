@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Upload } from "lucide-react";
 import { ID_TYPES } from "../../utils/constants";
 import { useFormContext } from "react-hook-form";
@@ -67,7 +67,7 @@ const IdentityVerification = () => {
       {/* Selfie Upload */}
       <div className="mt-5 flex justify-center">
         <div className="w-full md:w-[420px]">
-          <UploadCard
+          <UploadCard 
             title="Upload Selfie Photo"
             subtitle="Make sure face is clearly visible"
             type="selfie"
@@ -84,24 +84,44 @@ const UploadCard = ({ title, subtitle, type }) => {
     register,
     formState: { errors },
   } = useFormContext();
+ 
+  const [preview, setPreview] = useState('')
 
   const uploadMessage = {
     selfie: "your selfie",
     id_back: "the back side of document",
     id_front: "the front side of document",
   };
-  
+
+  const handleimage = (e) => {
+    const file = e.target.files[0]
+    console.log(e.target.files[0])
+    if(!file) return;
+
+      const url = URL.createObjectURL(file);
+
+    setPreview(url);
+
+    // console.log(files,"__________________");
+    // console.log("_______________", newPreviews[0]);
+  }
+
   return (
     <div>
       <label className="flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-50/40 p-6 text-center hover:border-green-800 hover:bg-green-50/30">
-        <input
+        <input 
           type="file"
           className="hidden"
           {...register(type, {
             required: `Please upload ${uploadMessage[type]}`,
+            onChange:handleimage,
             })}
         />
-
+      {preview ? 
+      <div className="w-45 h-45 flex items-center justify-center ">
+        <img className="w-full h-full object-contain" src={preview} alt="" />
+      </div> 
+      : <>
         <div className=" mb-6 flex h-10 w-10 items-center justify-center rounded-2xl">
           <Upload className="h-5 w-5 text-green-600" />
         </div>
@@ -112,6 +132,7 @@ const UploadCard = ({ title, subtitle, type }) => {
         </h3>
 
         <p className="mt-2 text-xs text-gray-400">{subtitle}</p>
+        </>}
       </label>
       <div className="mt-1">
         {errors[type] && (
