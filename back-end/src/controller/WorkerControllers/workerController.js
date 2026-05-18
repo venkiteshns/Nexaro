@@ -1,4 +1,4 @@
-import { getWorkersWithSkills, workerSignupService } from "../../services/workerServices.js";
+import { workerSignupService } from "../../services/workerServices.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
