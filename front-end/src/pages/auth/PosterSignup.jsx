@@ -8,16 +8,16 @@ const PosterSignup = () => {
   return (
     <div className="grid grid-cols-16">
       <Header landing={false} />
-      <span className="hidden md:block col-span-7 mt-15">
+      <span className="hidden lg:block lg:col-span-7 mt-15">
         <PosterSignUpBanner />
       </span>
-        <div className="md:hidden col-span-16 justify-items-center mt-10"><Logo/>
+        <div className="lg:hidden col-span-16 justify-items-center mt-20"><Logo/>
         <h1 className="banner text-4xl mt-3 font-semibold text-center">
           Skills Meet <br /> Needs. 
           <span className="italic text-[#0A6E5C]"> Instantly.</span>
         </h1>
         </div>
-      <span className="col-span-16 md:col-span-9 mt-15">
+      <span className="col-span-16 lg:col-span-9">
         <PosterSignupForm />
       </span>
     </div>

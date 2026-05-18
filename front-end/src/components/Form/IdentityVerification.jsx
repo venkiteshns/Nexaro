@@ -36,7 +36,7 @@ const IdentityVerification = () => {
             ))}
           </select>
           {errors.id_type && (
-            <span className="text-red-600 text-xs">
+            <span className="italic text-red-400/90 text-xs">
               {errors.id_type.message}
             </span>
           )}
@@ -115,7 +115,7 @@ const UploadCard = ({ title, subtitle, type }) => {
       </label>
       <div className="mt-1">
         {errors[type] && (
-          <span className="text-xs text-red-600">{errors[type].message}</span>
+          <span className="italic text-red-400/90 text-xs">{errors[type].message}</span>
         )}
       </div>
     </div>

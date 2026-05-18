@@ -44,7 +44,7 @@ const Password = () => {
             {showPassword ? <Eye size={18} /> : <EyeClosed size={18} />}
           </span>
           {errors.password && (
-            <span className="italic text-red-600 text-xs">
+            <span className="italic text-red-400/90 text-xs">
               {errors.password.message}
             </span>
           )}
@@ -75,7 +75,7 @@ const Password = () => {
           </span>
 
           {errors.confirmPassword && (
-            <span className="italic text-red-600 text-xs">
+            <span className="italic text-red-400/90 text-xs">
               {errors.confirmPassword.message}
             </span>
           )}

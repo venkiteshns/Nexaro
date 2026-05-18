@@ -1,5 +1,6 @@
 import React from "react";
 import { MoveRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const GetStarted = () => {
   return (
@@ -14,10 +15,12 @@ const GetStarted = () => {
           Access a curated network of the top 1% local professionals. Get your
           projects done right, the first time.
         </p>
+        <Link to='/signup/poster'>
         <span className="flex items-center justify-center bg-black/90 px-5 py-2 mt-8 rounded-xl text-white">
           <button>Post Your First Task </button>
           <MoveRight strokeWidth={1.8} className=" ms-1 w-4" />
         </span>
+        </Link>
       </div>
 
       {/* Worker */}
@@ -30,9 +33,11 @@ const GetStarted = () => {
           Join the most prestigious network of skilled workers. Earn more, work
           smarter, and build your editorial reputation.
         </p>
+        <Link to='/signup/worker'>
         <span className="flex items-center justify-center bg-[#0a6e5c] px-5 py-2 mt-8 rounded-xl">
           <button>Join the Network </button> <MoveRight strokeWidth={1.8} className=" ms-1 w-4" />
         </span>
+        </Link>
       </div>
     </div>
   );

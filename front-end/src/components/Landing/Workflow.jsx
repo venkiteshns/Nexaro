@@ -107,7 +107,7 @@ const EscrowCard = () => {
 // Main Content
 const Workflow = () => {
   return (
-    <div className="bg-green-700/10">
+    <div className="bg-green-700/10 pb-10">
       <div className="w-head grid grid-cols-1 sm:grid-cols-3 mb-5 p-10">
         <h2 className="text-5xl col-span-2 mt-3">
           Built for those who value <br />{" "}
