@@ -96,12 +96,3 @@ export const workerSignupService = async ({ files, data }) => {
         return { error: "User with same credentials exists, Try with different mobile number" };
     }
 }
-export const getWorkersWithSkills = async (skill)  => {
-    let usersList = await User.aggregate([
-        {$match:{ 
-            $and: [{role: "worker"},
-                
-            ]
-        }}
-    ])
-}

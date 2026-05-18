@@ -16,8 +16,6 @@ router.post("/get-otp", getOtpForSignUp)
 
 router.post("/verify-otp", verifySignUpOtp);
 
-router.get("/workers/:skill", getWorkers)
-
 router.post("/login", login);
 
 router.post("/logout", logout);
