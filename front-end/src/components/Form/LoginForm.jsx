@@ -11,7 +11,7 @@ const LoginForm = ({ onFormSubmit }) => {
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <PersonalInfo worker={false} login={true} />
         <Password login={true} />
-        <button type="submit" className="w-full mt-5 rounded-xl bg-[#0a6e5c] py-2 text-lg font-semibold text-white transition hover:opacity-90">
+        <button type="submit" className="w-full mt-5 rounded-xl bg-[#0a6e5c] py-2 font-semibold text-white transition hover:opacity-90">
           Login to Nexaro
         </button>
       </form>
