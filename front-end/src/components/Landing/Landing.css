@@ -10,7 +10,6 @@
 
 .header-c {
   font-family: "PT Serif", serif;
-  background-color: var(--bg);
   position: fixed;
   z-index: 999;
 }
