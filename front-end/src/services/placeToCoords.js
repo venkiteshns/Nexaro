@@ -12,7 +12,6 @@ export const placeToCoords = async ({ city, district, state, country }) => {
     if (!data.length) {
       throw new Error("Location not found");
     }
-    console.log(data[0]);
     return {
       lat: parseFloat(data[0].lat),
       lng: parseFloat(data[0].lon),

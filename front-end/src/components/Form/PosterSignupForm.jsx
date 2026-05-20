@@ -7,10 +7,7 @@ import Password from "./Password";
 import Location from "./Location";
 import TermsAndConditions from "./TermsAndConditions";
 
-const PosterSignupForm = () => {
-  const onSubmitForm = (data) => {
-    console.log(data);
-  };
+const PosterSignupForm = ({onSubmitForm}) => {
 
   const methods = useForm();
   return (

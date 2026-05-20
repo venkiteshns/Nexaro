@@ -8,11 +8,12 @@ const PersonalInfo = (props) => {
   } = useFormContext();
 
   const worker = props?.worker;
+  const login = props?.login;
 
   return (
-    <div className="mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm">
+    <div className={`${login ? "w-full" :"mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}>
       {/* Name */}
-      <div>
+      {!login && <div >
         <label className="text-xs text-gray-700/80">
           Name <span className="text-red-500">*</span>
         </label>
@@ -31,10 +32,10 @@ const PersonalInfo = (props) => {
           </span>
         )}
       </div>
-
-      <div className="flex gap-3">
+}
+      <div className="flex flex-col md:flex-row gap-3">
         {/* Email */}
-        <div>
+        <div className="w-full" >
           <label className="text-xs text-gray-700/80">
             Email <span className="text-red-500">*</span>
           </label>
@@ -59,7 +60,7 @@ const PersonalInfo = (props) => {
         </div>
 
         {/* Phone */}
-        <div>
+        {!login &&  <div>
           <label className="text-xs text-gray-700/80">
             Phone <span className="text-red-500">*</span>
           </label>
@@ -82,6 +83,7 @@ const PersonalInfo = (props) => {
             </span>
           )}
         </div>
+        }
       </div>
 
       {worker && (

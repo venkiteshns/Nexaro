@@ -3,6 +3,7 @@ import PosterSignup from './pages/auth/PosterSignup'
 import Landing from './pages/Landing/Landing.jsx'
 import WorkerSignup from './pages/auth/WorkerSignup.jsx'
 import { BrowserRouter as Router, Routes, Route  } from "react-router-dom";
+import UserLogin from './pages/auth/UserLogin.jsx';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path='/' element={<Landing/>} />
         <Route path='/signup/worker' element={<WorkerSignup/>} />
         <Route path='/signup/poster' element={<PosterSignup/>} />
+        <Route path='/user/login' element={<UserLogin/>} />
       </Routes>
     </Router>
   )

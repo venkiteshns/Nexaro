@@ -38,6 +38,28 @@ const Location = ({ worker }) => {
   const districtAreas =
     district && DISTRICT_AREAS[district] ? DISTRICT_AREAS[district] : [];
 
+  // setValue(type === "city" ? "locationLat" : "workPlacelat", res.lat);
+  // setValue(type === "city" ? "locationlng" : "workPlacelng", res.lng);
+  useEffect(() => {
+    register("locationLat", {
+      required: "Location latitude is required",
+    });
+
+    register("locationlng", {
+      required: "Location longitude is required",
+    });
+
+    if (worker) {
+      register("workPlacelat", {
+        required: worker ? "Service area latitude is required" : false,
+      });
+
+      register("workPlacelng", {
+        required: worker ? "Service area longitude is required" : false,
+      });
+    }
+  }, [register, worker]);
+
   const handleCountryChange = (e) => {
     const countryName = e.target.value;
     const found = countries.find((c) => c.name === countryName);
@@ -128,6 +150,9 @@ const Location = ({ worker }) => {
     };
     try {
       let res = await placeToCoords(payload);
+      // console.log(type, "_______" , res);
+      setValue(type === "city" ? "locationLat" : "workPlacelat", res.lat);
+      setValue(type === "city" ? "locationlng" : "workPlacelng", res.lng);
       setTimeout(() => {
         type == "city"
           ? setAfterChangeLocation("idle")
@@ -301,6 +326,13 @@ const Location = ({ worker }) => {
             </select>
           </div>
         </div>
+
+        {errors.locationLat ||
+          (errors.locationlng && (
+            <div className="italic text-red-400/90 text-xs mt-3">
+              Please try again or change location
+            </div>
+          ))}
         {afterChangeLocation === "changed" && (
           <div className="p-1 flex">
             <button
@@ -362,6 +394,13 @@ const Location = ({ worker }) => {
                 </p>
               )}
             </div>
+            {errors.workPlacelat ||
+              (errors.workPlacelng && (
+                <div className="italic text-red-400/90 text-xs mt-3">
+                  Please try again or try changing Work Area.
+                </div>
+              ))}
+
             {afterChangeWorkPlace === "changed" && (
               <div className="p-1 flex">
                 <button
