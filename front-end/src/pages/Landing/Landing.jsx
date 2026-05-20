@@ -6,10 +6,12 @@ import Status from "../../components/Landing/Status";
 import Workflow from "../../components/Landing/Workflow";
 import GetStarted from "../../components/Landing/GetStarted";
 import Footer from "../../components/Landing/Footer";
+import { useGetAllUsersQuery } from "../../store/services/data";
 
 const Landing = () => {
 
   const getStartRef = useRef(null);
+  const {data, isError, isLoading} = useGetAllUsersQuery()
 
   const goGetStart = () => {
     getStartRef.current?.scrollIntoView({
@@ -18,10 +20,16 @@ const Landing = () => {
     });
   };
 
+  console.log("RTK START")
+  console.log("err",isError);
+  console.log("load",isLoading);
+  console.log(data);
+  
+  console.log("RTK END")
+
   return (
     <>
       <Header landing={true} onRedirect={goGetStart} />
-
       <Hero />
       <Status />
       <Workflow />

@@ -5,8 +5,12 @@ import Logo from "../../components/Logo/Logo";
 import Header from "../../components/Landing/Header";
 
 const PosterSignup = () => {
+  const handleFormData = (data) => {
+    console.log("signup page",data)
+  }
   return (
     <div className="grid grid-cols-16">
+      <Header landing={false} />
       <Header landing={false} />
       <span className="hidden lg:block lg:col-span-7 mt-15">
         <PosterSignUpBanner />
@@ -18,7 +22,7 @@ const PosterSignup = () => {
         </h1>
         </div>
       <span className="col-span-16 lg:col-span-9">
-        <PosterSignupForm />
+        <PosterSignupForm onSubmitForm={handleFormData} />
       </span>
     </div>
   );
