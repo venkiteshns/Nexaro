@@ -2,8 +2,7 @@ import User from "../models/userSchema.js";
 import { hashData } from "../utils/hasing.js";
 
 export const posterSignupService = async (data) => {
-    console.log(data);
-
+    console.log("signUp data",data);
     try {
         // 1. Duplicate check
         const existing = await User.findOne({ email: data.email });

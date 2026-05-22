@@ -1,17 +1,44 @@
 import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import Logo from "../Logo/Logo";
+import { useVerifyOtpMutation } from "../../store/services/api";
 
 const OTP_LENGTH = 6;
 
-const OtpModal = ({ show, handleOtp, email }) => {
-  const [time, setTime] = useState(10);
+const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
+  const [time, setTime] = useState(60);
   const [resendCount, setResendCount] = useState(0);
   const [canResend, setCanResend] = useState(false);
+  const [otpError, setOtpError] = useState(false);
 
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const inputRefs = useRef([]);
 
+  const [verifyOtp, { isLoading, isError, isSuccess, error, data }] =
+    useVerifyOtpMutation();
+
+  const handleOtp = async (otp) => {
+    try {
+      const res = await verifyOtp({
+        otp,
+        email,
+      }).unwrap();
+      setTimeout(() => {
+        show(false)
+      }, 1500);
+      isVerified(true);
+    } catch (err) {
+      setOtpError(true);
+
+      setTimeout(() => {
+        setOtp(Array(OTP_LENGTH).fill(""));
+
+        setOtpError(false);
+
+        inputRefs.current[0]?.focus();
+      }, 800);
+    }
+  };
   //   useEffect Timer
   useEffect(() => {
     if (time <= 0) {
@@ -29,13 +56,12 @@ const OtpModal = ({ show, handleOtp, email }) => {
   // Functions
 
   const handleResendOtp = () => {
-    if (!canResend || resendCount >= 4) return;
+    if (!canResend || resendCount >= 3) return;
 
-    if(resendCount == 4) return
-    // API call here
     setResendCount((prev) => prev + 1);
     setCanResend(false);
-    setTime(10);
+    setTime(60);
+    reSendOtp(email);
 
     console.log("OTP resent");
   };
@@ -135,20 +161,29 @@ const OtpModal = ({ show, handleOtp, email }) => {
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
-              text-center text-lg sm:text-xl font-semibold
-              rounded-xl border border-dashed border-green-800/70
-              bg-gray-700/10 outline-none
-              focus:ring-2 focus:ring-green-800/20
-              focus:border-black transition-all"
+              className={`
+                  w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+                  text-center text-lg sm:text-xl font-semibold
+                  rounded-xl border outline-none transition-all
+                  bg-gray-700/10
+
+                  ${
+                    isSuccess
+                      ? "border-2 border-green-600 bg-green-50"
+                      : otpError
+                        ? "border-2 border-red-500 bg-red-50 shake"
+                        : "border border-dashed border-green-800/70 focus:ring-2 focus:ring-green-800/20 focus:border-black"
+                  }
+                `}
             />
           ))}
         </div>
 
         {/* Resend button */}
-        {resendCount >= 4 ? (
+        {resendCount >= 3 ? (
           <p className="text-xs text-red-600/70 text-center font-medium">
-            For security reasons, resend OTP is limited
+            For security reasons, resend OTP is limited. <br /> Please try after
+            sometime.
           </p>
         ) : (
           <button
@@ -156,15 +191,18 @@ const OtpModal = ({ show, handleOtp, email }) => {
             onClick={handleResendOtp}
             className={`text-sm font-semibold transition
                 ${
-                canResend
+                  canResend
                     ? "text-blue-700  cursor-pointer"
                     : "text-gray-400 cursor-not-allowed"
                 }`}
-                    >
+          >
             {canResend ? "Resend OTP" : `Resend OTP in ${time}s`}
           </button>
         )}
         {/* Verify */}
+        {isError && (
+          <span className="text-sm italic text-red-600/60">{error?.data?.message}</span>
+        )}
         <button
           disabled={finalOtp.length != 6}
           onClick={() => handleOtp(finalOtp)}
@@ -175,7 +213,11 @@ const OtpModal = ({ show, handleOtp, email }) => {
                     : "bg-gray-400 cursor-not-allowed opacity-70"
                 }`}
         >
-          Verify
+          {isLoading
+            ? "Verifing OTP"
+            : isSuccess
+              ? "OTP Verified, Registering.."
+              : "Verify"}
         </button>
       </div>
     </div>

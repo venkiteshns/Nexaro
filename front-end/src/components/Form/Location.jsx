@@ -14,7 +14,7 @@ const Location = ({ worker }) => {
     watch,
     trigger,
     getValues,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useFormContext();
 
   const selectedCountry = watch("country");
@@ -30,6 +30,10 @@ const Location = ({ worker }) => {
   const [locationError, setLocationError] = useState("");
   const [afterChangeLocation, setAfterChangeLocation] = useState("idle"); //idle, set, changed
   const [afterChangeWorkPlace, setAfterChangeWorkPlace] = useState("idle");
+
+  // UI-only flags — flipped true only on failed confirm or form submit, never on onChange
+  const [locationConfirmNeeded, setLocationConfirmNeeded] = useState(false);
+  const [workConfirmNeeded, setWorkConfirmNeeded] = useState(false);
 
   const countries = Country.getAllCountries();
   const states = State.getStatesOfCountry(countryCode);
@@ -99,6 +103,10 @@ const Location = ({ worker }) => {
       shouldValidate: true,
       shouldDirty: true,
     });
+    // Clear coords silently — no shouldValidate so errors.locationLat never fires on onChange
+    setValue("locationLat", "", { shouldDirty: true });
+    setValue("locationlng", "", { shouldDirty: true });
+    setLocationConfirmNeeded(false); // hide warning until next failed confirm or submit
     setAfterChangeLocation("changed");
   };
 
@@ -107,6 +115,10 @@ const Location = ({ worker }) => {
       shouldValidate: true,
       shouldDirty: true,
     });
+    // Clear coords silently on change
+    setValue("workPlacelat", "", { shouldDirty: true });
+    setValue("workPlacelng", "", { shouldDirty: true });
+    setWorkConfirmNeeded(false);
     setAfterChangeWorkPlace("changed");
   };
 
@@ -121,14 +133,18 @@ const Location = ({ worker }) => {
 
       const foundCountry = countries.find((c) => c.name === country);
       if (foundCountry) setCountryCode(foundCountry.isoCode);
-      setValue("country", country);
-      setValue("state", state);
+      setValue("country", country, { shouldValidate: true });
+      setValue("state", state, { shouldValidate: true });
 
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       if (detectedDistrict) setDistrict(detectedDistrict);
 
-      setValue("district", detectedDistrict);
+      // Wait for the district select to re-render as enabled (isKerala=true)
+      // before shouldValidate reads from the DOM ref, otherwise it reads "" from a disabled select
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      setValue("district", detectedDistrict, { shouldValidate: true });
       setAfterChangeLocation("set");
     } catch (err) {
       setLocationError("Could not detect location. Please fill manually.");
@@ -150,25 +166,28 @@ const Location = ({ worker }) => {
     };
     try {
       let res = await placeToCoords(payload);
-      // console.log(type, "_______" , res);
-      setValue(type === "city" ? "locationLat" : "workPlacelat", res.lat);
-      setValue(type === "city" ? "locationlng" : "workPlacelng", res.lng);
+      setValue(type === "city" ? "locationLat" : "workPlacelat", res.lat, { shouldValidate: true });
+      setValue(type === "city" ? "locationlng" : "workPlacelng", res.lng, { shouldValidate: true });
+      // Success — clear the warning flag
+      type === "city" ? setLocationConfirmNeeded(false) : setWorkConfirmNeeded(false);
       setTimeout(() => {
         type == "city"
           ? setAfterChangeLocation("idle")
           : setAfterChangeWorkPlace("idle");
         type === "city" ? setFetchCoords("idle") : setWFetchCords("idle");
-      }, 1500);
+      }, 500);
       type === "city" ? setFetchCoords("success") : setWFetchCords("success");
     } catch (error) {
       type === "city" ? setFetchCoords("fail") : setWFetchCords("fail");
+      // Failed confirm — show the warning message now
+      type === "city" ? setLocationConfirmNeeded(true) : setWorkConfirmNeeded(true);
 
       setTimeout(() => {
         type === "city" ? setFetchCoords("idle") : setWFetchCords("idle");
-        type == "city"
+        type === "city"
           ? setAfterChangeLocation("changed")
-          : setAfterChangeLocation("changed");
-      }, 1500);
+          : setAfterChangeWorkPlace("changed");
+      }, 500);
     }
   };
 
@@ -187,7 +206,7 @@ const Location = ({ worker }) => {
   return (
     <div className="space-y-5">
       {/* Location Button */}
-      <div className=" mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className=" mt-5 w-full flex flex-col items-center text-center rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
         <p className="text-sm text-gray-500 mb-4">
           Click the button below to auto-detect and fill your location, or fill
           the fields manually.
@@ -327,12 +346,12 @@ const Location = ({ worker }) => {
           </div>
         </div>
 
-        {errors.locationLat ||
-          (errors.locationlng && (
+        {(locationConfirmNeeded ||
+          (isSubmitted && (errors.locationLat || errors.locationlng))) && (
             <div className="italic text-red-400/90 text-xs mt-3">
-              Please try again or change location
+              Please Confirm the location or change location and confirm again.
             </div>
-          ))}
+          )}
         {afterChangeLocation === "changed" && (
           <div className="p-1 flex">
             <button
@@ -394,12 +413,12 @@ const Location = ({ worker }) => {
                 </p>
               )}
             </div>
-            {errors.workPlacelat ||
-              (errors.workPlacelng && (
+            {(workConfirmNeeded ||
+              (isSubmitted && (errors.workPlacelat || errors.workPlacelng))) && (
                 <div className="italic text-red-400/90 text-xs mt-3">
                   Please try again or try changing Work Area.
                 </div>
-              ))}
+              )}
 
             {afterChangeWorkPlace === "changed" && (
               <div className="p-1 flex">
