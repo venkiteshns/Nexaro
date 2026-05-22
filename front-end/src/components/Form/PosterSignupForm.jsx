@@ -7,7 +7,7 @@ import Password from "./Password";
 import Location from "./Location";
 import TermsAndConditions from "./TermsAndConditions";
 
-const PosterSignupForm = ({onSubmitForm}) => {
+const PosterSignupForm = ({onSubmitForm, isVerified}) => {
 
   const methods = useForm();
   return (
@@ -28,8 +28,8 @@ const PosterSignupForm = ({onSubmitForm}) => {
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmitForm)}>
             <PersonalInfo />
-            <Password />
             <Location worker={false}/>
+            <Password />
             <TermsAndConditions />
 
             {/* Submit */}
@@ -37,7 +37,7 @@ const PosterSignupForm = ({onSubmitForm}) => {
               type="submit"
               className="w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-3.5 rounded-xl"
             >
-              Create Account
+              {isVerified ? "Submitting Registration...":"Create Account"}
             </button>
 
             {/* Divider */}

@@ -4,7 +4,6 @@ import Header from "../../components/Landing/Header";
 import Logo from "../../components/Logo/Logo";
 import LoginForm from "../../components/Form/LoginForm";
 import { useForm, FormProvider } from "react-hook-form";
-import OtpModal from "../../components/OtpModal/OtpModal";
 
 const UserLogin = () => {
 

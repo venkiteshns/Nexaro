@@ -40,37 +40,64 @@ export const createOtp = async (email, phone) => {
     }
 }
 
+
+const MAX_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 300;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const sendOtp = async (email, otp) => {
-    try {
-        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "api-key": process.env.BREVO_API_KEY
-            },
-            body: JSON.stringify({
-                sender: {
-                    name: "NEXARO",
-                    email: process.env.BREVO_USER
+    let lastError;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+            const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "api-key": process.env.BREVO_API_KEY
                 },
-                to: [{ email: email }],
-                subject: "NEXARO Verification Code",
-                htmlContent: otpTemplate(otp)
-            })
-        });
+                body: JSON.stringify({
+                    sender: {
+                        name: "NEXARO",
+                        email: process.env.BREVO_USER
+                    },
+                    to: [{ email: email }],
+                    subject: "NEXARO Verification Code",
+                    htmlContent: otpTemplate(otp)
+                })
+            });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Brevo API Error:", errorData);
-            throw new Error("Failed to send email via Brevo API");
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Brevo API Error:", errorData);
+                throw new Error(`Brevo API rejected the request: ${errorData?.message ?? response.status}`);
+            }
+
+            return true;
+
+        } catch (error) {
+            lastError = error;
+
+            const isTransient =
+                error.cause?.code === "ERR_SSL_DECRYPTION_FAILED_OR_BAD_RECORD_MAC" ||
+                error.cause?.code === "ECONNRESET" ||
+                error.cause?.code === "ECONNREFUSED" ||
+                error.message === "fetch failed";
+
+            if (!isTransient || attempt === MAX_RETRIES) {
+                console.error(`sendOtp error (attempt ${attempt}/${MAX_RETRIES}):`, error);
+                throw error;
+            }
+
+            const delay = RETRY_BASE_DELAY_MS * (2 ** (attempt - 1));
+            console.warn(`sendOtp: transient error on attempt ${attempt}, retrying in ${delay}ms...`);
+            await sleep(delay);
         }
-
-        return true;
-    } catch (error) {
-        console.error("sendOtp error:", error);
-        throw error;
     }
+
+    throw lastError;
 }
 
 export const verifyOtp = async (email, otp) => {
