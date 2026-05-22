@@ -3,29 +3,29 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const api = createApi({
-    reducerPath:'api',
+    reducerPath: 'api',
 
     baseQuery: fetchBaseQuery({
         baseUrl: API_URL
     }),
 
     endpoints: (builder) => ({
-        
+
         // POST Send OTP
         sendOtp: builder.mutation({
             query: ({ email, phone }) => ({
                 url: '/auth/get-otp',
                 method: 'POST',
-                body: {email,phone},
+                body: { email, phone },
             })
         }),
 
         // POST Verify OTP
         verifyOtp: builder.mutation({
-            query:({email,otp}) => ({
+            query: ({ email, otp }) => ({
                 url: '/auth/verify-otp',
                 method: "POST",
-                body: {email, otp}
+                body: { email, otp }
             })
         }),
 
@@ -34,10 +34,20 @@ export const api = createApi({
             query: (payload) => ({
                 url: '/auth/signup/poster',
                 method: 'POST',
-                body: payload
+                body: payload,
+                formData: true
+            })
+        }),
+
+        workerSignUp: builder.mutation({
+            query: (formData) => ({
+                url: '/auth/signup/worker',
+                method: 'POST',
+                body: formData,
+                formData: true,
             })
         })
     })
 })
 
-export const {useSendOtpMutation, useVerifyOtpMutation, usePosterSignUpMutation} = api;
+export const { useSendOtpMutation, useVerifyOtpMutation, usePosterSignUpMutation, useWorkerSignUpMutation } = api;
