@@ -14,7 +14,10 @@ const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const inputRefs = useRef([]);
 
-  const [verifyOtp, { isLoading, isError, isSuccess, error, data }] =
+  // const [sendOtp, { isLoading, isSuccess, isError, error, data }] =
+  //   useSendOtpMutation();
+
+  const [verifyOtp, { isLoading, isSuccess, isError, error, data }] =
     useVerifyOtpMutation();
 
   const handleOtp = async (otp) => {
@@ -24,7 +27,7 @@ const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
         email,
       }).unwrap();
       setTimeout(() => {
-        show(false)
+        show(false);
       }, 1500);
       isVerified(true);
     } catch (err) {
@@ -201,7 +204,9 @@ const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
         )}
         {/* Verify */}
         {isError && (
-          <span className="text-sm italic text-red-600/60">{error?.data?.message}</span>
+          <span className="text-sm italic text-red-600/60">
+            {error?.data?.message}
+          </span>
         )}
         <button
           disabled={finalOtp.length != 6}

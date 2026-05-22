@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/signup/poster", posterSignup);
 
-router.post("/signup/worker", upload.fields([{ name: 'idFront' }, { name: 'idBack' }, { name: 'selfie' }]), workerSignup);
+router.post("/signup/worker", upload.fields([{ name: 'id_front' }, { name: 'id_back' }, { name: 'selfie' }]), workerSignup);
 
 router.post("/refresh-token", refreshAccessToken);
 

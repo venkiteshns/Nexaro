@@ -15,8 +15,8 @@ export const workerSignupService = async ({ files, data }) => {
         const locationLng = parseFloat(data.locationLng);
         const hasValidLocation = isFinite(locationLat) && isFinite(locationLng);
 
-        const serviceAreaLat = parseFloat(data.serviceAreaLat);
-        const serviceAreaLng = parseFloat(data.serviceAreaLng);
+        const serviceAreaLat = parseFloat(data.workPlacelat);
+        const serviceAreaLng = parseFloat(data.workPlacelng);
         const hasValidServiceArea = isFinite(serviceAreaLat) && isFinite(serviceAreaLng);
 
         let parsedSkills = [];
@@ -27,7 +27,7 @@ export const workerSignupService = async ({ files, data }) => {
         const hashedPassword = await hashData(data.password);
 
         let payLoad = {
-            name: data.fullName,
+            name: data.name,
             email: data.email,
             phone: data.phone,
             password: hashedPassword,

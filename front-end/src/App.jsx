@@ -9,6 +9,7 @@ import PosterSignup   from './pages/auth/PosterSignup.jsx';
 import WorkerSignup   from './pages/auth/WorkerSignup.jsx';
 import UserLogin      from './pages/auth/UserLogin.jsx';
 import PosterDasboard from './pages/dashboards/PosterDasboard.jsx';
+import WorkerDashboard from './pages/dashboards/WorkerDashboard.jsx';
 
 
 function App() {
@@ -29,8 +30,11 @@ function App() {
             <Route path='/poster/dashboard' element={<PosterDasboard />} />
           </Route>
 
-          {/* ── Private routes — worker only (uncomment when page exists) ─────── */}
-          {/* <Route element={<PrivateRoute allowedRoles='worker' />}>
+          <Route element={<PrivateRoute allowedRoles='worker' />}>
+            <Route path='/worker/dashboard' element={<WorkerDashboard />} />
+          </Route>
+
+          {/* <Route element={<PrivateRoute allowedRoles='admin' />}>
             <Route path='/worker/dashboard' element={<WorkerDashboard />} />
           </Route> */}
 
