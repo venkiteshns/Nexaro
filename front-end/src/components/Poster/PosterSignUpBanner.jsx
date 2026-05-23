@@ -9,7 +9,7 @@ const Taskcard = () => {
     <div className=" flex flex-col w-[90%] ps-5 mt-5">
       {/* card1 */}
       <div className=" max-w-4/6 grid grid-cols-2 bg-white/80 p-5 rounded-2xl -rotate-6 animate-[bounce_5s_ease-in-out_infinite]">
-        <div className="text-green-700/80 bg-green-500/9 text-center pt-1 pb-1 py-2 font-semibold rounded-xl text-sm">
+        <div className="text-green-800/90 bg-green-500/9 text-center pt-1 pb-1 py-2 font-semibold rounded-xl text-sm">
           Active Task
         </div>
         <div className="flex items-center justify-end me-5 text-green-700 font-semibold">
@@ -21,7 +21,7 @@ const Taskcard = () => {
             <MapPin strokeWidth={1} className="w-3 me-1" />
             Dwarka, Sector 2
           </p>
-          <p className="flex text-green-700 items-center text-xs">
+          <p className="flex text-green-800 items-center text-xs">
             <Dot /> 4 workers bidding
           </p>
         </div>

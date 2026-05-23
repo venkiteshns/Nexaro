@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import Header from "../../components/Landing/Header";
 import Hero from "../../components/Landing/Hero";
@@ -10,6 +11,7 @@ import Footer from "../../components/Landing/Footer";
 const Landing = () => {
 
   const getStartRef = useRef(null);
+  const location = useLocation();
 
   const goGetStart = () => {
     getStartRef.current?.scrollIntoView({
@@ -17,6 +19,17 @@ const Landing = () => {
       block: "start",
     });
   };
+
+  useEffect(() => {
+    if (location.state?.scrollToGetStarted) {
+      setTimeout(() => {
+        getStartRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    }
+  }, []);
 
 
   return (

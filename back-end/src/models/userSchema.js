@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -135,34 +134,8 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-// ── JWT instance methods ──────────────────────────────────────────────────
-
-userSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            role: this.role,
-            activeRole: this.activeRole
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1d" }
-    );
-};
-
-userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign(
-        { _id: this._id },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "10d" }
-    );
-};
-
-// Sparse 2dsphere index: documents without a location field are skipped,
-// preventing the "Point must only contain numeric elements" error on signup.
 userSchema.index({ location: "2dsphere" }, { sparse: true });
 userSchema.index({ serviceArea: "2dsphere" }, { sparse: true });
-
 
 const user = mongoose.model("User", userSchema);
 

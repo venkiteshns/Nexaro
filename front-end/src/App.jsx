@@ -19,10 +19,10 @@ function App() {
       <Router>
         <Routes>
 
-          <Route path='/' element={<Landing />} />
           <Route path='/admin/login' element={<AdminLogin/>} />
 
           <Route element={<PublicRoute />}>
+          <Route path='/' element={<Landing />} />
             <Route path='/signup/poster'  element={<PosterSignup />} />
             <Route path='/signup/worker'  element={<WorkerSignup />} />
             <Route path='/user/login'     element={<UserLogin />} />

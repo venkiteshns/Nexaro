@@ -78,10 +78,7 @@ const WorkerSignup = () => {
     
     const res = await workerSignUp(fd).unwrap();
     console.log("signUpResponse Res ", res);
-    dispatch(setCredentials({ user: res.user, accessToken: res.accessToken }));
-    localStorage.setItem("refresh-Token", res.refreshToken);
-    localStorage.setItem("user", JSON.stringify(res.user));
-    localStorage.setItem("token", res.accessToken);
+    dispatch(setCredentials({ user: res.user, accessToken: res.accessToken, refreshToken: res.refreshToken }));
     navigate("/worker/dashboard");
   };
 
