@@ -141,6 +141,7 @@ const AdminLoginForm = () => {
           onClose={() => {
             setForgotPassword(false);
           }}
+          role={'admin'}
           isUpdateSuccess={setIsPasswordUpdated}
         />
       )}

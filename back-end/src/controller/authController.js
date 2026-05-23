@@ -109,6 +109,7 @@ export const forgotPasswordOtp = async (req, res) => {
         }
 
         let response = await forgotPasswordOtpService(email, req.params?.role);
+        
         if (response.success) {
             return res.status(200).json({ success: true, message: response.message });
         } else {
