@@ -145,7 +145,7 @@ export const api = createApi({
 
         userLogin: builder.mutation({
             query: (credentials) => ({
-                url: "/auth/login/user",
+                url: "/auth/login",
                 method: "POST",
                 body: credentials,
             }),
@@ -153,7 +153,7 @@ export const api = createApi({
 
         adminLogin: builder.mutation({
             query: (credentials) => ({
-                url: "/auth/login/user",
+                url: "/auth/login/admin",
                 method: "POST",
                 body: credentials,
             }),
@@ -172,6 +172,22 @@ export const api = createApi({
                 method: "POST",
             }),
         }),
+
+        forgotPassword: builder.mutation({
+            query: ({ email, role }) => ({
+                url: `/auth/forgot-password/${role}`,
+                method: "POST",
+                body: { email },
+            }),
+        }),
+
+        updatePassword: builder.mutation({
+            query: ({ email, password }) => ({
+                url: "/auth/update-password",
+                method: "POST",
+                body: { email, password },
+            }),
+        }),
     }),
 });
 
@@ -184,4 +200,6 @@ export const {
     useAdminLoginMutation,
     useUserLogoutMutation,
     useAdminLogoutMutation,
+    useForgotPasswordMutation,
+    useUpdatePasswordMutation,
 } = api;

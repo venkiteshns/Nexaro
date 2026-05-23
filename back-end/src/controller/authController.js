@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
-import { createOtp, loginService, verifyOtp } from '../services/authServices.js';
+import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePasswordService } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/generateTokens.js';
 
 export const refreshAccessToken = async (req, res) => {
@@ -64,8 +64,7 @@ export const verifySignUpOtp = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const response = await loginService(req.body);
-
+        const response = await loginService(req.body, req.params?.admin);
         if (response.success) {
             const { responseUser, accessToken, refreshToken } = response;
 
@@ -97,5 +96,47 @@ export const logout = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Logged out successfully' });
     } catch {
         return res.status(200).json({ success: true, message: 'Logged out' });
+    }
+};
+
+export const forgotPasswordOtp = async (req, res) => {
+    console.log("req.body ", req.body);
+
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, message: "Email is required" });
+        }
+
+        let response = await forgotPasswordOtpService(email, req.params?.role);
+        if (response.success) {
+            return res.status(200).json({ success: true, message: response.message });
+        } else {
+            const status = response.message === "User does not exist with this email" ? 404 : 400;
+            return res.status(status).json({ success: false, message: response.message });
+        }
+    } catch (error) {
+        console.error("Forgot password OTP error:", error.message);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+export const updatePassword = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: "Email and password are required" });
+        }
+
+        const response = await updatePasswordService(email, password);
+        if (response.success) {
+            return res.status(200).json({ success: true, message: response.message });
+        } else {
+            const status = response.message === "User does not exist with this email" ? 404 : 400;
+            return res.status(status).json({ success: false, message: response.message });
+        }
+    } catch (error) {
+        console.error("Update password error:", error.message);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };

@@ -5,7 +5,10 @@ import { useVerifyOtpMutation } from "../../store/services/api";
 
 const OTP_LENGTH = 6;
 
-const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
+const OtpModal = (props) => {
+
+  const {show, email, reSendOtp, isVerified} = props;
+
   const [time, setTime] = useState(60);
   const [resendCount, setResendCount] = useState(0);
   const [canResend, setCanResend] = useState(false);
@@ -13,9 +16,6 @@ const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
 
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const inputRefs = useRef([]);
-
-  // const [sendOtp, { isLoading, isSuccess, isError, error, data }] =
-  //   useSendOtpMutation();
 
   const [verifyOtp, { isLoading, isSuccess, isError, error, data }] =
     useVerifyOtpMutation();
@@ -60,13 +60,10 @@ const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
 
   const handleResendOtp = () => {
     if (!canResend || resendCount >= 3) return;
-
     setResendCount((prev) => prev + 1);
     setCanResend(false);
     setTime(60);
-    reSendOtp(email);
-
-    console.log("OTP resent");
+    reSendOtp({email});
   };
 
   const handleClose = () => {
@@ -212,16 +209,17 @@ const OtpModal = ({ show, email, reSendOtp, isVerified }) => {
           disabled={finalOtp.length != 6}
           onClick={() => handleOtp(finalOtp)}
           className={`w-full rounded-xl py-3 font-semibold md:font-bold text-white transition
-                ${
+                ${isSuccess ? "bg-[#0A6E5C]/50 cursor-not-allowed" :
                   finalOtp.length === 6
-                    ? "bg-green-900/90 hover:bg-green-800 cursor-pointer"
+                    ? "bg-green-900/90 hover:bg-green-800 cursor-pointer" 
+                    
                     : "bg-gray-400 cursor-not-allowed opacity-70"
                 }`}
         >
           {isLoading
             ? "Verifing OTP"
             : isSuccess
-              ? "OTP Verified, Registering.."
+              ? "OTP Verified, Proceeding.."
               : "Verify"}
         </button>
       </div>

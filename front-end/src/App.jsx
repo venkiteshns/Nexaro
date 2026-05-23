@@ -12,6 +12,7 @@ import PosterDasboard from "./pages/poster/PosterDasboard.jsx";
 import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import AdminLogin from "./pages/auth/AdminLogin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import UserManagement from "./pages/admin/UserMangement.jsx";
 
 function App() {
   return (
@@ -40,7 +41,9 @@ function App() {
 
           <Route element={<PrivateRoute allowedRoles="admin" />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagement/>} />
           </Route>
+          
         </Routes>
       </Router>
     </ErrorBoundary>
