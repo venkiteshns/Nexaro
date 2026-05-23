@@ -4,7 +4,10 @@ import PosterSignupForm from "../../components/Form/PosterSignupForm";
 import Logo from "../../components/Logo/Logo";
 import Header from "../../components/Landing/Header";
 import OtpModal from "../../components/OtpModal/OtpModal";
-import { usePosterSignUpMutation, useSendOtpMutation } from "../../store/services/api";
+import {
+  usePosterSignUpMutation,
+  useSendOtpMutation,
+} from "../../store/services/api";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useNavigate } from "react-router-dom";
@@ -14,56 +17,73 @@ const PosterSignup = () => {
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
   const [isVerified, setIsVerified] = useState(false);
-  const [sendOtp, { isLoading, isSuccess, isError, error, data }] = useSendOtpMutation();
-  const [posterSignUp, { isLoading: signUpLoading, isSuccess: isSignUpSuccess, isError: isSignUpError, error: signUpError, data: signUpData }] = usePosterSignUpMutation();
+  
+  const [sendOtp, { isLoading, isSuccess, isError, error, data }] =
+    useSendOtpMutation();
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const [
+    posterSignUp,
+    {
+      isLoading: signUpLoading,
+      isSuccess: isSignUpSuccess,
+      isError: isSignUpError,
+      error: signUpError,
+      data: signUpData,
+    },
+  ] = usePosterSignUpMutation();
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const resendOtp = async (email) => {
     console.log("resend", email, formData.phone, formData.email);
-    const response = await sendOtp({
-      email: formData.email,
-      phone: formData.phone,
-    }).unwrap();
+    try {
+      const response = await sendOtp({
+        email: formData.email,
+        phone: formData.phone,
+      }).unwrap();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    sendDataToBackend()
-  },[isVerified])
+    sendDataToBackend();
+  }, [isVerified]);
 
   const handleFormData = async (data) => {
     console.log("signup page", data);
     try {
       let res = setEmail(data.email);
       setFormData(data);
-      setShowOtp(true);
       const response = await sendOtp({
         email: data.email,
         phone: data.phone,
       }).unwrap();
-
+      setShowOtp(true);
+      console.log("response poster : ", response);
+      
     } catch (error) {
       console.log(error);
     }
   };
 
-
   const sendDataToBackend = async () => {
-    if(!isVerified) return;
+    if (!isVerified) return;
     let res = await posterSignUp(formData).unwrap();
-    console.log("signUpResponse Res ",res);
-    dispatch(setCredentials({
-      user: res.user,
-      accessToken: res.accessToken,
-      refreshToken: res.refreshToken
-    }))
-    navigate('/poster/dashboard')
-  }
+    console.log("signUpResponse Res ", res);
+    dispatch(
+      setCredentials({
+        user: res.user,
+        accessToken: res.accessToken,
+        refreshToken: res.refreshToken,
+      }),
+    );
+    navigate("/poster/dashboard");
+  };
 
   return (
     <div className="grid grid-cols-16">
-      <Header landing={false} />
       <Header landing={false} />
       <span className="hidden lg:block lg:col-span-7 mt-15">
         <PosterSignUpBanner />
@@ -76,7 +96,12 @@ const PosterSignup = () => {
         </h1>
       </div>
       <span className="col-span-16 lg:col-span-9 mt-15">
-        <PosterSignupForm onSubmitForm={handleFormData} isVerified={isVerified}/>
+        <PosterSignupForm
+          onSubmitForm={handleFormData}
+          isVerified={isVerified}
+          otpStatus={{isLoading, isSuccess, isError, error, data}}
+          formStatus={{signUpLoading, isSignUpSuccess, isSignUpError, signUpError, signUpData}}
+        />
       </span>
       {showOtp && (
         <OtpModal

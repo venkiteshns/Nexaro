@@ -18,7 +18,7 @@ export const createOtp = async (email, phone) => {
   try {
     const userData = await User.findOne({ $or: [{ email }, { phone }] });
     if (userData) {
-      return { success: false, message: "User already exists" };
+      return { success: false, message: "User already exists with same email or mobile number" };
     }
     const otp = crypto.randomInt(100000, 999999).toString();
     console.log("OTP", otp);

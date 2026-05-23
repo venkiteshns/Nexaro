@@ -10,7 +10,7 @@ const Password = (props) => {
     formState: { errors },
   } = useFormContext();
 
-  const login = props.login;
+  const login = props?.login;
   const forgot = props?.forgotPassword;
 
   const password = watch("password");
