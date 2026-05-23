@@ -1,6 +1,7 @@
 import User from "../models/userSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -68,6 +69,9 @@ export const workerSignupService = async ({ files, data }) => {
                 coordinates: [serviceAreaLng, serviceAreaLat]
             };
         }
+
+        console.log("files", files);
+        
         const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 
         if (uploadStatus.error) {
@@ -75,13 +79,13 @@ export const workerSignupService = async ({ files, data }) => {
         }
 
         payLoad.verificationDocuments.selfie = uploadStatus.selfie;
-        payLoad.verificationDocuments.idFront = uploadStatus.idFront;
-        payLoad.verificationDocuments.idBack = uploadStatus.idBack;
+        payLoad.verificationDocuments.idFront = uploadStatus.id_front;
+        payLoad.verificationDocuments.idBack = uploadStatus.id_back;
 
         const createdUser = await User.create(payLoad);
 
-        const accessToken = createdUser.generateAccessToken();
-        const refreshToken = createdUser.generateRefreshToken();
+        const accessToken = generateAccessToken(createdUser);
+        const refreshToken = generateRefreshToken(createdUser);
 
         createdUser.refreshToken = refreshToken;
         await createdUser.save({ validateBeforeSave: false });

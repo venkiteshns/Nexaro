@@ -1,14 +1,19 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import otpTemplate from "../utils/otpTemplate.js";
 import Otp from "../models/otpSchems.js";
-import user from "../models/userSchema.js";
-import { hashData, compareHash } from "../utils/hasing.js";
 import User from "../models/userSchema.js";
+import { hashData, compareHash } from "../utils/hasing.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
+
+
+const MAX_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 300;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const createOtp = async (email, phone) => {
     try {
-        const userData = await user.findOne({ $or: [{ email }, { phone }] });
+        const userData = await User.findOne({ $or: [{ email }, { phone }] });
         if (userData) {
             return { success: false, message: "User already exists" };
         }
@@ -39,12 +44,6 @@ export const createOtp = async (email, phone) => {
         throw error;
     }
 }
-
-
-const MAX_RETRIES = 3;
-const RETRY_BASE_DELAY_MS = 300;
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const sendOtp = async (email, otp) => {
     let lastError;
@@ -121,15 +120,33 @@ export const verifyOtp = async (email, otp) => {
 
 export const loginService = async ({ email, password }) => {
     try {
+        // 1. Find user by email
         const existingUser = await User.findOne({ email });
         if (!existingUser) {
             return { success: false, message: "User not found" };
         }
+
+        // 2. Check if the password matches
         const isPasswordValid = await compareHash(password, existingUser.password);
         if (!isPasswordValid) {
             return { success: false, message: "Invalid password" };
         }
-        return { success: true, message: "Login successful", user };
+
+        // 3. Generate tokens
+        const accessToken = generateAccessToken(existingUser);
+        const refreshToken = generateRefreshToken(existingUser);
+
+        // 4. refresh token to database
+        existingUser.refreshToken = refreshToken;
+        await existingUser.save({ validateBeforeSave: false });
+        let isSelfie = existingUser?.verificationDocuments?.selfie;
+        console.log("selfie ", isSelfie);
+        let selfie = isSelfie.url || process.env.USER_ICON
+        // 5. user object 
+        const { _id, name, email: userEmail, activeRole, } = existingUser;
+        const responseUser = { id: _id, name, email: userEmail, role: activeRole, selfie };
+
+        return { success: true, message: "Login successful", responseUser, accessToken, refreshToken };
     } catch (error) {
         throw error;
     }

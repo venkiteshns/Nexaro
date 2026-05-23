@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
 import { createOtp, loginService, verifyOtp } from '../services/authServices.js';
+import { generateAccessToken } from '../utils/generateTokens.js';
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -18,7 +19,7 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(403).json({ success: false, message: "Invalid or expired refresh token" });
         }
 
-        const newAccessToken = user.generateAccessToken();
+        const newAccessToken = generateAccessToken(user);
 
         return res.status(200).json({
             success: true,
@@ -62,14 +63,20 @@ export const verifySignUpOtp = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-    console.log(req.body);
-
     try {
-        let response = await loginService(req.body);
-        console.log(response);
+        const response = await loginService(req.body);
 
         if (response.success) {
-            return res.status(200).json({ success: true, message: "Login successful" });
+            // Destructure everything the service prepared for us
+            const { responseUser, accessToken, refreshToken } = response;
+
+            return res.status(200).json({
+                success: true,
+                message: "Login successful",
+                user: responseUser,
+                accessToken,
+                refreshToken,
+            });
         } else {
             return res.status(400).json({ success: false, message: response.message });
         }

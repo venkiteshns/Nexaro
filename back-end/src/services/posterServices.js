@@ -1,8 +1,9 @@
 import User from "../models/userSchema.js";
 import { hashData } from "../utils/hasing.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 
 export const posterSignupService = async (data) => {
-    console.log("signUp data",data);
+    console.log("signUp data", data);
     try {
         // 1. Duplicate check
         const existing = await User.findOne({ email: data.email });
@@ -46,8 +47,8 @@ export const posterSignupService = async (data) => {
         const createdUser = await User.create(payload);
 
         // 7. Generate tokens
-        const accessToken = createdUser.generateAccessToken();
-        const refreshToken = createdUser.generateRefreshToken();
+        const accessToken = generateAccessToken(createdUser);
+        const refreshToken = generateRefreshToken(createdUser);
 
         createdUser.refreshToken = refreshToken;
         await createdUser.save({ validateBeforeSave: false });

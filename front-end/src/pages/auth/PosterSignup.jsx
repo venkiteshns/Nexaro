@@ -20,14 +20,6 @@ const PosterSignup = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    console.log('isSignUpError',isSignUpError);
-    console.log('isSignUpSuccess',isSignUpSuccess);
-    console.log('signUpLoading',signUpLoading);
-    console.log('signUpError',signUpError);
-    console.log('signUpData',signUpData);
-  },[isSignUpError, isSignUpSuccess, signUpLoading, signUpError, signUpData])
-
   const resendOtp = async (email) => {
     console.log("resend", email, formData.phone, formData.email);
     const response = await sendOtp({
@@ -63,11 +55,9 @@ const PosterSignup = () => {
     console.log("signUpResponse Res ",res);
     dispatch(setCredentials({
       user: res.user,
-      accessToken: res.accessToken
+      accessToken: res.accessToken,
+      refreshToken: res.refreshToken
     }))
-    localStorage.setItem('refresh-Token',res.refreshToken)
-    localStorage.setItem('user',JSON.stringify(res.user))
-    localStorage.setItem('token', res.accessToken)
     navigate('/poster/dashboard')
   }
 

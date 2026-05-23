@@ -1,6 +1,8 @@
 import cloudinary from "../config/cloudinary.js";
 
 export const uploadManyFiles = async (files, folder) => {
+    
+    
     try {
         if (!files || Object.keys(files).length === 0) {
             throw new Error("No files received for uploading ")
@@ -32,6 +34,10 @@ export const uploadManyFiles = async (files, folder) => {
                 public_id: file.public_id
             };
         });
+    console.log("-------------------------------------------------");
+
+        console.log("res", result)
+    console.log("-------------------------------------------------");
 
         return result;
 
