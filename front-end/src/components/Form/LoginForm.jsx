@@ -8,10 +8,10 @@ const LoginForm = ({ onFormSubmit }) => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onFormSubmit)}>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onFormSubmit)}>
         <PersonalInfo worker={false} login={true} />
         <Password login={true} />
-        <button type="submit" className="w-full mt-5 rounded-xl bg-[#0a6e5c] py-2 font-semibold text-white transition hover:opacity-90">
+        <button type="submit" className="w-full mt-1 rounded-xl bg-[#0a6e5c] py-2 font-semibold text-white transition hover:opacity-90">
           Login to Nexaro
         </button>
       </form>

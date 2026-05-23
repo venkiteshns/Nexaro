@@ -52,7 +52,7 @@ const Password = (props) => {
             placeholder="••••••••••••"
             className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
           />
-          
+
           <span
             onClick={() => {
               setShowPassword(!showPassword);
@@ -67,6 +67,14 @@ const Password = (props) => {
             </span>
           )}
         </div>
+        {login && <div className="flex mt-4 items-center justify-end gap-4">
+          <button
+            type="button"
+            className="text-xs font-semibold text-[#0A6E5C]/80 hover:text-[#075848] transition"
+          >
+            Forgot Password?
+          </button>
+        </div>}
 
         {!login && (
           <div className="relative">
