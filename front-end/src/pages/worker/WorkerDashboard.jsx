@@ -1,21 +1,55 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logOut } from '../../store/Slices/UserSlice';
+import { useUserLogoutMutation } from '../../store/services/api';
+import { LogOut } from 'lucide-react';
 
 const WorkerDashboard = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
-const {user} = useSelector((state) => state.auth)
+  const [userLogout] = useUserLogoutMutation();
 
-  console.log(user);
-  
+  const handleLogout = async () => {
+    try {
+      await userLogout().unwrap();
+    } catch {
+    } finally {
+      dispatch(logOut());
+      navigate('/user/login');
+    }
+  };
+
   return (
-    <div>
-      <h1>{user.name}</h1>
-      <p>{user.email}</p>
-      <p>{user.role}</p>
-      <img src={user.selfie} alt="" />
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
+        <h1 className="text-xl font-bold text-[#0A6E5C]">Worker Dashboard</h1>
 
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-red-500 border border-red-200 hover:bg-red-50 transition-all text-sm font-medium"
+        >
+          <LogOut size={16} />
+          Logout
+        </button>
+      </div>
+
+      <div className="p-6">
+        <h2 className="text-2xl font-semibold text-gray-800">{user?.name}</h2>
+        <p className="text-gray-500 mt-1">{user?.email}</p>
+        <p className="text-sm text-[#0A6E5C] font-medium mt-1">{user?.role}</p>
+        {user?.selfie && (
+          <img
+            src={user.selfie}
+            alt="profile"
+            className="w-24 h-24 rounded-full object-cover mt-4 border-2 border-[#0A6E5C]"
+          />
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default WorkerDashboard
+export default WorkerDashboard;
