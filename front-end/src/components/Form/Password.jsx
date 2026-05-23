@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import { useFormContext } from "react-hook-form";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 
 const Password = (props) => {
   const {
@@ -10,11 +11,13 @@ const Password = (props) => {
   } = useFormContext();
 
   const login = props.login;
+  const forgot = props?.forgotPassword;
 
   const password = watch("password");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
     <div
       className={`${login ? "" : "mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}
@@ -67,14 +70,19 @@ const Password = (props) => {
             </span>
           )}
         </div>
-        {login && <div className="flex mt-4 items-center justify-end gap-4">
-          <button
-            type="button"
-            className="text-xs font-semibold text-[#0A6E5C]/80 hover:text-[#075848] transition"
-          >
-            Forgot Password?
-          </button>
-        </div>}
+        {login && (
+          <div className="flex mt-4 items-center justify-end gap-4">
+            <button
+              onClick={() => {
+                forgot(true);
+              }}
+              type="button"
+              className="text-xs font-semibold text-[#0A6E5C]/80 hover:text-[#075848] transition"
+            >
+              Forgot Password?
+            </button>
+          </div>
+        )}
 
         {!login && (
           <div className="relative">

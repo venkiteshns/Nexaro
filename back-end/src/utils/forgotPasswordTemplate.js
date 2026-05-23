@@ -1,11 +1,11 @@
-const otpTemplate = (otp, appName = "NEXARO") => {
+const forgotPasswordTemplate = (otp, appName = "NEXARO") => {
     return `
   <!DOCTYPE html>
   <html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>OTP Verification</title>
+    <title>Reset Your Password</title>
   </head>
 
   <body style="
@@ -57,7 +57,7 @@ const otpTemplate = (otp, appName = "NEXARO") => {
                   font-size:24px;
                   font-weight:700;
                 ">
-                  Verify your email
+                  Reset your password
                 </p>
 
                 <p style="
@@ -66,7 +66,7 @@ const otpTemplate = (otp, appName = "NEXARO") => {
                   font-size:15px;
                   line-height:1.7;
                 ">
-                  Use the verification code below to complete your verification procedure.
+                  Use the verification code below to reset your password.
                   This code will expire in 10 minutes.
                 </p>
 
@@ -95,7 +95,7 @@ const otpTemplate = (otp, appName = "NEXARO") => {
                   font-size:14px;
                   line-height:1.7;
                 ">
-                  If you did not request this code, you can safely ignore this email.
+                  If you did not request this password reset, please ignore this email.
                 </p>
 
                 <hr style="
@@ -128,4 +128,4 @@ const otpTemplate = (otp, appName = "NEXARO") => {
   `;
 };
 
-export default otpTemplate;
+export default forgotPasswordTemplate;
