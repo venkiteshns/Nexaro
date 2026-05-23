@@ -7,7 +7,10 @@ import Password from "./Password";
 import Location from "./Location";
 import TermsAndConditions from "./TermsAndConditions";
 
-const PosterSignupForm = ({onSubmitForm, isVerified}) => {
+const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) => {
+
+  let { isLoading, isSuccess, isError, error, data } = otpStatus;
+  let { signUpLoading, isSignUpSuccess, isSignUpError, signUpError, signUpData } = formStatus;
 
   const methods = useForm();
   return (
@@ -28,16 +31,32 @@ const PosterSignupForm = ({onSubmitForm, isVerified}) => {
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmitForm)}>
             <PersonalInfo />
-            <Location worker={false}/>
-            <Password />
+            <Location worker={false} />
+            <Password login={false} />
             <TermsAndConditions />
+
+            {isError && (
+              <div className="text-center my-4">
+                <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
+                  {error?.data?.message || error?.message}
+                </span>
+              </div>
+            )}
+
+            {isSignUpError && (
+              <div className="text-center">
+                <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
+                  {signUpError?.data?.message || signUpError?.message}
+                </span>
+              </div>
+            )}
 
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-3.5 rounded-xl"
+              className={`w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-3.5 rounded-xl ${(isLoading || isVerified) ? "cursor-not-allowed opacity-50" : ""}`}
             >
-              {isVerified ? "Submitting Registration...":"Create Account"}
+              {isVerified ? "Submitting Registration..." : isLoading ? "Validating Data..." : "Create Account"}
             </button>
 
             {/* Divider */}
