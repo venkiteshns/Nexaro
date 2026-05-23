@@ -67,7 +67,6 @@ export const login = async (req, res) => {
         const response = await loginService(req.body);
 
         if (response.success) {
-            // Destructure everything the service prepared for us
             const { responseUser, accessToken, refreshToken } = response;
 
             return res.status(200).json({

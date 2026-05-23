@@ -11,17 +11,6 @@ const UserLogin = () => {
   const navigate = useNavigate();
   const methods = useForm();
 
-  const [isSuccess, setIsSuccess] = useState(false)
-
-  useEffect(() => {
-    redirectToDashboard()
-  },[isSuccess])
-
-  const redirectToDashboard = (role) => {
-    if(!isSuccess) return;
-    console.log("success");
-  }
-
   const handleRegister = () => {
     navigate("/", { state: { scrollToGetStarted: true } });
   };
@@ -51,7 +40,7 @@ const UserLogin = () => {
           {/* Form */}
           <div className="space-y-6">
             <FormProvider {...methods}>
-              <LoginForm isVerified={setIsSuccess} />
+              <LoginForm />
             </FormProvider>
 
             {/* Divider */}
