@@ -8,8 +8,9 @@ import Landing        from './pages/Landing/Landing.jsx';
 import PosterSignup   from './pages/auth/PosterSignup.jsx';
 import WorkerSignup   from './pages/auth/WorkerSignup.jsx';
 import UserLogin      from './pages/auth/UserLogin.jsx';
-import PosterDasboard from './pages/dashboards/PosterDasboard.jsx';
-import WorkerDashboard from './pages/dashboards/WorkerDashboard.jsx';
+import PosterDasboard from './pages/poster/PosterDasboard.jsx';
+import WorkerDashboard from './pages/worker/WorkerDashboard.jsx';
+import AdminLogin from './pages/auth/AdminLogin.jsx';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Routes>
 
           <Route path='/' element={<Landing />} />
+          <Route path='/admin/login' element={<AdminLogin/>} />
 
           <Route element={<PublicRoute />}>
             <Route path='/signup/poster'  element={<PosterSignup />} />

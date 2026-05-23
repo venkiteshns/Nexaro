@@ -11,7 +11,7 @@ const GetStarted = () => {
         <h2 className="text-3xl mb-4">
           I need <span className="italic text-[#0a6e5c]">specialized</span> help.
         </h2>
-        <p className="text-sm text-gray-600/90 px-5 md:px-20">
+        <p className="text-sm text-gray-600/90 px-5 md:px-20 text-center">
           Access a curated network of the top 1% local professionals. Get your
           projects done right, the first time.
         </p>
@@ -29,7 +29,7 @@ const GetStarted = () => {
         <h2 className="text-3xl mb-4">
           I have <span className="italic text-[#0a6e5c]">elite</span> skills.
         </h2>
-        <p className="text-sm text-gray-600/90 px-5 md:px-20">
+        <p className="text-sm text-gray-600/90 px-5 md:px-20 text-center ">
           Join the most prestigious network of skilled workers. Earn more, work
           smarter, and build your editorial reputation.
         </p>

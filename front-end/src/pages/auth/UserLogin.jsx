@@ -43,7 +43,7 @@ const UserLogin = () => {
             </FormProvider>
 
             {/* Divider */}
-            <div className="flex items-center gap-4">
+            {/* <div className="flex items-center gap-4">
               <div className="h-px flex-1 bg-gray-200"></div>
 
               <span className="text-sm text-gray-400">or continue with</span>
@@ -51,14 +51,13 @@ const UserLogin = () => {
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
 
-            {/* Google Button */}
             <button className=" text-sm w-full rounded-xl border border-gray-200 bg-white py-4 font-medium text-gray-700 transition hover:bg-gray-50">
               Sign in with Google
-            </button>
+            </button> */}
           </div>
 
           {/* Register */}
-          <p className="mt-10 text-center text-sm text-gray-500">
+          <p className="mt-10 text-center text-xs text-gray-500">
             Don't have an account?{" "}
             <button className="font-semibold text-[#0A6E5C] hover:underline">
               Register
