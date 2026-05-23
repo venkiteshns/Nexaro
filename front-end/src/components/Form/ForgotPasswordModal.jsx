@@ -6,7 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useForgotPasswordMutation, useUpdatePasswordMutation } from "../../store/services/api";
 import Password from "./Password";
 
-const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess }) => {
+const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
   if (!isOpen) return null;
 
   const [forgotPassword, { isLoading, isError, isSuccess, error, data }] =
@@ -37,7 +37,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess }) => {
     console.log("email ", email);
     setEmail(email)
     try {
-      let res = await forgotPassword({ email, role:"admin" });
+      let res = await forgotPassword({ email, role });
       console.log(" reset otp res ", res);
     } catch (error) {
       console.log("reset error", err);

@@ -249,11 +249,11 @@ export const sendForgotPasswordEmail = async (email, otp) => {
 };
 
 export const forgotPasswordOtpService = async (email, role) => {
-    console.log("role", role);
-    
+  console.log("role", role);
+
   try {
     if (role == "admin") {
-      const userData = await User.findOne({ email, activeRole:role });
+      const userData = await User.findOne({ email, activeRole: role });
       if (!userData) {
         return {
           success: false,
@@ -261,7 +261,10 @@ export const forgotPasswordOtpService = async (email, role) => {
         };
       }
     }
-    const userData = await User.findOne({ email });
+    const userData = await User.findOne({
+      email,
+      activeRole: { $in: ["worker", "poster"] },
+    });
     if (!userData) {
       return { success: false, message: "User does not exist with this email" };
     }
