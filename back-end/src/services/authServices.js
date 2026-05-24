@@ -18,7 +18,10 @@ export const createOtp = async (email, phone) => {
   try {
     const userData = await User.findOne({ $or: [{ email }, { phone }] });
     if (userData) {
-      return { success: false, message: "User already exists with same email or mobile number" };
+      return {
+        success: false,
+        message: "User already exists with same email or mobile number",
+      };
     }
     const otp = crypto.randomInt(100000, 999999).toString();
     console.log("OTP", otp);
@@ -162,7 +165,7 @@ export const loginService = async (userData, isAdmin) => {
     // 4. refresh token to database
     existingUser.refreshToken = refreshToken;
     await existingUser.save({ validateBeforeSave: false });
-    let isSelfie = existingUser?.verificationDocuments?.selfie;
+    let isSelfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
     console.log("selfie ", isSelfie);
     let selfie = isSelfie.url || process.env.USER_ICON;
 
@@ -260,13 +263,17 @@ export const forgotPasswordOtpService = async (email, role) => {
           message: "Invalid admin credentials",
         };
       }
-    }
-    const userData = await User.findOne({
-      email,
-      activeRole: { $in: ["worker", "poster"] },
-    });
-    if (!userData) {
-      return { success: false, message: "User does not exist with this email" };
+    } else {
+      const userData = await User.findOne({
+        email,
+        activeRole: { $in: ["worker", "poster"] },
+      });
+      if (!userData) {
+        return {
+          success: false,
+          message: "User does not exist with this email",
+        };
+      }
     }
 
     const otp = crypto.randomInt(100000, 999999).toString();

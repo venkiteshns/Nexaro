@@ -22,7 +22,7 @@ export const workerSignupService = async ({ files, data }) => {
 
         let parsedSkills = [];
         let parsedLanguages = [];
-        try { parsedSkills = typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills; } catch (e) { }
+        try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch (e) { }
         try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch (e) { }
 
         const hashedPassword = await hashData(data.password);
