@@ -19,7 +19,7 @@ const LoginForm = () => {
   const [isPasswordUpdated, setIsPasswordUpdated] = useState(false);
   const [forgotPassword, setForgotPassword] = useState(false);
 
-  const [userLogin, { isLoading, isError, isSuccess, error, data, reset:loginReset }] =
+  const [userLogin, { isLoading, isError, isSuccess, error, data, reset: loginReset }] =
     useUserLoginMutation();
 
   const [
@@ -78,17 +78,17 @@ const LoginForm = () => {
         <PersonalInfo worker={false} login={true} />
         <Password login={true} forgotPassword={setForgotPassword} />
         {isError && (
-          <div className="text-center">
-            <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
+          <div className="text-center bg-red-500/10 rounded-xl py-2 px-4">
+            <p className="italic text-red-600/90 text-sm">
               {error.data.message}
-            </span>
+            </p>
           </div>
         )}
         {isAdmin && (
-          <div className="text-center bg-red-500/10 py-1.5 rounded-xl">
-            <span className="italic text-red-600/90 text-sm">
-              Credentials is not matching with user datas
-            </span>
+          <div className="text-center bg-red-500/10 rounded-xl py-2 px-4">
+            <p className="italic text-red-600/90 text-sm">
+              Invalid User credentials
+            </p>
           </div>
         )}
         <button

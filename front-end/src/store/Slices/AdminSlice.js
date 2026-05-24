@@ -12,8 +12,8 @@ const initialState = {
     refreshToken: localStorage.getItem("adminRefreshToken")
         ? localStorage.getItem("adminRefreshToken")
         : null,
-    sideBarOpen: true,
-    activePage: 'Dashboard'
+    sideBarOpen: window.innerWidth > 768,
+    activePage: localStorage.getItem('page') || 'Dashboard'
 };
 
 const adminSlice = createSlice({
@@ -53,6 +53,7 @@ const adminSlice = createSlice({
             state.sideBarOpen = action.payload
         },
         setActivePage: (state, action) => {
+            localStorage.setItem('page', action.payload)
             state.activePage = action.payload
         }
     },
