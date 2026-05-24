@@ -12,6 +12,8 @@ const initialState = {
     refreshToken: localStorage.getItem("adminRefreshToken")
         ? localStorage.getItem("adminRefreshToken")
         : null,
+    sideBarOpen: true,
+    activePage: 'Dashboard'
 };
 
 const adminSlice = createSlice({
@@ -47,9 +49,15 @@ const adminSlice = createSlice({
             localStorage.removeItem("adminToken");
             localStorage.removeItem("adminRefreshToken");
         },
+        setSideBar: (state, action) => {
+            state.sideBarOpen = action.payload
+        },
+        setActivePage: (state, action) => {
+            state.activePage = action.payload
+        }
     },
 });
 
-export const { setAdminCredentials, adminLogOut } = adminSlice.actions;
+export const { setAdminCredentials, adminLogOut, setSideBar, setActivePage } = adminSlice.actions;
 
 export default adminSlice.reducer;

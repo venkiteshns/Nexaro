@@ -96,11 +96,11 @@ const WorkerSignup = () => {
     try {
       let res = setEmail(data.email);
       setFormData(data);
-      setShowOtp(true);
       const response = await sendOtp({
         email: data.email,
         phone: data.phone,
       }).unwrap();
+      setShowOtp(true);
       console.log(response)
     } catch (error) {
       console.log(error);
@@ -113,7 +113,14 @@ const WorkerSignup = () => {
       <Header landing={false} />
       <HeaderWorkerSignup />
       <FormProvider {...methods}>
-        <WorkerSignupForm onSubmitForm={handleFormSubmit} />
+        <WorkerSignupForm onSubmitForm={handleFormSubmit} isOtpError={isOtpError} otpError={otpError} isOtpSuccess={isOtpSuccess} />
+         {/* {
+      isLoading: isOtpLoading,
+      isSuccess: isOtpSuccess,
+      isError: isOtpError,  
+      error: otpError,
+      data: otpData,
+    }, */}
       </FormProvider>
       {showOtp && (
         <OtpModal

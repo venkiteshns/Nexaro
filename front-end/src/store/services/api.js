@@ -188,6 +188,13 @@ export const api = createApi({
                 body: { email, password },
             }),
         }),
+
+        adminGetUsers: builder.query({
+            query: ({ page = 1, limit = 10 } = {}) => ({
+                url: `/admin/users?page=${page}&limit=${limit}`,
+                method: "GET",
+            }),
+        }),
     }),
 });
 
@@ -202,4 +209,5 @@ export const {
     useAdminLogoutMutation,
     useForgotPasswordMutation,
     useUpdatePasswordMutation,
+    useAdminGetUsersQuery,
 } = api;
