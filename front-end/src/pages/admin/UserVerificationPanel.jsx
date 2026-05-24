@@ -15,10 +15,12 @@ import {
   useAdminGetPendingVerificationUsersQuery,
   useAdminRejectUserMutation,
 } from "../../store/services/api";
+import { useLocation } from "react-router-dom";
 
 const UserVerificationPanel = () => {
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchName, setSearchName] = useState("");
+  const [searchName, setSearchName] = useState(location.state?.userName || "");
 
   const [approveUser] = useAdminApproveUserMutation();
   const [rejectUser] = useAdminRejectUserMutation();

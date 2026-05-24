@@ -30,7 +30,6 @@ const UserManagement = () => {
   const totalPages = data?.totalPages || 1;
   const totalUsers = data?.totalUsers || 0;
 
-  // filter users by role and name on the frontend
   const filteredUsers = users.filter((user) => {
     const matchesRole = roleFilter === "all" || user.activeRole === roleFilter;
     const matchesName = user.name.toLowerCase().includes(searchName.toLowerCase());
@@ -83,7 +82,6 @@ const UserManagement = () => {
             </button>
           </div>
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            {/* Role filter dropdown */}
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
@@ -94,7 +92,6 @@ const UserManagement = () => {
               <option value="poster">Poster</option>
             </select>
 
-            {/* Search by name */}
             <div className="flex-1 bg-white border border-gray-200 rounded-2xl px-4 py-2 flex items-center gap-3">
               <Search size={20} className="text-gray-400" />
               <input
@@ -108,7 +105,6 @@ const UserManagement = () => {
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Selected User Details */}
             <div className="order-1 xl:order-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               {selectedUser ? (
                 <>
@@ -192,10 +188,13 @@ const UserManagement = () => {
 
                   {/* btns */}
                   <div className="space-y-4 mt-8">
-                    <button className="w-full p py-3  rounded-2xl bg-[#0A6E5C] text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                    {!selectedUser.isVerified && <button
+                      onClick={() => navigate('/admin/users/verification', { state: { userName: selectedUser.name } })}
+                      className="w-full py-3 rounded-2xl bg-[#0A6E5C] text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                    >
                       <ShieldCheck size={18} />
                       Verify Manually
-                    </button>
+                    </button>}
 
                     <button
                       onClick={() => {

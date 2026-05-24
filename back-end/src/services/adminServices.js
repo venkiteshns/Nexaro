@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import MESSAGES from "../constants/messages.js";
 
 export const getAllUsersService = async (page, limit) => {
     try {
@@ -30,17 +31,17 @@ export const suspendUserService = async (userId) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
-            return { success: false, message: "User not found" };
+            return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
 
         if (user.isSuspended) {
-            return { success: false, message: "User is already suspended" };
+            return { success: false, message: MESSAGES.USER_ALREADY_SUSPENDED };
         }
 
         user.isSuspended = true;
         await user.save({ validateBeforeSave: false });
 
-        return { success: true, message: "User suspended successfully" };
+        return { success: true, message: MESSAGES.USER_SUSPENDED };
     } catch (error) {
         throw error;
     }
@@ -50,17 +51,17 @@ export const unsuspendUserService = async (userId) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
-            return { success: false, message: "User not found" };
+            return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
 
         if (!user.isSuspended) {
-            return { success: false, message: "User is not suspended" };
+            return { success: false, message: MESSAGES.USER_NOT_SUSPENDED };
         }
 
         user.isSuspended = false;
         await user.save({ validateBeforeSave: false });
 
-        return { success: true, message: "User unsuspended successfully" };
+        return { success: true, message: MESSAGES.USER_UNSUSPENDED };
     } catch (error) {
         throw error;
     }
@@ -104,17 +105,17 @@ export const approveUserService = async (userId) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
-            return { success: false, message: "User not found" };
+            return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
 
         if (user.isVerified) {
-            return { success: false, message: "User is already verified" };
+            return { success: false, message: MESSAGES.USER_ALREADY_VERIFIED };
         }
 
         user.isVerified = true;
         await user.save({ validateBeforeSave: false });
 
-        return { success: true, message: "User approved successfully" };
+        return { success: true, message: MESSAGES.USER_APPROVED };
     } catch (error) {
         throw error;
     }
@@ -124,13 +125,13 @@ export const rejectUserService = async (userId) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
-            return { success: false, message: "User not found" };
+            return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
 
         user.isSuspended = true;
         await user.save({ validateBeforeSave: false });
 
-        return { success: true, message: "User rejected and account suspended" };
+        return { success: true, message: MESSAGES.USER_REJECTED };
     } catch (error) {
         throw error;
     }
