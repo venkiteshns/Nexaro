@@ -28,6 +28,8 @@ const MESSAGES = {
     USER_APPROVED: "User approved successfully",
     USER_REJECTED: "User rejected and account suspended",
 
+    ACCESS_RESTRICTED_ADMIN: "Access restricted to admins only",
+
 };
 
 export default MESSAGES;

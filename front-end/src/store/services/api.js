@@ -40,7 +40,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
             if (adminRefreshToken) {
                 const refreshResult = await baseQuery(
                     {
-                        url: "/admin/refresh-token",
+                        url: "/auth/refresh-token",
                         method: "POST",
                         body: { refreshToken: adminRefreshToken },
                     },
@@ -199,6 +199,7 @@ export const api = createApi({
                 url: `/admin/users/pending-verification?page=${page}&limit=${limit}`,
                 method: "GET",
             }),
+            extraOptions: { isAdmin: true },
             providesTags: ["Users"],
         }),
 
