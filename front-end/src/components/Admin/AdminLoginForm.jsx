@@ -100,17 +100,17 @@ const AdminLoginForm = () => {
 
               {/* Login Button */}
               {!isAdmin && (
-                <div className="text-center">
-                  <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
+                <div className="text-center bg-red-500/10 rounded-xl py-2 px-4">
+                  <p className="italic text-red-600/90 text-sm">
                     Invalid admin credentials
-                  </span>
+                  </p>
                 </div>
               )}
               {isError && (
-                <div className="text-center">
-                  <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
+                <div className="text-center bg-red-500/10 rounded-xl py-2 px-4">
+                  <p className="italic text-red-600/90 text-sm">
                     {error?.data?.message || "Invalid admin credentials"}
-                  </span>
+                  </p>
                 </div>
               )}
               <div className="flex justify-center">

@@ -12,7 +12,7 @@ const initialState = {
     refreshToken: localStorage.getItem("adminRefreshToken")
         ? localStorage.getItem("adminRefreshToken")
         : null,
-    sideBarOpen: true,
+    sideBarOpen: window.innerWidth > 768,
     activePage: 'Dashboard'
 };
 

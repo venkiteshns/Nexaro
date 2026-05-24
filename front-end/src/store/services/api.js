@@ -10,15 +10,11 @@ const baseQuery = fetchBaseQuery({
     prepareHeaders: (headers, { getState, endpoint }) => {
         const state = getState();
 
-        // Check both Redux state and localStorage for each role
         const adminToken =
             state.adminAuth?.accessToken || localStorage.getItem("adminToken");
         const userToken =
             state.auth?.accessToken || localStorage.getItem("token");
 
-        // Admin endpoints are grouped under the "adminLogin" endpoint name,
-        // or you can check the URL prefix via the args — we use endpoint name here.
-        // For admin requests: endpoint name starts with "admin"
         const isAdminRequest = endpoint?.startsWith("admin");
 
         const token = isAdminRequest ? adminToken : userToken;
@@ -107,6 +103,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithReauth,
+    tagTypes: ["Users"],
 
     endpoints: (builder) => ({
         sendOtp: builder.mutation({
@@ -194,6 +191,47 @@ export const api = createApi({
                 url: `/admin/users?page=${page}&limit=${limit}`,
                 method: "GET",
             }),
+            providesTags: ["Users"],
+        }),
+
+        adminGetPendingVerificationUsers: builder.query({
+            query: ({ page = 1, limit = 10 } = {}) => ({
+                url: `/admin/users/pending-verification?page=${page}&limit=${limit}`,
+                method: "GET",
+            }),
+            providesTags: ["Users"],
+        }),
+
+        adminSuspendUser: builder.mutation({
+            query: (userId) => ({
+                url: `/admin/users/${userId}/suspend`,
+                method: "PATCH",
+            }),
+            invalidatesTags: ["Users"],
+        }),
+
+        adminUnsuspendUser: builder.mutation({
+            query: (userId) => ({
+                url: `/admin/users/${userId}/unsuspend`,
+                method: "PATCH",
+            }),
+            invalidatesTags: ["Users"],
+        }),
+
+        adminApproveUser: builder.mutation({
+            query: (userId) => ({
+                url: `/admin/users/${userId}/approve`,
+                method: "PATCH",
+            }),
+            invalidatesTags: ["Users"],
+        }),
+
+        adminRejectUser: builder.mutation({
+            query: (userId) => ({
+                url: `/admin/users/${userId}/reject`,
+                method: "PATCH",
+            }),
+            invalidatesTags: ["Users"],
         }),
     }),
 });
@@ -210,4 +248,9 @@ export const {
     useForgotPasswordMutation,
     useUpdatePasswordMutation,
     useAdminGetUsersQuery,
+    useAdminGetPendingVerificationUsersQuery,
+    useAdminSuspendUserMutation,
+    useAdminUnsuspendUserMutation,
+    useAdminApproveUserMutation,
+    useAdminRejectUserMutation,
 } = api;

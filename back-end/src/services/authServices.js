@@ -152,6 +152,10 @@ export const loginService = async (userData, isAdmin) => {
       return { success: false, message: "User not found" };
     }
 
+    if(existingUser.isSuspended){
+      return { success: false, message: "Access Restricted : Your account is suspended by admin" };
+    }
+
     // 2. Check if the password matches
     const isPasswordValid = await compareHash(password, existingUser.password);
     if (!isPasswordValid) {
