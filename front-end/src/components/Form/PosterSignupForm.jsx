@@ -59,23 +59,7 @@ const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) =
               {isVerified ? "Submitting Registration..." : isLoading ? "Validating Data..." : "Create Account"}
             </button>
 
-            {/* Divider */}
-            <div className="flex items-center gap-4 py-2">
-              <div className="flex-1 h-[1px] bg-gray-300" />
-
-              <span className="text-sm text-gray-500 font-medium">OR</span>
-
-              <div className="flex-1 h-[1px] bg-gray-300" />
-            </div>
-
-            {/* Google Signup */}
-            <button
-              type="button"
-              className="w-full border border-gray-300 hover:bg-gray-50 transition rounded-xl py-3.5 flex items-center justify-center gap-3 font-semibold text-gray-700"
-            >
-              <Mail className="w-5 h-5" />
-              Continue with Google
-            </button>
+           
           </form>
         </FormProvider>
       </div>

@@ -8,6 +8,68 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const googleLoginService = async (accessToken) => {
+  try {
+    const googleResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!googleResponse.ok) {
+      return { success: false, message: "Failed to verify Google token" };
+    }
+
+    const payload = await googleResponse.json();
+    const { email } = payload;
+
+    const existingUser = await User.findOne({ email, activeRole: { $ne: 'admin' } });
+
+    if (!existingUser) {
+      return {
+        success: false,
+        message: "No account found with this Google email. Please sign up first.",
+      };
+    }
+
+    if (existingUser.isSuspended) {
+      return {
+        success: false,
+        message: "Access Restricted : Your account is suspended by admin",
+      };
+    }
+
+    const accessTokenJwt = generateAccessToken(existingUser);
+    const refreshToken = generateRefreshToken(existingUser);
+
+    existingUser.refreshToken = refreshToken;
+    await existingUser.save({ validateBeforeSave: false });
+
+    const { _id, name: userName, email: userEmail, activeRole } = existingUser;
+    const responseUser = {
+      id: _id,
+      name: userName,
+      email: userEmail,
+      role: activeRole,
+      selfie: existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON,
+    };
+
+    return {
+      success: true,
+      responseUser,
+      accessToken: accessTokenJwt,
+      refreshToken,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 300;
@@ -152,7 +214,7 @@ export const loginService = async (userData, isAdmin) => {
       return { success: false, message: "User not found" };
     }
 
-    if(existingUser.isSuspended){
+    if (existingUser.isSuspended) {
       return { success: false, message: "Access Restricted : Your account is suspended by admin" };
     }
 
@@ -169,9 +231,8 @@ export const loginService = async (userData, isAdmin) => {
     // 4. refresh token to database
     existingUser.refreshToken = refreshToken;
     await existingUser.save({ validateBeforeSave: false });
-    let isSelfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
-    console.log("selfie ", isSelfie);
-    let selfie = isSelfie.url || process.env.USER_ICON;
+    let selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
+    console.log("selfie ", selfie);
 
     // 5. response user
     const { _id, name, email: userEmail, activeRole } = existingUser;

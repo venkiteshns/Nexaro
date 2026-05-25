@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
-import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePasswordService } from '../services/authServices.js';
+import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePasswordService, googleLoginService } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/generateTokens.js';
 import STATUS_CODES from '../constants/statusCodes.js';
 import MESSAGES from '../constants/messages.js';
@@ -141,5 +141,41 @@ export const updatePassword = async (req, res) => {
     } catch (error) {
         console.error("Update password error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const googleLogin = async (req, res) => {
+    try {
+        const { idToken: accessToken } = req.body;
+
+        if (!accessToken) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: "Google token is required",
+            });
+        }
+
+        const response = await googleLoginService(accessToken);
+
+        if (response.success) {
+            return res.status(STATUS_CODES.OK).json({
+                success: true,
+                message: MESSAGES.LOGIN_SUCCESS,
+                user: response.responseUser,
+                accessToken: response.accessToken,
+                refreshToken: response.refreshToken,
+            });
+        } else {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.message,
+            });
+        }
+    } catch (error) {
+        console.error("Google login error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
     }
 };

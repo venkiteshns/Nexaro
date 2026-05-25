@@ -148,6 +148,14 @@ export const api = createApi({
             }),
         }),
 
+        googleLogin: builder.mutation({
+            query: (idToken) => ({
+                url: "/auth/google-login",
+                method: "POST",
+                body: { idToken },
+            }),
+        }),
+
         adminLogin: builder.mutation({
             query: (credentials) => ({
                 url: "/auth/login/admin",
@@ -243,6 +251,7 @@ export const {
     usePosterSignUpMutation,
     useWorkerSignUpMutation,
     useUserLoginMutation,
+    useGoogleLoginMutation,
     useAdminLoginMutation,
     useUserLogoutMutation,
     useAdminLogoutMutation,
