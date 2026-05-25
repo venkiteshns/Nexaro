@@ -8,13 +8,10 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
-import { OAuth2Client } from "google-auth-library";
-
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleLoginService = async (accessToken) => {
   try {
-    const googleResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    const googleResponse = await fetch(process.env.GOOGLE_USERINFO_URL, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
