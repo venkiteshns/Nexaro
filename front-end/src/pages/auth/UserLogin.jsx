@@ -5,6 +5,7 @@ import Header from "../../components/Landing/Header";
 import Logo from "../../components/Logo/Logo";
 import LoginForm from "../../components/Form/LoginForm";
 import { useForm, FormProvider } from "react-hook-form";
+import { Mail } from "lucide-react";
 
 const UserLogin = () => {
 
@@ -29,11 +30,11 @@ const UserLogin = () => {
             <h2 className="lg:hidden  text-2xl font-bold tracking-wide text-[#0A6E5C]">
               <Logo />
             </h2>
-          {/* Heading */}
-          <div className="text-center mt-2">
-            <h1 className="text-xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="mt-2 text-xs text-gray-500">Login to continue</p>
-          </div>
+            {/* Heading */}
+            <div className="text-center mt-2">
+              <h1 className="text-xl font-bold text-gray-900">Welcome Back</h1>
+              <p className="mt-2 text-xs text-gray-500">Login to continue</p>
+            </div>
           </div>
 
 
@@ -42,19 +43,6 @@ const UserLogin = () => {
             <FormProvider {...methods}>
               <LoginForm />
             </FormProvider>
-
-            {/* Divider */}
-            {/* <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-gray-200"></div>
-
-              <span className="text-sm text-gray-400">or continue with</span>
-
-              <div className="h-px flex-1 bg-gray-200"></div>
-            </div>
-
-            <button className=" text-sm w-full rounded-xl border border-gray-200 bg-white py-4 font-medium text-gray-700 transition hover:bg-gray-50">
-              Sign in with Google
-            </button> */}
           </div>
 
           {/* Register */}
