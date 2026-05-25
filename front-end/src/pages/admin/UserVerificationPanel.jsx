@@ -67,7 +67,6 @@ const UserVerificationPanel = () => {
         <AdminHeader />
 
         <div className="p-4 md:p-8">
-          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <StatCard
               title="Pending Review"
@@ -89,7 +88,6 @@ const UserVerificationPanel = () => {
             />
           </div>
 
-          {/* Search */}
           <div className="mt-8 bg-white border border-gray-200 rounded-3xl p-4">
             <div className="relative w-full">
               <Search className="w-4 h-4 absolute left-4 top-3.5 text-gray-400" />
@@ -103,7 +101,6 @@ const UserVerificationPanel = () => {
             </div>
           </div>
 
-          {/* Loading / Error states */}
           {isLoading && (
             <div className="mt-8 text-center text-gray-400">
               Loading users...
@@ -122,7 +119,6 @@ const UserVerificationPanel = () => {
             </div>
           )}
 
-          {/* Verification Cards */}
           <div className="space-y-6 mt-8">
             {!isLoading &&
               !isError &&
@@ -132,10 +128,8 @@ const UserVerificationPanel = () => {
                   className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm"
                 >
                   <div className="p-5 md:p-7">
-                    {/* Header */}
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        {/* Avatar — selfie or first letter */}
                         {user.verificationDocuments?.selfie?.url ? (
                           <img
                             src={user.verificationDocuments.selfie.url}
@@ -176,9 +170,7 @@ const UserVerificationPanel = () => {
                       </button>
                     </div>
 
-                    {/* Verification Documents */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8">
-                      {/* ID Front */}
                       <div>
                         <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase mb-3">
                           ID Front ({user.verificationDocuments?.idType || "ID"}
@@ -199,7 +191,6 @@ const UserVerificationPanel = () => {
                         )}
                       </div>
 
-                      {/* ID Back */}
                       <div>
                         <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase mb-3">
                           ID Back
@@ -219,7 +210,6 @@ const UserVerificationPanel = () => {
                         )}
                       </div>
 
-                      {/* Verification Selfie */}
                       <div>
                         <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase mb-3">
                           Verification Selfie
@@ -240,7 +230,6 @@ const UserVerificationPanel = () => {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-8">
                       <div className="flex flex-wrap gap-3">
                         <button onClick={() => {
@@ -270,7 +259,6 @@ const UserVerificationPanel = () => {
               ))}
           </div>
 
-          {/* Pagination */}
           {!isLoading && !isError && totalPages > 1 && (
             <div className="flex items-center justify-between mt-8">
               <p className="text-sm text-gray-500">

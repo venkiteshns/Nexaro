@@ -22,15 +22,12 @@ const UserLogin = () => {
         <PosterSignUpBanner />
       </span>
 
-      {/* Right Section */}
       <div className="flex  items-center justify-center px-6 py-10 mt-10">
         <div className="w-full max-w-md bg-white border border-green-100 rounded-3xl shadow-2xl shadow-green-100 p-10">
-          {/* Logo */}
           <div className="flex flex-col items-center justify-center mb-8">
             <h2 className="lg:hidden  text-2xl font-bold tracking-wide text-[#0A6E5C]">
               <Logo />
             </h2>
-            {/* Heading */}
             <div className="text-center mt-2">
               <h1 className="text-xl font-bold text-gray-900">Welcome Back</h1>
               <p className="mt-2 text-xs text-gray-500">Login to continue</p>
@@ -38,14 +35,12 @@ const UserLogin = () => {
           </div>
 
 
-          {/* Form */}
           <div className="space-y-6">
             <FormProvider {...methods}>
               <LoginForm />
             </FormProvider>
           </div>
 
-          {/* Register */}
           <p className="mt-10 text-center text-xs text-gray-500">
             Don't have an account?{" "}
             <button onClick={handleRegister} className="font-semibold text-[#0A6E5C] hover:underline">
