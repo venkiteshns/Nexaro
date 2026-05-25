@@ -139,7 +139,7 @@ const LoginForm = () => {
         <hr className="flex-1 border-gray-200" />
       </div>
 
-      {/* Google login button */}
+      {/* google login btn */}
       <button
         onClick={() => signInWithGoogle()}
         disabled={isGoogleLoading}
@@ -155,7 +155,7 @@ const LoginForm = () => {
         {isGoogleLoading ? "Signing in..." : "Continue with Google"}
       </button>
 
-      {/* google error */}
+      {/* google err */}
       {googleError && (
         <div className="text-center bg-red-500/10 rounded-xl py-2 px-4 mt-3">
           <p className="italic text-red-600/90 text-sm">{googleError}</p>
