@@ -5,7 +5,8 @@ import {
     unsuspendUser,
     getPendingVerificationUsers,
     approveUser,
-    rejectUser
+    rejectUser,
+    getAllTasks,
 } from "../controller/AdminControllers/adminController.js";
 import verifyToken from "../middlewares/verifyToken.js";
 
@@ -20,6 +21,8 @@ adminRouter.patch("/users/:userId/suspend", suspendUser);
 adminRouter.patch("/users/:userId/unsuspend", unsuspendUser);
 adminRouter.patch("/users/:userId/approve", approveUser);
 adminRouter.patch("/users/:userId/reject", rejectUser);
+
+adminRouter.get("/tasks", getAllTasks);
 
 export default adminRouter;
 

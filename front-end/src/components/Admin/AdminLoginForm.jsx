@@ -3,13 +3,13 @@ import "./Admin.css";
 import { Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 import Logo from "../Logo/Logo";
-import PersonalInfo from "../Form/PersonalInfo";
-import Password from "../Form/Password";
+import PersonalInfo from "../Form/FormComponents/PersonalInfo";
+import Password from "../Form/FormComponents/Password";
 import { useDispatch } from "react-redux";
 import { useAdminLoginMutation } from "../../store/services/api";
 import { setAdminCredentials } from "../../store/Slices/AdminSlice";
 import { useNavigate } from "react-router-dom";
-import ForgotPasswordModal from "../Form/ForgotPasswordModal";
+import ForgotPasswordModal from "../Form/FormComponents/ForgotPasswordModal";
 
 const AdminLoginForm = () => {
   const dispatch = useDispatch();

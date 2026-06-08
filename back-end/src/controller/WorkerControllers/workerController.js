@@ -1,4 +1,6 @@
-import { workerSignupService } from "../../services/workerServices.js";
+import { workerSignupService, getNearbyTasksService } from "../../services/workerServices.js";
+import STATUS_CODES from "../../constants/statusCodes.js";
+import MESSAGES from "../../constants/messages.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -9,20 +11,50 @@ export const workerSignup = async (req, res) => {
 
         console.log("result from worker controller", result);
 
-
         if (result?.error) {
-            throw new Error(result.error)
+            throw new Error(result.error);
         }
 
-        return res.status(201).json({
+        return res.status(STATUS_CODES.CREATED).json({
             success: true,
-            message: "Worker registered successfully",
+            message: MESSAGES.WORKER_REGISTERED,
             user: result.responseUser,
             accessToken: result.accessToken,
-            refreshToken: result.refreshToken
+            refreshToken: result.refreshToken,
         });
-    } catch (error) {
-        return res.status(400).json({ success: false, message: error.message });
-    }
 
+    } catch (error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+export const getNearbyTasks = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+
+        const result = await getNearbyTasksService(workerId);
+
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: MESSAGES.NEARBY_TASKS_FETCHED,
+            tasks: result.tasks,
+        });
+
+    } catch (error) {
+        console.error("getNearbyTasks controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
 };

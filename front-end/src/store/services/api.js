@@ -103,7 +103,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithReauth,
-    tagTypes: ["Users"],
+    tagTypes: ["Users", "Tasks", "Worker_Tasks"],
 
     endpoints: (builder) => ({
         sendOtp: builder.mutation({
@@ -242,6 +242,76 @@ export const api = createApi({
             }),
             invalidatesTags: ["Users"],
         }),
+
+        createTask: builder.mutation({
+            query: (formValues) => {
+                const formData = new FormData();
+
+                formData.append("title", formValues.taskTitle);
+                formData.append("description", formValues.description);
+                formData.append("deadline", formValues.deadline);
+                formData.append("urgencyLevel", formValues.urgency);
+                formData.append("amount", formValues.budget);
+                formData.append("category", formValues.category);
+
+                if (formValues.photos && formValues.photos.length > 0) {
+                    Array.from(formValues.photos).forEach((file) => {
+                        formData.append("photos", file);
+                    });
+                }
+                console.log("check : ", formValues)
+                const address = {
+                    state: formValues.state,
+                    district: formValues.district,
+                    city: formValues.city,
+                    area: formValues.area,
+                    houseNumber: formValues.houseNumber,
+                    landmark: formValues.fullAddress,
+                };
+                formData.append("address", JSON.stringify(address));
+
+                const location = {
+                    type: "Point",
+                    coordinates: [
+                        Number(formValues.locationlng),
+                        Number(formValues.locationLat),
+                    ],
+                };
+                formData.append("location", JSON.stringify(location));
+
+                return {
+                    url: "/poster/tasks/create",
+                    method: "POST",
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Tasks"],
+        }),
+
+        getPosterTasks: builder.query({
+            query: () => ({
+                url: "/poster/tasks",
+                method: "GET",
+            }),
+            providesTags: ["Tasks"],
+        }),
+
+        adminGetAllTasks: builder.query({
+            query: ({ page = 1, limit = 4 } = {}) => ({
+                url: `/admin/tasks?page=${page}&limit=${limit}`,
+                method: "GET",
+            }),
+            providesTags: ["Tasks"],
+        }),
+
+        getWorkerNearbyTasks: builder.query({
+            query: () => ({
+                url: "/worker/tasks/nearby",
+                method: "GET",
+            }),
+            providesTags: ["Worker_Tasks"],
+        }),
     }),
 });
 
@@ -263,4 +333,8 @@ export const {
     useAdminUnsuspendUserMutation,
     useAdminApproveUserMutation,
     useAdminRejectUserMutation,
+    useCreateTaskMutation,
+    useGetPosterTasksQuery,
+    useAdminGetAllTasksQuery,
+    useGetWorkerNearbyTasksQuery,
 } = api;

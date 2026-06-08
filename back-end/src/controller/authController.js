@@ -151,7 +151,7 @@ export const googleLogin = async (req, res) => {
         if (!accessToken) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
-                message: "Google token is required",
+                message: MESSAGES.GOOGLE_TOKEN_REQUIRED,
             });
         }
 

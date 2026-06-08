@@ -2,10 +2,10 @@ import React from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import PersonalInfo from "./PersonalInfo";
-import Password from "./Password";
-import Location from "./Location";
-import TermsAndConditions from "./TermsAndConditions";
+import PersonalInfo from "./FormComponents/PersonalInfo";
+import Password from "./FormComponents/Password";
+import Location from "./FormComponents/Location";
+import TermsAndConditions from "./FormComponents/TermsAndConditions";
 
 const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) => {
 

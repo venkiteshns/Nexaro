@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import Task from "../models/taskSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
@@ -71,7 +72,7 @@ export const workerSignupService = async ({ files, data }) => {
         }
 
         console.log("files", files);
-        
+
         const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 
         if (uploadStatus.error) {
@@ -100,3 +101,45 @@ export const workerSignupService = async ({ files, data }) => {
         return { error: "User with same credentials exists, Try with different mobile number" };
     }
 }
+
+export const getNearbyTasksService = async (workerId) => {
+    try {
+        const worker = await User.findById(workerId);
+
+        if (!worker) {
+            return { error: "Worker not found" };
+        }
+
+        const hasServiceArea =
+            worker.serviceArea &&
+            worker.serviceArea.coordinates &&
+            worker.serviceArea.coordinates.length === 2;
+
+        if (!hasServiceArea) {
+            return { error: "Worker service area location is not set. Please update your profile." };
+        }
+
+        const [lng, lat] = worker.serviceArea.coordinates;
+
+
+        const tasks = await Task.aggregate([
+            {
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [lng, lat],
+                    },
+                    distanceField: "distance",
+                    maxDistance: 10000,
+                    spherical: true,
+                },
+            },
+        ]);
+
+        return { tasks };
+
+    } catch (error) {
+        console.error("getNearbyTasksService error:", error.message);
+        return { error: "Something went wrong while fetching nearby tasks." };
+    }
+};

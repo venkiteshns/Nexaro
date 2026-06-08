@@ -1,6 +1,7 @@
 import User from "../models/userSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
+import Task from "../models/taskSchema.js";
 
 export const posterSignupService = async (data) => {
     console.log("signUp data", data);
@@ -60,6 +61,19 @@ export const posterSignupService = async (data) => {
 
     } catch (error) {
         console.error("posterSignupService error:", error.message);
+        return { error: error.message };
+    }
+};
+
+export const getTasksService = async (posterId) => {
+    try {
+        const tasks = await Task.find({ posterId });
+        if (!tasks) {
+            throw new Error("No tasks found");
+        }
+        return tasks;
+    } catch (error) {
+        console.error("getTasksService error:", error.message);
         return { error: error.message };
     }
 };
