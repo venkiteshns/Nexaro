@@ -30,6 +30,16 @@ const MESSAGES = {
 
     ACCESS_RESTRICTED_ADMIN: "Access restricted to admins only",
 
+    WORKER_REGISTERED: "Worker registered successfully",
+    NEARBY_TASKS_FETCHED: "Nearby tasks fetched successfully",
+    SERVICE_AREA_NOT_SET: "Worker service area location is not set. Please update your profile.",
+
+    POSTER_REGISTERED: "Poster registered successfully",
+    TASK_CREATED: "Task created successfully",
+    TASKS_FETCHED: "Tasks fetched successfully",
+    FAILED_TO_FETCH_TASKS: "Failed to fetch tasks",
+    GOOGLE_TOKEN_REQUIRED: "Google token is required",
+
 };
 
 export default MESSAGES;

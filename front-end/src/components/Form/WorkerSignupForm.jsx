@@ -1,10 +1,10 @@
 import React from "react";
-import PersonalInfo from "./PersonalInfo";
-import Password from "./Password";
+import PersonalInfo from "./FormComponents/PersonalInfo";
+import Password from "./FormComponents/Password";
 import { useFormContext } from "react-hook-form";
-import TermsAndConditions from "./TermsAndConditions";
-import Location from "./Location";
-import IdentityVerification from "./IdentityVerification";
+import TermsAndConditions from "./FormComponents/TermsAndConditions";
+import Location from "./FormComponents/Location";
+import IdentityVerification from "./FormComponents/IdentityVerification";
 import CustomSelector from "./CustomSelector";
 
 const WorkerSignupForm = ({ onSubmitForm, isOtpError, otpError, isOtpSuccess}) => {

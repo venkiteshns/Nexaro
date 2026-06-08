@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Mail, X } from "lucide-react";
 import PersonalInfo from "./PersonalInfo";
-import OtpModal from '../OtpModal/OtpModal'
+import OtpModal from '../../OtpModal/OtpModal'
 import { FormProvider, useForm } from "react-hook-form";
-import { useForgotPasswordMutation, useUpdatePasswordMutation } from "../../store/services/api";
+import { useForgotPasswordMutation, useUpdatePasswordMutation } from "../../../store/services/api";
 import Password from "./Password";
 
 const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {

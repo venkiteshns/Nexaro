@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Country, State } from "country-state-city";
 import { useFormContext } from "react-hook-form";
-import { KERALA_DISTRICTS, DISTRICT_AREAS } from "../../utils/constants";
-import { getCoords } from "../../services/getCooords";
-import { reverseCoords } from "../../services/reverseCoords";
+import { KERALA_DISTRICTS, DISTRICT_AREAS } from "../../../utils/constants";
+import { getCoords } from "../../../services/getCooords";
+import { reverseCoords } from "../../../services/reverseCoords";
 import { MapPin, Loader2, LocateFixed } from "lucide-react";
-import { placeToCoords } from "../../services/placeToCoords";
+import { placeToCoords } from "../../../services/placeToCoords";
 
 const Location = ({ worker }) => {
   const {

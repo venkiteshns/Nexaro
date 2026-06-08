@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Upload } from "lucide-react";
-import { ID_TYPES } from "../../utils/constants";
+import { ID_TYPES } from "../../../utils/constants";
 import { useFormContext } from "react-hook-form";
 
 const IdentityVerification = () => {
@@ -67,7 +67,7 @@ const IdentityVerification = () => {
       {/* Selfie Upload */}
       <div className="mt-5 flex justify-center">
         <div className="w-full md:w-[420px]">
-          <UploadCard 
+          <UploadCard
             title="Upload Selfie Photo"
             subtitle="Make sure face is clearly visible"
             type="selfie"
@@ -79,12 +79,12 @@ const IdentityVerification = () => {
 };
 
 const UploadCard = ({ title, subtitle, type }) => {
-  
+
   const {
     register,
     formState: { errors },
   } = useFormContext();
- 
+
   const [preview, setPreview] = useState('')
 
   const uploadMessage = {
@@ -95,9 +95,9 @@ const UploadCard = ({ title, subtitle, type }) => {
 
   const handleimage = (e) => {
     const file = e.target.files[0]
-    if(!file) return;
+    if (!file) return;
 
-      const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(file);
 
     setPreview(url);
 
@@ -108,30 +108,30 @@ const UploadCard = ({ title, subtitle, type }) => {
   return (
     <div>
       <label className="flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-50/40 p-6 text-center hover:border-green-800 hover:bg-green-50/30">
-        <input 
+        <input
           type="file"
           className="hidden"
           {...register(type, {
             required: `Please upload ${uploadMessage[type]}`,
-            onChange:handleimage,
-            })}
+            onChange: handleimage,
+          })}
         />
-      {preview ? 
-      <div className="w-45 h-45 flex items-center justify-center ">
-        <img className="w-full h-full object-contain" src={preview} alt="" />
-      </div> 
-      : <>
-        <div className=" mb-6 flex h-10 w-10 items-center justify-center rounded-2xl">
-          <Upload className="h-5 w-5 text-green-600" />
-        </div>
+        {preview ?
+          <div className="w-45 h-45 flex items-center justify-center ">
+            <img className="w-full h-full object-contain" src={preview} alt="" />
+          </div>
+          : <>
+            <div className=" mb-6 flex h-10 w-10 items-center justify-center rounded-2xl">
+              <Upload className="h-5 w-5 text-green-600" />
+            </div>
 
-        <h3 className="text-sm font-semibold text-gray-900">
-          {title}
-          <span className="text-red-500">*</span>
-        </h3>
+            <h3 className="text-sm font-semibold text-gray-900">
+              {title}
+              <span className="text-red-500">*</span>
+            </h3>
 
-        <p className="mt-2 text-xs text-gray-400">{subtitle}</p>
-        </>}
+            <p className="mt-2 text-xs text-gray-400">{subtitle}</p>
+          </>}
       </label>
       <div className="mt-1">
         {errors[type] && (

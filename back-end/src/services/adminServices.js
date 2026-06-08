@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import Task from "../models/taskSchema.js";
 import MESSAGES from "../constants/messages.js";
 
 export const getAllUsersService = async (page, limit) => {
@@ -136,3 +137,29 @@ export const rejectUserService = async (userId) => {
         throw error;
     }
 };
+
+export const getAllTasksService = async (page, limit) => {
+    try {
+        const skip = (page - 1) * limit;
+
+        const tasks = await Task.find()
+            .populate("posterId", "name email")
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        const totalTasks = await Task.countDocuments();
+        const totalPages = Math.ceil(totalTasks / limit);
+
+        return {
+            success: true,
+            tasks,
+            currentPage: page,
+            totalPages,
+            totalTasks,
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+

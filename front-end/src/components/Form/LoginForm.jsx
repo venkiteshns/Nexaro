@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import PersonalInfo from "./PersonalInfo";
+import PersonalInfo from "./FormComponents/PersonalInfo";
 import { useFormContext } from "react-hook-form";
-import Password from "./Password";
+import Password from "./FormComponents/Password";
 import {
   useUpdatePasswordMutation,
   useUserLoginMutation,
@@ -9,7 +9,7 @@ import {
 } from "../../store/services/api";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
-import ForgotPasswordModal from "./ForgotPasswordModal";
+import ForgotPasswordModal from "./FormComponents/ForgotPasswordModal";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 
@@ -112,8 +112,8 @@ const LoginForm = () => {
         <Password login={true} forgotPassword={setForgotPassword} />
         {isError && (
           <div className="text-center bg-red-500/10 rounded-xl py-2 px-4">
-            <p className="italic text-red-600/90 text-sm">
-              {error.data.message}
+            <p className="italic text-red-600/90 text-xs">
+              {error?.data?.message || "Unable to connect to server. Please try again later"}
             </p>
           </div>
         )}

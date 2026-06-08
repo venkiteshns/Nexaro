@@ -1,4 +1,4 @@
-import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService } from "../../services/adminServices.js";
+import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService, getAllTasksService } from "../../services/adminServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -132,6 +132,31 @@ export const rejectUser = async (req, res) => {
         }
     } catch (error) {
         console.error("Reject user error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAllTasks = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 4;
+        console.log(req.query.limit);
+
+        const response = await getAllTasksService(page, limit);
+
+        if (response.success) {
+            return res.status(STATUS_CODES.OK).json({
+                success: true,
+                tasks: response.tasks,
+                currentPage: response.currentPage,
+                totalPages: response.totalPages,
+                totalTasks: response.totalTasks,
+            });
+        } else {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.FAILED_TO_FETCH_TASKS });
+        }
+    } catch (error) {
+        console.error("Get all tasks error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
