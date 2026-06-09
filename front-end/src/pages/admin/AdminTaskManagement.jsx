@@ -40,7 +40,7 @@ function StatusBadge({ status }) {
     );
 }
 
-function StatPill({ icon, count, label, color }) {
+function StatsSec({ icon, count, label, color }) {
     return (
         <div className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold ${color}`}>
             {icon}
@@ -114,7 +114,8 @@ const AdminTaskManagement = () => {
         page: currentPage,
         limit: 4,
     });
-
+    console.log(data);
+    
     const tasks = data?.tasks || [];
     const totalPages = data?.totalPages || 1;
     const totalTasks = data?.totalTasks || 0;
@@ -130,6 +131,8 @@ const AdminTaskManagement = () => {
     const categories = ['all', ...new Set(tasks.map((t) => t.category).filter(Boolean))];
 
     const filteredTasks = tasks.filter((task) => {
+        // console.log(task);
+        
         const posterName = task.posterId?.name || '';
 
         const matchesSearch =
@@ -166,37 +169,37 @@ const AdminTaskManagement = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                        <StatPill
+                        <StatsSec
                             icon={<ClipboardList size={14} />}
                             count={totalTasks}
                             label="Total"
                             color="border-gray-200 text-gray-600 bg-white"
                         />
-                        <StatPill
+                        <StatsSec
                             icon={<span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />}
                             count={counts.open}
                             label="Open"
                             color="border-blue-200 text-blue-600 bg-blue-50"
                         />
-                        <StatPill
+                        <StatsSec
                             icon={<span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" />}
                             count={counts.assigned}
                             label="Assigned"
                             color="border-yellow-200 text-yellow-600 bg-yellow-50"
                         />
-                        <StatPill
+                        <StatsSec
                             icon={<span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />}
                             count={counts.in_progress}
                             label="In Progress"
                             color="border-purple-200 text-purple-600 bg-purple-50"
                         />
-                        <StatPill
+                        <StatsSec
                             icon={<CheckCircle2 size={14} />}
                             count={counts.completed}
                             label="Completed"
                             color="border-emerald-200 text-emerald-600 bg-emerald-50"
                         />
-                        <StatPill
+                        <StatsSec
                             icon={<XCircle size={14} />}
                             count={counts.cancelled}
                             label="Cancelled"

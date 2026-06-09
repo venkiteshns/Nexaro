@@ -139,7 +139,7 @@ const TaskDetails = () => {
                     <FormError error={errors?.description} />
                 </div>
 
-                {/* Deadline + Urgency */}
+                {/* deadline and urgency */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm text-gray-500 mb-2 font-medium">
