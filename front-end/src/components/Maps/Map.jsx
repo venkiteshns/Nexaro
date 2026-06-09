@@ -23,7 +23,6 @@ const getUserLocation = async (setPosition) => {
     })
 }
 
-// Only handles flying the map to the new position — reverse geocoding is the parent's job
 const FlyToLocation = ({ position }) => {
     const map = useMap();
     useEffect(() => {
@@ -34,17 +33,13 @@ const FlyToLocation = ({ position }) => {
     return null;
 }
 
-// Map can work in two modes:
-// 1. Standalone (no props) — manages its own position state, shows Get Location button
-// 2. Controlled (position + setPosition props) — driven by parent, no standalone button
 const Map = ({ position: externalPosition, setPosition: externalSetPosition, height = "500px", showButton = true }) => {
-
+    // handleMapPositionChange
     const [internalPosition, setInternalPosition] = useState({
         lat: 10.5276,
         lng: 76.2144
     });
 
-    // Use external state if provided (controlled), otherwise use internal state
     const position = externalPosition ?? internalPosition;
     const setPosition = externalSetPosition ?? setInternalPosition;
 

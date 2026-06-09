@@ -16,7 +16,7 @@ const RightSideBar = ({ title, location, budget }) => {
                     </div>
                 </div>
 
-                {/* Preview card */}
+                {/* card */}
                 <div className="bg-[#F6FAF8] rounded-xl p-4 border border-gray-100">
                     <span className="inline-block text-[10px] font-bold text-[#0A6E5C] bg-emerald-100 rounded-full px-2.5 py-0.5 mb-2">
                         NEW LISTING

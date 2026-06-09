@@ -40,8 +40,7 @@ function TaskCard({ task }) {
   console.log("task ", task);
 
   const isUrgent = task.urgencyLevel === "urgent";
-  const isNew = task.urgencyLevel === "new";
-  const hasBid = !!task.myBid;
+  const hasBid = 0;
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3 relative overflow-hidden">
@@ -51,11 +50,7 @@ function TaskCard({ task }) {
           Urgent
         </span>
       )}
-      {isNew && (
-        <span className="absolute top-4 left-4 bg-[#0A6E5C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
-          New
-        </span>
-      )}
+     
 
       <div className="flex justify-between items-start">
         <div className={`w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center ${isUrgent || isNew ? "mt-6" : ""}`}>
@@ -118,6 +113,7 @@ const NearbyTasks = () => {
 
   const allTasks = data?.tasks || [];
   const noServiceArea = isError && error?.data?.message?.includes("service area");
+  
   const filteredTasks = allTasks.filter((task) => {
     const categoryMatch = !selectedCategory || task.category === selectedCategory;
 

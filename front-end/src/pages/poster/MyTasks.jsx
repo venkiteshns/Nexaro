@@ -89,7 +89,7 @@ function TaskCard({ task }) {
                 <div className="text-sm text-gray-500">
                     {task.status === 'open' && task.bidCount > 0 && (
                         <span className="text-[#0A6E5C] font-semibold">
-                            🔵 {task.bidCount} new bid{task.bidCount > 1 ? 's' : ''} waiting
+                            {task.bidCount} new bid{task.bidCount > 1 ? 's' : ''} waiting
                         </span>
                     )}
                     {task.status === 'open' && (!task.bidCount || task.bidCount === 0) && (

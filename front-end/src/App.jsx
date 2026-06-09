@@ -55,12 +55,6 @@ function App() {
             </Route>
           </Route>
 
-          {/* <Route element={<PrivateRoute allowedRoles="admin" />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UserManagement/>} />
-            <Route path="/admin/users/verification" element={<UserVerificationPanel/>} />
-          </Route> */}
-
           <Route element={<PrivateRoute allowedRoles="admin" />}>
             <Route path="/admin">
               <Route path="dashboard" element={<AdminDashboard />} />

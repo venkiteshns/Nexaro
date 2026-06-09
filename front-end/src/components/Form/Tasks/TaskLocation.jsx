@@ -8,7 +8,7 @@ import { reverseCoords } from "../../../services/reverseCoords";
 import Map from '../../Maps/Map';
 
 const TaskLocation = () => {
-    const { register, watch, setValue, getValues, formState: { errors } } = useFormContext();
+    const { register, watch, setValue, clearErrors, getValues, formState: { errors } } = useFormContext();
     const [fetchCords, setFetchCords] = useState("idle");
     const selectedState = watch('state');
     const selectedDistrict = watch('district');
@@ -20,6 +20,18 @@ const TaskLocation = () => {
     const [mapPosition, setMapPosition] = useState({ lat: 10.5276, lng: 76.2144 });
     const [pendingDistrict, setPendingDistrict] = useState(null);
     const reverseDebounceRef = useRef(null);
+
+
+    const indiaStates = State.getStatesOfCountry("IN");
+    const isKerala = selectedState === "KL" || selectedState === "Kerala";
+
+    const districts = isKerala
+        ? KERALA_DISTRICTS
+        : (selectedState ? City.getCitiesOfState("IN", selectedState).map(c => c.name) : []);
+
+    useEffect(() => {
+        setFetchCords('idle');
+    }, [selectedState, selectedDistrict, city, area, locationLat, locationLng])
 
     const handleMapPositionChange = (pos) => {
         setMapPosition(pos);
@@ -41,8 +53,10 @@ const TaskLocation = () => {
                     }
                 }
 
+                if (place.city) setValue('city', place.city);
                 if (place.district) setPendingDistrict(place.district);
-                if (place.city) setValue('city', place.city, { shouldValidate: true });
+                clearErrors("city");
+
                 if (place.area) setValue('area', place.area, { shouldValidate: true });
                 if (place.displayName) setValue('fullAddress', place.displayName, { shouldValidate: true });
             } catch (e) {
@@ -50,12 +64,6 @@ const TaskLocation = () => {
         }, 600);
     };
 
-    const indiaStates = State.getStatesOfCountry("IN");
-    const isKerala = selectedState === "KL" || selectedState === "Kerala";
-
-    const districts = isKerala
-        ? KERALA_DISTRICTS
-        : (selectedState ? City.getCitiesOfState("IN", selectedState).map(c => c.name) : []);
 
     useEffect(() => {
         if (!pendingDistrict || districts.length === 0) return;
@@ -99,13 +107,18 @@ const TaskLocation = () => {
             let place = await reverseCoords({ lat: res.lat, lng: res.lng });
             setValue("fullAddress", place.displayName, { shouldValidate: true });
             setValue("district", place.district || "", { shouldValidate: true });
-            setTimeout(() => {
-                setFetchCords("idle");
-            }, 1500);
+            setValue("city", place.city || "", { shouldValidate: true });
+            clearErrors("city");
+            console.log("place : ", place);
+
+            // setTimeout(() => {
+            //     setFetchCords("idle");
+            // }, 1500);
             setFetchCords("success");
         } catch (error) {
             setFetchCords("fail");
             setTimeout(() => {
+                n
                 setFetchCords("idle");
             }, 1500);
         }

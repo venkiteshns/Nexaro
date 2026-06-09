@@ -1,6 +1,7 @@
 import { Camera, Image, Upload, X } from 'lucide-react'
 import React from 'react'
 import { useFormContext } from 'react-hook-form';
+import FormError from '../FormComponents/FormError';
 
 const TaskPhotos = () => {
     const { register, watch, setValue, getValues, formState: { errors } } = useFormContext();
@@ -101,14 +102,12 @@ const TaskPhotos = () => {
             />
 
             {errors.photos && (
-                <p className="text-xs text-red-500 mt-2">
-                    {errors.photos.message}
-                </p>
+                <FormError error={errors.photos} />
             )}
 
             <p className="text-xs text-gray-400 mt-2">
                 Add up to 5 photos to help workers understand the scale of
-                work. Max 5MB per file.
+                work.
             </p>
         </div>
     )
