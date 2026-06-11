@@ -6,8 +6,8 @@ import adminReducer from "./Slices/AdminSlice.js";
 export const store = configureStore({
     reducer: {
         [api.reducerPath]: api.reducer,
-        auth: authReducer,       // poster & worker state → state.auth
-        adminAuth: adminReducer, // admin state          → state.adminAuth
+        auth: authReducer,       
+        adminAuth: adminReducer, 
     },
 
     middleware: (getDefaultMiddleware) =>
