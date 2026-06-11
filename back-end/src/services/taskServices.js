@@ -37,7 +37,7 @@ export const createTaskService = async (body, files, posterId) => {
             description: body.description,
             category: body.category,
             deadline: new Date(body.deadline),
-            urgencyLevel: body.urgency || "medium",
+            urgencyLevel: body.urgency || "flexible",
             amount: Number(body.amount) || 0,
             images,
             address,
@@ -60,3 +60,16 @@ export const createTaskService = async (body, files, posterId) => {
         return { error: error.message };
     }
 };
+
+export const handleNewBid = async (task) => {
+    try {
+        let {_id} = task;
+        let isTask = await Task.find({_id});
+        if(!isTask){
+            return "No task found"
+        }
+        isTask.
+    } catch (error) {
+        
+    }
+}

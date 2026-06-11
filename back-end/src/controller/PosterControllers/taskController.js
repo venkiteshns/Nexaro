@@ -1,5 +1,5 @@
 import { getTasksService } from "../../services/posterServices.js";
-import { createTaskService } from "../../services/taskServices.js";
+import { createTaskService, handleNewBid } from "../../services/taskServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -58,3 +58,11 @@ export const getMyTasks = async (req, res) => {
         });
     }
 };
+
+export const addNewBid = async(req,res) => {
+    try {
+        let response = await handleNewBid(req.body)
+    } catch (error) {
+        
+    }
+}
