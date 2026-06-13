@@ -1,6 +1,7 @@
 import Task from "../models/taskSchema.js";
 import cloudinary from "../config/cloudinary.js";
 import Bid from "../models/bidsSchema.js";
+import mongoose from "mongoose";
 
 const uploadImagesToCloudinary = async (files) => {
     const uploadPromises = files.map((file) =>
@@ -77,6 +78,95 @@ export const getTaskForBidService = async (taskId) => {
         return { error: error.message };
     }
 }
+
+export const getWorkerBidsService = async (workerId, { status, page, limit }) => {
+    try {
+        const workerMatch = { workerId: new mongoose.Types.ObjectId(workerId) };
+
+        const statusFilter = status && status !== "all" ? { status } : {};
+
+        const skip = (page - 1) * limit;
+
+        const result = await Bid.aggregate([
+            { $match: workerMatch },
+            {
+                $lookup: {
+                    from: "tasks",
+                    localField: "taskId",
+                    foreignField: "_id",
+                    as: "taskDetails",
+                }
+            },
+            { $unwind: "$taskDetails" },
+            {
+                $lookup: {
+                    from: "bids",
+                    localField: "taskDetails._id",
+                    foreignField: "taskId",
+                    as: "bidsForTask",
+                }
+            },
+            {
+                $addFields: {
+                    "taskDetails.bidCount": { $size: "$bidsForTask" }
+                }
+            },
+            {
+                $project: {
+                    taskId: 1,
+                    amount: 1,
+                    status: 1,
+                    createdAt: 1,
+                    eta: 1,
+                    "taskDetails.title": 1,
+                    "taskDetails.category": 1,
+                    "taskDetails.urgencyLevel": 1,
+                    "taskDetails.bidCount": 1,
+                    "taskDetails.amount": 1,
+                }
+            },
+            { $sort: { createdAt: -1 } },
+
+            {
+                $facet: {
+                    data: [
+                        { $match: statusFilter },
+                        { $skip: skip },
+                        { $limit: limit },
+                    ],
+                    total: [
+                        { $match: statusFilter },
+                        { $count: "count" }
+                    ],
+                    pendingCount: [{ $match: { status: "pending" } }, { $count: "count" }],
+                    acceptedCount: [{ $match: { status: "accepted" } }, { $count: "count" }],
+                    rejectedCount: [{ $match: { status: "rejected" } }, { $count: "count" }],
+                }
+            }
+        ]);
+
+        const bids = result[0]?.data || [];
+        const total = result[0]?.total[0]?.count || 0;
+        const totalPages = Math.ceil(total / limit);
+        const counts = {
+            total: result[0]?.total[0]?.count || 0,
+            all: (result[0]?.pendingCount[0]?.count || 0) +
+                (result[0]?.acceptedCount[0]?.count || 0) +
+                (result[0]?.rejectedCount[0]?.count || 0),
+            pending: result[0]?.pendingCount[0]?.count || 0,
+            accepted: result[0]?.acceptedCount[0]?.count || 0,
+            rejected: result[0]?.rejectedCount[0]?.count || 0,
+        };
+
+        // console.log(total, page, limit, totalPages, counts);
+        return { bids, total, page, limit, totalPages, counts };
+
+    } catch (error) {
+        console.error("getWorkerBidsService error:", error.message);
+        return { error: error.message };
+    }
+};
+
 
 export const handleNewBid = async (task, user) => {
     console.log(task, user);

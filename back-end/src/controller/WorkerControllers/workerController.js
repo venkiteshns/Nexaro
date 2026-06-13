@@ -1,7 +1,7 @@
 import { workerSignupService, getNearbyTasksService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { getTaskForBidService } from "../../services/taskServices.js";
+import { getTaskForBidService, getWorkerBidsService } from "../../services/taskServices.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -80,6 +80,44 @@ export const getTaskForBid = async (req, res) => {
         });
     } catch (error) {
         console.error("getTaskForBid controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+}
+
+export const getWorkerBids = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+
+        const status = req.query.status || "all";       // "all" | "pending" | "accepted" | "rejected"
+        const page   = Math.max(1, parseInt(req.query.page)  || 1);
+        const limit  = Math.max(1, parseInt(req.query.limit) || 5);
+
+        const result = await getWorkerBidsService(workerId, { status, page, limit });
+
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Bids fetched successfully",
+            bids: result.bids,
+            pagination: {
+                total: result.total,
+                page: result.page,
+                limit: result.limit,
+                totalPages: result.totalPages,
+            },
+            counts: result.counts,
+        });
+    } catch (error) {
+        console.error("getWorkerBids controller error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
