@@ -103,7 +103,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithReauth,
-    tagTypes: ["Users", "Tasks", "Worker_Tasks"],
+    tagTypes: ["Users", "Tasks", "Worker_Tasks", "Worker_Bids"],
 
     endpoints: (builder) => ({
         sendOtp: builder.mutation({
@@ -325,8 +325,20 @@ export const api = createApi({
                 url: '/worker/tasks/add_bid',
                 method: "POST",
                 body: payload
-            })
-        })
+            }),
+            invalidatesTags: ["Worker_Bids"],
+        }),
+
+        getWorkerBids: builder.query({
+            query: ({ status = "all", page = 1, limit = 5 } = {}) => {
+                const params = new URLSearchParams({ status, page, limit });
+                return {
+                    url: `/worker/my-bids?${params.toString()}`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["Worker_Bids"],
+        }),
     }),
 });
 
@@ -353,5 +365,6 @@ export const {
     useAdminGetAllTasksQuery,
     useGetWorkerNearbyTasksQuery,
     useGetTaskForBidQuery,
-    useAddNewBidMutation
+    useAddNewBidMutation,
+    useGetWorkerBidsQuery,
 } = api;

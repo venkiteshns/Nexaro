@@ -54,7 +54,7 @@ function TaskCard({ task, handleNavigate }) {
 
 
       <div className="flex justify-between items-start">
-        <div className={`w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center ${isUrgent || isNew ? "mt-6" : ""}`}>
+        <div className={`w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center ${isUrgent ? "mt-6" : ""}`}>
           {getCategoryIcon(task.category)}
         </div>
         <div className="text-right">
@@ -117,6 +117,8 @@ const NearbyTasks = () => {
   const [searchText, setSearchText] = useState("");
 
   const { data, isLoading, isError, error } = useGetWorkerNearbyTasksQuery();
+  console.log("testee : ", data);
+
 
   const allTasks = data?.tasks || [];
   const noServiceArea = isError && error?.data?.message?.includes("service area");
