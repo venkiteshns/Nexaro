@@ -1,47 +1,39 @@
 import mongoose from "mongoose";
 
-const bidSchema = new mongoose,Schema({
-    taskId:{
+const bidSchema = new mongoose.Schema({
+    taskId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: "Tasks"
     },
-    workerId:{
+    workerId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: "User"
     },
-    amount:{
+    amount: {
         type: Number,
         required: true
     },
-    eta:{
-        type: Number,
+    eta: {
+        type: String,
         required: true,
     },
     pitch: {
         type: String,
         required: true
     },
-    availability:{
-        type:Date,
+    availability: {
+        type: Date,
         required: true
     },
-    status:{
-        
+    status: {
+        type: String,
+        enum: ["pending", "accepted", "rejected"],
+        default: "pending"
     }
 
-})
+}, { timestamps: true });
 
-
-// bids [icon: play-circle, color: yellow] {
-//   id ObjectId
-//   taskId ObjectId fk
-//   workerId ObjectId fk
-//   amount number
-//   eta number
-//   pitch string
-//   availability date
-//   status string
-//   createdAt timestamp
-// }
+const Bid = mongoose.model("Bid", bidSchema);
+export default Bid;

@@ -312,6 +312,21 @@ export const api = createApi({
             }),
             providesTags: ["Worker_Tasks"],
         }),
+
+        getTaskForBid: builder.query({
+            query: (taskId) => ({
+                url: `/worker/task/${taskId}`,
+                method: "GET",
+            }),
+        }),
+
+        addNewBid: builder.mutation({
+            query: (payload) => ({
+                url: '/worker/tasks/add_bid',
+                method: "POST",
+                body: payload
+            })
+        })
     }),
 });
 
@@ -337,4 +352,6 @@ export const {
     useGetPosterTasksQuery,
     useAdminGetAllTasksQuery,
     useGetWorkerNearbyTasksQuery,
+    useGetTaskForBidQuery,
+    useAddNewBidMutation
 } = api;

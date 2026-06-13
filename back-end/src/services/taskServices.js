@@ -1,5 +1,6 @@
 import Task from "../models/taskSchema.js";
 import cloudinary from "../config/cloudinary.js";
+import Bid from "../models/bidsSchema.js";
 
 const uploadImagesToCloudinary = async (files) => {
     const uploadPromises = files.map((file) =>
@@ -61,15 +62,59 @@ export const createTaskService = async (body, files, posterId) => {
     }
 };
 
-export const handleNewBid = async (task) => {
+export const getTaskForBidService = async (taskId) => {
+    console.log("taskId ", taskId);
     try {
-        let {_id} = task;
-        let isTask = await Task.find({_id});
-        if(!isTask){
+        let task = await Task.find({ _id: taskId });
+        if (!task) {
             return "No task found"
         }
-        isTask.
+        console.log(task, "task data");
+        return task;
+
     } catch (error) {
-        
+        console.error("getTaskByIdService error:", error.message);
+        return { error: error.message };
+    }
+}
+
+export const handleNewBid = async (task, user) => {
+    console.log(task, user);
+
+    try {
+        let { taskId, bidAmount, estimatedTime, pitch } = task;
+        let isTask = await Task.find({ _id: taskId });
+        if (!isTask) {
+            return { error: "No task found" }
+        }
+        let isAlreadyBid = await Bid.findOne({
+            taskId,
+            workerId: user._id
+        })
+        console.log("already bid", isAlreadyBid);
+
+        if (isAlreadyBid) {
+            return { error: "You have already bid on this task" }
+        }
+        let payload = {
+            taskId,
+            workerId: user._id,
+            amount: bidAmount,
+            eta: estimatedTime,
+            pitch,
+            availability: new Date(task.availableDate + "T" + task.availableTime),
+            status: "pending"
+        }
+        // console.log(payload, "bid payload");
+
+        let newBid = await Bid.create(payload)
+        console.log("new bid created ", newBid);
+        return "bid created successfully"
+    } catch (error) {
+        console.log(error);
+        if (error.message) {
+            return { error: error.message }
+        }
+        return { error: "Failed to create bid" }
     }
 }

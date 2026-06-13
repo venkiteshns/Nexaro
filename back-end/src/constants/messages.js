@@ -32,6 +32,7 @@ const MESSAGES = {
 
     WORKER_REGISTERED: "Worker registered successfully",
     NEARBY_TASKS_FETCHED: "Nearby tasks fetched successfully",
+    TASK_FETCHED: "Task fetched successfully",
     SERVICE_AREA_NOT_SET: "Worker service area location is not set. Please update your profile.",
 
     POSTER_REGISTERED: "Poster registered successfully",

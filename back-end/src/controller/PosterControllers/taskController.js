@@ -59,10 +59,24 @@ export const getMyTasks = async (req, res) => {
     }
 };
 
-export const addNewBid = async(req,res) => {
+export const addNewBid = async (req, res) => {
     try {
-        let response = await handleNewBid(req.body)
+        let response = await handleNewBid(req.body, req.user)
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: response,
+        });
     } catch (error) {
-        
+        console.error("addnewbid controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
     }
 }
