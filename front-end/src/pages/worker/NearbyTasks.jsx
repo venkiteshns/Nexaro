@@ -16,6 +16,7 @@ import {
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import { useGetWorkerNearbyTasksQuery } from "../../store/services/api";
+import { useNavigate } from "react-router-dom";
 
 function getCategoryIcon(category) {
   const iconMap = {
@@ -36,8 +37,8 @@ function formatDistance(metres) {
 
 const CATEGORIES = ["Plumbing", "Electrical", "Cleaning", "Moving", "Tutoring"];
 
-function TaskCard({ task }) {
-  console.log("task ", task);
+function TaskCard({ task, handleNavigate }) {
+  // console.log("task ", task);
 
   const isUrgent = task.urgencyLevel === "urgent";
   const hasBid = 0;
@@ -50,7 +51,7 @@ function TaskCard({ task }) {
           Urgent
         </span>
       )}
-     
+
 
       <div className="flex justify-between items-start">
         <div className={`w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center ${isUrgent || isNew ? "mt-6" : ""}`}>
@@ -97,7 +98,7 @@ function TaskCard({ task }) {
           </span>
         </div>
       ) : (
-        <button className="mt-auto w-full py-2.5 rounded-xl text-sm font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors">
+        <button onClick={() => { handleNavigate(task._id) }} className="mt-auto w-full py-2.5 rounded-xl text-sm font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors">
           Place Bid →
         </button>
       )}
@@ -106,6 +107,12 @@ function TaskCard({ task }) {
 }
 
 const NearbyTasks = () => {
+  const navigate = useNavigate()
+
+  const handleNavigate = (taskId) => {
+    navigate(`/worker/place-bid/${taskId}`);
+  }
+
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchText, setSearchText] = useState("");
 
@@ -113,7 +120,7 @@ const NearbyTasks = () => {
 
   const allTasks = data?.tasks || [];
   const noServiceArea = isError && error?.data?.message?.includes("service area");
-  
+
   const filteredTasks = allTasks.filter((task) => {
     const categoryMatch = !selectedCategory || task.category === selectedCategory;
 
@@ -124,6 +131,9 @@ const NearbyTasks = () => {
 
     return categoryMatch && searchMatch;
   });
+
+  // console.log("data : ", data);
+
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -233,7 +243,7 @@ const NearbyTasks = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredTasks.map((task) => (
-                  <TaskCard key={task._id} task={task} />
+                  <TaskCard handleNavigate={handleNavigate} key={task._id} task={task} />
                 ))}
               </div>
             </>

@@ -1,6 +1,7 @@
 import { workerSignupService, getNearbyTasksService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
+import { getTaskForBidService } from "../../services/taskServices.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -58,3 +59,30 @@ export const getNearbyTasks = async (req, res) => {
         });
     }
 };
+
+export const getTaskForBid = async (req, res) => {
+    // console.log(req.params, "params");
+    try {
+        const taskId = req.params.taskId;
+        const result = await getTaskForBidService(taskId);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+        console.log("task data", result);
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: MESSAGES.TASK_FETCHED,
+            task: result,
+        });
+    } catch (error) {
+        console.error("getTaskForBid controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+}
