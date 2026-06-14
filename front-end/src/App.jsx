@@ -17,6 +17,7 @@ import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
 import MyBids from "./pages/worker/MyBids.jsx";
+import TaskBidDetails from './pages/worker/TaskBidDetails.jsx'
 import AdminLogin from "./pages/auth/AdminLogin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import UserManagement from "./pages/admin/UserMangement.jsx";
@@ -56,6 +57,7 @@ function App() {
               <Route path="nearby-tasks" element={<NearbyTasks />} />
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
               <Route path="my-bids" element={<MyBids />} />
+              <Route path='task-details/:bidId' element={<TaskBidDetails />} />
             </Route>
           </Route>
 

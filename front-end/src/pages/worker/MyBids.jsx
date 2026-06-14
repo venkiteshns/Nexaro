@@ -78,7 +78,7 @@ function StatCard({ icon, count, label, topColor, extra }) {
 }
 
 function BidCard({ bid }) {
-    // console.log(bid)
+    console.log("ghafvs", bid.taskDetails)
 
     const navigate = useNavigate();
     const { badge, border, label } = getBidStatusConfig(bid.status);
@@ -132,7 +132,7 @@ function BidCard({ bid }) {
                 <div className="flex gap-2">
                     {bid.status === "accepted" && (
                         <button
-                            onClick={() => navigate("/worker/active-job")}
+                            onClick={() => navigate(`/worker/active-job/${task._id}`)}
                             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors"
                         >
                             Go to Active Job <ArrowRight size={13} />
