@@ -2,6 +2,7 @@ import Task from "../models/taskSchema.js";
 import cloudinary from "../config/cloudinary.js";
 import Bid from "../models/bidsSchema.js";
 import mongoose from "mongoose";
+import user from "../models/userSchema.js";
 
 const uploadImagesToCloudinary = async (files) => {
     const uploadPromises = files.map((file) =>
@@ -118,6 +119,7 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
                     status: 1,
                     createdAt: 1,
                     eta: 1,
+                    "taskDetails._id": 1,
                     "taskDetails.title": 1,
                     "taskDetails.category": 1,
                     "taskDetails.urgencyLevel": 1,
@@ -167,7 +169,6 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
     }
 };
 
-
 export const handleNewBid = async (task, user) => {
     console.log(task, user);
 
@@ -208,3 +209,119 @@ export const handleNewBid = async (task, user) => {
         return { error: "Failed to create bid" }
     }
 }
+
+export const getNearbyTasksService = async (workerId, { search, category }) => {
+    console.log(search, category);
+
+    try {
+        const worker = await user.findById(workerId);
+
+        if (!worker) {
+            return { error: "Worker not found" };
+        }
+
+        const hasServiceArea =
+            worker.serviceArea &&
+            worker.serviceArea.coordinates &&
+            worker.serviceArea.coordinates.length === 2;
+
+        if (!hasServiceArea) {
+            return { error: "Worker service area location is not set. Please update your profile." };
+        }
+
+        const [lng, lat] = worker.serviceArea.coordinates;
+
+        let matchCriterias = {};
+
+        if (search) {
+            matchCriterias.title = { $regex: search, $options: "i" };
+        }
+        if (category) {
+            matchCriterias.category = category;
+        }
+
+        const result = await Task.aggregate([
+            {
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [lng, lat],
+                    },
+                    distanceField: "distance",
+                    maxDistance: 10000,
+                    spherical: true,
+                },
+            },
+            {
+                $facet: {
+                    categoryList: [
+                        { $group: { _id: "$category" } },
+                        { $match: { _id: { $ne: null } } },
+                        { $project: { _id: 1 } }
+                    ],
+                    tasks: [
+                        {
+                            $match: matchCriterias
+                        },
+                        {
+                            $lookup: {
+                                from: "bids",
+                                localField: "_id",
+                                foreignField: "taskId",
+                                as: "bids"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                bidCount: { $size: "$bids" },
+
+                                myBid: {
+                                    $arrayElemAt: [
+                                        {
+                                            $filter: {
+                                                input: "$bids",
+                                                as: "bid",
+                                                cond: {
+                                                    $eq: [
+                                                        "$$bid.workerId",
+                                                        new mongoose.Types.ObjectId(workerId)
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        0
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                title: 1,
+                                category: 1,
+                                urgencyLevel: 1,
+                                amount: 1,
+                                address: 1,
+                                location: 1,
+                                distance: 1,
+                                bidCount: 1,
+                                "myBid.amount": 1,
+                                "myBid.status": 1,
+                            }
+                        }
+
+                    ]
+                }
+            }
+
+        ]);
+
+        const categoryList = result[0].categoryList.map((c) => c._id)
+        console.log(result[0], "result");
+
+        return { tasks: result[0].tasks, categoryList };
+
+    } catch (error) {
+        console.error("getNearbyTasksService error:", error);
+        return { error: "Something went wrong while fetching nearby tasks." };
+    }
+};

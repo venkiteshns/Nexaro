@@ -11,12 +11,16 @@ import {
   BookOpen,
   Hammer,
   AlertTriangle,
+  X,
+  ArrowRight,
+  Clock,
 } from "lucide-react";
 
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import { useGetWorkerNearbyTasksQuery } from "../../store/services/api";
 import { useNavigate } from "react-router-dom";
+import useDebounce from "../../customHooks/useDebounce";
 
 function getCategoryIcon(category) {
   const iconMap = {
@@ -35,13 +39,13 @@ function formatDistance(metres) {
   return `${(metres / 1000).toFixed(1)} km away`;
 }
 
-const CATEGORIES = ["Plumbing", "Electrical", "Cleaning", "Moving", "Tutoring"];
+// const CATEGORIES = ["Plumbing", "Electrical", "Cleaning", "Moving", "Tutoring"];
 
-function TaskCard({ task, handleNavigate }) {
+function TaskCard({ task, handleNavigate, handleActiveJob }) {
   // console.log("task ", task);
 
   const isUrgent = task.urgencyLevel === "urgent";
-  const hasBid = 0;
+  const hasBid = task?.myBid;
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3 relative overflow-hidden">
@@ -90,13 +94,31 @@ function TaskCard({ task, handleNavigate }) {
       </div>
 
       {hasBid ? (
-        <div className="flex items-center gap-2 mt-auto bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2">
-          <CheckCircle size={15} className="text-[#0A6E5C]" />
-          <span className="text-sm font-semibold text-[#0A6E5C]">Bid Placed</span>
-          <span className="text-xs text-gray-500 ml-auto">
-            ₹{Number(task.myBid.amount).toLocaleString("en-IN")} · Pending
-          </span>
-        </div>
+        (hasBid.status === "pending") ?
+          (<div className="flex items-center gap-2 mt-auto bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2">
+            <Clock size={15} className="text-yellow-600" />
+            <span className="text-xs font-semibold text-yellow-600">Bid Placed</span>
+            <span className="text-xs text-gray-500 ml-auto">
+              ₹{Number(task.myBid.amount).toLocaleString("en-IN")} · {task.myBid.status}
+            </span>
+          </div>) : (hasBid.status === "accepted") ? (<div className="flex flex-col items-center gap-2 mt-auto bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle size={15} className="text-[#0A6E5C]" />
+              <span className="text-xs font-semibold text-[#0A6E5C]">Bid Accepted</span>
+            </div>
+            <button
+              onClick={() => handleActiveJob(task._id)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors"
+            >
+              Go to Active Job <ArrowRight size={13} />
+            </button>
+          </div>) : (hasBid.status === "rejected") ? (<div className="flex items-center gap-2 mt-auto bg-red-50 border border-red-200 rounded-xl px-4 py-2">
+            <X size={15} className="text-red-600" />
+            <span className="text-xs font-semibold text-red-600">Bid Rejected</span>
+            <span className="text-xs text-gray-500 ml-auto">
+              Bid: ₹{Number(task.myBid.amount).toLocaleString("en-IN")}
+            </span>
+          </div>) : ""
       ) : (
         <button onClick={() => { handleNavigate(task._id) }} className="mt-auto w-full py-2.5 rounded-xl text-sm font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors">
           Place Bid →
@@ -113,29 +135,19 @@ const NearbyTasks = () => {
     navigate(`/worker/place-bid/${taskId}`);
   }
 
+  const handleActiveJob = (taskId) => {
+    navigate(`/worker/active-job/${taskId}`);
+  }
+
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchText, setSearchText] = useState("");
 
-  const { data, isLoading, isError, error } = useGetWorkerNearbyTasksQuery();
-  console.log("testee : ", data);
+  const deBouncedText = useDebounce({ searchText, delay: 500 })
 
+  const { data, isLoading, isError, error } = useGetWorkerNearbyTasksQuery({ category: selectedCategory, search: deBouncedText });
 
   const allTasks = data?.tasks || [];
   const noServiceArea = isError && error?.data?.message?.includes("service area");
-
-  const filteredTasks = allTasks.filter((task) => {
-    const categoryMatch = !selectedCategory || task.category === selectedCategory;
-
-    const searchMatch =
-      searchText === "" ||
-      task.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-      task.address?.city?.toLowerCase().includes(searchText.toLowerCase());
-
-    return categoryMatch && searchMatch;
-  });
-
-  // console.log("data : ", data);
-
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -180,7 +192,7 @@ const NearbyTasks = () => {
               All
             </button>
 
-            {CATEGORIES.map((cat) => (
+            {data?.categoryList?.map((cat) => (
               <button
                 key={cat}
                 onClick={() =>
@@ -224,7 +236,7 @@ const NearbyTasks = () => {
             </div>
           )}
 
-          {!isLoading && !isError && filteredTasks.length === 0 && (
+          {!isLoading && !isError && allTasks.length === 0 && (
             <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
               <p className="text-sm font-semibold text-gray-700 mb-1">
                 No tasks found nearby
@@ -237,15 +249,15 @@ const NearbyTasks = () => {
             </div>
           )}
 
-          {!isLoading && !isError && filteredTasks.length > 0 && (
+          {!isLoading && !isError && allTasks.length > 0 && (
             <>
               <p className="text-xs text-gray-500 mb-3 font-medium">
-                {filteredTasks.length} task{filteredTasks.length > 1 ? "s" : ""} found within 10 km
+                {allTasks.length} task{allTasks.length > 1 ? "s" : ""} found within 10 km
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredTasks.map((task) => (
-                  <TaskCard handleNavigate={handleNavigate} key={task._id} task={task} />
+                {allTasks.map((task) => (
+                  <TaskCard handleNavigate={handleNavigate} handleActiveJob={handleActiveJob} key={task._id} task={task} />
                 ))}
               </div>
             </>

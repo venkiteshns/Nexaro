@@ -1,7 +1,7 @@
-import { workerSignupService, getNearbyTasksService } from "../../services/workerServices.js";
+import { workerSignupService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { getTaskForBidService, getWorkerBidsService } from "../../services/taskServices.js";
+import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService } from "../../services/taskServices.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -36,7 +36,7 @@ export const getNearbyTasks = async (req, res) => {
     try {
         const workerId = req.user._id;
 
-        const result = await getNearbyTasksService(workerId);
+        const result = await getNearbyTasksService(workerId, req.query);
 
         if (result.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -49,6 +49,7 @@ export const getNearbyTasks = async (req, res) => {
             success: true,
             message: MESSAGES.NEARBY_TASKS_FETCHED,
             tasks: result.tasks,
+            categoryList: result.categoryList,
         });
 
     } catch (error) {
@@ -92,8 +93,8 @@ export const getWorkerBids = async (req, res) => {
         const workerId = req.user._id;
 
         const status = req.query.status || "all";       // "all" | "pending" | "accepted" | "rejected"
-        const page   = Math.max(1, parseInt(req.query.page)  || 1);
-        const limit  = Math.max(1, parseInt(req.query.limit) || 5);
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit) || 5);
 
         const result = await getWorkerBidsService(workerId, { status, page, limit });
 

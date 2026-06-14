@@ -306,10 +306,15 @@ export const api = createApi({
         }),
 
         getWorkerNearbyTasks: builder.query({
-            query: () => ({
-                url: "/worker/tasks/nearby",
-                method: "GET",
-            }),
+            query: ({ search = "", category = "" } = {}) => {
+                let params = new URLSearchParams();
+                if (search) params.append('search', search);
+                if (category) params.append('category', category);
+                return {
+                    url: `/worker/tasks/nearby?${params}`,
+                    method: "GET",
+                }
+            },
             providesTags: ["Worker_Tasks"],
         }),
 
