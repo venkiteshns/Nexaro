@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   ArrowLeft,
   MapPin,
@@ -25,7 +25,9 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
-// import { useGetWorkerBidDetailsQuery } from "../../store/services/api";
+import { useGetWorkerBidDetailsQuery } from "../../store/services/api";
+import WithdrawBidModal from "../../components/Worker/WithdrawBidModal.jsx";
+import Map from "../../components/Maps/Map";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -49,11 +51,11 @@ function formatDate(dateStr) {
   });
 }
 
-function formatDistance(metres) {
-  if (!metres && metres !== 0) return null;
-  if (metres < 1000) return `${Math.round(metres)} m from your location`;
-  return `${(metres / 1000).toFixed(1)} km from your location`;
-}
+// function formatDistance(metres) {
+//   if (!metres && metres !== 0) return null;
+//   if (metres < 1000) return `${Math.round(metres)} m from your location`;
+//   return `${(metres / 1000).toFixed(1)} km from your location`;
+// }
 
 function getBidStatusConfig(status) {
   switch (status) {
@@ -79,7 +81,6 @@ function getBidStatusConfig(status) {
 }
 
 // ─── Photo Gallery ─────────────────────────────────────────────────────────────
-
 function PhotoGallery({ photos }) {
   const [lightbox, setLightbox] = useState(null);
 
@@ -169,83 +170,91 @@ function PhotoGallery({ photos }) {
 
 // ─── Sidebar Cards ─────────────────────────────────────────────────────────────
 
-function YourBidCard({ bid }) {
+function YourBidCard({ bid, taskTitle }) {
   const { dot, badge, label } = getBidStatusConfig(bid?.status);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-      {/* Green top accent */}
-      <div className="h-1 w-full bg-[#0A6E5C]" />
+    <>
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        {/* Green top accent */}
+        <div className="h-1 w-full bg-[#0A6E5C]" />
 
-      <div className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-            Your Submitted Bid
-          </p>
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${badge}`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-            {label}
-          </span>
-        </div>
-
-        {/* Bid amount + ETA */}
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <p className="text-3xl font-extrabold text-gray-900">
-              ₹{Number(bid?.amount || 0).toLocaleString("en-IN")}
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              Your Submitted Bid
             </p>
-          </div>
-          <div className="flex items-center gap-1.5 text-gray-500 text-sm bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-            <Clock size={13} className="text-[#0A6E5C]" />
-            <span className="text-xs font-medium">{bid?.eta || "—"} ETA</span>
-          </div>
-        </div>
-
-        {/* Pitch */}
-        {bid?.pitch && (
-          <div className="mb-4">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-              Professional Pitch
-            </p>
-            <blockquote className="text-sm text-gray-600 italic leading-relaxed border-l-2 border-[#0A6E5C] pl-3 bg-emerald-50/50 py-2 rounded-r-lg">
-              "{bid.pitch}"
-            </blockquote>
-          </div>
-        )}
-
-        {/* Available Date */}
-        {bid?.availableDate && (
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-            <Calendar size={13} className="text-[#0A6E5C]" />
-            Available from:{" "}
-            <span className="font-semibold text-gray-700">
-              {formatDate(bid.availableDate)}
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${badge}`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+              {label}
             </span>
           </div>
-        )}
 
-        {/* Actions */}
-        {bid?.status === "pending" && (
-          <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
-            Withdraw Bid
-          </button>
-        )}
+          {/* Bid amount + ETA */}
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <p className="text-3xl font-extrabold text-gray-900">
+                ₹{Number(bid?.amount || 0).toLocaleString("en-IN")}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 text-gray-500 text-sm bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+              <Clock size={13} className="text-[#0A6E5C]" />
+              <span className="text-xs font-medium">{bid?.eta || "—"} ETA</span>
+            </div>
+          </div>
 
-        {bid?.status === "accepted" && (
-          <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors flex items-center justify-center gap-2">
-            Go to Active Job <span className="text-base">→</span>
-          </button>
-        )}
+          {/* Pitch */}
+          {bid?.pitch && (
+            <div className="mb-4">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+                Your Pitch
+              </p>
+              <blockquote className="text-sm text-gray-600 italic leading-relaxed border-l-2 border-[#0A6E5C] pl-3 bg-emerald-50/50 py-2 rounded-r-lg">
+                "{bid.pitch}"
+              </blockquote>
+            </div>
+          )}
 
-        {bid?.status === "rejected" && (
-          <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-            Find Similar Tasks
-          </button>
-        )}
+          {/* Available Date */}
+          {bid?.availableDate && (
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+              <Calendar size={13} className="text-[#0A6E5C]" />
+              Available from:{" "}
+              <span className="font-semibold text-gray-700">
+                {formatDate(bid.availableDate)}
+              </span>
+            </div>
+          )}
+
+          {/* Actions */}
+          {bid?.status === "pending" && (
+            <button onClick={() => {
+              setShowWithdrawModal(true)
+            }} className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+              Withdraw Bid
+            </button>
+          )}
+
+          {bid?.status === "accepted" && (
+            <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors flex items-center justify-center gap-2">
+              Go to Active Job <span className="text-base">→</span>
+            </button>
+          )}
+
+          {bid?.status === "rejected" && (
+            <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+              Find Similar Tasks
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+      {showWithdrawModal &&
+        <WithdrawBidModal bidId={bid._id} isOpen={showWithdrawModal} taskTitle={taskTitle} bidAmount={bid?.amount} onClose={() => setShowWithdrawModal(false)} />
+      }
+    </>
   );
 }
 
@@ -290,16 +299,18 @@ function CompetitionCard({ bidCount, averageBid }) {
 }
 
 function PostedByCard({ poster }) {
+  // console.log(poster);
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
       <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
         Posted By
       </p>
       <div className="flex items-center gap-3">
-        {poster?.selfie ? (
+        {poster?.picture ? (
           <img
-            src={poster.selfie}
-            alt={poster.name}
+            src={poster?.picture}
+            alt={poster?.name}
             className="w-11 h-11 rounded-full object-cover border-2 border-[#0A6E5C]/20"
           />
         ) : (
@@ -318,12 +329,18 @@ function PostedByCard({ poster }) {
   );
 }
 
-// ─── Location Card ─────────────────────────────────────────────────────────────
-
-function LocationCard({ address, distance }) {
+function LocationCard({ address, location }) {
   const cityDistrict = [address?.city, address?.district]
     .filter(Boolean)
     .join(", ");
+
+  const mapPosition = useMemo(() => {
+    const coords = location?.coordinates;
+    if (coords && coords.length === 2) {
+      return { lat: coords[1], lng: coords[0] };
+    }
+    return null;
+  }, [location]);
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -339,38 +356,20 @@ function LocationCard({ address, distance }) {
         )}
       </div>
 
-      {/* Map placeholder — swap with a real map component if available */}
-      <div className="mx-5 mb-3 h-48 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-100 border border-gray-200 relative flex items-center justify-center">
-        <div className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, #0A6E5C 1px, transparent 0)",
-            backgroundSize: "24px 24px",
-          }}
-        />
-        {/* Pin */}
-        <div className="flex flex-col items-center z-10">
-          <div className="w-12 h-12 rounded-full bg-red-500 border-4 border-white shadow-lg flex items-center justify-center mb-1">
-            <MapPin size={22} className="text-white" />
+      <div className="mx-5 mb-3 rounded-xl overflow-hidden border border-gray-200">
+        {mapPosition ? (
+          <Map
+            position={mapPosition}
+            height="192px"
+            showButton={false}
+          />
+        ) : (
+          <div className="h-48 bg-gradient-to-br from-emerald-50 to-teal-100 flex flex-col items-center justify-center text-gray-400">
+            <MapPin size={28} className="text-[#0A6E5C]/40 mb-1" />
+            <span className="text-xs">Location not available</span>
           </div>
-          <div className="w-3 h-3 rounded-full bg-red-500/40 blur-sm" />
-        </div>
+        )}
       </div>
-
-      {/* Zone info */}
-      {distance != null && (
-        <div className="mx-5 mb-5 flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5">
-          <Navigation size={14} className="text-[#0A6E5C]" />
-          <div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-              Primary Zone
-            </p>
-            <p className="text-xs font-semibold text-[#0A6E5C]">
-              {formatDistance(distance)}
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Full address */}
       {address?.landmark && (
@@ -391,20 +390,27 @@ const TaskBidDetails = () => {
   const navigate = useNavigate();
   const { bidId } = useParams();
 
-  // const { data, isLoading, isError } = useGetWorkerBidDetailsQuery(bidId, {
-  //   skip: !bidId,
-  // });
+  // console.log("bidId", bidId)
+
+  const { data, isLoading, isError } = useGetWorkerBidDetailsQuery(bidId, {
+    skip: !bidId,
+  });
 
   const bid = data?.bid;
   const task = data?.task;
   const poster = data?.poster;
   const competitionData = data?.competition;
+  // console.log("task: ", task);
+
+
+  // console.log("bid", bid);
+  // console.log("task", task);
+  // console.log("poster", poster);
+  // console.log("competitionData", competitionData);
 
   const isUrgent =
-    task?.urgencyLevel === "urgent" || task?.urgencyLevel === "high";
-  const { badge: statusBadge, label: statusLabel } = getBidStatusConfig(
-    bid?.status
-  );
+    task?.urgencyLevel === "urgent";
+
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -413,13 +419,11 @@ const TaskBidDetails = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <WorkerHeader />
 
-        {/* ── Scrollable body ── */}
         <div className="flex-1 overflow-y-auto">
 
-          {/* ── Top bar ── */}
           <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/worker/my-bids", { replace: true })}
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium"
             >
               <ArrowLeft size={16} />
@@ -430,7 +434,6 @@ const TaskBidDetails = () => {
             <div className="w-24 hidden sm:block" />
           </div>
 
-          {/* ── Loading ── */}
           {isLoading && (
             <div className="flex items-center justify-center py-24 gap-3 text-gray-400">
               <Loader2 size={22} className="animate-spin text-[#0A6E5C]" />
@@ -438,7 +441,6 @@ const TaskBidDetails = () => {
             </div>
           )}
 
-          {/* ── Error ── */}
           {isError && (
             <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500">
               <AlertCircle size={36} className="text-red-400" />
@@ -454,17 +456,13 @@ const TaskBidDetails = () => {
             </div>
           )}
 
-          {/* ── Content ── */}
           {!isLoading && !isError && (task || bid) && (
             <div className="p-4 sm:p-6 max-w-6xl mx-auto w-full">
               <div className="flex flex-col lg:flex-row gap-5">
 
-                {/* ══ LEFT / MAIN COLUMN ══ */}
                 <div className="flex-1 min-w-0 space-y-4">
 
-                  {/* Task Overview Card */}
                   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                    {/* Top row: badges + budget */}
                     <div className="flex items-start justify-between mb-3 gap-3">
                       <div className="flex items-center gap-2 flex-wrap">
                         {task?.category && (
@@ -473,37 +471,23 @@ const TaskBidDetails = () => {
                             {task.category}
                           </span>
                         )}
-                        <span
-                          className={`px-3 py-1 rounded-full text-[11px] font-bold ${statusBadge}`}
-                        >
-                          {statusLabel}
-                        </span>
-                        {isUrgent && (
-                          <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-red-50 text-red-600 text-[11px] font-bold border border-red-200">
-                            <Zap size={11} />
-                            High Priority
-                          </span>
-                        )}
                       </div>
 
-                      {task?.amount && (
+                      {task?.budget && (
                         <div className="text-right shrink-0">
                           <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">
                             Poster's Budget
                           </p>
                           <p className="text-2xl font-extrabold text-gray-900">
-                            ₹{Number(task.amount).toLocaleString("en-IN")}
+                            ₹{Number(task.budget).toLocaleString("en-IN")}
                           </p>
                         </div>
                       )}
                     </div>
 
-                    {/* Title */}
                     <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug mb-3">
                       {task?.title || "Task Title"}
                     </h2>
-
-                    {/* Meta */}
                     <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                       {task?.createdAt && (
                         <span className="flex items-center gap-1.5">
@@ -571,13 +555,12 @@ const TaskBidDetails = () => {
                   {/* Task Location Card */}
                   <LocationCard
                     address={task?.address}
-                    distance={task?.distance}
+                    location={task?.location}
                   />
                 </div>
 
-                {/* ══ RIGHT / SIDEBAR COLUMN ══ */}
                 <div className="w-full lg:w-80 xl:w-96 space-y-4 shrink-0">
-                  <YourBidCard bid={bid} />
+                  <YourBidCard bid={bid} taskTitle={task?.title} />
                   <CompetitionCard
                     bidCount={competitionData?.otherBidCount ?? task?.bidCount ?? 0}
                     averageBid={competitionData?.averageBid}

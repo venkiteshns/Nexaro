@@ -78,7 +78,7 @@ function StatCard({ icon, count, label, topColor, extra }) {
 }
 
 function BidCard({ bid }) {
-    console.log("ghafvs", bid.taskDetails)
+    console.log("ghafvs", bid)
 
     const navigate = useNavigate();
     const { badge, border, label } = getBidStatusConfig(bid.status);
@@ -144,7 +144,7 @@ function BidCard({ bid }) {
                                 Withdraw Bid
                             </button>
                             <button
-                                onClick={() => bid.taskId && navigate(`/worker/place-bid/${bid.taskId}`)}
+                                onClick={() => bid._id && navigate(`/worker/task-bid-details/${bid._id}`)}
                                 className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors"
                             >
                                 View Task

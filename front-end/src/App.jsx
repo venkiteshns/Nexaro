@@ -57,7 +57,7 @@ function App() {
               <Route path="nearby-tasks" element={<NearbyTasks />} />
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
               <Route path="my-bids" element={<MyBids />} />
-              <Route path='task-details/:bidId' element={<TaskBidDetails />} />
+              <Route path='task-bid-details/:bidId' element={<TaskBidDetails />} />
             </Route>
           </Route>
 
