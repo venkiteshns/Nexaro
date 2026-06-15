@@ -1,7 +1,7 @@
 import { workerSignupService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService } from "../../services/taskServices.js";
+import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService } from "../../services/taskServices.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -36,7 +36,15 @@ export const getNearbyTasks = async (req, res) => {
     try {
         const workerId = req.user._id;
 
-        const result = await getNearbyTasksService(workerId, req.query);
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit) || 9);
+
+        const result = await getNearbyTasksService(workerId, {
+            search: req.query.search || "",
+            category: req.query.category || "",
+            page,
+            limit,
+        });
 
         if (result.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -50,6 +58,7 @@ export const getNearbyTasks = async (req, res) => {
             message: MESSAGES.NEARBY_TASKS_FETCHED,
             tasks: result.tasks,
             categoryList: result.categoryList,
+            pagination: result.pagination,
         });
 
     } catch (error) {
@@ -119,6 +128,38 @@ export const getWorkerBids = async (req, res) => {
         });
     } catch (error) {
         console.error("getWorkerBids controller error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+}
+
+export const getWorkerBidDetails = async (req, res) => {
+    try {
+        const { bidId } = req.params;
+        const workerId = req.user._id;
+
+        const result = await getWorkerBidDetailsService(bidId, workerId);
+
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Bid details fetched successfully",
+            bid: result.bid,
+            task: result.task,
+            poster: result.poster,
+            competition: result.competition,
+        });
+
+    } catch (error) {
+        console.error("getWorkerBidDetails controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

@@ -306,10 +306,12 @@ export const api = createApi({
         }),
 
         getWorkerNearbyTasks: builder.query({
-            query: ({ search = "", category = "" } = {}) => {
+            query: ({ search = "", category = "", page = 1, limit = 9 } = {}) => {
                 let params = new URLSearchParams();
                 if (search) params.append('search', search);
                 if (category) params.append('category', category);
+                params.append('page', page);
+                params.append('limit', limit);
                 return {
                     url: `/worker/tasks/nearby?${params}`,
                     method: "GET",
@@ -344,6 +346,14 @@ export const api = createApi({
             },
             providesTags: ["Worker_Bids"],
         }),
+
+        getWorkerBidDetails: builder.query({
+            query: (bidId) => ({
+                url: `/worker/bid-details/${bidId}`,
+                method: "GET"
+            }),
+            providesTags: ["Worker_Bid_Details"],
+        })
     }),
 });
 
@@ -372,4 +382,5 @@ export const {
     useGetTaskForBidQuery,
     useAddNewBidMutation,
     useGetWorkerBidsQuery,
+    useGetWorkerBidDetailsQuery,
 } = api;

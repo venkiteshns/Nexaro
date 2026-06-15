@@ -210,8 +210,8 @@ export const handleNewBid = async (task, user) => {
     }
 }
 
-export const getNearbyTasksService = async (workerId, { search, category }) => {
-    console.log(search, category);
+export const getNearbyTasksService = async (workerId, { search, category, page = 1, limit = 9 }) => {
+    console.log(search, category, page, limit);
 
     try {
         const worker = await user.findById(workerId);
@@ -230,6 +230,7 @@ export const getNearbyTasksService = async (workerId, { search, category }) => {
         }
 
         const [lng, lat] = worker.serviceArea.coordinates;
+        const skip = (page - 1) * limit;
 
         let matchCriterias = {};
 
@@ -248,7 +249,7 @@ export const getNearbyTasksService = async (workerId, { search, category }) => {
                         coordinates: [lng, lat],
                     },
                     distanceField: "distance",
-                    maxDistance: 10000,
+                    maxDistance: 50000,
                     spherical: true,
                 },
             },
@@ -257,12 +258,15 @@ export const getNearbyTasksService = async (workerId, { search, category }) => {
                     categoryList: [
                         { $group: { _id: "$category" } },
                         { $match: { _id: { $ne: null } } },
-                        { $project: { _id: 1 } }
+                        { $project: { _id: 1 } },
+                        { $sort: { _id: 1 } },
+                    ],
+                    totalCount: [
+                        { $match: matchCriterias },
+                        { $count: "count" }
                     ],
                     tasks: [
-                        {
-                            $match: matchCriterias
-                        },
+                        { $match: matchCriterias },
                         {
                             $lookup: {
                                 from: "bids",
@@ -274,7 +278,6 @@ export const getNearbyTasksService = async (workerId, { search, category }) => {
                         {
                             $addFields: {
                                 bidCount: { $size: "$bids" },
-
                                 myBid: {
                                     $arrayElemAt: [
                                         {
@@ -307,21 +310,158 @@ export const getNearbyTasksService = async (workerId, { search, category }) => {
                                 "myBid.amount": 1,
                                 "myBid.status": 1,
                             }
-                        }
-
+                        },
+                        { $skip: skip },
+                        { $limit: Number(limit) },
                     ]
                 }
             }
-
         ]);
 
-        const categoryList = result[0].categoryList.map((c) => c._id)
-        console.log(result[0], "result");
+        const categoryList = result[0].categoryList.map((c) => c._id);
+        const total = result[0].totalCount[0]?.count || 0;
+        const totalPages = Math.ceil(total / limit);
 
-        return { tasks: result[0].tasks, categoryList };
+        return {
+            tasks: result[0].tasks,
+            categoryList,
+            pagination: { total, page: Number(page), limit: Number(limit), totalPages }
+        };
 
     } catch (error) {
         console.error("getNearbyTasksService error:", error);
         return { error: "Something went wrong while fetching nearby tasks." };
     }
 };
+
+export const getWorkerBidDetailsService = async (bidId, workerId) => {
+    try {
+        const bidDetails = await Bid.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(bidId) } },
+            {
+                $lookup: {
+                    from: 'tasks',
+                    localField: 'taskId',
+                    foreignField: '_id',
+                    as: "taskDetails"
+                }
+            },
+            { $unwind: { path: "$taskDetails", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'taskDetails.posterId',
+                    foreignField: "_id",
+                    as: "posterDetails"
+                }
+            },
+            { $unwind: { path: '$posterDetails', preserveNullAndEmptyArrays: true } },
+
+            // ── All bids on the same task (for competition insight) ──────────────
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: 'taskId',
+                    foreignField: 'taskId',
+                    as: 'allBidsOnTask'
+                }
+            },
+            {
+                $addFields: {
+                    otherBids: {
+                        $filter: {
+                            input: '$allBidsOnTask',
+                            as: 'b',
+                            cond: { $ne: ['$$b._id', new mongoose.Types.ObjectId(bidId)] }
+                        }
+                    }
+                }
+            },
+
+            // ── final values ──
+            {
+                $project: {
+                    _id: 1,
+                    taskId: 1,
+                    amount: 1,
+                    eta: 1,
+                    pitch: 1,
+                    status: 1,
+                    availability: 1,
+                    // Task fields
+                    title: '$taskDetails.title',
+                    description: '$taskDetails.description',
+                    category: '$taskDetails.category',
+                    deadline: '$taskDetails.deadline',
+                    location: '$taskDetails.location',
+                    address: '$taskDetails.address',
+                    budget: '$taskDetails.amount',
+                    postedAt: '$taskDetails.createdAt',
+                    urgencyLevel: '$taskDetails.urgencyLevel',
+                    images: '$taskDetails.images',
+                    // Poster info
+                    posterName: '$posterDetails.name',
+                    posterPicture: {
+                        $ifNull: [
+                            '$posterDetails.verificationDocuments.selfie.url',
+                            process.env.USER_ICON
+                        ]
+                    },
+                    // Competition
+                    otherBidCount: { $size: '$otherBids' },
+                    averageBid: {
+                        $cond: {
+                            if: { $gt: [{ $size: '$allBidsOnTask' }, 0] },
+                            then: { $avg: '$allBidsOnTask.amount' },
+                            else: null
+                        }
+                    },
+                }
+            }
+        ]);
+
+        if (!bidDetails || bidDetails.length === 0) {
+            return { error: "Bid not found" };
+        }
+
+        const bid = bidDetails[0];
+        // console.log(bidDetails[0]);
+
+
+        return {
+            bid: {
+                _id: bid._id,
+                taskId: bid.taskId,
+                amount: bid.amount,
+                eta: bid.eta,
+                pitch: bid.pitch,
+                status: bid.status,
+                availability: bid.availability,
+            },
+            task: {
+                title: bid.title,
+                description: bid.description,
+                category: bid.category,
+                deadline: bid.deadline,
+                location: bid.location,
+                address: bid.address,
+                budget: bid.budget,
+                postedAt: bid.postedAt,
+                urgencyLevel: bid.urgencyLevel,
+                images: bid.images,
+            },
+            poster: {
+                name: bid.posterName,
+                picture: bid.posterPicture,
+            },
+            competition: {
+                otherBidCount: bid.otherBidCount,
+                averageBid: bid.averageBid ? Math.round(bid.averageBid) : null,
+            }
+        };
+
+    } catch (error) {
+        console.error("getWorkerBidDetailsService error:", error.message);
+        return { error: "Something went wrong while fetching bid details." };
+    }
+}
