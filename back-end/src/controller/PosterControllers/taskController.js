@@ -1,5 +1,5 @@
 import { getTasksService } from "../../services/posterServices.js";
-import { createTaskService, handleNewBid } from "../../services/taskServices.js";
+import { createTaskService, handleNewBid, cancelTaskByPosterService } from "../../services/taskServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -74,6 +74,28 @@ export const addNewBid = async (req, res) => {
         });
     } catch (error) {
         console.error("addnewbid controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+}
+
+export const cancelTaskByPoster = async (req, res) => {
+    try {
+        let res = await cancelTaskByPosterService(req.params.taskId);
+        if (res.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: res.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: res.message,
+        });
+    } catch (error) {
+        console.error("cancelTaskByPoster controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

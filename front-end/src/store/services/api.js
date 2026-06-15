@@ -286,7 +286,7 @@ export const api = createApi({
                     formData: true,
                 };
             },
-            invalidatesTags: ["Tasks"],
+            invalidatesTags: ["Poster_Tasks"],
         }),
 
         getPosterTasks: builder.query({
@@ -294,7 +294,7 @@ export const api = createApi({
                 url: "/poster/tasks",
                 method: "GET",
             }),
-            providesTags: ["Tasks"],
+            providesTags: ["Poster_Tasks"],
         }),
 
         adminGetAllTasks: builder.query({
@@ -302,7 +302,7 @@ export const api = createApi({
                 url: `/admin/tasks?page=${page}&limit=${limit}`,
                 method: "GET",
             }),
-            providesTags: ["Tasks"],
+            providesTags: ["Poster_Tasks"],
         }),
 
         getWorkerNearbyTasks: builder.query({
@@ -333,7 +333,15 @@ export const api = createApi({
                 method: "POST",
                 body: payload
             }),
-            invalidatesTags: ["Worker_Bids"],
+            invalidatesTags: ["Worker_Bids", "Worker_Tasks"],
+        }),
+
+        cancelTaskByPoster: builder.mutation({
+            query: (taskId) => ({
+                url: `/poster/task/cancel/${taskId}`,
+                method: "PATCH"
+            }),
+            invalidatesTags: ["Poster_Tasks", "Worker_Tasks"]
         }),
 
         getWorkerBids: builder.query({
@@ -354,12 +362,29 @@ export const api = createApi({
             }),
             providesTags: ["Worker_Bid_Details"],
         }),
+
         withdrawBid: builder.mutation({
             query: (bidId) => ({
                 url: `/worker/bid/withdraw/${bidId}`,
                 method: "DELETE"
             }),
             invalidatesTags: ["Worker_Bids", "Worker_Bid_Details"],
+        }),
+
+        getPosterBids: builder.query({
+            query: ({ taskId, sort }) => ({
+                url: `/poster/task/bids/${taskId}?sort=${sort}`,
+                method: "GET",
+            }),
+            providesTags: ["Poster_Bids"],
+        }),
+
+        acceptBid: builder.mutation({
+            query: (bidId) => ({
+                url: `/poster/bid/accept/${bidId}`,
+                method: "PATCH"
+            }),
+            invalidatesTags: ["Poster_Bids", "Worker_Bids", "Worker_Bid_Details", "Poster_Tasks"]
         })
     }),
 });
@@ -390,5 +415,8 @@ export const {
     useAddNewBidMutation,
     useGetWorkerBidsQuery,
     useGetWorkerBidDetailsQuery,
-    useWithdrawBidMutation
+    useWithdrawBidMutation,
+    useGetPosterBidsQuery,
+    useAcceptBidMutation,
+    useCancelTaskByPosterMutation,
 } = api;

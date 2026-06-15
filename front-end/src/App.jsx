@@ -13,6 +13,8 @@ import UserLogin from "./pages/auth/UserLogin.jsx";
 import PosterDasboard from "./pages/poster/PosterDasboard.jsx";
 import PostTask from "./pages/poster/PostTask.jsx";
 import MyTasks from "./pages/poster/MyTasks.jsx";
+import ReviewBids from "./pages/poster/ReviewBids.jsx";
+import WorkProgress from "./pages/poster/WorkProgress.jsx";
 import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
@@ -48,6 +50,8 @@ function App() {
               <Route path="dashboard" element={<PosterDasboard />} />
               <Route path="post-task" element={<PostTask />} />
               <Route path="my-tasks" element={<MyTasks />} />
+              <Route path="review-bids/:taskId" element={<ReviewBids />} />
+              <Route path="work-progress/:taskId" element={<WorkProgress />} />
             </Route>
           </Route>
 
