@@ -71,11 +71,9 @@ const taskSchema = new mongoose.Schema(
         },
 
         update: {
-            arrived: { type: Boolean, default: false },
-            discussed: { type: Boolean, default: false },
-            started: { type: Boolean, default: false },
-            completed: { type: Boolean, default: false },
-            payment: { type: Boolean, default: false },
+            type: String,
+            default: "not_started",
+            enum: ["not_started", "arrived", "discussed", "started", "completed", "payment"],
         },
 
         address: {

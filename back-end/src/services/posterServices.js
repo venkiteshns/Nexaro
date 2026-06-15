@@ -206,3 +206,70 @@ export const acceptBidService = async (bidId) => {
         return { error: error.message };
     }
 }
+
+export const getPosterTaskProgressService = async (taskId) => {
+    try {
+        // titile, update, posted, duration, location, worker name, rating, completed jobs, bid amount, worker number,
+        // const task = await Task.findOne({ _id: taskId });
+        const task = await Task.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(taskId) } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'workerId',
+                    foreignField: '_id',
+                    as: 'worker'
+                }
+            },
+            {
+                $unwind: { path: "$worker", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: 'acceptedBid',
+                    foreignField: '_id',
+                    as: 'bid'
+                }
+            },
+            {
+                $unwind: { path: "$bid", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    workerId: 1,
+                    update: 1,
+                    category: 1,
+                    createdAt: 1,
+                    address: 1,
+                    status: 1,
+                    'worker.name': 1,
+                    'worker.rating': '$worker.worker.rating',
+                    'worker.phone': 1,
+                    'worker.completedJobs': 1,
+                    'worker.selfie': '$worker.verificationDocuments.selfie.url',
+                    'bid.amount': 1,
+                    'bid.eta': 1,
+                }
+            }
+        ])
+
+
+        if (!task[0]) {
+            return { error: "Task not found" };
+        }
+        console.log("task", task[0]);
+
+        const result = task[0];
+        const completedWork = await Task.find({ workerId: task[0].workerId, status: "completed" })
+        result.worker.completedJobs = completedWork.length
+
+        return result;
+
+    } catch (error) {
+        console.error("getPosterTaskProgressService error:", error.message);
+        return { error: error.message };
+    }
+}

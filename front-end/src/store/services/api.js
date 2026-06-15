@@ -385,6 +385,13 @@ export const api = createApi({
                 method: "PATCH"
             }),
             invalidatesTags: ["Poster_Bids", "Worker_Bids", "Worker_Bid_Details", "Poster_Tasks"]
+        }),
+        getPosterTaskProgress: builder.query({
+            query: (taskId) => ({
+                url: `/poster/task/${taskId}/progress`,
+                method: "GET",
+            }),
+            providesTags: ["Poster_Task_Progress"]
         })
     }),
 });
@@ -419,4 +426,5 @@ export const {
     useGetPosterBidsQuery,
     useAcceptBidMutation,
     useCancelTaskByPosterMutation,
+    useGetPosterTaskProgressQuery
 } = api;
