@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
+import WithdrawBidModal from "../../components/Worker/WithdrawBidModal.jsx";
 import { useGetWorkerBidsQuery } from "../../store/services/api";
 
 const LIMIT = 5;
@@ -79,6 +80,8 @@ function StatCard({ icon, count, label, topColor, extra }) {
 
 function BidCard({ bid }) {
     console.log("ghafvs", bid)
+    const [isWithdrawSuccess, setIsWithdrawSuccess] = useState(false);
+
 
     const navigate = useNavigate();
     const { badge, border, label } = getBidStatusConfig(bid.status);
@@ -87,8 +90,10 @@ function BidCard({ bid }) {
     const taskBudget = task?.amount ?? "—";
     const taskBidCount = task?.bidCount ?? 0;
 
+
     return (
         <div className={`bg-white rounded-xl border border-gray-200 border-l-4 ${border} shadow-sm overflow-hidden`}>
+            {isWithdrawSuccess && <WithdrawBidModal taskTitle={taskTitle} bidAmount={bid.amount} isOpen={isWithdrawSuccess} onClose={() => setIsWithdrawSuccess(false)} bidId={bid._id} />}
             <div className="flex justify-between items-start px-5 pt-4 pb-3">
                 <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
@@ -140,7 +145,9 @@ function BidCard({ bid }) {
                     )}
                     {bid.status === "pending" && (
                         <>
-                            <button className="px-4 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+                            <button onClick={() => {
+                                setIsWithdrawSuccess(true)
+                            }} className="px-4 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
                                 Withdraw Bid
                             </button>
                             <button
@@ -224,6 +231,7 @@ const TABS = [
 
 const MyBids = () => {
     const [activeTab, setActiveTab] = useState("all");
+
     const [page, setPage] = useState(1);
 
     const { data, isLoading, isFetching, isError } = useGetWorkerBidsQuery({

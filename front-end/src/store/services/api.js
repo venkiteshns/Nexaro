@@ -353,6 +353,13 @@ export const api = createApi({
                 method: "GET"
             }),
             providesTags: ["Worker_Bid_Details"],
+        }),
+        withdrawBid: builder.mutation({
+            query: (bidId) => ({
+                url: `/worker/bid/withdraw/${bidId}`,
+                method: "DELETE"
+            }),
+            invalidatesTags: ["Worker_Bids", "Worker_Bid_Details"],
         })
     }),
 });
@@ -383,4 +390,5 @@ export const {
     useAddNewBidMutation,
     useGetWorkerBidsQuery,
     useGetWorkerBidDetailsQuery,
+    useWithdrawBidMutation
 } = api;

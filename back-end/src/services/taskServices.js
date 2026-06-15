@@ -465,3 +465,21 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
         return { error: "Something went wrong while fetching bid details." };
     }
 }
+
+export const withdrawBidService = async (bidId) => {
+    console.log(bidId);
+
+    try {
+        const bid = await Bid.findByIdAndDelete({ _id: bidId })
+        console.log(bid);
+        // const bid = await Bid.findByIdAndDelete(bidId)
+
+        if (!bid) {
+            return { error: "Bid not found" }
+        }
+        return { message: "Bid withdrawn successfully" }
+    } catch (error) {
+        console.error("withdrawBidService error:", error.message);
+        return { error: "Something went wrong while withdrawing bid." };
+    }
+}
