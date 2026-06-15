@@ -1,5 +1,7 @@
 import React from "react";
 import { AlertTriangle, Wrench } from "lucide-react";
+import { useWithdrawBidMutation } from "../../store/services/api";
+import { showError, showSuccess } from "../../utils/toast";
 
 /**
  * WithdrawBid Modal
@@ -17,23 +19,43 @@ const WithdrawBidModal = ({
   onClose,
   taskTitle = "Fetching failed",
   bidAmount = 0,
-  bidId
+  bidId,
+  isWithdrawSuccess
 }) => {
   if (!isOpen) return null;
 
-  const onConfirm = () => {
+  const [withdrawBid, { isLoading, isSuccess }] = useWithdrawBidMutation();
+
+  const onConfirm = async () => {
+    try {
+      const response = await withdrawBid(bidId).unwrap()
+      console.log("response", response)
+      if (response.success) {
+        showSuccess(response.message)
+        if (isWithdrawSuccess) {
+          isWithdrawSuccess(true)
+        }
+        onClose()
+      }
+    } catch (error) {
+      console.log(error)
+      showError(error.data.message)
+      setTimeout(() => {
+        onClose()
+      }, 1500);
+    }
     console.log(bidId)
     console.log("Confirming bid withdrawal");
   }
 
-  let isLoading = false;
+  // let isLoading = false;
 
   const formattedAmount = Number(bidAmount).toLocaleString("en-IN");
 
   return (
     /* ── Backdrop ──────────────────────────────────────────────────────────── */
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-1000 flex items-center justify-center p-4 sm:p-6"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
       aria-modal="true"
@@ -97,11 +119,16 @@ const WithdrawBidModal = ({
             <button
               id="confirm-withdraw-btn"
               onClick={onConfirm}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-400
-                         text-white text-sm font-bold tracking-wide
-                         hover:from-red-600 hover:to-red-500 active:scale-[0.98]
-                         transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed
-                         flex items-center justify-center gap-2 shadow-sm"
+              disabled={isLoading || isSuccess}
+              className={`w-full py-3 rounded-2xl text-white text-sm font-bold tracking-wide
+                         active:scale-[0.98] transition-all duration-300
+                         disabled:opacity-60 disabled:cursor-not-allowed
+                         flex items-center justify-center gap-2 shadow-sm
+                         bg-gradient-to-r
+                         ${isSuccess
+                  ? "from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500"
+                  : "from-red-500 to-red-400 hover:from-red-600 hover:to-red-500"
+                }`}
             >
               {isLoading ? (
                 <>
@@ -110,6 +137,11 @@ const WithdrawBidModal = ({
                     aria-hidden="true"
                   />
                   Withdrawing…
+                </>
+              ) : isSuccess ? (
+                <>
+                  <span className="text-base">✓</span>
+                  Bid Withdrawn Successfully
                 </>
               ) : (
                 "Yes, Withdraw Bid"
@@ -120,7 +152,7 @@ const WithdrawBidModal = ({
             <button
               id="cancel-withdraw-btn"
               onClick={onClose}
-              disabled={isLoading}
+              disabled={isLoading || isSuccess}
               className="w-full py-3 rounded-2xl border border-gray-200 bg-white
                          text-sm font-semibold text-[#0A6E5C]
                          hover:bg-emerald-50 hover:border-[#0A6E5C]/30 active:scale-[0.98]

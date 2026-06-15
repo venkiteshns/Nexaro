@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   MapPin,
@@ -170,7 +170,7 @@ function PhotoGallery({ photos }) {
 
 // ─── Sidebar Cards ─────────────────────────────────────────────────────────────
 
-function YourBidCard({ bid, taskTitle }) {
+function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
   const { dot, badge, label } = getBidStatusConfig(bid?.status);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
@@ -252,7 +252,7 @@ function YourBidCard({ bid, taskTitle }) {
         </div>
       </div>
       {showWithdrawModal &&
-        <WithdrawBidModal bidId={bid._id} isOpen={showWithdrawModal} taskTitle={taskTitle} bidAmount={bid?.amount} onClose={() => setShowWithdrawModal(false)} />
+        <WithdrawBidModal isWithdrawSuccess={isWithdrawSuccess} bidId={bid._id} isOpen={showWithdrawModal} taskTitle={taskTitle} bidAmount={bid?.amount} onClose={() => setShowWithdrawModal(false)} />
       }
     </>
   );
@@ -384,33 +384,93 @@ function LocationCard({ address, location }) {
   );
 }
 
+// ─── Bid Withdrawn Success Screen ──────────────────────────────────────────────
+
+function BidWithdrawnSuccess({ navigate }) {
+  const [count, setCount] = useState(3);
+
+  useEffect(() => {
+    if (count <= 0) return;
+    const timer = setTimeout(() => setCount((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [count]);
+
+  useEffect(() => {
+    if (count === 0) {
+      navigate("/worker/my-bids", { replace: true });
+    }
+  }, [count, navigate]);
+
+  return (
+    <div className="flex-1 flex items-center justify-center bg-[#F6FAF8] px-4">
+      <div className="flex flex-col items-center text-center max-w-xs w-full">
+
+        {/* Animated ring + checkmark */}
+        <div className="relative mb-6">
+          <div className="w-24 h-24 rounded-full bg-emerald-50 border-4 border-[#0A6E5C]/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-[#0A6E5C]/10 flex items-center justify-center">
+              <svg
+                className="w-9 h-9 text-[#0A6E5C]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+          </div>
+          {/* Pulse ring */}
+          <span className="absolute inset-0 rounded-full border-2 border-[#0A6E5C]/30 animate-ping" />
+        </div>
+
+        <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Bid Withdrawn Successfully!</h2>
+        <p className="text-sm text-gray-500 leading-relaxed mb-6">
+          Your bid has been successfully withdrawn. You won't be considered for this task anymore.
+        </p>
+
+        {/* Countdown pill */}
+        <p className="text-xs text-gray-400 mb-4">
+          Redirecting to My Bids in{" "}
+          <span className="font-bold text-[#0A6E5C]">{count}s</span>…
+        </p>
+
+        <button
+          onClick={() => navigate("/worker/my-bids", { replace: true })}
+          className="w-full py-3 rounded-2xl bg-[#0A6E5C] text-white text-sm font-bold
+                     hover:bg-[#085e4e] active:scale-[0.98] transition-all duration-150 shadow-sm"
+        >
+          Go to My Bids
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 const TaskBidDetails = () => {
   const navigate = useNavigate();
   const { bidId } = useParams();
 
-  // console.log("bidId", bidId)
+  const [isWithdrawSuccess, setIsWithdrawSuccess] = useState(false);
+  console.log("withdraw", isWithdrawSuccess);
+
+  // if (isWithdrawSuccess) return <BidWithdrawnSuccess navigate={navigate} />
 
   const { data, isLoading, isError } = useGetWorkerBidDetailsQuery(bidId, {
-    skip: !bidId,
+    skip: !bidId || isWithdrawSuccess,
   });
 
   const bid = data?.bid;
   const task = data?.task;
   const poster = data?.poster;
   const competitionData = data?.competition;
-  // console.log("task: ", task);
-
-
-  // console.log("bid", bid);
-  // console.log("task", task);
-  // console.log("poster", poster);
-  // console.log("competitionData", competitionData);
 
   const isUrgent =
     task?.urgencyLevel === "urgent";
-
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -419,7 +479,7 @@ const TaskBidDetails = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <WorkerHeader />
 
-        <div className="flex-1 overflow-y-auto">
+        {!isWithdrawSuccess && <div className="flex-1 overflow-y-auto">
 
           <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
             <button
@@ -560,7 +620,7 @@ const TaskBidDetails = () => {
                 </div>
 
                 <div className="w-full lg:w-80 xl:w-96 space-y-4 shrink-0">
-                  <YourBidCard bid={bid} taskTitle={task?.title} />
+                  <YourBidCard bid={bid} taskTitle={task?.title} isWithdrawSuccess={setIsWithdrawSuccess} />
                   <CompetitionCard
                     bidCount={competitionData?.otherBidCount ?? task?.bidCount ?? 0}
                     averageBid={competitionData?.averageBid}
@@ -586,7 +646,8 @@ const TaskBidDetails = () => {
               </button>
             </div>
           )}
-        </div>
+        </div>}
+        {isWithdrawSuccess && <BidWithdrawnSuccess navigate={navigate} />}
       </div>
     </div>
   );
