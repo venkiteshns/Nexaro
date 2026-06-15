@@ -40,7 +40,7 @@ export const createTaskService = async (body, files, posterId) => {
             description: body.description,
             category: body.category,
             deadline: new Date(body.deadline),
-            urgencyLevel: body.urgency || "flexible",
+            urgencyLevel: body.urgencyLevel || "flexible",
             amount: Number(body.amount) || 0,
             images,
             address,
@@ -481,5 +481,21 @@ export const withdrawBidService = async (bidId) => {
     } catch (error) {
         console.error("withdrawBidService error:", error.message);
         return { error: "Something went wrong while withdrawing bid." };
+    }
+}
+
+export const cancelTaskByPosterService = async (taskId) => {
+    console.log(taskId);
+    try {
+        const taskData = await Task.findById({ _id: taskId });
+        if (!taskData) {
+            return { error: "Task not found" }
+        }
+        taskData.status = "cancelled"
+        await taskData.save()
+        return { message: "Task cancelled successfully" }
+    } catch (error) {
+        console.error("cancelTaskByPosterService error:", error.message);
+        return { error: "Something went wrong while cancelling task." };
     }
 }

@@ -1,4 +1,4 @@
-import { posterSignupService } from "../../services/posterServices.js";
+import { posterSignupService, getPosterBidsService, acceptBidService } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -31,3 +31,60 @@ export const posterSignup = async (req, res) => {
         });
     }
 };
+
+export const getPosterBids = async (req, res) => {
+    console.log("query : ", req.query.sort);
+
+    try {
+        let response = await getPosterBidsService(req.params.taskId, req.query.sort);
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error
+            })
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Bids fetched successfully",
+            data: response
+        })
+    } catch (error) {
+        console.error("getPosterBids error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Internal server error",
+        })
+    }
+
+}
+
+export const acceptBid = async (req, res) => {
+    try {
+        const response = await acceptBidService(req.params.bidId);
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Bid accepted successfully",
+            data: {
+                acceptedBid: response.acceptedBid,
+                rejectedCount: response.rejectedCount,
+                task: response.task,
+            },
+        });
+
+    } catch (error) {
+        console.error("acceptBid error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+}
