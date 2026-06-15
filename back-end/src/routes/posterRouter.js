@@ -2,7 +2,7 @@ import express from "express";
 import upload from "../middlewares/upload.js";
 import verifyToken from "../middlewares/verifyToken.js";
 import { createTask, getMyTasks, cancelTaskByPoster } from "../controller/PosterControllers/taskController.js";
-import { getPosterBids, acceptBid } from "../controller/PosterControllers/posterController.js";
+import { getPosterBids, acceptBid, getPosterTaskProgress } from "../controller/PosterControllers/posterController.js";
 
 const router = express.Router();
 
@@ -18,6 +18,7 @@ router.get(
     getMyTasks
 );
 router.get('/task/bids/:taskId', verifyToken, getPosterBids);
+router.get('/task/:taskId/progress', verifyToken, getPosterTaskProgress)
 
 router.patch('/bid/accept/:bidId', verifyToken, acceptBid);
 router.patch('/task/cancel/:taskId', verifyToken, cancelTaskByPoster)

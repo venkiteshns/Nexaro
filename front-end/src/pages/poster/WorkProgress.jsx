@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useGetPosterTaskProgressQuery } from '../../store/services/api';
 import {
     ArrowLeft,
     Phone,
@@ -13,38 +14,25 @@ import {
     Flag,
     ChevronRight,
     ShieldCheck,
+    Loader2,
+    AlertTriangle,
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
 
 const STEPS = [
-    { key: 'posted', label: 'TASK POSTED', icon: CheckCircle, done: true, active: false },
-    { key: 'accepted', label: 'BID ACCEPTED', icon: CheckCircle, done: true, active: false },
-    { key: 'payment', label: 'PAYMENT SECURED', icon: CheckCircle, done: true, active: false },
-    { key: 'working', label: 'ACTIVE WORKING', icon: Wrench, done: false, active: true },
+    { key: 'posted', label: 'TASK POSTED', icon: CheckCircle, done: false, active: false },
+    { key: 'accepted', label: 'BID ACCEPTED', icon: CheckCircle, done: false, active: false },
+    { key: 'payment', label: 'PAYMENT SECURED', icon: CheckCircle, done: false, active: false },
+    { key: 'working', label: 'ACTIVE WORKING', icon: Wrench, done: false, active: false },
     { key: 'completed', label: 'COMPLETED', icon: Flag, done: false, active: false },
 ];
 
 const MOCK = {
-    task: {
-        title: 'Fix bathroom water leakage',
-        status: 'in_progress',
-        amount: 420,
-        postedAt: 'Today, 10:30 AM',
-        estDuration: '3–4 Hours',
-        location: 'Hauz Khas, Delhi',
-    },
-    worker: {
-        name: 'Ravi Kumar',
-        selfie: null,
-        rating: 4.9,
-        jobCount: 124,
-        phone: '+91 98765 43210',
-    },
     checklist: [
-        { id: 1, label: 'Worker arrived at site', done: true },
-        { id: 2, label: 'Discussed job and materials', done: true },
-        { id: 3, label: 'Started repair work', done: true },
+        { id: 1, label: 'Worker arrived at site', done: false },
+        { id: 2, label: 'Discussed job and materials', done: false },
+        { id: 3, label: 'Started repair work', done: false },
         { id: 4, label: 'Testing for leaks', done: false },
         { id: 5, label: 'Final clean up', done: false },
     ],
@@ -55,8 +43,65 @@ function completedCount(list) {
     return list.filter((i) => i.done).length;
 }
 
+// ── Page Loader ───────────────────────────────────────────────────────────────
+function PageLoader() {
+    return (
+        <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20">
+            {/* Spinner ring */}
+            <div className="relative w-20 h-20">
+                <div className="w-20 h-20 rounded-full border-4 border-emerald-100" />
+                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#0A6E5C] animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Wrench size={22} className="text-[#0A6E5C]" />
+                </div>
+            </div>
 
-// ─── Release Payment Confirmation Modal ────────────────────────────────────
+            <div className="text-center">
+                <p className="text-base font-extrabold text-gray-900 mb-1">Loading Task Details</p>
+                <p className="text-sm text-gray-400">Fetching progress data…</p>
+            </div>
+
+            {/* Bouncing dots */}
+            <div className="flex gap-1.5">
+                {[0, 1, 2].map((i) => (
+                    <span
+                        key={i}
+                        className="w-2 h-2 rounded-full bg-[#0A6E5C] animate-bounce"
+                        style={{ animationDelay: `${i * 0.15}s` }}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function PageError({ onBack }) {
+    return (
+        <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20">
+            <div className="w-20 h-20 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center">
+                <AlertTriangle size={32} className="text-red-500" />
+            </div>
+
+            <div className="text-center">
+                <p className="text-base font-extrabold text-gray-900 mb-1">Failed to Load</p>
+                <p className="text-sm text-gray-400 max-w-xs">
+                    We couldn’t fetch the task progress. Please check your connection and try again.
+                </p>
+            </div>
+
+            <button
+                onClick={onBack}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0A6E5C] text-white
+                           text-sm font-bold hover:bg-[#085e4e] transition-all active:scale-[0.98]"
+            >
+                <ArrowLeft size={15} />
+                Back to My Tasks
+            </button>
+        </div>
+    );
+}
+
+
 function ReleaseModal({ amount, workerName, onConfirm, onCancel }) {
     return (
         <div
@@ -117,6 +162,45 @@ const WorkProgress = () => {
     const total = checklist.length;
     const pct = Math.round((done / total) * 100);
 
+    const { data, isLoading, isError, isSuccess } = useGetPosterTaskProgressQuery(taskId);
+    console.log("data", data);
+
+    const mainData = data?.data;
+    const { bid, worker: workerData } = mainData ?? {};
+
+    const update = mainData?.update;
+    const updateCount = {
+        'not_started': 0,
+        'arrived': 1,
+        'discussed': 2,
+        'started': 3,
+        'completed': 4,
+        'payment': 5,
+    }[update];
+
+    const statusUpdate = {
+        'open': 1,
+        'assigned': 2,
+        'in_progress': 3,
+        'completed': 4,
+        'cancelled': 5,
+    }[mainData?.status];
+
+    console.log("updateCount", statusUpdate ? statusUpdate : 89, mainData?.status);
+    if (statusUpdate) {
+
+        for (let c = 0; c < statusUpdate; c++) {
+            STEPS[c].done = true;
+            STEPS[c].active = false;
+        }
+        STEPS[statusUpdate].active = true;
+    }
+
+
+    for (let c = 1; c <= updateCount; c++) {
+        checklist[c - 1].done = true;
+    }
+
     const handleRelease = () => {
         setShowReleaseModal(false);
         setReleased(true);
@@ -129,7 +213,7 @@ const WorkProgress = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <PosterHeader />
 
-                <div className="flex-1 overflow-y-auto">
+                {(!isLoading && !isError) && <div className="flex-1 overflow-y-auto">
 
                     {/* ── Top bar ── */}
                     <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200
@@ -158,7 +242,7 @@ const WorkProgress = () => {
                                 Task Progress
                             </p>
                             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-                                {task.title}
+                                {mainData?.title}
                             </h1>
                         </div>
 
@@ -176,7 +260,7 @@ const WorkProgress = () => {
                                                         ${step.done
                                                             ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white'
                                                             : step.active
-                                                                ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white shadow-lg shadow-emerald-200'
+                                                                ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white shadow-lg shadow-emerald-200 animate-pulse'
                                                                 : 'bg-gray-100 border-gray-300 text-gray-400'
                                                         }`}
                                                 >
@@ -213,21 +297,21 @@ const WorkProgress = () => {
                             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex flex-col items-center text-center gap-3">
                                 {/* Avatar */}
                                 <div className="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden">
-                                    {worker.selfie ? (
-                                        <img src={worker.selfie} alt={worker.name} className="w-full h-full object-cover" />
+                                    {workerData?.selfie ? (
+                                        <img src={workerData?.selfie} alt={workerData?.name} className="w-full h-full object-cover" />
                                     ) : (
                                         <span className="text-3xl font-extrabold text-[#0A6E5C]">
-                                            {worker.name.charAt(0)}
+                                            {workerData?.name?.charAt(0)}
                                         </span>
                                     )}
                                 </div>
 
                                 <div>
-                                    <p className="font-bold text-gray-900 text-base">{worker.name}</p>
+                                    <p className="font-bold text-gray-900 text-base">{workerData?.name}</p>
                                     <div className="flex items-center justify-center gap-1 mt-1">
                                         <Star size={12} fill="#FBBF24" color="#FBBF24" />
-                                        <span className="text-sm font-bold text-gray-700">{worker.rating}</span>
-                                        <span className="text-xs text-gray-400">({worker.jobCount} jobs)</span>
+                                        <span className="text-sm font-bold text-gray-700">{workerData?.rating}</span>
+                                        <span className="text-xs text-gray-400">({workerData?.completedJobs} jobs)</span>
                                     </div>
                                 </div>
 
@@ -235,11 +319,11 @@ const WorkProgress = () => {
                                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                                         Agreed Bid
                                     </p>
-                                    <p className="text-2xl font-extrabold text-gray-900">₹{task.amount}</p>
+                                    <p className="text-2xl font-extrabold text-gray-900">₹{bid?.amount}</p>
                                 </div>
-
+                                <p>{workerData?.phone}</p>
                                 <a
-                                    href={`tel:${worker.phone}`}
+                                    href={`tel:${workerData?.phone}`}
                                     className="w-full mt-1 flex items-center justify-center gap-2 px-4 py-2.5
                                                border border-gray-200 rounded-xl text-sm font-semibold text-gray-700
                                                hover:border-[#0A6E5C] hover:text-[#0A6E5C] hover:bg-emerald-50 transition-all"
@@ -288,9 +372,9 @@ const WorkProgress = () => {
 
                                 <div className="space-y-3">
                                     {[
-                                        { icon: Clock, label: 'POSTED', value: task.postedAt },
-                                        { icon: Calendar, label: 'EST. DURATION', value: task.estDuration },
-                                        { icon: MapPin, label: 'LOCATION', value: task.location },
+                                        { icon: Clock, label: 'POSTED', value: new Date(mainData?.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) },
+                                        { icon: Calendar, label: 'EST. DURATION', value: bid?.eta },
+                                        { icon: MapPin, label: 'LOCATION', value: `${mainData?.address?.city}, ${mainData?.address?.state}` },
                                     ].map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="flex items-start justify-between gap-2">
                                             <div className="flex items-center gap-1.5">
@@ -326,7 +410,7 @@ const WorkProgress = () => {
                                     </h2>
                                     <p className="text-sm text-gray-500 leading-relaxed max-w-md">
                                         Confirm that the work has been completed to your satisfaction. The funds
-                                        will be released to {worker.name} immediately after confirmation.
+                                        will be released to {workerData?.name} immediately after confirmation.
                                     </p>
                                 </div>
 
@@ -335,7 +419,7 @@ const WorkProgress = () => {
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                                             Amount Held
                                         </p>
-                                        <p className="text-2xl font-extrabold text-gray-900">₹{task.amount}.00</p>
+                                        <p className="text-2xl font-extrabold text-gray-900">₹{bid?.amount}.00</p>
                                     </div>
 
                                     <button
@@ -352,14 +436,17 @@ const WorkProgress = () => {
                         )}
 
                     </div>
-                </div>
+                </div>}
+
+                {isLoading && <PageLoader />}
+                {isError && <PageError onBack={() => navigate('/poster/my-tasks', { replace: true })} />}
             </div>
 
             {/* ── Release Modal ── */}
             {showReleaseModal && (
                 <ReleaseModal
-                    amount={task.amount}
-                    workerName={worker.name}
+                    amount={bid?.amount}
+                    workerName={workerData?.name}
                     onConfirm={handleRelease}
                     onCancel={() => setShowReleaseModal(false)}
                 />

@@ -1,4 +1,4 @@
-import { posterSignupService, getPosterBidsService, acceptBidService } from "../../services/posterServices.js";
+import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -82,6 +82,29 @@ export const acceptBid = async (req, res) => {
 
     } catch (error) {
         console.error("acceptBid error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+}
+
+export const getPosterTaskProgress = async (req, res) => {
+    try {
+        let response = await getPosterTaskProgressService(req.params.taskId);
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Task progress fetched successfully",
+            data: response,
+        });
+    } catch (error) {
+        console.error("getPosterTaskProgress controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

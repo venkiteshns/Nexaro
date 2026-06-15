@@ -121,7 +121,11 @@ const PosterNavBar = () => {
         {/* NAVIGATION */}
         <div className="p-3 space-y-1 mt-1">
           {posterNav.map((item, index) => {
-            const isActive = location.pathname === item.redirect;
+            const myTasksGroup = ['/poster/my-tasks', '/poster/review-bids', '/poster/work-progress'];
+            const isActive =
+              location.pathname === item.redirect ||
+              (item.redirect === '/poster/my-tasks' &&
+                myTasksGroup.some((prefix) => location.pathname.startsWith(prefix)));
             return (
               <button
                 key={index}
