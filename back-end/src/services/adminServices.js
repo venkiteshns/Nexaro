@@ -163,3 +163,19 @@ export const getAllTasksService = async (page, limit) => {
     }
 };
 
+export const cancelTaskByAdminService = async (taskId) => {
+    try {
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return { error: MESSAGES.TASK_NOT_FOUND };
+        }
+
+        task.status = "cancelled";
+        await task.save({ validateBeforeSave: false });
+
+        return { success: true, message: MESSAGES.TASK_CANCELLED };
+    } catch (error) {
+        throw error;
+    }
+}
+

@@ -302,7 +302,7 @@ export const api = createApi({
                 url: `/admin/tasks?page=${page}&limit=${limit}`,
                 method: "GET",
             }),
-            providesTags: ["Poster_Tasks"],
+            providesTags: ["Admin_Tasks"],
         }),
 
         getWorkerNearbyTasks: builder.query({
@@ -410,6 +410,14 @@ export const api = createApi({
             }),
             invalidatesTags: ["Active_Job"],
         }),
+
+        adminTaskDelete: builder.mutation({
+            query: (taskId) => ({
+                url: `/admin/task/cancel/${taskId}`,
+                method: "PATCH"
+            }),
+            invalidatesTags: ["Admin_Tasks"]
+        })
     }),
 });
 
@@ -446,4 +454,5 @@ export const {
     useGetPosterTaskProgressQuery,
     useGetWorkerActiveJobQuery,
     useUpdateJobProgressMutation,
+    useAdminTaskDeleteMutation
 } = api;
