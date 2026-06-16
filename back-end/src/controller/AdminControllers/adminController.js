@@ -1,4 +1,4 @@
-import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService, getAllTasksService } from "../../services/adminServices.js";
+import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService, getAllTasksService, cancelTaskByAdminService } from "../../services/adminServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -157,6 +157,25 @@ export const getAllTasks = async (req, res) => {
         }
     } catch (error) {
         console.error("Get all tasks error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const cancelTaskByAdmin = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        if (!taskId) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.TASK_ID_REQUIRED });
+        }
+
+        const response = await cancelTaskByAdminService(taskId);
+        if (response.success) {
+            return res.status(STATUS_CODES.OK).json({ success: true, message: response.message });
+        } else {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
+        }
+    } catch (error) {
+        console.error("Cancel task by admin error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };

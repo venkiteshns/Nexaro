@@ -11,7 +11,7 @@ const MESSAGES = {
 
     LOGIN_SUCCESS: "Login successful",
     LOGGED_OUT: "Logged out successfully",
-    REFRESH_TOKEN_REQUIRED: "Refresh token is required",
+    REFRESH_TOKEN_REQUIRED: "Invalid Access Token - Refresh token is required",
     INVALID_REFRESH_TOKEN: "Invalid or expired refresh token",
 
     EMAIL_REQUIRED: "Email is required",
@@ -38,6 +38,9 @@ const MESSAGES = {
     POSTER_REGISTERED: "Poster registered successfully",
     TASK_CREATED: "Task created successfully",
     TASKS_FETCHED: "Tasks fetched successfully",
+    TASK_ID_REQUIRED: "Task ID is required",
+    TASK_NOT_FOUND: "Task not found",
+    TASK_CANCELLED: "Task cancelled successfully",
     FAILED_TO_FETCH_TASKS: "Failed to fetch tasks",
     GOOGLE_TOKEN_REQUIRED: "Google token is required",
 

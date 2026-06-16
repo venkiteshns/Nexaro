@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import AdminNavBar from '../../layouts/Admin/AdminNavBar';
 import AdminHeader from '../../layouts/Admin/AdminHeader';
+import { showError, showSuccess } from '../../utils/toast.js'
 import {
     Search,
     ClipboardList,
@@ -10,8 +12,9 @@ import {
     Eye,
     ChevronLeft,
     ChevronRight,
+    AlertTriangle,
 } from 'lucide-react';
-import { useAdminGetAllTasksQuery } from '../../store/services/api';
+import { useAdminGetAllTasksQuery, useAdminTaskDeleteMutation } from '../../store/services/api';
 
 function getStatusConfig(status) {
     switch (status) {
@@ -49,10 +52,76 @@ function StatsSec({ icon, count, label, color }) {
     );
 }
 
+function ConfirmModal({ taskTitle, onConfirm, onCancel, isLoading }) {
+    return createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                onClick={onCancel}
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl p-7 w-full max-w-sm mx-4 border border-gray-100 animate-[fadeIn_.15s_ease]">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mx-auto mb-4">
+                    <AlertTriangle size={22} className="text-red-500" />
+                </div>
+
+                <h2 className="text-center text-[#111827] font-bold text-base mb-1">
+                    Delete Task?
+                </h2>
+                <p className="text-center text-sm text-gray-500 mb-6">
+                    You are about to permanently delete{' '}
+                    <span className="font-semibold text-gray-700">&ldquo;{taskTitle}&rdquo;</span>.
+                    This action cannot be undone.
+                </p>
+
+                <div className="flex gap-3">
+                    <button
+                        onClick={onCancel}
+                        disabled={isLoading}
+                        className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isLoading}
+                        className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                    >
+                        {isLoading ? (
+                            <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Trash2 size={14} />
+                        )}
+                        {isLoading ? 'Deleting...' : 'Yes, Delete'}
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+}
+
 function TaskRow({ task }) {
     const config = getStatusConfig(task.status);
-
     const posterName = task.posterId?.name || 'Unknown';
+
+    const [deleteTask, { isLoading: isDeleting }] = useAdminTaskDeleteMutation();
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const handleDeleteConfirm = async () => {
+        try {
+            const res = await deleteTask(task._id).unwrap();
+            if (res.success) {
+                showSuccess(res.message);
+            } else {
+                showError(res.message);
+            }
+        } catch (err) {
+            showError(err?.data?.message || 'Failed to delete task');
+        } finally {
+            setShowConfirm(false);
+        }
+    };
 
     return (
         <tr className="border-b border-gray-50 hover:bg-[#F6FAF8] transition-colors">
@@ -89,11 +158,24 @@ function TaskRow({ task }) {
             </td>
 
             <td className="px-6 py-5">
+                {showConfirm && (
+                    <ConfirmModal
+                        taskTitle={task.title}
+                        onConfirm={handleDeleteConfirm}
+                        onCancel={() => setShowConfirm(false)}
+                        isLoading={isDeleting}
+                    />
+                )}
                 <div className="flex items-center gap-2">
-                    <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center gap-1">
-                        <Trash2 size={12} />
-                        Delete Task
-                    </button>
+                    {task.status !== 'cancelled' && (
+                        <button
+                            onClick={() => setShowConfirm(true)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center gap-1"
+                        >
+                            <Trash2 size={12} />
+                            Delete Task
+                        </button>
+                    )}
                     <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-[#0A6E5C] hover:bg-emerald-100 transition-colors flex items-center gap-1">
                         <Eye size={12} />
                         View Task
@@ -115,7 +197,7 @@ const AdminTaskManagement = () => {
         limit: 4,
     });
     console.log(data);
-    
+
     const tasks = data?.tasks || [];
     const totalPages = data?.totalPages || 1;
     const totalTasks = data?.totalTasks || 0;
@@ -132,7 +214,7 @@ const AdminTaskManagement = () => {
 
     const filteredTasks = tasks.filter((task) => {
         // console.log(task);
-        
+
         const posterName = task.posterId?.name || '';
 
         const matchesSearch =

@@ -1,9 +1,11 @@
+import STATUS_CODES from "../constants/statusCodes.js";
+
 const errorHandler = (err, req, res, _next) => {
     console.error(`[ERROR] ${req.method} ${req.originalUrl} →`, err.message || err);
 
     if (err.name === 'ValidationError') {
         const messages = Object.values(err.errors).map((e) => e.message);
-        return res.status(400).json({
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
             success: false,
             message: 'Validation failed',
             errors: messages,
@@ -19,34 +21,34 @@ const errorHandler = (err, req, res, _next) => {
     }
 
     if (err.name === 'CastError') {
-        return res.status(400).json({
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
             success: false,
             message: `Invalid value for field: ${err.path}`,
         });
     }
 
     if (err.name === 'JsonWebTokenError') {
-        return res.status(401).json({
+        return res.status(STATUS_CODES.UNAUTHORIZED).json({
             success: false,
             message: 'Invalid token. Please log in again.',
         });
     }
 
     if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({
+        return res.status(STATUS_CODES.UNAUTHORIZED).json({
             success: false,
             message: 'Token expired. Please log in again.',
         });
     }
 
     if (err.name === 'MulterError') {
-        return res.status(400).json({
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
             success: false,
             message: `File upload error: ${err.message}`,
         });
     }
 
-    const statusCode = err.statusCode || err.status || 500;
+    const statusCode = err.statusCode || err.status || STATUS_CODES.INTERNAL_SERVER_ERROR;
     return res.status(statusCode).json({
         success: false,
         message: err.message || 'Internal Server Error',
