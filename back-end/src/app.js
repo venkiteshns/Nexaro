@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import router from "./routes/index.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 dotenv.config();
 
@@ -19,5 +20,6 @@ app.get('/check', (req, res) => {
     res.status(200).json({ success: true, message: "Check Call Successfull" })
 })
 
+app.use(errorHandler);
 
 export default app;

@@ -103,7 +103,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithReauth,
-    tagTypes: ["Users", "Tasks", "Worker_Tasks", "Worker_Bids"],
+    tagTypes: ["Users", "Tasks", "Worker_Tasks", "Worker_Bids", "Active_Job"],
 
     endpoints: (builder) => ({
         sendOtp: builder.mutation({
@@ -392,7 +392,24 @@ export const api = createApi({
                 method: "GET",
             }),
             providesTags: ["Poster_Task_Progress"]
-        })
+        }),
+
+        getWorkerActiveJob: builder.query({
+            query: (taskId) => ({
+                url: `/worker/task/${taskId}/active-job`,
+                method: "GET",
+            }),
+            providesTags: ["Active_Job"],
+        }),
+
+        updateJobProgress: builder.mutation({
+            query: ({ taskId, update }) => ({
+                url: `/worker/task/${taskId}/progress`,
+                method: "PATCH",
+                body: { update },
+            }),
+            invalidatesTags: ["Active_Job"],
+        }),
     }),
 });
 
@@ -426,5 +443,7 @@ export const {
     useGetPosterBidsQuery,
     useAcceptBidMutation,
     useCancelTaskByPosterMutation,
-    useGetPosterTaskProgressQuery
+    useGetPosterTaskProgressQuery,
+    useGetWorkerActiveJobQuery,
+    useUpdateJobProgressMutation,
 } = api;

@@ -1,7 +1,7 @@
 import { workerSignupService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService } from "../../services/taskServices.js";
+import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -190,3 +190,42 @@ export const withdrawBid = async (req, res) => {
     }
 
 }
+
+export const getWorkerActiveJob = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const { taskId } = req.params;
+        const result = await getWorkerActiveJobService(taskId, workerId);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.error });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Active job fetched successfully",
+            data: result,
+        });
+    } catch (error) {
+        console.error("getWorkerActiveJob controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const updateJobProgress = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const { taskId } = req.params;
+        const { update } = req.body;
+        const result = await updateJobProgressService(taskId, workerId, update);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.error });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: result.message,
+            update: result.update,
+        });
+    } catch (error) {
+        console.error("updateJobProgress controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};

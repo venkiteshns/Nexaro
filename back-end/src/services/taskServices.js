@@ -499,3 +499,90 @@ export const cancelTaskByPosterService = async (taskId) => {
         return { error: "Something went wrong while cancelling task." };
     }
 }
+
+export const getWorkerActiveJobService = async (taskId, workerId) => {
+    try {
+        const result = await Task.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(taskId),
+                    workerId: new mongoose.Types.ObjectId(workerId),
+                }
+            },
+            // Join poster (user)
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'posterId',
+                    foreignField: '_id',
+                    as: 'poster'
+                }
+            },
+            { $unwind: { path: '$poster', preserveNullAndEmptyArrays: true } },
+            // Join accepted bid
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: 'acceptedBid',
+                    foreignField: '_id',
+                    as: 'bid'
+                }
+            },
+            { $unwind: { path: '$bid', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    category: 1,
+                    description: 1,
+                    address: 1,
+                    location: 1,
+                    update: 1,
+                    status: 1,
+                    amount: 1,
+                    createdAt: 1,
+                    'poster.name': 1,
+                    'poster.phone': 1,
+                    'poster.selfie': { $ifNull: ['$poster.verificationDocuments.selfie.url', null] },
+                    'bid.amount': 1,
+                    'bid.eta': 1,
+                }
+            }
+        ]);
+
+        if (!result[0]) return { error: "Active job not found" };
+
+        return result[0];
+    } catch (error) {
+        console.error("getWorkerActiveJobService error:", error.message);
+        return { error: error.message };
+    }
+};
+
+export const updateJobProgressService = async (taskId, workerId, update) => {
+    const VALID = ['not_started', 'arrived', 'discussed', 'started', 'completed', 'payment'];
+    if (!VALID.includes(update)) return { error: "Invalid progress step" };
+
+    try {
+        const task = await Task.findOneAndUpdate(
+            { _id: taskId, workerId },
+            { $set: { update } },
+            { returnDocument: 'after' }
+        );
+        if (update === "arrived") {
+            const updatedTask = await Task.findById(taskId)
+            updatedTask.status = "in_progress"
+            await updatedTask.save()
+        }
+        if (update === "completed") {
+            const updatedTask = await Task.findById(taskId)
+            updatedTask.status = "completed"
+            await updatedTask.save()
+        }
+        if (!task) return { error: "Task not found or unauthorized" };
+        return { message: "Progress updated successfully", update: task.update };
+    } catch (error) {
+        console.error("updateJobProgressService error:", error.message);
+        return { error: error.message };
+    }
+};

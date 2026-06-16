@@ -248,15 +248,14 @@ const WorkProgress = () => {
 
                         {/* ── Progress Stepper ── */}
                         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4 sm:px-8 py-5 overflow-x-auto">
-                            <div className="flex items-center min-w-[480px]">
+                            <div className="flex items-center min-w-[380px]">
                                 {STEPS.map((step, idx) => {
                                     const Icon = step.icon;
                                     return (
                                         <React.Fragment key={step.key}>
-                                            {/* node */}
                                             <div className="flex flex-col items-center gap-2 flex-shrink-0">
                                                 <div
-                                                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all
+                                                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all
                                                         ${step.done
                                                             ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white'
                                                             : step.active
@@ -264,20 +263,19 @@ const WorkProgress = () => {
                                                                 : 'bg-gray-100 border-gray-300 text-gray-400'
                                                         }`}
                                                 >
-                                                    <Icon size={18} />
+                                                    <Icon size={16} />
                                                 </div>
                                                 <span
-                                                    className={`text-[9px] font-bold tracking-wider text-center whitespace-nowrap
+                                                    className={`text-[8px] sm:text-[9px] font-bold tracking-wider text-center whitespace-nowrap
                                                         ${step.done || step.active ? 'text-[#0A6E5C]' : 'text-gray-400'}`}
                                                 >
                                                     {step.label}
                                                 </span>
                                             </div>
 
-                                            {/* connector */}
                                             {idx < STEPS.length - 1 && (
                                                 <div
-                                                    className={`flex-1 h-0.5 mx-2 rounded-full
+                                                    className={`flex-1 h-0.5 mx-1.5 sm:mx-2 rounded-full
                                                         ${STEPS[idx + 1].done || STEPS[idx + 1].active || step.done
                                                             ? 'bg-[#0A6E5C]'
                                                             : 'bg-gray-200'
@@ -290,41 +288,47 @@ const WorkProgress = () => {
                             </div>
                         </div>
 
-                        {/* ── Mid row: Worker card + Checklist + Timeline ── */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-                            {/* Worker card */}
-                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex flex-col items-center text-center gap-3">
-                                {/* Avatar */}
-                                <div className="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden">
-                                    {workerData?.selfie ? (
-                                        <img src={workerData?.selfie} alt={workerData?.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span className="text-3xl font-extrabold text-[#0A6E5C]">
-                                            {workerData?.name?.charAt(0)}
-                                        </span>
-                                    )}
-                                </div>
+                            {/* Worker card — row on mobile, column on md+ */}
+                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5
+                                            sm:col-span-2 lg:col-span-1">
+                                <div className="flex items-center gap-4 sm:flex-col sm:items-center sm:text-center lg:flex-col lg:items-center lg:text-center">
+                                    {/* Avatar */}
+                                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 border-2 border-emerald-100
+                                                    flex items-center justify-center overflow-hidden shrink-0">
+                                        {workerData?.selfie ? (
+                                            <img src={workerData?.selfie} alt={workerData?.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-2xl sm:text-3xl font-extrabold text-[#0A6E5C]">
+                                                {workerData?.name?.charAt(0)}
+                                            </span>
+                                        )}
+                                    </div>
 
-                                <div>
-                                    <p className="font-bold text-gray-900 text-base">{workerData?.name}</p>
-                                    <div className="flex items-center justify-center gap-1 mt-1">
-                                        <Star size={12} fill="#FBBF24" color="#FBBF24" />
-                                        <span className="text-sm font-bold text-gray-700">{workerData?.rating}</span>
-                                        <span className="text-xs text-gray-400">({workerData?.completedJobs} jobs)</span>
+                                    <div className="flex-1 sm:flex-none">
+                                        <p className="font-bold text-gray-900 text-base">{workerData?.name}</p>
+                                        <div className="flex items-center gap-1 mt-1 sm:justify-center">
+                                            <Star size={12} fill="#FBBF24" color="#FBBF24" />
+                                            <span className="text-sm font-bold text-gray-700">{workerData?.rating}</span>
+                                            <span className="text-xs text-gray-400">({workerData?.completedJobs} jobs)</span>
+                                        </div>
+
+                                        <div className="mt-2 sm:hidden">
+                                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Agreed Bid</p>
+                                            <p className="text-xl font-extrabold text-gray-900">₹{bid?.amount}</p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="w-full">
-                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                                        Agreed Bid
-                                    </p>
+                                <div className="hidden sm:block w-full mt-3 text-center">
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Agreed Bid</p>
                                     <p className="text-2xl font-extrabold text-gray-900">₹{bid?.amount}</p>
                                 </div>
-                                <p>{workerData?.phone}</p>
+
                                 <a
                                     href={`tel:${workerData?.phone}`}
-                                    className="w-full mt-1 flex items-center justify-center gap-2 px-4 py-2.5
+                                    className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5
                                                border border-gray-200 rounded-xl text-sm font-semibold text-gray-700
                                                hover:border-[#0A6E5C] hover:text-[#0A6E5C] hover:bg-emerald-50 transition-all"
                                 >
@@ -340,7 +344,6 @@ const WorkProgress = () => {
                                     <span className="text-xs font-bold text-[#0A6E5C]">{pct}% Done</span>
                                 </div>
 
-                                {/* Progress bar */}
                                 <div className="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
                                     <div
                                         className="h-full bg-[#0A6E5C] rounded-full transition-all duration-500"
@@ -397,15 +400,15 @@ const WorkProgress = () => {
                                 <div>
                                     <p className="font-bold text-[#0A6E5C]">Payment Released!</p>
                                     <p className="text-sm text-emerald-700 mt-0.5">
-                                        ₹{task.amount}.00 has been transferred to {worker.name}.
+                                        ₹{bid?.amount}.00 has been transferred to {workerData?.name}.
                                     </p>
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-6 py-5
+                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 sm:px-6 py-5
                                             flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div>
-                                    <h2 className="text-lg font-extrabold text-gray-900 mb-1">
+                                    <h2 className="text-base sm:text-lg font-extrabold text-gray-900 mb-1">
                                         Complete Payment &amp; Release Escrow
                                     </h2>
                                     <p className="text-sm text-gray-500 leading-relaxed max-w-md">
@@ -414,19 +417,19 @@ const WorkProgress = () => {
                                     </p>
                                 </div>
 
-                                <div className="flex flex-col items-end gap-2 shrink-0">
-                                    <div className="text-right">
+                                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start w-full sm:w-auto gap-3 sm:gap-2 shrink-0">
+                                    <div className="sm:text-right">
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                                             Amount Held
                                         </p>
-                                        <p className="text-2xl font-extrabold text-gray-900">₹{bid?.amount}.00</p>
+                                        <p className="text-xl sm:text-2xl font-extrabold text-gray-900">₹{bid?.amount}.00</p>
                                     </div>
 
                                     <button
                                         onClick={() => setShowReleaseModal(true)}
-                                        className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#0A6E5C] text-white
+                                        className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-[#0A6E5C] text-white
                                                    text-sm font-bold hover:bg-[#085e4e] active:scale-[0.98]
-                                                   transition-all duration-150 shadow-md"
+                                                   transition-all duration-150 shadow-md whitespace-nowrap"
                                     >
                                         Release Payment
                                         <ChevronRight size={16} />
