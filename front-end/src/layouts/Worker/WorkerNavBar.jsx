@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   X,
+  Wrench,
 } from "lucide-react";
 import Logo from "../../components/Logo/Logo";
 import logo from "../../assets/Nex_Logo.png";
@@ -55,7 +56,7 @@ const WorkerNavBar = () => {
     },
     {
       label: "Active Job",
-      icon: <Briefcase size={20} />,
+      icon: <Wrench size={20} />,
       redirect: "/worker/active-job",
     },
     {
@@ -121,7 +122,15 @@ const WorkerNavBar = () => {
 
         <div className="p-3 space-y-1 mt-1">
           {workerNav.map((item, index) => {
-            const isActive = location.pathname === item.redirect;
+            const routeGroups = {
+              '/worker/my-bids': ['/worker/my-bids', '/worker/task-bid-details'],
+              '/worker/nearby-tasks': ['/worker/nearby-tasks', '/worker/place-bid'],
+              '/worker/active-job': ['/worker/active-job'],
+            };
+            const group = routeGroups[item.redirect];
+            const isActive =
+              location.pathname === item.redirect ||
+              (group ? group.some((prefix) => location.pathname.startsWith(prefix)) : false);
             return (
               <button
                 key={index}
