@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import  { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   MapPin,
@@ -17,10 +17,7 @@ import {
   Truck,
   BookOpen,
   Hammer,
-  CheckCircle,
-  XCircle,
   IndianRupee,
-  Navigation,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";

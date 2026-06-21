@@ -53,6 +53,7 @@ const Password = (props) => {
             })}
             type={showPassword ? "text" : "password"}
             placeholder="••••••••••••"
+            autoComplete={login ? "current-password" : "new-password"}
             className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
           />
 
@@ -98,6 +99,7 @@ const Password = (props) => {
               })}
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm password"
+              autoComplete="new-password"
               className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
             />
             <span

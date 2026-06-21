@@ -1,9 +1,7 @@
-import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logOut } from '../../store/Slices/UserSlice';
 import { useUserLogoutMutation } from '../../store/services/api';
-import { LogOut } from 'lucide-react';
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 
@@ -14,15 +12,15 @@ const WorkerDashboard = () => {
 
   const [userLogout] = useUserLogoutMutation();
 
-  const handleLogout = async () => {
-    try {
-      await userLogout().unwrap();
-    } catch {
-    } finally {
-      dispatch(logOut());
-      navigate('/user/login');
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await userLogout().unwrap();
+  //   } catch {
+  //   } finally {
+  //     dispatch(logOut());
+  //     navigate('/user/login');
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">

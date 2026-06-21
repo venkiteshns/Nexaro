@@ -1,4 +1,4 @@
-import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService } from "../../services/posterServices.js";
+import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService, updateUserProfileService } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -110,4 +110,14 @@ export const getPosterTaskProgress = async (req, res) => {
             message: MESSAGES.INTERNAL_SERVER_ERROR,
         });
     }
+}
+
+export const updateUserProfile = async (req, res) => {
+    let response = await updateUserProfileService({userId:req.user.id, role:req.params.role, body:req.body});
+    if(response.error){
+        return res.status(STATUS_CODES.BAD_REQUEST).json({success: false, message: response.error});
+    }
+    return res.status(STATUS_CODES.CREATED).json({
+        success: true, message: response.message
+    })
 }
