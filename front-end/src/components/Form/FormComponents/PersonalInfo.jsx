@@ -23,6 +23,7 @@ const PersonalInfo = (props) => {
             required: "Please enter your name",
           })}
           type="text"
+          autoComplete="name"
           placeholder="Enter your name"
           className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
         />
@@ -49,6 +50,7 @@ const PersonalInfo = (props) => {
               },
             })}
             type="email"
+            autoComplete="email"
             placeholder="Enter your email"
             className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
           />
@@ -74,6 +76,7 @@ const PersonalInfo = (props) => {
               },
             })}
             type="tel"
+            autoComplete="tel"
             placeholder="Enter your phone number"
             className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
           />

@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import ErrorBoundary from "./components/routes/ErrorBoundary.jsx";
 import PublicRoute from "./components/routes/PublicRoute.jsx";
 import PrivateRoute from "./components/routes/PrivateRoute.jsx";
+import useSocketNotification from "./customHooks/useSocketNotification.js";
 
 import Landing from "./pages/Landing/Landing.jsx";
 import Map from "./components/Maps/Map.jsx";
@@ -28,6 +29,8 @@ import UserVerificationPanel from './pages/admin/UserVerificationPanel.jsx'
 import AdminTaskManagement from './pages/admin/AdminTaskManagement.jsx'
 
 function App() {
+  useSocketNotification();
+
   return (
     <ErrorBoundary>
       <Router>
