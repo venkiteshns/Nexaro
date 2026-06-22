@@ -1,4 +1,4 @@
-import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService, updateUserProfileService } from "../../services/posterServices.js";
+import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService, updateUserProfileService, getCompletedTaskPosterSideService } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -113,11 +113,32 @@ export const getPosterTaskProgress = async (req, res) => {
 }
 
 export const updateUserProfile = async (req, res) => {
-    let response = await updateUserProfileService({userId:req.user.id, role:req.params.role, body:req.body});
-    if(response.error){
-        return res.status(STATUS_CODES.BAD_REQUEST).json({success: false, message: response.error});
+    let response = await updateUserProfileService({ userId: req.user.id, role: req.params.role, body: req.body });
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error });
     }
     return res.status(STATUS_CODES.CREATED).json({
         success: true, message: response.message
     })
+}
+
+export const getCompletedTaskPosterSide = async (req, res) => {
+    // console.log("task id : ", req.params.taskId);
+    // console.log("user id", req.user._id);
+    const response = await getCompletedTaskPosterSideService(req.params.taskId, req.user._id);
+    // console.log('resssssssssssssss', response);
+
+
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: response.error,
+        });
+    }
+    return res.status(STATUS_CODES.OK).json({
+        success: true,
+        message: "Task completed details fetched successfully",
+        data: response,
+    });
+
 }

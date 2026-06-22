@@ -1,4 +1,4 @@
-import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService, getAllTasksService, cancelTaskByAdminService } from "../../services/adminServices.js";
+import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService, getAllTasksService, cancelTaskByAdminService, getAdminTaskDetailsService } from "../../services/adminServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -140,9 +140,15 @@ export const getAllTasks = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 4;
-        console.log(req.query.limit);
+        const search = req.query.search?.trim() || '';
+        const status = req.query.status || 'all';
+        const category = req.query.category || 'all';
 
-        const response = await getAllTasksService(page, limit);
+        if (page < 1 || limit < 1) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.INVALID_PAGE_OR_LIMIT });
+        }
+
+        const response = await getAllTasksService(page, limit, search, status, category);
 
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({
@@ -151,6 +157,8 @@ export const getAllTasks = async (req, res) => {
                 currentPage: response.currentPage,
                 totalPages: response.totalPages,
                 totalTasks: response.totalTasks,
+                statusCounts: response.statusCounts,
+                categories: response.categories,
             });
         } else {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.FAILED_TO_FETCH_TASKS });
@@ -176,6 +184,26 @@ export const cancelTaskByAdmin = async (req, res) => {
         }
     } catch (error) {
         console.error("Cancel task by admin error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminTaskDetails = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        if (!taskId) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: 'Task ID required' });
+        }
+
+        const response = await getAdminTaskDetailsService(taskId);
+
+        if (response.error) {
+            return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: response.error });
+        }
+
+        return res.status(STATUS_CODES.OK).json({ success: true, task: response.task });
+    } catch (error) {
+        console.error('Get admin task details error:', error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };

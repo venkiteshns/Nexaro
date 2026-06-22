@@ -193,10 +193,10 @@ export const acceptBidService = async (bidId) => {
         const rejectedWorkers = await Bid.find({ _id: { $ne: bidId }, taskId }).select("workerId");
 
 
-
+        const platformFee = acceptedBid.amount * 5 / 100;
         const updatedTask = await Task.findOneAndUpdate(
             { _id: taskId },
-            { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId } },
+            { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId, platformFee: platformFee } },
             { returnDocument: 'after' }
         );
 
@@ -310,5 +310,85 @@ export const updateUserProfileService = async ({ userId, role, body }) => {
 
     } catch (error) {
         return ({ error: error.message })
+    }
+}
+
+export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
+    try {
+        const task = await Task.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(taskId),
+                    status: 'completed',
+                    posterId: new mongoose.Types.ObjectId(posterId)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'workerId',
+                    foreignField: '_id',
+                    as: 'worker'
+                }
+            },
+            {
+                $unwind: { path: "$worker", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: 'acceptedBid',
+                    foreignField: '_id',
+                    as: 'bid'
+                }
+            },
+            {
+                $unwind: { path: "$bid", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    localField: '_id',
+                    foreignField: 'taskId',
+                    as: 'review'
+                }
+            },
+            {
+                $unwind: { path: "$review", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    workerId: 1,
+                    status: 1,
+                    category: 1,
+                    createdAt: 1,
+                    address: 1,
+                    amount: 1,
+                    platformFee: 1,
+                    completedOn: 1,
+                    'worker.name': 1,
+                    'worker.rating': '$worker.worker.rating',
+                    'worker.phone': 1,
+                    'worker.selfie': '$worker.verificationDocuments.selfie.url',
+                    'worker.isVerified': 1,
+                    'bid.amount': 1,
+                    'bid.eta': 1,
+                    'review': 1,
+                }
+            }
+        ])
+        if (!task) {
+            return ({ error: "Task not found" });
+        }
+
+        const result = task[0];
+
+        // console.log("task", result);
+
+        return task;
+    } catch (error) {
+        return ({ error: error })
     }
 }

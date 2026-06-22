@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import AdminNavBar from '../../layouts/Admin/AdminNavBar';
 import AdminHeader from '../../layouts/Admin/AdminHeader';
@@ -15,6 +15,8 @@ import {
     AlertTriangle,
 } from 'lucide-react';
 import { useAdminGetAllTasksQuery, useAdminTaskDeleteMutation } from '../../store/services/api';
+import useDebounce from '../../customHooks/useDebounce';
+import { useNavigate } from 'react-router-dom';
 
 function getStatusConfig(status) {
     switch (status) {
@@ -101,9 +103,88 @@ function ConfirmModal({ taskTitle, onConfirm, onCancel, isLoading }) {
     );
 }
 
+function MobileTaskCard({ task }) {
+    const config = getStatusConfig(task.status);
+    const posterName = task.posterId?.name || 'Unknown';
+    const navigate = useNavigate();
+
+    const [deleteTask, { isLoading: isDeleting }] = useAdminTaskDeleteMutation();
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const handleDeleteConfirm = async () => {
+        try {
+            const res = await deleteTask(task._id).unwrap();
+            if (res.success) showSuccess(res.message);
+            else showError(res.message);
+        } catch (err) {
+            showError(err?.data?.message || 'Failed to delete task');
+        } finally {
+            setShowConfirm(false);
+        }
+    };
+
+    return (
+        <div className="p-4 hover:bg-[#F6FAF8] transition-colors">
+            {showConfirm && (
+                <ConfirmModal
+                    taskTitle={task.title}
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={() => setShowConfirm(false)}
+                    isLoading={isDeleting}
+                />
+            )}
+
+            {/* Title row */}
+            <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-start gap-2.5 min-w-0">
+                    <div className={`w-1 self-stretch rounded-full shrink-0 ${config.dot}`} />
+                    <div className="min-w-0">
+                        <p className="font-semibold text-[#111827] text-sm leading-snug truncate">{task.title}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{task.category}</p>
+                    </div>
+                </div>
+                <span className="text-sm font-bold text-gray-900 shrink-0">
+                    ₹{Number(task.amount || 0).toLocaleString('en-IN')}
+                </span>
+            </div>
+
+            {/* Poster + Status row */}
+            <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs shrink-0">
+                        {posterName.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-xs text-gray-600">{posterName}</span>
+                </div>
+                <StatusBadge status={task.status} />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2">
+                {task.status !== 'cancelled' && (
+                    <button
+                        onClick={() => setShowConfirm(true)}
+                        className="flex-1 py-2 rounded-xl text-xs font-semibold bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
+                    >
+                        <Trash2 size={12} />
+                        Delete Task
+                    </button>
+                )}
+                <button
+                    onClick={() => navigate(`/admin/tasks/${task._id}`)}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-[#0A6E5C] hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1">
+                    <Eye size={12} />
+                    View Task
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function TaskRow({ task }) {
     const config = getStatusConfig(task.status);
     const posterName = task.posterId?.name || 'Unknown';
+    const navigate = useNavigate();
 
     const [deleteTask, { isLoading: isDeleting }] = useAdminTaskDeleteMutation();
     const [showConfirm, setShowConfirm] = useState(false);
@@ -176,7 +257,9 @@ function TaskRow({ task }) {
                             Delete Task
                         </button>
                     )}
-                    <button className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-[#0A6E5C] hover:bg-emerald-100 transition-colors flex items-center gap-1">
+                    <button
+                        onClick={() => navigate(`/admin/tasks/${task._id}`)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-[#0A6E5C] hover:bg-emerald-100 transition-colors flex items-center gap-1">
                         <Eye size={12} />
                         View Task
                     </button>
@@ -192,41 +275,34 @@ const AdminTaskManagement = () => {
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [currentPage, setCurrentPage] = useState(1);
 
+    const debouncedSearch = useDebounce({ searchText, delay: 400 });
+
+    // ── Reset to page 1 whenever any filter changes ───────────────────────────
+    useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter, categoryFilter]);
+
     const { data, isLoading, isError } = useAdminGetAllTasksQuery({
         page: currentPage,
         limit: 4,
+        search: debouncedSearch,
+        status: statusFilter === 'all' ? undefined : statusFilter,
+        category: categoryFilter === 'all' ? undefined : categoryFilter,
     });
+
     console.log(data);
 
     const tasks = data?.tasks || [];
     const totalPages = data?.totalPages || 1;
     const totalTasks = data?.totalTasks || 0;
+    const categories = data?.categories || [];
 
+    // ── Platform-wide status counts from backend ──────────────────────────────
     const counts = {
-        open: tasks.filter((t) => t.status === 'open').length,
-        assigned: tasks.filter((t) => t.status === 'assigned').length,
-        in_progress: tasks.filter((t) => t.status === 'in_progress').length,
-        completed: tasks.filter((t) => t.status === 'completed').length,
-        cancelled: tasks.filter((t) => t.status === 'cancelled').length,
+        open: data?.statusCounts?.open ?? 0,
+        assigned: data?.statusCounts?.assigned ?? 0,
+        in_progress: data?.statusCounts?.in_progress ?? 0,
+        completed: data?.statusCounts?.completed ?? 0,
+        cancelled: data?.statusCounts?.cancelled ?? 0,
     };
-
-    const categories = ['all', ...new Set(tasks.map((t) => t.category).filter(Boolean))];
-
-    const filteredTasks = tasks.filter((task) => {
-        // console.log(task);
-
-        const posterName = task.posterId?.name || '';
-
-        const matchesSearch =
-            searchText === '' ||
-            task.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-            posterName.toLowerCase().includes(searchText.toLowerCase());
-
-        const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-        const matchesCategory = categoryFilter === 'all' || task.category === categoryFilter;
-
-        return matchesSearch && matchesStatus && matchesCategory;
-    });
 
     const handlePrevPage = () => {
         if (currentPage > 1) setCurrentPage((p) => p - 1);
@@ -329,19 +405,38 @@ const AdminTaskManagement = () => {
                                     onChange={(e) => setCategoryFilter(e.target.value)}
                                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none cursor-pointer"
                                 >
-                                    {categories.map((cat) => (
-                                        <option key={cat} value={cat}>
-                                            {cat === 'all' ? 'All Categories' : cat}
-                                        </option>
-                                    ))}
+                                    <option value="all">All Categories</option>
+                                    {
+                                        categories.map((category) => (
+                                            <option key={category} value={category}>
+                                                {category}
+                                            </option>
+                                        ))
+                                    }
                                 </select>
                             </div>
                         </div>
                     </div>
 
                     <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[700px]">
+
+                        <div className="lg:hidden divide-y divide-gray-50">
+                            {isLoading && (
+                                <p className="px-5 py-12 text-center text-gray-400 text-sm">Loading tasks...</p>
+                            )}
+                            {isError && (
+                                <p className="px-5 py-12 text-center text-red-400 text-sm">Failed to load tasks. Please try again.</p>
+                            )}
+                            {!isLoading && !isError && tasks.length === 0 && (
+                                <p className="px-5 py-12 text-center text-gray-400 text-sm">No tasks found.</p>
+                            )}
+                            {!isLoading && !isError && tasks.map((task) => (
+                                <MobileTaskCard key={task._id} task={task} />
+                            ))}
+                        </div>
+
+                        <div className="hidden lg:block overflow-x-auto">
+                            <table className="w-full">
                                 <thead className="border-b border-gray-100">
                                     <tr className="text-left text-gray-500 text-sm">
                                         <th className="px-6 py-5 font-medium">Task Details</th>
@@ -369,7 +464,7 @@ const AdminTaskManagement = () => {
                                         </tr>
                                     )}
 
-                                    {!isLoading && !isError && filteredTasks.length === 0 && (
+                                    {!isLoading && !isError && tasks.length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm">
                                                 No tasks found.
@@ -377,18 +472,19 @@ const AdminTaskManagement = () => {
                                         </tr>
                                     )}
 
-                                    {!isLoading && !isError && filteredTasks.map((task) => (
+                                    {!isLoading && !isError && tasks.map((task) => (
                                         <TaskRow key={task._id} task={task} />
                                     ))}
                                 </tbody>
                             </table>
                         </div>
 
-                        <div className="px-6 py-5 flex items-center justify-between border-t border-gray-100">
-                            <p className="text-sm text-gray-500">
+                        {/* ── Pagination footer ── */}
+                        <div className="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
+                            <p className="text-sm text-gray-500 order-2 sm:order-1">
                                 Showing page {currentPage} of {totalPages} · {totalTasks} total tasks
                             </p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 order-1 sm:order-2">
                                 <button
                                     onClick={handlePrevPage}
                                     disabled={currentPage === 1}
