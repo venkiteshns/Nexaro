@@ -127,8 +127,8 @@ function BidCard({ bid, onAccept }) {
                     </p>
                 )}
 
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div>
+                <div className="flex flex-col sm:flex-row items-center justify-between pt-3 border-t border-gray-100">
+                    <div className='flex flex-col '>
                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Bid Amount</p>
                         <p className="text-2xl font-extrabold text-gray-900">
                             ₹{bid.amount}
@@ -409,16 +409,16 @@ const ReviewBids = () => {
 
                         {/* ── Compare Bids header + Sort ── */}
                         <div className="flex items-center justify-between mb-4">
-                            <h1 className="text-[18px] font-extrabold text-gray-900">Compare Bids</h1>
+                            <h1 className="text-sm md:text-base font-extrabold text-gray-900">Compare Bids</h1>
 
                             <div className="relative">
                                 <button
                                     onClick={() => setShowSort((v) => !v)}
                                     className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white
-                                               text-sm font-semibold text-gray-700 hover:border-[#0A6E5C]/40 transition-colors shadow-sm"
+                                               text-xs sm:text-sm font-semibold text-gray-700 hover:border-[#0A6E5C]/40 transition-colors shadow-sm"
                                 >
                                     Sort by:{' '}
-                                    <span className="text-[#0A6E5C] font-bold">{sort}</span>
+                                    <span className="text-[#0A6E5C] text-xs sm:text-sm font-bold">{sort}</span>
                                     <ChevronDown size={14} className={`transition - transform text - [#0A6E5C] ${showSort ? 'rotate-180' : ''} `} />
                                 </button>
 
@@ -443,7 +443,6 @@ const ReviewBids = () => {
                         </div>
 
 
-                        {/* ── Bid Cards Grid / State Screens ── */}
                         {isLoadingAcceptBid ? (
                             <LoadingState bid={acceptedBidDetails} />
                         ) : isErrorAcceptBid ? (
@@ -476,7 +475,6 @@ const ReviewBids = () => {
                 </div>
             </div>
 
-            {/* ── Accept Confirmation Modal ── */}
             {pendingAccept && (
                 <AcceptModal
                     bid={pendingAccept}

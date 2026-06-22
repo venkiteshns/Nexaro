@@ -1,68 +1,212 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AdminNavBar from "../../layouts/Admin/AdminNavBar";
 import AdminHeader from "../../layouts/Admin/AdminHeader";
 import {
-  Search,
-  CheckCircle2,
-  Clock3,
-  ShieldCheck,
-  UserX,
-  ChevronLeft,
-  ChevronRight,
+  Search, CheckCircle2, Clock3, ShieldCheck,
+  UserX, ChevronLeft, ChevronRight, X,
 } from "lucide-react";
-import { useAdminGetUsersQuery, useAdminSuspendUserMutation, useAdminUnsuspendUserMutation } from "../../store/services/api";
+import {
+  useAdminGetUsersQuery,
+  useAdminSuspendUserMutation,
+  useAdminUnsuspendUserMutation,
+} from "../../store/services/api";
 import { useNavigate } from "react-router-dom";
+
+const DEFAULT_AVATAR =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23e2f4f1'/%3E%3Ccircle cx='20' cy='16' r='7' fill='%230A6E5C' opacity='.6'/%3E%3Cellipse cx='20' cy='36' rx='12' ry='8' fill='%230A6E5C' opacity='.4'/%3E%3C/svg%3E";
+
+function MobileUserCard({ user, onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      className="w-full flex flex-col sm:flex-row items-center gap-3 px-4 py-4 border-b border-green-700 hover:bg-[#F6FAF8] transition-colors cursor-pointer active:bg-emerald-50"
+    >
+      <div className="relative shrink-0">
+        <img
+          src={user.verificationDocuments?.selfie?.url || DEFAULT_AVATAR}
+          alt={user.name}
+          className="w-11 h-11 rounded-full object-cover"
+        />
+        <span
+          className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${user.isSuspended ? "bg-red-400" : "bg-emerald-500"
+            }`}
+        />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-[#111827] text-sm truncate">{user.name}</p>
+        <p className="text-xs text-gray-400">{user.phone}</p>
+      </div>
+
+      <div className="flex justify-center gap-8 items-center">
+        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-[#0A6E5C] capitalize">
+          {user.activeRole}
+        </span>
+        <span
+          className={`text-xs font-semibold ${user.isVerified ? "text-emerald-600" : "text-yellow-500"
+            }`}
+        >
+
+
+          {user.isVerified ? <span className="flex items-center gap-2"><CheckCircle2 size={16} className="text-emerald-600" /> "Verified" </span>
+            : <span className="flex items-center gap-2"><Clock3 size={16} className="text-yellow-500" />"Pending"</span>}
+        </span>
+      </div>
+
+    </div>
+  );
+}
+
+function UserDetailPanel({ user, onClose, isMobile, navigate, onAction }) {
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 py-16">
+        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <UserX size={32} className="text-gray-300" />
+        </div>
+        <p className="text-sm">Click on a user to see their details</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {isMobile && (
+        <button
+          onClick={onClose}
+          className="absolute top-0 right-0 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+        >
+          <X size={16} className="text-gray-500" />
+        </button>
+      )}
+
+      {/* Avatar + name */}
+      <div className="flex flex-col items-center text-center">
+        <div className="relative">
+          <img
+            src={user.verificationDocuments?.selfie?.url || DEFAULT_AVATAR}
+            alt={user.name}
+            className="w-24 h-24 rounded-full object-cover border-4 border-emerald-100"
+          />
+          <div
+            className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-4 border-white ${user.isSuspended ? "bg-red-400" : "bg-emerald-500"
+              }`}
+          />
+        </div>
+        <h3 className="text-2xl font-bold text-[#111827] mt-4">{user.name}</h3>
+        <p className="text-[#0A6E5C] font-medium mt-1 capitalize">{user.activeRole}</p>
+        <p className="text-sm text-gray-500 mt-2">{user.email}</p>
+        <p className="text-gray-400 text-xs mt-0.5">
+          {user.city}, {user.state}
+        </p>
+      </div>
+
+      {/* Skills */}
+      {user.skills?.length > 0 && (
+        <div className="mt-6">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+            Skills
+          </h4>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {user.skills.map((skill, i) => (
+              <span
+                key={i}
+                className="px-3 py-1 rounded-full bg-emerald-100 text-[#0A6E5C] text-xs font-medium"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Status card */}
+      <div className="mt-6 bg-[#F6FAF8] rounded-2xl p-4">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-[#111827] text-sm">Account Status</h4>
+          <span
+            className={`font-bold text-sm ${user.isSuspended ? "text-red-500" : "text-emerald-600"
+              }`}
+          >
+            {user.isSuspended ? "Suspended" : "Active"}
+          </span>
+        </div>
+        <p className="text-sm text-gray-500 mt-1">
+          Verification: {user.isVerified ? "Verified ✓" : "Pending"}
+        </p>
+      </div>
+
+      {/* Actions */}
+      <div className="space-y-3 mt-6">
+        {!user.isVerified && (
+          <button
+            onClick={() =>
+              navigate("/admin/users/verification", {
+                state: { userName: user.name },
+              })
+            }
+            className="w-full py-3 rounded-2xl bg-[#0A6E5C] text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2 text-sm"
+          >
+            <ShieldCheck size={16} />
+            Verify Manually
+          </button>
+        )}
+        <button
+          onClick={() => onAction(user._id, user.isSuspended)}
+          className="w-full py-3 rounded-2xl bg-red-50 text-red-500 font-semibold hover:bg-red-100 transition-all flex items-center justify-center gap-2 text-sm"
+        >
+          <UserX size={16} />
+          {user.isSuspended ? "Unsuspend Account" : "Suspend User Account"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchName, setSearchName] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { data, isLoading, isError } = useAdminGetUsersQuery({
     page: currentPage,
     limit: 10,
   });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [suspendUser] = useAdminSuspendUserMutation();
+  const [unsuspendUser] = useAdminUnsuspendUserMutation();
 
   const users = data?.users || [];
   const totalPages = data?.totalPages || 1;
   const totalUsers = data?.totalUsers || 0;
 
-  const filteredUsers = users.filter((user) => {
-    const matchesRole = roleFilter === "all" || user.activeRole === roleFilter;
-    const matchesName = user.name.toLowerCase().includes(searchName.toLowerCase());
+  const filteredUsers = users.filter((u) => {
+    const matchesRole = roleFilter === "all" || u.activeRole === roleFilter;
+    const matchesName = u.name.toLowerCase().includes(searchName.toLowerCase());
     return matchesRole && matchesName;
   });
 
-  let selectedUser = users.find((u) => u._id == selectedUserId)
-
-  const [suspendUser] = useAdminSuspendUserMutation();
-  const [unsuspendUser] = useAdminUnsuspendUserMutation();
-
-  useEffect(() => {
-    if (data) {
-      console.log(data);
-    }
-  }, [data]);
+  const selectedUser = users.find((u) => u._id === selectedUserId) || null;
 
   const handleSuspensionStatus = (id, isSuspended) => {
     try {
-      if (isSuspended) {
-        unsuspendUser(id)
-      }else{
-        suspendUser(id)
-      }
-    } catch (error) {}
+      isSuspended ? unsuspendUser(id) : suspendUser(id);
+    } catch { }
+  };
+
+  const handleSelectUser = (id) => {
+    setSelectedUserId(id);
+    setDrawerOpen(true);
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
-
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
   };
 
   return (
@@ -72,292 +216,180 @@ const UserManagement = () => {
       <div className="flex-1 overflow-y-auto">
         <AdminHeader />
 
-        <div className="p-6 grid grid-cols-1 gap-3">
-          <div className="grid grid-cols-2 items-center gap-2">
-            <h2 className="col-span-2 md:col-span-1 font-semibold text-xl ms-3">
-              User Management
-            </h2>
-            <button onClick={() => {navigate('/admin/users/verification')}} className="col-span-2 md:col-span-1 lg:ms-auto xl:w-[50%] px-6 py-2 rounded-2xl bg-[#0A6E5C] text-sm md:text-md text-white font-semibold hover:opacity-90 transition-all">
+        <div className="p-4 sm:p-6 flex flex-col gap-4">
+
+          {/* Header row */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <h2 className="font-bold text-xl text-[#111827] flex-1">User Management</h2>
+            <button
+              onClick={() => navigate("/admin/users/verification")}
+              className="sm:w-auto px-5 py-2.5 rounded-2xl bg-[#0A6E5C] text-sm text-white font-semibold hover:opacity-90 transition-all"
+            >
               View Verification Panel
             </button>
           </div>
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-3">
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="py-3 px-5 bg-white border border-gray-200 rounded-2xl text-sm text-gray-600 outline-none cursor-pointer min-w-[160px]"
+              className="py-2.5 px-4 bg-white border border-gray-200 rounded-2xl text-sm text-gray-600 outline-none cursor-pointer"
             >
               <option value="all">All Roles</option>
               <option value="worker">Worker</option>
               <option value="poster">Poster</option>
             </select>
 
-            <div className="flex-1 bg-white border border-gray-200 rounded-2xl px-4 py-2 flex items-center gap-3">
-              <Search size={20} className="text-gray-400" />
+            <div className="flex-1 bg-white border border-gray-200 rounded-2xl px-4 py-2.5 flex items-center gap-3">
+              <Search size={16} className="text-gray-400 shrink-0" />
               <input
                 type="text"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 placeholder="Search by name"
-                className="w-full bg-transparent outline-none text-gray-700"
+                className="w-full bg-transparent outline-none text-sm text-gray-700"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="order-1 xl:order-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-              {selectedUser ? (
-                <>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="relative">
-                      <img
-                        src={
-                          selectedUser.verificationDocuments?.selfie?.url ||
-                          "data:image/png;base64,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"
-                        }
-                        alt={selectedUser.name}
-                        className="w-28 h-28 rounded-full object-cover border-4 border-emerald-100"
-                      />
+          {/* Main grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
-                      <div
-                        className={`absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-white ${
-                          selectedUser.isSuspended
-                            ? "bg-red-400"
-                            : "bg-emerald-500"
-                        }`}
-                      />
-                    </div>
-
-                    <h3 className="text-3xl font-bold text-[#111827] mt-5">
-                      {selectedUser.name}
-                    </h3>
-
-                    <p className="text-[#0A6E5C] font-medium mt-2 capitalize">
-                      {selectedUser.activeRole}
-                    </p>
-
-                    <div className="flex items-center gap-3 text-gray-500 text-sm mt-4">
-                      <span>{selectedUser.email}</span>
-                    </div>
-
-                    <div className="text-gray-400 text-xs mt-1">
-                      {selectedUser.city}, {selectedUser.state}
-                    </div>
-                  </div>
-
-                  {selectedUser.skills && selectedUser.skills.length > 0 && (
-                    <div className="mt-8">
-                      <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Skills
-                      </h4>
-
-                      <div className="flex flex-wrap gap-3 mt-4">
-                        {selectedUser.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-4 py-2 rounded-full bg-emerald-100 text-[#0A6E5C] text-sm font-medium"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="mt-8 bg-[#F6FAF8] rounded-2xl p-5">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-[#111827]">
-                        Account Status
-                      </h4>
-                      <span
-                        className={`font-bold text-sm ${
-                          selectedUser.isSuspended
-                            ? "text-red-500"
-                            : "text-emerald-600"
-                        }`}
-                      >
-                        {selectedUser.isSuspended ? "Suspended" : "Active"}
-                      </span>
-                    </div>
-
-                    <p className="text-sm text-gray-500 mt-2">
-                      Verification:{" "}
-                      {selectedUser.isVerified ? "Verified ✓" : "Pending"}
-                    </p>
-                  </div>
-
-                  {/* btns */}
-                  <div className="space-y-4 mt-8">
-                    {!selectedUser.isVerified && <button
-                      onClick={() => navigate('/admin/users/verification', { state: { userName: selectedUser.name } })}
-                      className="w-full py-3 rounded-2xl bg-[#0A6E5C] text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                    >
-                      <ShieldCheck size={18} />
-                      Verify Manually
-                    </button>}
-
-                    <button
-                      onClick={() => {
-                        handleSuspensionStatus(
-                          selectedUser._id,
-                          selectedUser.isSuspended,
-                        );
-                      }}
-                      className="w-full py-3 rounded-2xl bg-red-50 text-red-500 font-semibold hover:bg-red-100 transition-all flex items-center justify-center gap-2"
-                    >
-                      <UserX size={18} />
-                      {selectedUser.isSuspended
-                        ? "Unsuspend Account"
-                        : "Suspend User Account"}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                // when no user is clicked
-                <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 py-16">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                    <UserX size={32} className="text-gray-300" />
-                  </div>
-                  <p className="text-sm">
-                    Click on a user to see their details
-                  </p>
-                </div>
-              )}
+            {/* Sidebar: user detail (xl+) */}
+            <div className="hidden xl:block xl:order-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+              <UserDetailPanel
+                user={selectedUser}
+                isMobile={false}
+                navigate={navigate}
+                onAction={handleSuspensionStatus}
+              />
             </div>
 
-            <div className="order-2 xl:order-1 xl:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px]">
+            <div className="xl:order-1 xl:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+
+              <div className="lg:hidden divide-y divide-gray-50">
+                {isLoading && (
+                  <p className="px-5 py-12 text-center text-gray-400 text-sm">Loading users...</p>
+                )}
+                {isError && (
+                  <p className="px-5 py-12 text-center text-red-400 text-sm">
+                    Failed to load users. Please try again.
+                  </p>
+                )}
+                {!isLoading && !isError && filteredUsers.length === 0 && (
+                  <p className="px-5 py-12 text-center text-gray-400 text-sm">No users found.</p>
+                )}
+                {!isLoading && !isError &&
+                  filteredUsers.map((user) => (
+                    <MobileUserCard
+                      key={user._id}
+                      user={user}
+                      onClick={() => handleSelectUser(user._id)}
+                    />
+                  ))}
+              </div>
+
+              {/* Desktop table (lg+) */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="w-full">
                   <thead className="border-b border-gray-100">
                     <tr className="text-left text-gray-500 text-sm">
-                      <th className="px-6 py-5">Name</th>
-                      <th className="px-6 py-5">Role</th>
-                      <th className="px-6 py-5">Verification</th>
-                      <th className="px-6 py-5">Status</th>
+                      <th className="px-6 py-5 font-medium">Name</th>
+                      <th className="px-6 py-5 font-medium">Role</th>
+                      <th className="px-6 py-5 font-medium">Verification</th>
+                      <th className="px-6 py-5 font-medium">Status</th>
                     </tr>
                   </thead>
-
                   <tbody>
                     {isLoading && (
                       <tr>
-                        <td
-                          colSpan={4}
-                          className="px-6 py-10 text-center text-gray-400"
-                        >
+                        <td colSpan={4} className="px-6 py-10 text-center text-gray-400">
                           Loading users...
                         </td>
                       </tr>
                     )}
-
                     {isError && (
                       <tr>
-                        <td
-                          colSpan={4}
-                          className="px-6 py-10 text-center text-red-400"
-                        >
+                        <td colSpan={4} className="px-6 py-10 text-center text-red-400">
                           Failed to load users. Please try again.
                         </td>
                       </tr>
                     )}
-
-                    {!isLoading &&
-                      !isError &&
+                    {!isLoading && !isError && filteredUsers.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-10 text-center text-gray-400">
+                          No users found.
+                        </td>
+                      </tr>
+                    )}
+                    {!isLoading && !isError &&
                       filteredUsers.map((user) => (
                         <tr
                           key={user._id}
-                          onClick={() => setSelectedUserId(user._id)}
-                          className="border-b border-gray-50 hover:bg-[#F6FAF8] transition-all cursor-pointer"
+                          onClick={() => handleSelectUser(user._id)}
+                          className={`border-b border-gray-50 hover:bg-[#F6FAF8] transition-all cursor-pointer ${selectedUserId === user._id ? "bg-emerald-50/50" : ""
+                            }`}
                         >
-                          <td className="px-6 py-6">
-                            <div className="flex items-center gap-4">
-                              <img
-                                src={
-                                  user.verificationDocuments?.selfie?.url ||
-                                  `data:image/png;base64,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`
-                                }
-                                alt={user.name}
-                                className="w-12 h-12 rounded-full object-cover"
-                              />
-
+                          <td className="px-6 py-5">
+                            <div className="flex items-center gap-3">
+                              <div className="relative shrink-0">
+                                <img
+                                  src={user.verificationDocuments?.selfie?.url || DEFAULT_AVATAR}
+                                  alt={user.name}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <span
+                                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${user.isSuspended ? "bg-red-400" : "bg-emerald-500"
+                                    }`}
+                                />
+                              </div>
                               <div>
-                                <h4 className="font-semibold text-[#111827]">
-                                  {user.name}
-                                </h4>
-
-                                <p className="text-sm text-gray-500">
-                                  {user.phone}
-                                </p>
+                                <p className="font-semibold text-[#111827] text-sm">{user.name}</p>
+                                <p className="text-xs text-gray-400">{user.phone}</p>
                               </div>
                             </div>
                           </td>
-
-                          <td className="px-6 py-6">
+                          <td className="px-6 py-5">
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-[#0A6E5C] capitalize">
                               {user.activeRole}
                             </span>
                           </td>
-
-                          <td className="px-6 py-6">
-                            <div className="flex items-center gap-2">
+                          <td className="px-6 py-5">
+                            <div className="flex items-center gap-1.5">
                               {user.isVerified ? (
                                 <>
-                                  <CheckCircle2
-                                    size={18}
-                                    className="text-emerald-600"
-                                  />
-                                  <span className="font-medium text-sm text-emerald-600">
-                                    Verified
-                                  </span>
+                                  <CheckCircle2 size={16} className="text-emerald-600" />
+                                  <span className="text-sm font-medium text-emerald-600">Verified</span>
                                 </>
                               ) : (
                                 <>
-                                  <Clock3
-                                    size={18}
-                                    className="text-yellow-500"
-                                  />
-                                  <span className="font-medium text-sm text-yellow-600">
-                                    Pending
-                                  </span>
+                                  <Clock3 size={16} className="text-yellow-500" />
+                                  <span className="text-sm font-medium text-yellow-600">Pending</span>
                                 </>
                               )}
                             </div>
                           </td>
-
-                          <td className="px-6 py-6">
+                          <td className="px-6 py-5">
                             <span
-                              className={`font-medium ${
-                                user.isSuspended
-                                  ? "text-red-500"
-                                  : "text-emerald-600"
-                              }`}
+                              className={`font-medium text-sm ${user.isSuspended ? "text-red-500" : "text-emerald-600"
+                                }`}
                             >
                               {user.isSuspended ? "Suspended" : "Active"}
                             </span>
                           </td>
                         </tr>
                       ))}
-
-                    {!isLoading && !isError && users.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="px-6 py-10 text-center text-gray-400"
-                        >
-                          No users found.
-                        </td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>
 
-              <div className="px-6 py-5 flex items-center justify-between">
-                <p className="text-sm text-gray-500">
-                  Showing page {currentPage} of {totalPages} &nbsp;·&nbsp;{" "}
-                  {totalUsers} total users
+              {/* Pagination */}
+              <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
+                <p className="text-sm text-gray-500 order-2 sm:order-1">
+                  Showing page {currentPage} of {totalPages} · {totalUsers} total users
                 </p>
-
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 order-1 sm:order-2">
                   <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
@@ -365,11 +397,7 @@ const UserManagement = () => {
                   >
                     <ChevronLeft size={18} />
                   </button>
-
-                  <span className="text-sm font-medium text-gray-700 px-2">
-                    {currentPage}
-                  </span>
-
+                  <span className="text-sm font-medium text-gray-700 px-2">{currentPage}</span>
                   <button
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
@@ -383,6 +411,30 @@ const UserManagement = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Mobile centered modal (< xl) ── */}
+      {drawerOpen && (
+        <div className="xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setDrawerOpen(false)}
+          />
+          {/* Modal */}
+          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-6">
+            {/* Drag/close indicator */}
+            <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-5" />
+            <UserDetailPanel
+              user={selectedUser}
+              onClose={() => setDrawerOpen(false)}
+              isMobile={true}
+              navigate={navigate}
+              onAction={handleSuspensionStatus}
+            />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

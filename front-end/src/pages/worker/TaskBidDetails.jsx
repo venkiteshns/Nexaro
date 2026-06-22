@@ -1,4 +1,4 @@
-import  { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   MapPin,
@@ -453,7 +453,7 @@ const TaskBidDetails = () => {
   const { bidId } = useParams();
 
   const [isWithdrawSuccess, setIsWithdrawSuccess] = useState(false);
-  console.log("withdraw", isWithdrawSuccess);
+  // console.log("withdraw", isWithdrawSuccess);
 
   // if (isWithdrawSuccess) return <BidWithdrawnSuccess navigate={navigate} />
 
@@ -520,7 +520,7 @@ const TaskBidDetails = () => {
                 <div className="flex-1 min-w-0 space-y-4">
 
                   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                    <div className="flex items-start justify-between mb-3 gap-3">
+                    <div className="flex flex-col md:flex-row items-start justify-between mb-3 gap-3">
                       <div className="flex items-center gap-2 flex-wrap">
                         {task?.category && (
                           <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#0A6E5C] text-xs font-bold border border-emerald-200">

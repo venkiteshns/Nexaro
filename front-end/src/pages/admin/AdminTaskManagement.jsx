@@ -47,7 +47,7 @@ function StatusBadge({ status }) {
 
 function StatsSec({ icon, count, label, color }) {
     return (
-        <div className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold ${color}`}>
+        <div className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-full border text-xs md:text-sm font-semibold ${color}`}>
             {icon}
             <span>{count} {label}</span>
         </div>
@@ -277,7 +277,6 @@ const AdminTaskManagement = () => {
 
     const debouncedSearch = useDebounce({ searchText, delay: 400 });
 
-    // ── Reset to page 1 whenever any filter changes ───────────────────────────
     useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter, categoryFilter]);
 
     const { data, isLoading, isError } = useAdminGetAllTasksQuery({
@@ -288,14 +287,13 @@ const AdminTaskManagement = () => {
         category: categoryFilter === 'all' ? undefined : categoryFilter,
     });
 
-    console.log(data);
+    // console.log(data);
 
     const tasks = data?.tasks || [];
     const totalPages = data?.totalPages || 1;
     const totalTasks = data?.totalTasks || 0;
     const categories = data?.categories || [];
 
-    // ── Platform-wide status counts from backend ──────────────────────────────
     const counts = {
         open: data?.statusCounts?.open ?? 0,
         assigned: data?.statusCounts?.assigned ?? 0,
