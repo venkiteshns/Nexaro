@@ -1,9 +1,13 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { showInfo } from '../utils/toast';
+import { showInfo, showWarning } from '../utils/toast';
 import { connectSocket, disconnectSocket, getSocket } from '../services/socketService';
+import { useDispatch } from 'react-redux';
+import { api } from '../store/services/api';
 
 const useSocketNotification = () => {
+    const dispatch = useDispatch();
+
     const { user, accessToken } = useSelector((state) => state.auth);
     const { admin, accessToken: adminToken } = useSelector((state) => state.adminAuth);
 
@@ -25,7 +29,14 @@ const useSocketNotification = () => {
         });
 
         socket.on('new-task-nearby', (data) => {
-            showInfo(`New task nearby: ${data.taskTitle}`, { autoClose: 6000 });
+            console.log(data.urgencyLevel);
+
+            if (data.urgencyLevel === 'urgent') {
+                showWarning(`NEW URGENT task nearby: ${data.taskTitle} at ${data.city} for ${data.amount} rupees`, { autoClose: 6000 });
+            } else {
+                showInfo(`New task nearby: ${data.taskTitle} at ${data.city} for ${data.amount} rupees`, { autoClose: 6000 });
+            }
+            dispatch(api.util.invalidateTags(['Worker_Tasks']));
         });
 
         return () => {
