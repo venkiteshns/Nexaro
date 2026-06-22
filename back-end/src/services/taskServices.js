@@ -3,6 +3,10 @@ import cloudinary from "../config/cloudinary.js";
 import Bid from "../models/bidsSchema.js";
 import mongoose from "mongoose";
 import user from "../models/userSchema.js";
+import { getIo } from "../socket.js";
+import ngeohash from 'ngeohash';
+
+
 
 const uploadImagesToCloudinary = async (files) => {
     const uploadPromises = files.map((file) =>
@@ -55,6 +59,30 @@ export const createTaskService = async (body, files, posterId) => {
         }
 
         const createdTask = await Task.create(taskData);
+
+        // notify nearby workers
+
+        const [task_lng, task_lat] = taskData.location.coordinates;
+
+        const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
+        console.log(taskGeoHash, "taskGeoHash");
+
+        const neighbors = ngeohash.neighbors(taskGeoHash);
+        console.log(neighbors, "neighbours");
+
+        const zonesToNotiffy = [taskGeoHash, ...neighbors];
+
+        const io = getIo();
+        zonesToNotiffy.forEach((zone) => {
+            io.to(`zone:${zone}`).emit('new-task-nearby', {
+                taskTitle: createdTask.title,
+                taskId: createdTask._id,
+                amount: createdTask.amount,
+                category: createdTask.category,
+                urgencyLevel: createdTask.urgencyLevel,
+                city: createdTask.address.city,
+            })
+        })
 
         return { task: createdTask };
 
@@ -311,6 +339,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
                                 "myBid.status": 1,
                             }
                         },
+                        { $sort: { createdAt: 1 } },
                         { $skip: skip },
                         { $limit: Number(limit) },
                     ]
