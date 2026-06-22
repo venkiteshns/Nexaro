@@ -198,7 +198,7 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
 };
 
 export const handleNewBid = async (task, user) => {
-    console.log(task, user);
+    // console.log(task, user);
 
     try {
         let { taskId, bidAmount, estimatedTime, pitch } = task;
@@ -210,6 +210,8 @@ export const handleNewBid = async (task, user) => {
             taskId,
             workerId: user._id
         })
+        const posterId = isTask[0].posterId;
+        console.log("posterId", posterId);
         console.log("already bid", isAlreadyBid);
 
         if (isAlreadyBid) {
@@ -225,9 +227,16 @@ export const handleNewBid = async (task, user) => {
             status: "pending"
         }
         // console.log(payload, "bid payload");
+        // user:${userId}
+        const io = getIo()
+
+        io.to(`user:${posterId}`).emit('new-bid-added', {
+            taskTitle: isTask[0].title,
+            bidAmount,
+        })
 
         let newBid = await Bid.create(payload)
-        console.log("new bid created ", newBid);
+        // console.log("new bid created ", newBid);
         return "bid created successfully"
     } catch (error) {
         console.log(error);

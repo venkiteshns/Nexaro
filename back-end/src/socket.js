@@ -26,6 +26,12 @@ const initSocket = (socketIo) => {
             // 2. Decode token → get _id and activeRole
             const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
+            if (decoded) {
+                const userId = decoded._id
+                socket.join(`user:${userId}`);
+                console.log(`User ${userId} joined room`);
+            }
+
 
             // 3. Only workers join a zone room — posters/admins stay as individual connections
             if (decoded.activeRole !== 'worker') {
