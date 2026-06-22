@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { showInfo, showWarning } from '../utils/toast';
+import { showError, showInfo, showSuccess, showWarning } from '../utils/toast';
 import { connectSocket, disconnectSocket, getSocket } from '../services/socketService';
 import { useDispatch } from 'react-redux';
 import { api } from '../store/services/api';
@@ -48,12 +48,25 @@ const useSocketNotification = () => {
 
         });
 
-        // io.to(`user:${posterId}`).emit('new-bid-added', {
-        //     taskId,
-        //     taksTitle: isTask[0].title,
-        //     bidAmount,
-        //     status: "pending"
-        // })
+        socket.on("bid-accepted", (data) => {
+            showInfo(`Your bid has been accepted for task : ${data.taskTitle} for amount : ${data.bidAmount} rupees`)
+            dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job']));
+        })
+
+        socket.on("bid-rejected", (data) => {
+            showError(`Your bid has been rejected for task : ${data.taskTitle} for amount : ${data.bidAmount} rupees`)
+            dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job']));
+        })
+
+        socket.on("task-update", (data) => {
+            if (data.update === "completed") {
+                showSuccess(`Task : ${data.taskTitle} has been completed`)
+            }
+            else {
+                showInfo(`Task : ${data.taskTitle} has been updated with progress ${data.update}`)
+            }
+            dispatch(api.util.invalidateTags(["Poster_Task_Progress"]));
+        })
 
         return () => {
             disconnectSocket();

@@ -618,6 +618,13 @@ export const updateJobProgressService = async (taskId, workerId, update) => {
             await updatedTask.save()
         }
         if (!task) return { error: "Task not found or unauthorized" };
+
+        const io = getIo()
+        io.to(`user:${task.posterId}`).emit("task-update", {
+            taskTitle: task.title,
+            update: task.update,
+        })
+
         return { message: "Progress updated successfully", update: task.update };
     } catch (error) {
         console.error("updateJobProgressService error:", error.message);

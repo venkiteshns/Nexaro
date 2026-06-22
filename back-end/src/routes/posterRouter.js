@@ -12,11 +12,13 @@ router.post(
     upload.array("photos", 5),
     createTask
 );
+
 router.get(
     "/tasks",
     verifyToken,
     getMyTasks
 );
+
 router.get('/task/bids/:taskId', verifyToken, getPosterBids);
 router.get('/task/:taskId/progress', verifyToken, getPosterTaskProgress)
 

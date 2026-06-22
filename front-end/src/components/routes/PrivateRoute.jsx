@@ -8,7 +8,7 @@ function PrivateRoute({ allowedRoles }) {
       return <Navigate to="/admin/login" replace />;
     }
   } else {
-    const { accessToken, user } = useSelector((state) => state.auth);
+    const { accessToken, user } = useSelector((state) => state?.auth);
 
     if (!(accessToken && user)) {
       return <Navigate to="/user/login" replace />;

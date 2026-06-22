@@ -386,6 +386,7 @@ export const api = createApi({
             }),
             invalidatesTags: ["Poster_Bids", "Worker_Bids", "Worker_Bid_Details", "Poster_Tasks"]
         }),
+
         getPosterTaskProgress: builder.query({
             query: (taskId) => ({
                 url: `/poster/task/${taskId}/progress`,
