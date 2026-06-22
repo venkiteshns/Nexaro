@@ -1,4 +1,3 @@
-import React from "react";
 import PersonalInfo from "./FormComponents/PersonalInfo";
 import Password from "./FormComponents/Password";
 import { useFormContext } from "react-hook-form";

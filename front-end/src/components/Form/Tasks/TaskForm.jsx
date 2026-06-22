@@ -1,4 +1,3 @@
-import React from 'react'
 import TaskDetails from '../FormComponents/TaskDetails';
 import TaskPhotos from './TaskPhotos';
 import TaskLocation from './TaskLocation';
@@ -17,7 +16,7 @@ const TaskForm = () => {
     });
     const navigate = useNavigate();
 
-    const [createTask, { isLoading, isError, isSuccess }] = useCreateTaskMutation();
+    const [createTask, { isLoading }] = useCreateTaskMutation();
 
     const onSubmitForm = async (data) => {
         console.log("Form data:", data);

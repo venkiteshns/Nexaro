@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import PosterNavBar from "../../layouts/Poster/PosterNavBar";
 import PosterHeader from "../../layouts/Poster/PosterHeader";
 import TaskForm from "../../components/Form/Tasks/TaskForm";

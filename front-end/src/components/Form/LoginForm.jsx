@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PersonalInfo from "./FormComponents/PersonalInfo";
 import { useFormContext } from "react-hook-form";
 import Password from "./FormComponents/Password";
 import {
-  useUpdatePasswordMutation,
   useUserLoginMutation,
   useGoogleLoginMutation,
 } from "../../store/services/api";
@@ -24,28 +23,18 @@ const LoginForm = () => {
   const [forgotPassword, setForgotPassword] = useState(false);
   const [googleError, setGoogleError] = useState("");
 
-  const [userLogin, { isLoading, isError, isSuccess, error, data, reset: loginReset }] =
+  const [userLogin, { isLoading, isError, error, reset: loginReset }] =
     useUserLoginMutation();
 
   const [googleLogin, { isLoading: isGoogleLoading }] = useGoogleLoginMutation();
 
-  const [
-    updatePassword,
-    {
-      isError: updateError,
-      isSuccess: updateSuccess,
-      isLoading: updateLoading,
-      error: updateErrorData,
-      data: updateData,
-    },
-  ] = useUpdatePasswordMutation();
 
   useEffect(() => {
     if (forgotPassword) {
       reset();
       loginReset();
     }
-  }, [forgotPassword])
+  }, [forgotPassword, reset, loginReset])
 
   const handleLogin = async (data) => {
     try {

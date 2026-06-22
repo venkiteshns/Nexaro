@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetPosterTaskProgressQuery } from '../../store/services/api';
 import {
@@ -14,7 +14,6 @@ import {
     Flag,
     ChevronRight,
     ShieldCheck,
-    Loader2,
     AlertTriangle,
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
@@ -153,17 +152,16 @@ const WorkProgress = () => {
     const navigate = useNavigate();
     const { taskId } = useParams();
 
-    const { task, worker, checklist } = MOCK;
+    const { checklist: rawChecklist } = MOCK;
+    const done = completedCount(rawChecklist);
+    const total = rawChecklist.length;
+    const pct = Math.round((done / total) * 100);
 
     const [showReleaseModal, setShowReleaseModal] = useState(false);
     const [released, setReleased] = useState(false);
 
-    const done = completedCount(checklist);
-    const total = checklist.length;
-    const pct = Math.round((done / total) * 100);
 
-    const { data, isLoading, isError, isSuccess } = useGetPosterTaskProgressQuery(taskId);
-    console.log("data", data);
+    const { data, isLoading, isError } = useGetPosterTaskProgressQuery(taskId);
 
     const mainData = data?.data;
     const { bid, worker: workerData } = mainData ?? {};
@@ -186,20 +184,18 @@ const WorkProgress = () => {
         'cancelled': 5,
     }[mainData?.status];
 
-    console.log("updateCount", statusUpdate ? statusUpdate : 89, mainData?.status);
-    if (statusUpdate) {
+    // ── Derive display steps from backend data (never mutate module-level STEPS)
+    const steps = STEPS.map((step, i) => ({
+        ...step,
+        done: statusUpdate ? i < statusUpdate : false,
+        active: statusUpdate ? i === statusUpdate : false,
+    }));
 
-        for (let c = 0; c < statusUpdate; c++) {
-            STEPS[c].done = true;
-            STEPS[c].active = false;
-        }
-        STEPS[statusUpdate].active = true;
-    }
-
-
-    for (let c = 1; c <= updateCount; c++) {
-        checklist[c - 1].done = true;
-    }
+    // ── Derive checklist from backend update count
+    const displayChecklist = MOCK.checklist.map((item, i) => ({
+        ...item,
+        done: updateCount ? i < updateCount : false,
+    }));
 
     const handleRelease = () => {
         setShowReleaseModal(false);
@@ -249,10 +245,10 @@ const WorkProgress = () => {
                         {/* ── Progress Stepper ── */}
                         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4 sm:px-8 py-5 overflow-x-auto">
                             <div className="flex items-center min-w-[380px]">
-                                {STEPS.map((step, idx) => {
+                                {steps.map((step, idx) => {
                                     const Icon = step.icon;
                                     return (
-                                        <React.Fragment key={step.key}>
+                                        <Fragment key={step.key}>
                                             <div className="flex flex-col items-center gap-2 flex-shrink-0">
                                                 <div
                                                     className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all
@@ -273,16 +269,16 @@ const WorkProgress = () => {
                                                 </span>
                                             </div>
 
-                                            {idx < STEPS.length - 1 && (
+                                            {idx < steps.length - 1 && (
                                                 <div
                                                     className={`flex-1 h-0.5 mx-1.5 sm:mx-2 rounded-full
-                                                        ${STEPS[idx + 1].done || STEPS[idx + 1].active || step.done
+                                                        ${steps[idx + 1].done || steps[idx + 1].active || step.done
                                                             ? 'bg-[#0A6E5C]'
                                                             : 'bg-gray-200'
                                                         }`}
                                                 />
                                             )}
-                                        </React.Fragment>
+                                        </Fragment>
                                     );
                                 })}
                             </div>
@@ -352,7 +348,7 @@ const WorkProgress = () => {
                                 </div>
 
                                 <ul className="space-y-2.5">
-                                    {checklist.map((item) => (
+                                    {displayChecklist.map((item) => (
                                         <li key={item.id} className="flex items-center gap-2.5">
                                             {item.done ? (
                                                 <CheckCircle size={16} className="text-[#0A6E5C] shrink-0" />

@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 
 function InvoiceRow({ label, value, bold = false, highlight = false }) {

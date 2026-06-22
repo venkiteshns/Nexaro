@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -131,8 +131,6 @@ const ActiveJob = () => {
     const update = mainData?.update ?? 'not_started';
     const done = doneCount(update);
     const pct = Math.round((done / 5) * 100);
-
-    const nextStep = UPDATE_ORDER[done + 1]; // next step to mark
 
     const handleStepUpdate = async (step) => {
         try {

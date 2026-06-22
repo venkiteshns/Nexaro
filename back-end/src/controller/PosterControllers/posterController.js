@@ -33,10 +33,8 @@ export const posterSignup = async (req, res) => {
 };
 
 export const getPosterBids = async (req, res) => {
-    console.log("query : ", req.query.sort);
-
     try {
-        let response = await getPosterBidsService(req.params.taskId, req.query.sort);
+        const response = await getPosterBidsService(req.params.taskId, req.query.sort);
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -91,7 +89,7 @@ export const acceptBid = async (req, res) => {
 
 export const getPosterTaskProgress = async (req, res) => {
     try {
-        let response = await getPosterTaskProgressService(req.params.taskId);
+        const response = await getPosterTaskProgressService(req.params.taskId);
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -113,7 +111,7 @@ export const getPosterTaskProgress = async (req, res) => {
 }
 
 export const updateUserProfile = async (req, res) => {
-    let response = await updateUserProfileService({ userId: req.user.id, role: req.params.role, body: req.body });
+    const response = await updateUserProfileService({ userId: req.user.id, role: req.params.role, body: req.body });
     if (response.error) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error });
     }

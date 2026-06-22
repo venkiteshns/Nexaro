@@ -2,7 +2,6 @@ import { getTasksService } from "../../services/posterServices.js";
 import { createTaskService, handleNewBid, cancelTaskByPosterService } from "../../services/taskServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { response } from "express";
 
 export const createTask = async (req, res) => {
     try {
@@ -62,7 +61,7 @@ export const getMyTasks = async (req, res) => {
 
 export const addNewBid = async (req, res) => {
     try {
-        let response = await handleNewBid(req.body, req.user)
+        const response = await handleNewBid(req.body, req.user)
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -84,7 +83,7 @@ export const addNewBid = async (req, res) => {
 
 export const cancelTaskByPoster = async (req, res) => {
     try {
-        let response = await cancelTaskByPosterService(req.params.taskId);
+        const response = await cancelTaskByPosterService(req.params.taskId);
         console.log("controller side response", response);
 
         if (response.error) {

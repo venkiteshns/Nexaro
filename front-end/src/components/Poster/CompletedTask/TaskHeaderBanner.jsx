@@ -1,5 +1,4 @@
-import React from 'react';
-import { ArrowLeft, CheckCircle, History } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const TaskHeaderBanner = ({ title }) => {

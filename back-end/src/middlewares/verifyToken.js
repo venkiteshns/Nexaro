@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import STATUS_CODES from "../constants/statusCodes.js";
 import MESSAGES from "../constants/messages.js";
 
-const verifyToken = async (req, res, next) => {
+const verifyToken = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 

@@ -1,5 +1,4 @@
 import { Camera, Image, Upload, X } from 'lucide-react'
-import React from 'react'
 import { useFormContext } from 'react-hook-form';
 import FormError from '../FormComponents/FormError';
 

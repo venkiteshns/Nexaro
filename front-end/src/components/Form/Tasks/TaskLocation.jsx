@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronDown, MapPin, Loader2, LocateFixed } from 'lucide-react';
 import { State, City } from "country-state-city";
 import { useFormContext } from 'react-hook-form';
@@ -6,6 +6,11 @@ import { KERALA_DISTRICTS, DISTRICT_AREAS } from "../../../utils/constants";
 import { placeToCoords } from "../../../services/placeToCoords";
 import { reverseCoords } from "../../../services/reverseCoords";
 import Map from '../../Maps/Map';
+
+const FieldError = ({ name, errors }) =>
+    errors[name] ? (
+        <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+    ) : null;
 
 const TaskLocation = () => {
     const { register, watch, setValue, clearErrors, getValues, formState: { errors } } = useFormContext();
@@ -25,13 +30,17 @@ const TaskLocation = () => {
     const indiaStates = State.getStatesOfCountry("IN");
     const isKerala = selectedState === "KL" || selectedState === "Kerala";
 
-    const districts = isKerala
-        ? KERALA_DISTRICTS
-        : (selectedState ? City.getCitiesOfState("IN", selectedState).map(c => c.name) : []);
+    const districts = useMemo(() => (
+        isKerala
+            ? KERALA_DISTRICTS
+            : (selectedState ? City.getCitiesOfState("IN", selectedState).map(c => c.name) : [])
+    ), [isKerala, selectedState]);
 
     useEffect(() => {
-        setFetchCords('idle');
-    }, [selectedState, selectedDistrict, city, area, locationLat, locationLng])
+        if (fetchCords !== 'idle') {
+            setFetchCords('idle');
+        }
+    }, [selectedState, selectedDistrict, city, area, locationLat, locationLng, fetchCords])
 
     const handleMapPositionChange = (pos) => {
         setMapPosition(pos);
@@ -59,7 +68,7 @@ const TaskLocation = () => {
 
                 if (place.area) setValue('area', place.area, { shouldValidate: true });
                 if (place.displayName) setValue('fullAddress', place.displayName, { shouldValidate: true });
-            } catch (e) {
+            } catch {
             }
         }, 600);
     };
@@ -73,8 +82,10 @@ const TaskLocation = () => {
         if (match) {
             setValue('district', match, { shouldValidate: true });
         }
-        setPendingDistrict(null);
-    }, [districts, pendingDistrict]);
+        if (pendingDistrict !== null) {
+            setPendingDistrict(null);
+        }
+    }, [districts, pendingDistrict, setValue]);
 
     const districtAreas = selectedDistrict && DISTRICT_AREAS[selectedDistrict]
         ? DISTRICT_AREAS[selectedDistrict]
@@ -82,9 +93,11 @@ const TaskLocation = () => {
 
     useEffect(() => {
         if (locationLat && locationLng) {
-            setMapPosition({ lat: locationLat, lng: locationLng });
+            if (mapPosition.lat !== locationLat || mapPosition.lng !== locationLng) {
+                setMapPosition({ lat: locationLat, lng: locationLng });
+            }
         }
-    }, [locationLat, locationLng]);
+    }, [locationLat, locationLng, mapPosition.lat, mapPosition.lng]);
 
     const handleLocationCoords = async () => {
         setFetchCords("fetching");
@@ -115,19 +128,14 @@ const TaskLocation = () => {
             //     setFetchCords("idle");
             // }, 1500);
             setFetchCords("success");
-        } catch (error) {
+        } catch {
             setFetchCords("fail");
             setTimeout(() => {
-                n
                 setFetchCords("idle");
             }, 1500);
         }
     };
 
-    const FieldError = ({ name }) =>
-        errors[name] ? (
-            <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
-        ) : null;
 
     return (
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
@@ -164,7 +172,7 @@ const TaskLocation = () => {
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                                 />
                             </div>
-                            <FieldError name="state" />
+                            <FieldError name="state" errors={errors} />
                         </div>
 
                         <div>
@@ -191,7 +199,7 @@ const TaskLocation = () => {
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                                 />
                             </div>
-                            <FieldError name="district" />
+                            <FieldError name="district" errors={errors} />
                         </div>
                     </div>
 
@@ -233,7 +241,7 @@ const TaskLocation = () => {
                                         }`}
                                 />
                             )}
-                            <FieldError name="city" />
+                            <FieldError name="city" errors={errors} />
                         </div>
 
                         <div>
@@ -248,7 +256,7 @@ const TaskLocation = () => {
                                     : 'border-gray-200 focus:border-[#0A6E5C]'
                                     }`}
                             />
-                            <FieldError name="area" />
+                            <FieldError name="area" errors={errors} />
                         </div>
                     </div>
 
@@ -264,7 +272,7 @@ const TaskLocation = () => {
                                 : 'border-gray-200 focus:border-[#0A6E5C]'
                                 }`}
                         />
-                        <FieldError name="houseNumber" />
+                        <FieldError name="houseNumber" errors={errors} />
                     </div>
 
                     {/* Full Address */}
@@ -280,7 +288,7 @@ const TaskLocation = () => {
                                 : 'border-gray-200 focus:border-[#0A6E5C]'
                                 }`}
                         />
-                        <FieldError name="fullAddress" />
+                        <FieldError name="fullAddress" errors={errors} />
                     </div>
 
                     {selectedState && selectedDistrict && city && area && (

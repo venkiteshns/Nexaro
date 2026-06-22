@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star, Phone, Mail, BadgeCheck, IndianRupee } from 'lucide-react';
 
 const WorkerAssignedCard = ({ worker, bid }) => {

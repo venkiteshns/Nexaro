@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -30,7 +30,7 @@ const PosterNavBar = () => {
   const handleLogout = async () => {
     try {
       await userLogout().unwrap();
-    } catch (error) {
+    } catch {
       // log out locally even if API fails
     } finally {
       dispatch(logOut());

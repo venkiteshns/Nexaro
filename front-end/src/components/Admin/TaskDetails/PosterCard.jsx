@@ -1,5 +1,4 @@
-import React from 'react';
-import { Mail, Phone, User } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
 const PosterCard = ({ poster }) => {
     if (!poster) return null;

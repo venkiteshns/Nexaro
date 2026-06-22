@@ -1,18 +1,17 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 
-function PublicRoute({ user }) {
-  if (user == "admin") {
-    const { accessToken, admin } = useSelector((state) => state.adminAuth);
+function PublicRoute({ user: roleProp }) {
+  const adminAuth = useSelector((state) => state.adminAuth);
+  const userAuth = useSelector((state) => state.auth);
 
-    if (accessToken && admin) {
+  if (roleProp === "admin") {
+    if (adminAuth.accessToken && adminAuth.admin) {
       return <Navigate to="/admin/dashboard" replace />;
     }
   } else {
-    const { accessToken, user } = useSelector((state) => state.auth);
-
-    if (accessToken && user) {
-      const role = user.role;
+    if (userAuth.accessToken && userAuth.user) {
+      const role = userAuth.user.role;
       if (role === "worker") return <Navigate to="/worker/dashboard" replace />;
       if (role === "poster") return <Navigate to="/poster/dashboard" replace />;
     }

@@ -127,7 +127,7 @@ export const getPosterBidsService = async (taskId, sort) => {
         sortCriteria = { "worker.rating": -1 }
     }
     try {
-        let bids = await Bid.aggregate([
+        const bids = await Bid.aggregate([
             { $match: { taskId: new mongoose.Types.ObjectId(taskId) } },
             {
                 $lookup: {
@@ -161,7 +161,7 @@ export const getPosterBidsService = async (taskId, sort) => {
         if (!bids || bids.length === 0) {
             return { error: "No bids found" };
         }
-        let task = await Task.findOne({ _id: taskId });
+        const task = await Task.findOne({ _id: taskId });
         return { bids, task }
 
     } catch (error) {
@@ -196,7 +196,7 @@ export const acceptBidService = async (bidId) => {
         const platformFee = acceptedBid.amount * 5 / 100;
         const updatedTask = await Task.findOneAndUpdate(
             { _id: taskId },
-            { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId, platformFee: platformFee } },
+            { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId, platformFee } },
             { returnDocument: 'after' }
         );
 
@@ -296,11 +296,11 @@ export const getPosterTaskProgressService = async (taskId) => {
 
 export const updateUserProfileService = async ({ userId, role, body }) => {
     try {
-        let user = User.find({ _id: mongoose.Types.ObjectId(userId), activeRole: role });
+        const user = User.find({ _id: mongoose.Types.ObjectId(userId), activeRole: role });
         if (!user) {
             return ({ error: "user not found" });
         }
-        let { email, address, phone, bio } = body;
+        const { email, address, phone, bio } = body;
         user.email = email,
             user.address = address;
         user.phone = phone,
@@ -383,12 +383,8 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
             return ({ error: "Task not found" });
         }
 
-        const result = task[0];
-
-        // console.log("task", result);
-
         return task;
     } catch (error) {
-        return ({ error: error })
+        return ({ error })
     }
 }

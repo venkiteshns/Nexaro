@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom';
 import FormError from '../FormComponents/FormError';
 import Dropdown from '../../Custom/Dropdown';
 import { Calendar, Clock, Lightbulb, Loader2 } from 'lucide-react';
@@ -15,21 +16,10 @@ const TIME_OPTIONS = [
     "5+ hours",
 ];
 
-const formatDate = (val) => {
-    // console.log(val);
 
-    if (!val) return "";
-    const d = new Date(val + "T00:00:00");
-    console.log(d);
+const BidForm = ({ task, bidLoading }) => {
 
-    return d.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
-};
-
-const BidForm = ({ task, bidLoading, bidError, bidSuccess }) => {
+    const navigate = useNavigate();
 
 
     const { register, formState: { errors }, watch, setValue } = useFormContext();

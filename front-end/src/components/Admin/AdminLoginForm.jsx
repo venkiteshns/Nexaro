@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Admin.css";
-import { Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 import Logo from "../Logo/Logo";
 import PersonalInfo from "../Form/FormComponents/PersonalInfo";
@@ -17,7 +17,6 @@ const AdminLoginForm = () => {
 
   const [adminLogin, { isLoading, isError, error, reset }] = useAdminLoginMutation();
 
-  const [showPassword, setShowPassword] = useState(false);
   const [isAdmin, setIsAdmin] = useState(true);
   const [forgotPassword, setForgotPassword] = useState(false);
   const [isPasswordUpdated, setIsPasswordUpdated] = useState(false);
@@ -39,7 +38,7 @@ const AdminLoginForm = () => {
         return;
       }
       console.log(res.success);
-      
+
       if (res.success) {
         dispatch(
           setAdminCredentials({

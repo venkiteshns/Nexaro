@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PosterSignUpBanner from "../../components/Poster/PosterSignUpBanner";
 import PosterSignupForm from "../../components/Form/PosterSignupForm";
 import Logo from "../../components/Logo/Logo";
@@ -17,7 +17,7 @@ const PosterSignup = () => {
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
   const [isVerified, setIsVerified] = useState(false);
-  
+
   const [sendOtp, { isLoading, isSuccess, isError, error, data }] =
     useSendOtpMutation();
 
@@ -38,7 +38,7 @@ const PosterSignup = () => {
   const resendOtp = async (email) => {
     console.log("resend", email, formData.phone, formData.email);
     try {
-      const response = await sendOtp({
+      await sendOtp({
         email: formData.email,
         phone: formData.phone,
       }).unwrap();
@@ -47,22 +47,16 @@ const PosterSignup = () => {
     }
   };
 
-  useEffect(() => {
-    sendDataToBackend();
-  }, [isVerified]);
-
   const handleFormData = async (data) => {
     console.log("signup page", data);
     try {
-      let res = setEmail(data.email);
+      setEmail(data.email);
       setFormData(data);
-      const response = await sendOtp({
+      await sendOtp({
         email: data.email,
         phone: data.phone,
       }).unwrap();
       setShowOtp(true);
-      console.log("response poster : ", response);
-      
     } catch (error) {
       console.log(error);
     }
@@ -82,6 +76,10 @@ const PosterSignup = () => {
     navigate("/poster/dashboard");
   };
 
+  useEffect(() => {
+    sendDataToBackend();
+  }, [isVerified]);
+
   return (
     <div className="grid grid-cols-16">
       <Header landing={false} />
@@ -99,8 +97,8 @@ const PosterSignup = () => {
         <PosterSignupForm
           onSubmitForm={handleFormData}
           isVerified={isVerified}
-          otpStatus={{isLoading, isSuccess, isError, error, data}}
-          formStatus={{signUpLoading, isSignUpSuccess, isSignUpError, signUpError, signUpData}}
+          otpStatus={{ isLoading, isSuccess, isError, error, data }}
+          formStatus={{ signUpLoading, isSignUpSuccess, isSignUpError, signUpError, signUpData }}
         />
       </span>
       {showOtp && (

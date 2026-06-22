@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import ForgotPasswordModal from "./ForgotPasswordModal";
 
 const Password = (props) => {
   const {

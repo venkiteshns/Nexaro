@@ -10,62 +10,61 @@ import {
 } from "../utils/generateTokens.js";
 
 export const googleLoginService = async (accessToken) => {
-  try {
-    const googleResponse = await fetch(process.env.GOOGLE_USERINFO_URL, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  // try {
+  const googleResponse = await fetch(process.env.GOOGLE_USERINFO_URL, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
-    if (!googleResponse.ok) {
-      return { success: false, message: "Failed to verify Google token" };
-    }
-
-    const payload = await googleResponse.json();
-    const { email } = payload;
-
-    const existingUser = await User.findOne({ email, activeRole: { $ne: 'admin' } });
-
-    if (!existingUser) {
-      return {
-        success: false,
-        message: "No account found with this Google email. Please sign up first.",
-      };
-    }
-
-    if (existingUser.isSuspended) {
-      return {
-        success: false,
-        message: "Access Restricted : Your account is suspended by admin",
-      };
-    }
-
-    const accessTokenJwt = generateAccessToken(existingUser);
-    const refreshToken = generateRefreshToken(existingUser);
-
-    existingUser.refreshToken = refreshToken;
-    await existingUser.save({ validateBeforeSave: false });
-
-    const { _id, name: userName, email: userEmail, activeRole } = existingUser;
-    const responseUser = {
-      id: _id,
-      name: userName,
-      email: userEmail,
-      role: activeRole,
-      selfie: existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON,
-    };
-
-    return {
-      success: true,
-      responseUser,
-      accessToken: accessTokenJwt,
-      refreshToken,
-    };
-  } catch (error) {
-    throw error;
+  if (!googleResponse.ok) {
+    return { success: false, message: "Failed to verify Google token" };
   }
-};
 
+  const payload = await googleResponse.json();
+  const { email } = payload;
+
+  const existingUser = await User.findOne({ email, activeRole: { $ne: 'admin' } });
+
+  if (!existingUser) {
+    return {
+      success: false,
+      message: "No account found with this Google email. Please sign up first.",
+    };
+  }
+
+  if (existingUser.isSuspended) {
+    return {
+      success: false,
+      message: "Access Restricted : Your account is suspended by admin",
+    };
+  }
+
+  const accessTokenJwt = generateAccessToken(existingUser);
+  const refreshToken = generateRefreshToken(existingUser);
+
+  existingUser.refreshToken = refreshToken;
+  await existingUser.save({ validateBeforeSave: false });
+
+  const { _id, name: userName, email: userEmail, activeRole } = existingUser;
+  const responseUser = {
+    id: _id,
+    name: userName,
+    email: userEmail,
+    role: activeRole,
+    selfie: existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON,
+  };
+
+  return {
+    success: true,
+    responseUser,
+    accessToken: accessTokenJwt,
+    refreshToken,
+  };
+  // } catch (error) {
+  //   throw error;
+  // }
+};
 
 
 const MAX_RETRIES = 3;
@@ -74,7 +73,6 @@ const RETRY_BASE_DELAY_MS = 300;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const createOtp = async (email, phone) => {
-  try {
     const userData = await User.findOne({ $or: [{ email }, { phone }] });
     if (userData) {
       return {
@@ -98,7 +96,7 @@ export const createOtp = async (email, phone) => {
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
     });
-    let otpSend = await sendOtp(email, otp);
+    const otpSend = await sendOtp(email, otp);
     if (!otpSend) {
       await Otp.deleteOne({ email });
       return { success: false, response: "Failed to send OTP" };
@@ -108,9 +106,6 @@ export const createOtp = async (email, phone) => {
       message: "OTP sent successfully",
       response: otpRecord,
     };
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const sendOtp = async (email, otp) => {
@@ -130,7 +125,7 @@ export const sendOtp = async (email, otp) => {
             name: "NEXARO",
             email: process.env.BREVO_USER,
           },
-          to: [{ email: email }],
+          to: [{ email }],
           subject: "NEXARO Verification Code",
           htmlContent: otpTemplate(otp),
         }),
@@ -196,8 +191,7 @@ export const verifyOtp = async (email, otp) => {
 };
 
 export const loginService = async (userData, isAdmin) => {
-  let { email, password } = userData;
-  try {
+  const { email, password } = userData;
     // 1. Find user by email
     if (isAdmin) {
       const existingUser = await User.findOne({ email, activeRole: "admin" });
@@ -228,7 +222,7 @@ export const loginService = async (userData, isAdmin) => {
     // 4. refresh token to database
     existingUser.refreshToken = refreshToken;
     await existingUser.save({ validateBeforeSave: false });
-    let selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
+    const selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
     console.log("selfie ", selfie);
 
     // 5. response user
@@ -248,9 +242,6 @@ export const loginService = async (userData, isAdmin) => {
       accessToken,
       refreshToken,
     };
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const sendForgotPasswordEmail = async (email, otp) => {
@@ -270,7 +261,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
             name: "NEXARO",
             email: process.env.BREVO_USER,
           },
-          to: [{ email: email }],
+          to: [{ email }],
           subject: "NEXARO Password Reset OTP",
           htmlContent: forgotPasswordTemplate(otp),
         }),
@@ -316,8 +307,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
 export const forgotPasswordOtpService = async (email, role) => {
   console.log("role", role);
 
-  try {
-    if (role == "admin") {
+    if (role === "admin") {
       const userData = await User.findOne({ email, activeRole: role });
       if (!userData) {
         return {
@@ -347,27 +337,23 @@ export const forgotPasswordOtpService = async (email, role) => {
     }
 
     const hashedOtp = await hashData(otp);
-    const otpRecord = await Otp.create({
+    await Otp.create({
       email,
       otp: hashedOtp,
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
     });
 
-    let otpSend = await sendForgotPasswordEmail(email, otp);
+    const otpSend = await sendForgotPasswordEmail(email, otp);
     if (!otpSend) {
       await Otp.deleteOne({ email });
       return { success: false, message: "Failed to send password reset OTP" };
     }
 
     return { success: true, message: "Password reset OTP sent successfully" };
-  } catch (error) {
-    throw error;
-  }
 };
 
 export const updatePasswordService = async (email, password) => {
-  try {
     const user = await User.findOne({ email });
     if (!user) {
       return { success: false, message: "User does not exist with this email" };
@@ -378,7 +364,4 @@ export const updatePasswordService = async (email, password) => {
     await user.save();
 
     return { success: true, message: "Password updated successfully" };
-  } catch (error) {
-    throw error;
-  }
 };

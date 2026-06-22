@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import {
     Plus,
     MapPin,
@@ -88,7 +87,7 @@ function TaskCard({ task }) {
     const { badge, border, label } = getStatusConfig(task.status);
     const [showCancelModal, setShowCancelModal] = useState(false);
 
-    const [cancelTask, { isLoading, isSuccess, isError, error }] = useCancelTaskByPosterMutation()
+    const [cancelTask, { isLoading, isSuccess }] = useCancelTaskByPosterMutation()
 
     const handleCancelConfirm = async () => {
         setTimeout(() => {
@@ -276,7 +275,6 @@ function StatCard({ icon, count, label, topColor }) {
 
 const MyTasks = () => {
     const navigate = useNavigate();
-    const user = useSelector((state) => state.auth.user);
 
     const [activeTab, setActiveTab] = useState('all');
     const [searchText, setSearchText] = useState('');

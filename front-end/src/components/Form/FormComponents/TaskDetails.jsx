@@ -1,5 +1,5 @@
 import { ChevronDown, ClipboardList } from 'lucide-react'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form';
 import FormError from './FormError';
 

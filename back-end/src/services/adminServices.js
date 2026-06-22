@@ -4,8 +4,7 @@ import Task from "../models/taskSchema.js";
 import MESSAGES from "../constants/messages.js";
 
 export const getAllUsersService = async (page, limit) => {
-    try {
-        const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
         const users = await User.find({ activeRole: { $ne: "admin" } })
             .select("name email phone activeRole isVerified isSuspended createdAt skills location verificationDocuments")
@@ -24,14 +23,10 @@ export const getAllUsersService = async (page, limit) => {
             totalPages,
             totalUsers,
         };
-    } catch (error) {
-        throw error;
-    }
 };
 
 export const suspendUserService = async (userId) => {
-    try {
-        const user = await User.findById(userId);
+    const user = await User.findById(userId);
         if (!user) {
             return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
@@ -44,14 +39,10 @@ export const suspendUserService = async (userId) => {
         await user.save({ validateBeforeSave: false });
 
         return { success: true, message: MESSAGES.USER_SUSPENDED };
-    } catch (error) {
-        throw error;
-    }
 };
 
 export const unsuspendUserService = async (userId) => {
-    try {
-        const user = await User.findById(userId);
+    const user = await User.findById(userId);
         if (!user) {
             return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
@@ -64,14 +55,10 @@ export const unsuspendUserService = async (userId) => {
         await user.save({ validateBeforeSave: false });
 
         return { success: true, message: MESSAGES.USER_UNSUSPENDED };
-    } catch (error) {
-        throw error;
-    }
 };
 
 export const getPendingVerificationUsersService = async (page, limit) => {
-    try {
-        const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
         const users = await User.find({
             activeRole: { $ne: "admin" },
@@ -98,14 +85,10 @@ export const getPendingVerificationUsersService = async (page, limit) => {
             totalPages,
             totalUsers,
         };
-    } catch (error) {
-        throw error;
-    }
 };
 
 export const approveUserService = async (userId) => {
-    try {
-        const user = await User.findById(userId);
+    const user = await User.findById(userId);
         if (!user) {
             return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
@@ -118,14 +101,10 @@ export const approveUserService = async (userId) => {
         await user.save({ validateBeforeSave: false });
 
         return { success: true, message: MESSAGES.USER_APPROVED };
-    } catch (error) {
-        throw error;
-    }
 };
 
 export const rejectUserService = async (userId) => {
-    try {
-        const user = await User.findById(userId);
+    const user = await User.findById(userId);
         if (!user) {
             return { success: false, message: MESSAGES.USER_NOT_FOUND };
         }
@@ -134,14 +113,10 @@ export const rejectUserService = async (userId) => {
         await user.save({ validateBeforeSave: false });
 
         return { success: true, message: MESSAGES.USER_REJECTED };
-    } catch (error) {
-        throw error;
-    }
 };
 
 export const getAllTasksService = async (page, limit, search = '', status = 'all', category = 'all') => {
-    try {
-        const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
         // ── Build the filtered $match (applied to paginated tasks + totalCount) ──
         const filterMatch = {};
@@ -218,7 +193,7 @@ export const getAllTasksService = async (page, limit, search = '', status = 'all
 
         const statusCounts = { open: 0, assigned: 0, in_progress: 0, completed: 0, cancelled: 0 };
         for (const { _id, count } of result.statusCounts || []) {
-            if (_id && statusCounts.hasOwnProperty(_id)) {
+            if (_id && Object.prototype.hasOwnProperty.call(statusCounts, _id)) {
                 statusCounts[_id] = count;
             }
         }
@@ -232,16 +207,12 @@ export const getAllTasksService = async (page, limit, search = '', status = 'all
             statusCounts,
             categories,
         };
-    } catch (error) {
-        throw error;
-    }
 
 };
 
 
 export const cancelTaskByAdminService = async (taskId) => {
-    try {
-        const task = await Task.findById(taskId);
+    const task = await Task.findById(taskId);
         if (!task) {
             return { error: MESSAGES.TASK_NOT_FOUND };
         }
@@ -250,14 +221,10 @@ export const cancelTaskByAdminService = async (taskId) => {
         await task.save({ validateBeforeSave: false });
 
         return { success: true, message: MESSAGES.TASK_CANCELLED };
-    } catch (error) {
-        throw error;
-    }
 }
 
 export const getAdminTaskDetailsService = async (taskId) => {
-    try {
-        const [result] = await Task.aggregate([
+    const [result] = await Task.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(taskId) } },
 
             {
@@ -308,7 +275,4 @@ export const getAdminTaskDetailsService = async (taskId) => {
         if (!result) return { error: 'Task not found' };
 
         return { success: true, task: result };
-    } catch (error) {
-        throw error;
-    }
 };

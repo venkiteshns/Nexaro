@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   LayoutDashboard,
   ListChecks,
@@ -31,7 +31,8 @@ const WorkerNavBar = () => {
   const handleLogout = async () => {
     try {
       await userLogout().unwrap();
-    } catch (error) {
+    } catch {
+      // Logout locally even if server request fails
     } finally {
       dispatch(logOut());
       navigate("/user/login");

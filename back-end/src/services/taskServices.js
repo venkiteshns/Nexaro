@@ -93,13 +93,11 @@ export const createTaskService = async (body, files, posterId) => {
 };
 
 export const getTaskForBidService = async (taskId) => {
-    console.log("taskId ", taskId);
     try {
-        let task = await Task.find({ _id: taskId });
+        const task = await Task.find({ _id: new mongoose.Types.ObjectId(taskId) });
         if (!task) {
             return "No task found"
         }
-        console.log(task, "task data");
         return task;
 
     } catch (error) {
@@ -201,12 +199,12 @@ export const handleNewBid = async (task, user) => {
     // console.log(task, user);
 
     try {
-        let { taskId, bidAmount, estimatedTime, pitch } = task;
-        let isTask = await Task.find({ _id: taskId });
+        const { taskId, bidAmount, estimatedTime, pitch } = task;
+        const isTask = await Task.find({ _id: taskId });
         if (!isTask) {
             return { error: "No task found" }
         }
-        let isAlreadyBid = await Bid.findOne({
+        const isAlreadyBid = await Bid.findOne({
             taskId,
             workerId: user._id
         })
@@ -217,7 +215,7 @@ export const handleNewBid = async (task, user) => {
         if (isAlreadyBid) {
             return { error: "You have already bid on this task" }
         }
-        let payload = {
+        const payload = {
             taskId,
             workerId: user._id,
             amount: bidAmount,
@@ -235,8 +233,7 @@ export const handleNewBid = async (task, user) => {
             bidAmount,
         })
 
-        let newBid = await Bid.create(payload)
-        // console.log("new bid created ", newBid);
+        await Bid.create(payload)
         return "bid created successfully"
     } catch (error) {
         console.log(error);
@@ -269,7 +266,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
         const [lng, lat] = worker.serviceArea.coordinates;
         const skip = (page - 1) * limit;
 
-        let matchCriterias = {};
+        const matchCriterias = {};
 
         if (search) {
             matchCriterias.title = { $regex: search, $options: "i" };
@@ -375,7 +372,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
 export const getWorkerBidDetailsService = async (bidId, workerId) => {
     try {
         const bidDetails = await Bid.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(bidId) } },
+            { $match: { _id: new mongoose.Types.ObjectId(bidId), workerId: new mongoose.Types.ObjectId(workerId) } },
             {
                 $lookup: {
                     from: 'tasks',
@@ -523,7 +520,6 @@ export const withdrawBidService = async (bidId) => {
 }
 
 export const cancelTaskByPosterService = async (taskId) => {
-    console.log(taskId);
     try {
         const taskData = await Task.findById({ _id: taskId });
         if (!taskData) {

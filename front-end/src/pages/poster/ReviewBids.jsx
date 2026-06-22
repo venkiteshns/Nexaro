@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -7,7 +7,6 @@ import {
     Star,
     CheckCircle,
     ChevronDown,
-    Wrench,
     Loader2,
     AlertTriangle,
     ArrowRight,
@@ -309,7 +308,7 @@ const ReviewBids = () => {
     const bidsData = data?.data?.bids;
     console.log("bidsData : ", bidsData);
 
-    const [acceptBid, { data: acceptBidData, isLoading: isLoadingAcceptBid, isSuccess: isSuccessAcceptBid, isError: isErrorAcceptBid, error: acceptBidError, reset: resetAcceptBid }] = useAcceptBidMutation();
+    const [acceptBid, { isLoading: isLoadingAcceptBid, isSuccess: isSuccessAcceptBid, isError: isErrorAcceptBid, reset: resetAcceptBid }] = useAcceptBidMutation();
 
     const handleConfirmAccept = async () => {
         try {
@@ -327,7 +326,6 @@ const ReviewBids = () => {
 
     useEffect(() => {
         if (isSuccessAcceptBid) {
-            setCountdown(5);
             countdownRef.current = setInterval(() => {
                 setCountdown((prev) => {
                     if (prev <= 1) {
@@ -340,7 +338,7 @@ const ReviewBids = () => {
             }, 1000);
         }
         return () => clearInterval(countdownRef.current);
-    }, [isSuccessAcceptBid]);
+    }, [isSuccessAcceptBid, navigate, taskData?._id]);
 
     return (
         <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">

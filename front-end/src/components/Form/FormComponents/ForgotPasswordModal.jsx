@@ -1,66 +1,59 @@
-import React, { useEffect, useState } from "react";
-import { Mail, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import PersonalInfo from "./PersonalInfo";
-import OtpModal from '../../OtpModal/OtpModal'
+import OtpModal from '../../OtpModal/OtpModal';
 import { FormProvider, useForm } from "react-hook-form";
 import { useForgotPasswordMutation, useUpdatePasswordMutation } from "../../../store/services/api";
 import Password from "./Password";
 
 const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
-  if (!isOpen) return null;
-
-  const [forgotPassword, { isLoading, isError, isSuccess, error, data }] =
+  const [forgotPassword, { isLoading, isError, isSuccess, error }] =
     useForgotPasswordMutation();
 
-  const [updatePassword, { isError: updateError, isSuccess: updateSuccess, isLoading: updateLoading, error: updateErrorData, data: updateData }] = useUpdatePasswordMutation();
+  const [updatePassword, { isError: updateError, isLoading: updateLoading }] =
+    useUpdatePasswordMutation();
 
-  const [showOtp, setShowOtp] = useState(false)
-  const [email, setEmail] = useState(null)
-  const [isVerified, setIsVerified] = useState(false)
+  const [showOtp, setShowOtp] = useState(false);
+  const [email, setEmail] = useState(null);
+  const [isVerified, setIsVerified] = useState(false);
+
+  const methods = useForm();
 
   useEffect(() => {
     if (isSuccess) {
       setShowOtp(true);
-      // onClose();
     }
-  }, [isSuccess])
+  }, [isSuccess]);
 
-  const methods = useForm();
+  if (!isOpen) return null;
 
   const activeBtn =
-    "py-2 px-4 rounded-2xl bg-[#0A6E5C] text-sm font-semibold text-white  hover:bg-[#095847] ";
+    "py-2 px-4 rounded-2xl bg-[#0A6E5C] text-sm font-semibold text-white hover:bg-[#095847]";
   const disabledBtn =
     "py-2 px-4 rounded-2xl bg-[#0A6E5C]/70 text-sm font-semibold text-white cursor-not-allowed";
 
-
-  const handlePasswordResetOtp = async ({ email }) => {
-    console.log("email ", email);
-    setEmail(email)
+  const handlePasswordResetOtp = async ({ email: emailInput }) => {
+    setEmail(emailInput);
     try {
-      let res = await forgotPassword({ email, role });
-      console.log(" reset otp res ", res);
-    } catch (error) {
+      const res = await forgotPassword({ email: emailInput, role });
+      console.log("reset otp res", res);
+    } catch (err) {
       console.log("reset error", err);
     }
   };
 
   const updateNewPassword = async (data) => {
-    console.log("update password : ", data);
     try {
-      let res = await updatePassword({
-        email: email,
-        password: data.password
-      })
-      console.log(" update res ", res);
+      const res = await updatePassword({ email, password: data.password });
+      console.log("update res", res);
       if (res.data.success) {
-        isUpdateSuccess(true)
+        isUpdateSuccess(true);
         onClose();
       }
-    } catch (error) {
-      console.log(" error ", error);
+    } catch (err) {
+      console.log("error", err);
     }
-
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
@@ -78,9 +71,10 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
           <h2 className="text-2xl leading-none font-black tracking-tight text-[#111827]">
             Reset Password
           </h2>
-
           <p className="mt-4 text-xs text-[#6B7280]">
-            {isVerified ? "Enter your new password" : "Enter your registered admin email address to receive password reset instructions."}
+            {isVerified
+              ? "Enter your new password"
+              : "Enter your registered admin email address to receive password reset instructions."}
           </p>
         </div>
 
@@ -99,14 +93,14 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
           {isError && (
             <div className="text-center">
               <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
-                {error.data.message}
+                {error?.data?.message}
               </span>
             </div>
           )}
           {updateError && (
             <div className="text-center">
               <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
-                {updateError.data.message}
+                {updateError?.data?.message}
               </span>
             </div>
           )}
@@ -118,13 +112,25 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
               disabled={isLoading || updateLoading}
               className={(isLoading || updateLoading) ? disabledBtn : activeBtn}
             >
-              {isLoading ? "Sending OTP.." : isVerified ? "Update Password" : updateLoading ? "Updating Password" : "Send Reset Otp"}
+              {isLoading
+                ? "Sending OTP.."
+                : isVerified
+                  ? "Update Password"
+                  : updateLoading
+                    ? "Updating Password"
+                    : "Send Reset Otp"}
             </button>
           </div>
         </form>
       </div>
-      {/* { show, email, reSendOtp, isVerified } */}
-      {showOtp && <OtpModal show={setShowOtp} email={email} reSendOtp={handlePasswordResetOtp} isVerified={setIsVerified} />}
+      {showOtp && (
+        <OtpModal
+          show={setShowOtp}
+          email={email}
+          reSendOtp={handlePasswordResetOtp}
+          isVerified={setIsVerified}
+        />
+      )}
     </div>
   );
 };

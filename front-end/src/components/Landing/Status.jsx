@@ -1,4 +1,3 @@
-import React from "react";
 
 const STATS = [
   { value: "24,800+", label: "Active Experts" },
