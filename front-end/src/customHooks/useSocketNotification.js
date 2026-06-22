@@ -39,6 +39,22 @@ const useSocketNotification = () => {
             dispatch(api.util.invalidateTags(['Worker_Tasks']));
         });
 
+
+        socket.on('new-bid-added', (data) => {
+
+            showInfo(`New bid added for : ${data.taskTitle}  for ${data.bidAmount} rupees`, { autoClose: 6000 });
+
+            dispatch(api.util.invalidateTags(['Poster_Tasks']));
+
+        });
+
+        // io.to(`user:${posterId}`).emit('new-bid-added', {
+        //     taskId,
+        //     taksTitle: isTask[0].title,
+        //     bidAmount,
+        //     status: "pending"
+        // })
+
         return () => {
             disconnectSocket();
         };

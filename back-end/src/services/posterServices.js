@@ -274,21 +274,21 @@ export const getPosterTaskProgressService = async (taskId) => {
     }
 }
 
-export const updateUserProfileService = async ({userId,role,body}) => {
+export const updateUserProfileService = async ({ userId, role, body }) => {
     try {
-        let user = User.find({_id: mongoose.Types.ObjectId(userId), activeRole:role});
-        if(!user) {
-            return ({error: "user not found"});
+        let user = User.find({ _id: mongoose.Types.ObjectId(userId), activeRole: role });
+        if (!user) {
+            return ({ error: "user not found" });
         }
-        let {email, address, phone, bio} = body;
+        let { email, address, phone, bio } = body;
         user.email = email,
-        user.address = address;
+            user.address = address;
         user.phone = phone,
-        user.bio = bio;
+            user.bio = bio;
         await user.save();
-        return ({message:"user profile updated successfully"})
+        return ({ message: "user profile updated successfully" })
 
     } catch (error) {
-        return ({error: error.message})
+        return ({ error: error.message })
     }
 }
