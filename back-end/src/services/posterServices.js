@@ -4,6 +4,7 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
 import Bid from "../models/bidsSchema.js";
+import { getIo } from "../socket.js";
 
 export const posterSignupService = async (data) => {
     console.log("signUp data", data);
@@ -182,17 +183,36 @@ export const acceptBidService = async (bidId) => {
         }
 
         const taskId = acceptedBid.taskId;
+        const workerId = acceptedBid.workerId;
 
         const { modifiedCount: rejectedCount } = await Bid.updateMany(
             { _id: { $ne: bidId }, taskId },
             { $set: { status: "rejected" } }
         );
 
+        const rejectedWorkers = await Bid.find({ _id: { $ne: bidId }, taskId }).select("workerId");
+
+
+
         const updatedTask = await Task.findOneAndUpdate(
             { _id: taskId },
             { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId } },
             { returnDocument: 'after' }
         );
+
+        const io = getIo();
+
+        rejectedWorkers.forEach((worker) => {
+            io.to(`user:${worker.workerId}`).emit("bid-rejected", {
+                taskTitle: updatedTask.title,
+                bidAmount: acceptedBid.amount,
+            })
+        })
+
+        io.to(`user:${workerId}`).emit("bid-accepted", {
+            taskTitle: updatedTask.title,
+            bidAmount: acceptedBid.amount,
+        })
 
         return {
             success: true,
