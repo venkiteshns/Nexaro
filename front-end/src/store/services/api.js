@@ -298,11 +298,17 @@ export const api = createApi({
         }),
 
         adminGetAllTasks: builder.query({
-            query: ({ page = 1, limit = 4 } = {}) => ({
-                url: `/admin/tasks?page=${page}&limit=${limit}`,
-                method: "GET",
-            }),
-            providesTags: ["Admin_Tasks"],
+            query: ({ page = 1, limit = 4, search = '', status = 'all', category = 'all' } = {}) => {
+                const params = new URLSearchParams({ page, limit });
+                if (search) params.append('search', search);
+                if (status !== 'all') params.append('status', status);
+                if (category !== 'all') params.append('category', category);
+                return {
+                    url: `/admin/tasks?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
+            providesTags: ['Admin_Tasks'],
         }),
 
         getWorkerNearbyTasks: builder.query({
@@ -418,7 +424,23 @@ export const api = createApi({
                 method: "PATCH"
             }),
             invalidatesTags: ["Admin_Tasks"]
-        })
+        }),
+
+        adminGetTaskDetails: builder.query({
+            query: (taskId) => ({
+                url: `/admin/task/${taskId}`,
+                method: "GET",
+            }),
+            providesTags: ["Admin_Task_Details"],
+        }),
+
+        getCompletedTaskPosterSide: builder.query({
+            query: (taskId) => ({
+                url: `/poster/task/completed/${taskId}`,
+                method: "GET",
+            }),
+            providesTags: ["Poster_Completed_Task"],
+        }),
     }),
 });
 
@@ -455,5 +477,7 @@ export const {
     useGetPosterTaskProgressQuery,
     useGetWorkerActiveJobQuery,
     useUpdateJobProgressMutation,
-    useAdminTaskDeleteMutation
+    useAdminTaskDeleteMutation,
+    useAdminGetTaskDetailsQuery,
+    useGetCompletedTaskPosterSideQuery,
 } = api;

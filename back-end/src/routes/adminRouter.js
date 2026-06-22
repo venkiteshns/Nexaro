@@ -7,7 +7,8 @@ import {
     approveUser,
     rejectUser,
     getAllTasks,
-    cancelTaskByAdmin
+    cancelTaskByAdmin,
+    getAdminTaskDetails,
 } from "../controller/AdminControllers/adminController.js";
 import verifyToken from "../middlewares/verifyToken.js";
 
@@ -25,6 +26,7 @@ adminRouter.patch("/users/:userId/approve", approveUser);
 adminRouter.patch("/users/:userId/reject", rejectUser);
 
 adminRouter.patch('/task/cancel/:taskId', cancelTaskByAdmin);
+adminRouter.get('/task/:taskId', getAdminTaskDetails);
 
 
 export default adminRouter;

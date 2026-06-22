@@ -50,12 +50,12 @@ const useSocketNotification = () => {
 
         socket.on("bid-accepted", (data) => {
             showInfo(`Your bid has been accepted for task : ${data.taskTitle} for amount : ${data.bidAmount} rupees`)
-            dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job']));
+            dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job', 'Worker_Tasks']));
         })
 
         socket.on("bid-rejected", (data) => {
             showError(`Your bid has been rejected for task : ${data.taskTitle} for amount : ${data.bidAmount} rupees`)
-            dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job']));
+            dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job', 'Worker_Tasks']));
         })
 
         socket.on("task-update", (data) => {

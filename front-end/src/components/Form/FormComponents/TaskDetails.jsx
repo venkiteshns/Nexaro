@@ -4,18 +4,18 @@ import { useFormContext } from 'react-hook-form';
 import FormError from './FormError';
 
 const categories = [
-    { label: "Cleaning Services", value: "cleaning" },
-    { label: "Plumbing", value: "plumbing" },
-    { label: "Electrical", value: "electrical" },
-    { label: "Home Repair", value: "home_repair" },
-    { label: "Gardening", value: "gardening" },
-    { label: "Painting", value: "painting" },
-    { label: "Moving & Packing", value: "moving" },
-    { label: "IT & Tech Support", value: "it_support" },
-    { label: "Babysitting", value: "babysitting" },
-    { label: "Pet Care", value: "pet_care" },
-    { label: "Cooking", value: "cooking" },
-    { label: "Delivery", value: "delivery" },
+    { label: "Cleaning Services", value: "Cleaning" },
+    { label: "Plumbing", value: "Plumbing" },
+    { label: "Electrical", value: "Electrical" },
+    { label: "Home Repair", value: "Home Repair" },
+    { label: "Gardening", value: "Gardening" },
+    { label: "Painting", value: "Painting" },
+    { label: "Moving & Packing", value: "Moving" },
+    { label: "IT & Tech Support", value: "IT & Tech Support" },
+    { label: "Babysitting", value: "Babysitting" },
+    { label: "Pet Care", value: "Pet Care" },
+    { label: "Cooking", value: "Cooking" },
+    { label: "Delivery", value: "Delivery" },
 ];
 
 

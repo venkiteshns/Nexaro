@@ -97,7 +97,7 @@ function TaskCard({ task }) {
         }, 300);
         try {
             let res = await cancelTask(task._id).unwrap()
-            showSuccess(res?.message)
+            showSuccess(res?.message || "task cancelled successfully")
         } catch (error) {
             showError(error?.data?.message || error?.message || "Failed to cancel task, Retry after some time");
         }
@@ -232,7 +232,10 @@ function TaskCard({ task }) {
                         )}
 
                         {task.status === 'completed' && (
-                            <button className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors">
+                            <button
+                                onClick={() => navigate(`/poster/completed-task/${task._id}`)}
+                                className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
                                 View Details
                             </button>
                         )}
@@ -280,7 +283,6 @@ const MyTasks = () => {
     const [searchText, setSearchText] = useState('');
 
     const { data, isLoading, isError } = useGetPosterTasksQuery();
-    console.log(data);
 
     const allTasks = data?.tasks || [];
 

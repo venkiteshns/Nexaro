@@ -615,6 +615,7 @@ export const updateJobProgressService = async (taskId, workerId, update) => {
         if (update === "completed") {
             const updatedTask = await Task.findById(taskId)
             updatedTask.status = "completed"
+            updatedTask.completedOn = new Date();
             await updatedTask.save()
         }
         if (!task) return { error: "Task not found or unauthorized" };

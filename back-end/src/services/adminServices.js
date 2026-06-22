@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Task from "../models/taskSchema.js";
 import MESSAGES from "../constants/messages.js";
@@ -138,18 +139,89 @@ export const rejectUserService = async (userId) => {
     }
 };
 
-export const getAllTasksService = async (page, limit) => {
+export const getAllTasksService = async (page, limit, search = '', status = 'all', category = 'all') => {
     try {
         const skip = (page - 1) * limit;
 
-        const tasks = await Task.find()
-            .populate("posterId", "name email")
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
+        // ── Build the filtered $match (applied to paginated tasks + totalCount) ──
+        const filterMatch = {};
+        if (status && status !== 'all') filterMatch.status = status;
+        if (category && category !== 'all') filterMatch.category = category;
 
-        const totalTasks = await Task.countDocuments();
-        const totalPages = Math.ceil(totalTasks / limit);
+        // ── Search is applied via a $lookup + $or after joining poster ──
+        const searchRegex = search ? new RegExp(search, 'i') : null;
+
+        const [result] = await Task.aggregate([
+            // Apply status + category match first (DB-level, indexed)
+            ...(Object.keys(filterMatch).length ? [{ $match: filterMatch }] : []),
+            {
+                $facet: {
+                    // ── Paginated tasks with poster + search filter ──
+                    tasks: [
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'posterId',
+                                foreignField: '_id',
+                                as: 'posterId',
+                                pipeline: [{ $project: { name: 1, email: 1 } }],
+                            },
+                        },
+                        { $unwind: { path: '$posterId', preserveNullAndEmptyArrays: true } },
+                        // Apply search filter after poster is joined
+                        ...(searchRegex ? [{
+                            $match: {
+                                $or: [
+                                    { title: { $regex: searchRegex } },
+                                    { 'posterId.name': { $regex: searchRegex } },
+                                ],
+                            },
+                        }] : []),
+                        { $sort: { createdAt: -1 } },
+                        { $skip: skip },
+                        { $limit: limit },
+                    ],
+                    // ── Total count of filtered results ──
+                    totalCount: [
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'posterId',
+                                foreignField: '_id',
+                                as: 'posterId',
+                                pipeline: [{ $project: { name: 1 } }],
+                            },
+                        },
+                        { $unwind: { path: '$posterId', preserveNullAndEmptyArrays: true } },
+                        ...(searchRegex ? [{
+                            $match: {
+                                $or: [
+                                    { title: { $regex: searchRegex } },
+                                    { 'posterId.name': { $regex: searchRegex } },
+                                ],
+                            },
+                        }] : []),
+                        { $count: 'count' },
+                    ],
+                    // ── Platform-wide status counts (no search/category applied) ──
+                    statusCounts: [
+                        { $group: { _id: '$status', count: { $sum: 1 } } },
+                    ],
+                },
+            },
+        ]);
+
+        const tasks = result.tasks || [];
+        const totalTasks = result.totalCount[0]?.count || 0;
+        const totalPages = Math.ceil(totalTasks / limit) || 1;
+        const categories = await Task.distinct("category");
+
+        const statusCounts = { open: 0, assigned: 0, in_progress: 0, completed: 0, cancelled: 0 };
+        for (const { _id, count } of result.statusCounts || []) {
+            if (_id && statusCounts.hasOwnProperty(_id)) {
+                statusCounts[_id] = count;
+            }
+        }
 
         return {
             success: true,
@@ -157,11 +229,15 @@ export const getAllTasksService = async (page, limit) => {
             currentPage: page,
             totalPages,
             totalTasks,
+            statusCounts,
+            categories,
         };
     } catch (error) {
         throw error;
     }
+
 };
+
 
 export const cancelTaskByAdminService = async (taskId) => {
     try {
@@ -179,3 +255,60 @@ export const cancelTaskByAdminService = async (taskId) => {
     }
 }
 
+export const getAdminTaskDetailsService = async (taskId) => {
+    try {
+        const [result] = await Task.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(taskId) } },
+
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'posterId',
+                    foreignField: '_id',
+                    as: 'poster',
+                    pipeline: [{ $project: { name: 1, email: 1, phone: 1, selfie: '$verificationDocuments.selfie.url' } }],
+                },
+            },
+            { $unwind: { path: '$poster', preserveNullAndEmptyArrays: true } },
+
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'workerId',
+                    foreignField: '_id',
+                    as: 'worker',
+                    pipeline: [{ $project: { name: 1, email: 1, phone: 1, rating: '$worker.rating', selfie: '$verificationDocuments.selfie.url', isVerified: 1 } }],
+                },
+            },
+            { $unwind: { path: '$worker', preserveNullAndEmptyArrays: true } },
+
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: 'acceptedBid',
+                    foreignField: '_id',
+                    as: 'bid',
+                    pipeline: [{ $project: { amount: 1, eta: 1, pitch: 1 } }],
+                },
+            },
+            { $unwind: { path: '$bid', preserveNullAndEmptyArrays: true } },
+
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: '_id',
+                    foreignField: 'taskId',
+                    as: 'allBids',
+                },
+            },
+            { $addFields: { bidCount: { $size: '$allBids' } } },
+            { $project: { allBids: 0 } },
+        ]);
+
+        if (!result) return { error: 'Task not found' };
+
+        return { success: true, task: result };
+    } catch (error) {
+        throw error;
+    }
+};
