@@ -23,7 +23,7 @@ const PosterNavBar = () => {
   const location = useLocation();
   const user = useSelector((state) => state.auth.user);
 
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [userLogout] = useUserLogoutMutation();
 
@@ -73,9 +73,10 @@ const PosterNavBar = () => {
 
   return (
     <div
-      className={`h-screen bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between flex-shrink-0 ${
-        sidebarOpen ? "w-[220px]" : "w-[72px]"
-      }`}
+      className={`h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between flex-shrink-0 ${sidebarOpen
+        ? "fixed top-0 left-0 w-[220px]"
+        : "relative w-[72px]"
+        }`}
     >
       <div>
         {/* LOGO */}
@@ -131,11 +132,10 @@ const PosterNavBar = () => {
                 key={index}
                 onClick={() => navigate(item.redirect)}
                 title={!sidebarOpen ? item.label : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium ${
-                  isActive
-                    ? "bg-[#0A6E5C] text-white"
-                    : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
-                } ${!sidebarOpen ? "justify-center" : ""}`}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium ${isActive
+                  ? "bg-[#0A6E5C] text-white"
+                  : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
+                  } ${!sidebarOpen ? "justify-center" : ""}`}
               >
                 {item.icon}
                 {sidebarOpen && <span>{item.label}</span>}
@@ -150,9 +150,8 @@ const PosterNavBar = () => {
         <button
           onClick={handleLogout}
           title={!sidebarOpen ? "Logout" : undefined}
-          className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all text-sm font-medium ${
-            !sidebarOpen ? "justify-center" : ""
-          }`}
+          className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all text-sm font-medium ${!sidebarOpen ? "justify-center" : ""
+            }`}
         >
           <LogOut size={20} />
           {sidebarOpen && <span>Logout</span>}

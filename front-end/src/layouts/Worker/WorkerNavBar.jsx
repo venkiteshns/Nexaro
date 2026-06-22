@@ -24,7 +24,7 @@ const WorkerNavBar = () => {
   const location = useLocation();
   const user = useSelector((state) => state.auth.user);
 
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [userLogout] = useUserLogoutMutation();
 
@@ -78,7 +78,9 @@ const WorkerNavBar = () => {
 
   return (
     <div
-      className={`h-screen bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between flex-shrink-0 ${sidebarOpen ? "w-[220px]" : "w-[72px]"
+      className={`h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between flex-shrink-0 ${sidebarOpen
+          ? "fixed top-0 left-0 w-[220px]"
+          : "relative w-[72px]"
         }`}
     >
       <div>

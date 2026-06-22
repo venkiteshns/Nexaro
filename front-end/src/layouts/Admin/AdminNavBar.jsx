@@ -65,8 +65,10 @@ const AdminNavBar = () => {
 
   return (
     <div
-      className={`bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between ${
-        sidebarOpen ? "w-[260px]" : "w-[90px]"
+      className={`h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between ${
+        sidebarOpen
+          ? "fixed top-0 left-0 w-[260px]"
+          : "sticky top-0 w-[90px]"
       }`}
     >
       <div>

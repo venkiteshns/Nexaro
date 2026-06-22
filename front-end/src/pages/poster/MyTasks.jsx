@@ -37,7 +37,6 @@ function getStatusConfig(status) {
     }
 }
 
-// ── Cancel Confirmation Modal ──────────────────────────────────────────────
 function CancelConfirmModal({ task, onConfirm, onClose }) {
     if (!task) return null;
     return (
@@ -113,11 +112,11 @@ function TaskCard({ task }) {
 
                 <div className="flex justify-between items-start px-5 pt-4 pb-3">
 
-                    <div className="flex items-start gap-3">
+                    <div className="flex flex-col md:flex-row items-start gap-3">
                         <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
                             <AlertCircle size={20} className="text-[#0A6E5C]" />
                         </div>
-                        <div>
+                        <div className='flex flex-col  ' >
                             <p className="font-semibold text-[15px] text-gray-900">{task.title}</p>
                             <div className="flex items-center gap-3 mt-1 flex-wrap">
                                 {task.address?.city && (
@@ -153,9 +152,9 @@ function TaskCard({ task }) {
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center px-5 pb-4 pt-2 border-t border-gray-100">
+                <div className="flex flex-col sm:flex-row justify-between items-center px-5 pb-4 pt-2 border-t border-gray-100">
 
-                    <div className="text-xs text-gray-500">
+                    <div className=" mb-2 sm:mb-0 text-xs text-gray-500">
                         {task.status === 'open' && task.bidCount > 0 && (
                             <span className="text-[#0A6E5C] font-semibold">
                                 {task.bidCount} new bid{task.bidCount > 1 ? 's' : ''} waiting
@@ -179,7 +178,7 @@ function TaskCard({ task }) {
                         )}
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex  gap-2">
                         {task.status === 'open' && (
                             <>
                                 {!isLoading && <button
@@ -323,20 +322,22 @@ const MyTasks = () => {
 
                 <div className="flex-1 overflow-y-auto p-6">
 
-                    <div className="flex justify-between items-start mb-5">
+                    <div className="flex flex-col sm:flex-row justify-between items-start mb-5">
                         <div>
                             <h1 className="text-[22px] font-extrabold text-gray-900">My Tasks</h1>
                             <p className="text-sm text-gray-500 mt-1">
                                 Manage all your posted tasks from one central dashboard.
                             </p>
                         </div>
-                        <button
-                            onClick={() => navigate('/poster/post-task')}
-                            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0A6E5C] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#085e4e] transition-colors"
-                        >
-                            <Plus size={16} />
-                            Post New Task
-                        </button>
+                        <div className='flex items-end justify-end w-full' >
+                            <button
+                                onClick={() => navigate('/poster/post-task')}
+                                className="mt-2 sm:mt-0 flex items-center gap-1.5 px-5 py-2.5 bg-[#0A6E5C] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#085e4e] transition-colors"
+                            >
+                                <Plus size={16} />
+                                Post New Task
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex gap-3 mb-5 flex-wrap">
