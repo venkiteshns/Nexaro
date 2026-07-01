@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 let socket = null;
 
 export const connectSocket = (token) => {
-    if (!token || socket) return; // prevent duplicate connections
+    if (!token || socket) return; 
     socket = io('http://localhost:8000', {
         auth: { token },
         withCredentials: true,

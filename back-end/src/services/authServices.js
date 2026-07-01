@@ -81,7 +81,7 @@ export const createOtp = async (email, phone) => {
       };
     }
     const otp = crypto.randomInt(100000, 999999).toString();
-    console.log("OTP", otp);
+    // console.log("OTP", otp);
 
     const existingOtp = await Otp.findOne({ email });
     if (existingOtp) {
@@ -89,7 +89,7 @@ export const createOtp = async (email, phone) => {
     }
 
     const hashedOtp = await hashData(otp);
-    console.log(email);
+    // console.log(email);
     const otpRecord = await Otp.create({
       email,
       otp: hashedOtp,
@@ -169,7 +169,7 @@ export const sendOtp = async (email, otp) => {
 };
 
 export const verifyOtp = async (email, otp) => {
-  console.log(email, otp);
+  // console.log(email, otp);
   try {
     const otpRecord = await Otp.findOne({
       email,
@@ -185,7 +185,7 @@ export const verifyOtp = async (email, otp) => {
     await Otp.deleteOne({ email });
     return { success: true, message: "OTP verified successfully" };
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     throw error;
   }
 };
@@ -223,7 +223,7 @@ export const loginService = async (userData, isAdmin) => {
     existingUser.refreshToken = refreshToken;
     await existingUser.save({ validateBeforeSave: false });
     const selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
-    console.log("selfie ", selfie);
+    // console.log("selfie ", selfie);
 
     // 5. response user
     const { _id, name, email: userEmail, activeRole } = existingUser;
@@ -305,7 +305,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
 };
 
 export const forgotPasswordOtpService = async (email, role) => {
-  console.log("role", role);
+  // console.log("role", role);
 
     if (role === "admin") {
       const userData = await User.findOne({ email, activeRole: role });
@@ -329,7 +329,7 @@ export const forgotPasswordOtpService = async (email, role) => {
     }
 
     const otp = crypto.randomInt(100000, 999999).toString();
-    console.log("Forgot Password OTP", otp);
+    // console.log("Forgot Password OTP", otp);
 
     const existingOtp = await Otp.findOne({ email });
     if (existingOtp) {

@@ -7,7 +7,7 @@ import Bid from "../models/bidsSchema.js";
 import { getIo } from "../socket.js";
 
 export const posterSignupService = async (data) => {
-    console.log("signUp data", data);
+    // console.log("signUp data", data);
     try {
         // 1. Duplicate check
         const existing = await User.findOne({ email: data.email });
@@ -103,7 +103,7 @@ export const getTasksService = async (posterId) => {
                 }
             }
         ])
-        console.log(tasks);
+        // console.log(tasks);
 
         if (!tasks) {
             throw new Error("No tasks found");
@@ -280,7 +280,7 @@ export const getPosterTaskProgressService = async (taskId) => {
         if (!task[0]) {
             return { error: "Task not found" };
         }
-        console.log("task", task[0]);
+        // console.log("task", task[0]);
 
         const result = task[0];
         const completedWork = await Task.find({ workerId: task[0].workerId, status: "completed" })

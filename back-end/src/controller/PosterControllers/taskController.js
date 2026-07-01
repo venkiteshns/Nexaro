@@ -84,7 +84,7 @@ export const addNewBid = async (req, res) => {
 export const cancelTaskByPoster = async (req, res) => {
     try {
         const response = await cancelTaskByPosterService(req.params.taskId);
-        console.log("controller side response", response);
+        // console.log("controller side response", response);
 
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({

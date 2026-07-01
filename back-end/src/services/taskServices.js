@@ -26,7 +26,7 @@ const uploadImagesToCloudinary = async (files) => {
 };
 
 export const createTaskService = async (body, files, posterId) => {
-    console.log(body, files, posterId)
+    // console.log(body, files, posterId)
     try {
         const address = JSON.parse(body.address);
         const location = JSON.parse(body.location);
@@ -65,10 +65,10 @@ export const createTaskService = async (body, files, posterId) => {
         const [task_lng, task_lat] = taskData.location.coordinates;
 
         const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
-        console.log(taskGeoHash, "taskGeoHash");
+        // console.log(taskGeoHash, "taskGeoHash");
 
         const neighbors = ngeohash.neighbors(taskGeoHash);
-        console.log(neighbors, "neighbours");
+        // console.log(neighbors, "neighbours");
 
         const zonesToNotiffy = [taskGeoHash, ...neighbors];
 
@@ -209,12 +209,47 @@ export const handleNewBid = async (task, user) => {
             workerId: user._id
         })
         const posterId = isTask[0].posterId;
-        console.log("posterId", posterId);
-        console.log("already bid", isAlreadyBid);
+        // console.log("posterId", isTask);
+        // console.log("already bid", isAlreadyBid);
 
         if (isAlreadyBid) {
             return { error: "You have already bid on this task" }
         }
+
+        const bidsDetails = await Bid.aggregate([
+            {
+                $match: {workerId: mongoose.Types.ObjectId(user._id)}
+            },
+            {
+                $sort: {
+                    createdAt: -1
+                }
+            }, 
+            {
+                $lookup: {
+                    from: 'tasks',
+                    localField: 'taskId',
+                    foreignField: '_id',
+                    as:'taskDetails'
+                }
+            }
+        ]);
+
+        // const date = Date.now();
+
+        // let filteredMonthData = bidsDetails[0].filter((bid) => date - createdAt < 30);
+
+        // const category = isTask.category;
+
+        // const categoryCount = filteredMonthData.redcue((acc, task) => {
+        //     acc[task.category] ? acc[task.category]+1 : 1;
+        //     return acc;
+        // },{})
+
+        // if(categoryCount[category] >= 1){
+        //     return {error: `cannot add new bid for category ${category} in this month`}
+        // }
+
         const payload = {
             taskId,
             workerId: user._id,
@@ -236,7 +271,7 @@ export const handleNewBid = async (task, user) => {
         await Bid.create(payload)
         return "bid created successfully"
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         if (error.message) {
             return { error: error.message }
         }
@@ -245,7 +280,7 @@ export const handleNewBid = async (task, user) => {
 }
 
 export const getNearbyTasksService = async (workerId, { search, category, page = 1, limit = 9 }) => {
-    console.log(search, category, page, limit);
+    // console.log(search, category, page, limit);
 
     try {
         const worker = await user.findById(workerId);
@@ -502,11 +537,11 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
 }
 
 export const withdrawBidService = async (bidId) => {
-    console.log(bidId);
+    // console.log(bidId);
 
     try {
         const bid = await Bid.findByIdAndDelete({ _id: bidId })
-        console.log(bid);
+        // console.log(bid);
         // const bid = await Bid.findByIdAndDelete(bidId)
 
         if (!bid) {
