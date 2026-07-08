@@ -8,6 +8,13 @@ import ngeohash from 'ngeohash';
 
 
 
+const deleteImagesFromCloudinary = async (publicIds) => {
+    if (!publicIds || publicIds.length === 0) return;
+    await Promise.all(
+        publicIds.map((id) => cloudinary.uploader.destroy(id))
+    );
+};
+
 const uploadImagesToCloudinary = async (files) => {
     const uploadPromises = files.map((file) =>
         cloudinary.uploader.upload(file.path, {
@@ -26,7 +33,7 @@ const uploadImagesToCloudinary = async (files) => {
 };
 
 export const createTaskService = async (body, files, posterId) => {
-    console.log(body, files, posterId)
+    // console.log(body, files, posterId)
     try {
         const address = JSON.parse(body.address);
         const location = JSON.parse(body.location);
@@ -65,10 +72,10 @@ export const createTaskService = async (body, files, posterId) => {
         const [task_lng, task_lat] = taskData.location.coordinates;
 
         const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
-        console.log(taskGeoHash, "taskGeoHash");
+        // console.log(taskGeoHash, "taskGeoHash");
 
         const neighbors = ngeohash.neighbors(taskGeoHash);
-        console.log(neighbors, "neighbours");
+        // console.log(neighbors, "neighbours");
 
         const zonesToNotiffy = [taskGeoHash, ...neighbors];
 
@@ -93,13 +100,11 @@ export const createTaskService = async (body, files, posterId) => {
 };
 
 export const getTaskForBidService = async (taskId) => {
-    console.log("taskId ", taskId);
     try {
-        let task = await Task.find({ _id: taskId });
+        const task = await Task.find({ _id: new mongoose.Types.ObjectId(taskId) });
         if (!task) {
             return "No task found"
         }
-        console.log(task, "task data");
         return task;
 
     } catch (error) {
@@ -201,23 +206,58 @@ export const handleNewBid = async (task, user) => {
     // console.log(task, user);
 
     try {
-        let { taskId, bidAmount, estimatedTime, pitch } = task;
-        let isTask = await Task.find({ _id: taskId });
+        const { taskId, bidAmount, estimatedTime, pitch } = task;
+        const isTask = await Task.find({ _id: taskId });
         if (!isTask) {
             return { error: "No task found" }
         }
-        let isAlreadyBid = await Bid.findOne({
+        const isAlreadyBid = await Bid.findOne({
             taskId,
             workerId: user._id
         })
         const posterId = isTask[0].posterId;
-        console.log("posterId", posterId);
-        console.log("already bid", isAlreadyBid);
+        // console.log("posterId", isTask);
+        // console.log("already bid", isAlreadyBid);
 
         if (isAlreadyBid) {
             return { error: "You have already bid on this task" }
         }
-        let payload = {
+
+        const bidsDetails = await Bid.aggregate([
+            {
+                $match: {workerId: mongoose.Types.ObjectId(user._id)}
+            },
+            {
+                $sort: {
+                    createdAt: -1
+                }
+            }, 
+            {
+                $lookup: {
+                    from: 'tasks',
+                    localField: 'taskId',
+                    foreignField: '_id',
+                    as:'taskDetails'
+                }
+            }
+        ]);
+
+        // const date = Date.now();
+
+        // let filteredMonthData = bidsDetails[0].filter((bid) => date - createdAt < 30);
+
+        // const category = isTask.category;
+
+        // const categoryCount = filteredMonthData.redcue((acc, task) => {
+        //     acc[task.category] ? acc[task.category]+1 : 1;
+        //     return acc;
+        // },{})
+
+        // if(categoryCount[category] >= 1){
+        //     return {error: `cannot add new bid for category ${category} in this month`}
+        // }
+
+        const payload = {
             taskId,
             workerId: user._id,
             amount: bidAmount,
@@ -235,11 +275,10 @@ export const handleNewBid = async (task, user) => {
             bidAmount,
         })
 
-        let newBid = await Bid.create(payload)
-        // console.log("new bid created ", newBid);
+        await Bid.create(payload)
         return "bid created successfully"
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         if (error.message) {
             return { error: error.message }
         }
@@ -248,7 +287,7 @@ export const handleNewBid = async (task, user) => {
 }
 
 export const getNearbyTasksService = async (workerId, { search, category, page = 1, limit = 9 }) => {
-    console.log(search, category, page, limit);
+    // console.log(search, category, page, limit);
 
     try {
         const worker = await user.findById(workerId);
@@ -269,7 +308,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
         const [lng, lat] = worker.serviceArea.coordinates;
         const skip = (page - 1) * limit;
 
-        let matchCriterias = {};
+        const matchCriterias = {};
 
         if (search) {
             matchCriterias.title = { $regex: search, $options: "i" };
@@ -375,7 +414,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
 export const getWorkerBidDetailsService = async (bidId, workerId) => {
     try {
         const bidDetails = await Bid.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(bidId) } },
+            { $match: { _id: new mongoose.Types.ObjectId(bidId), workerId: new mongoose.Types.ObjectId(workerId) } },
             {
                 $lookup: {
                     from: 'tasks',
@@ -505,11 +544,11 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
 }
 
 export const withdrawBidService = async (bidId) => {
-    console.log(bidId);
+    // console.log(bidId);
 
     try {
         const bid = await Bid.findByIdAndDelete({ _id: bidId })
-        console.log(bid);
+        // console.log(bid);
         // const bid = await Bid.findByIdAndDelete(bidId)
 
         if (!bid) {
@@ -523,7 +562,6 @@ export const withdrawBidService = async (bidId) => {
 }
 
 export const cancelTaskByPosterService = async (taskId) => {
-    console.log(taskId);
     try {
         const taskData = await Task.findById({ _id: taskId });
         if (!taskData) {
@@ -538,6 +576,83 @@ export const cancelTaskByPosterService = async (taskId) => {
     }
 }
 
+export const updateTaskService = async (taskId, posterId, body, newFiles) => {
+    try {
+        const task = await Task.findOne({ _id: taskId, posterId });
+        if (!task) {
+            return { error: "Task not found or unauthorized" };
+        }
+
+        if (task.status !== "open") {
+            return { error: "Only open tasks can be edited" };
+        }
+
+        const bidCount = await Bid.countDocuments({ taskId });
+        if (bidCount > 0) {
+            return { error: "Cannot edit task — bids are already waiting" };
+        }
+
+        let imagesToKeep = [];
+        if (body.retainedImages) {
+            try {
+                imagesToKeep = JSON.parse(body.retainedImages);
+            } catch (_) {
+                imagesToKeep = [];
+            }
+        }
+
+        const removedImages = task.images.filter(
+            (img) => !imagesToKeep.some((r) => r.public_id === img.public_id)
+        );
+        if (removedImages.length > 0) {
+            await deleteImagesFromCloudinary(removedImages.map((i) => i.public_id));
+        }
+
+        let uploadedImages = [];
+        if (newFiles && newFiles.length > 0) {
+            uploadedImages = await uploadImagesToCloudinary(newFiles);
+        }
+
+        const finalImages = [...imagesToKeep, ...uploadedImages].slice(0, 5);
+
+        if (finalImages.length === 0) {
+            return { error: "At least 1 image is required" };
+        }
+
+        let address = task.address;
+        if (body.address) {
+            try { address = JSON.parse(body.address); } catch (_) { /* keep existing */ }
+        }
+        let location = task.location;
+        if (body.location) {
+            try { location = JSON.parse(body.location); } catch (_) { /* keep existing */ }
+        }
+
+        const updatedTask = await Task.findByIdAndUpdate(
+            taskId,
+            {
+                $set: {
+                    title: body.title || task.title,
+                    description: body.description || task.description,
+                    category: body.category || task.category,
+                    deadline: body.deadline ? new Date(body.deadline) : task.deadline,
+                    urgencyLevel: body.urgencyLevel || task.urgencyLevel,
+                    amount: body.amount !== undefined ? Number(body.amount) : task.amount,
+                    images: finalImages,
+                    address,
+                    location,
+                },
+            },
+            { new: true }
+        );
+
+        return { task: updatedTask };
+    } catch (error) {
+        console.error("updateTaskService error:", error.message);
+        return { error: error.message };
+    }
+};
+
 export const getWorkerActiveJobService = async (taskId, workerId) => {
     try {
         const result = await Task.aggregate([
@@ -547,7 +662,6 @@ export const getWorkerActiveJobService = async (taskId, workerId) => {
                     workerId: new mongoose.Types.ObjectId(workerId),
                 }
             },
-            // Join poster (user)
             {
                 $lookup: {
                     from: 'users',
@@ -557,7 +671,6 @@ export const getWorkerActiveJobService = async (taskId, workerId) => {
                 }
             },
             { $unwind: { path: '$poster', preserveNullAndEmptyArrays: true } },
-            // Join accepted bid
             {
                 $lookup: {
                     from: 'bids',

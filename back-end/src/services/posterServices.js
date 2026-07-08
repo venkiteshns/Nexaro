@@ -4,10 +4,11 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
 import Bid from "../models/bidsSchema.js";
+import Review from "../models/reviewSchema.js";
 import { getIo } from "../socket.js";
 
 export const posterSignupService = async (data) => {
-    console.log("signUp data", data);
+    // console.log("signUp data", data);
     try {
         // 1. Duplicate check
         const existing = await User.findOne({ email: data.email });
@@ -95,15 +96,21 @@ export const getTasksService = async (posterId) => {
                 $project: {
                     _id: 1,
                     title: 1,
+                    description: 1,
+                    category: 1,
+                    deadline: 1,
+                    urgencyLevel: 1,
                     createdAt: 1,
                     status: 1,
                     amount: 1,
                     bidCount: 1,
                     address: 1,
+                    location: 1,
+                    images: 1,
                 }
             }
         ])
-        console.log(tasks);
+        // console.log(tasks);
 
         if (!tasks) {
             throw new Error("No tasks found");
@@ -127,7 +134,7 @@ export const getPosterBidsService = async (taskId, sort) => {
         sortCriteria = { "worker.rating": -1 }
     }
     try {
-        let bids = await Bid.aggregate([
+        const bids = await Bid.aggregate([
             { $match: { taskId: new mongoose.Types.ObjectId(taskId) } },
             {
                 $lookup: {
@@ -161,7 +168,7 @@ export const getPosterBidsService = async (taskId, sort) => {
         if (!bids || bids.length === 0) {
             return { error: "No bids found" };
         }
-        let task = await Task.findOne({ _id: taskId });
+        const task = await Task.findOne({ _id: taskId });
         return { bids, task }
 
     } catch (error) {
@@ -196,7 +203,7 @@ export const acceptBidService = async (bidId) => {
         const platformFee = acceptedBid.amount * 5 / 100;
         const updatedTask = await Task.findOneAndUpdate(
             { _id: taskId },
-            { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId, platformFee: platformFee } },
+            { $set: { status: "assigned", workerId: acceptedBid.workerId, acceptedBid: bidId, platformFee } },
             { returnDocument: 'after' }
         );
 
@@ -229,8 +236,6 @@ export const acceptBidService = async (bidId) => {
 
 export const getPosterTaskProgressService = async (taskId) => {
     try {
-        // titile, update, posted, duration, location, worker name, rating, completed jobs, bid amount, worker number,
-        // const task = await Task.findOne({ _id: taskId });
         const task = await Task.aggregate([
             { $match: { _id: new mongoose.Types.ObjectId(taskId) } },
             {
@@ -280,7 +285,7 @@ export const getPosterTaskProgressService = async (taskId) => {
         if (!task[0]) {
             return { error: "Task not found" };
         }
-        console.log("task", task[0]);
+        // console.log("task", task[0]);
 
         const result = task[0];
         const completedWork = await Task.find({ workerId: task[0].workerId, status: "completed" })
@@ -294,24 +299,114 @@ export const getPosterTaskProgressService = async (taskId) => {
     }
 }
 
-export const updateUserProfileService = async ({ userId, role, body }) => {
+export const updateUserProfileService = async ({ userId, body }) => {
     try {
-        let user = User.find({ _id: mongoose.Types.ObjectId(userId), activeRole: role });
+        console.log(body);
+        
+        const user = User.find({ _id: mongoose.Types.ObjectId(userId) });
         if (!user) {
             return ({ error: "user not found" });
         }
-        let { email, address, phone, bio } = body;
-        user.email = email,
-            user.address = address;
-        user.phone = phone,
-            user.bio = bio;
-        await user.save();
-        return ({ message: "user profile updated successfully" })
+        // const { email, locat } = body;
+        // user.email = email,
+        //     user.address = address;
+        // user.phone = phone,
+        //     user.bio = bio;
+        // await user.save();
+        // return ({ message: "user profile updated successfully" })
 
     } catch (error) {
         return ({ error: error.message })
     }
 }
+
+export const getPosterProfileService = async (posterId) => {
+    try {
+        const posterObjectId = new mongoose.Types.ObjectId(posterId);
+
+        const [taskStats] = await Task.aggregate([
+            { $match: { posterId: posterObjectId } },
+            {
+                $group: {
+                    _id: null,
+                    totalPosted: { $sum: 1 },
+                    totalCompleted: {
+                        $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                    }
+                }
+            }
+        ]);
+
+        const posterUser = await User.findById(posterObjectId).select('poster.spent verificationDocuments.selfie.url name email phone city createdAt');
+
+        const stats = {
+            totalPosted: taskStats?.totalPosted || 0,
+            totalCompleted: taskStats?.totalCompleted || 0,
+            totalSpent: posterUser?.poster?.spent || 0
+        };
+
+        const recentTasks = await Task.find({ posterId: posterObjectId })
+            .sort({ createdAt: -1 })
+            .limit(3)
+            .select('_id title status amount category createdAt address');
+
+        const reviews = await Review.aggregate([
+            { $match: { reviewer: posterObjectId, isDeleted: false } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'reviewee',
+                    foreignField: '_id',
+                    as: 'worker'
+                }
+            },
+            { $unwind: { path: '$worker', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'tasks',
+                    localField: 'taskId',
+                    foreignField: '_id',
+                    as: 'task'
+                }
+            },
+            { $unwind: { path: '$task', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1,
+                    rating: 1,
+                    comment: '$review',
+                    createdAt: 1,
+                    'workerName': '$worker.name',
+                    'category': '$task.category',
+                }
+            },
+            { $sort: { createdAt: -1 } }
+        ]);
+
+        stats.reviewsGiven = reviews.length;
+
+       
+
+        return {
+            stats,
+            recentTasks,
+            reviews,
+            poster: {
+                _id: posterObjectId,
+                name: posterUser?.name || null,
+                email: posterUser?.email || null,
+                phone: posterUser?.phone || null,
+                city: posterUser?.city || null,
+                createdAt: posterUser?.createdAt || null,
+                selfie: posterUser?.verificationDocuments?.selfie?.url || null,
+            },
+        };
+
+    } catch (error) {
+        console.error('getPosterProfileService error:', error.message);
+        return { error: error.message };
+    }
+};
 
 export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
     try {
@@ -383,12 +478,9 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
             return ({ error: "Task not found" });
         }
 
-        const result = task[0];
-
-        // console.log("task", result);
-
         return task;
     } catch (error) {
-        return ({ error: error })
+        return ({ error })
     }
 }
+

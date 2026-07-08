@@ -1,4 +1,3 @@
-import React from "react";
 import { TbCurrencyRupee } from "react-icons/tb";
 import "./Landing.css";
 

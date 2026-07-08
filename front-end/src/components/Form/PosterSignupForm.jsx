@@ -1,7 +1,4 @@
-import React from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Mail } from "lucide-react";
-import { Link } from "react-router-dom";
 import PersonalInfo from "./FormComponents/PersonalInfo";
 import Password from "./FormComponents/Password";
 import Location from "./FormComponents/Location";
@@ -9,8 +6,8 @@ import TermsAndConditions from "./FormComponents/TermsAndConditions";
 
 const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) => {
 
-  let { isLoading, isSuccess, isError, error, data } = otpStatus;
-  let { signUpLoading, isSignUpSuccess, isSignUpError, signUpError, signUpData } = formStatus;
+  const { isLoading, isError, error } = otpStatus;
+  const { isSignUpError, signUpError } = formStatus;
 
   const methods = useForm();
   return (

@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
 import { getCoords } from '../../services/getCooords'
 
 const MapClickHandler = ({ setPosition }) => {
@@ -29,7 +30,7 @@ const FlyToLocation = ({ position }) => {
         if (position) {
             map.flyTo([position.lat, position.lng]);
         }
-    }, [position]);
+    }, [position, map]);
     return null;
 }
 

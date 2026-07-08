@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 export const workerSignupService = async ({ files, data }) => {
 
     try {
-        let user = await User.findOne({ email: data.email })
+        const user = await User.findOne({ email: data.email })
 
         if (user) {
             throw new Error("User Already Exists")
@@ -22,12 +22,12 @@ export const workerSignupService = async ({ files, data }) => {
 
         let parsedSkills = [];
         let parsedLanguages = [];
-        try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch (e) { }
-        try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch (e) { }
+        try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch { /* ignore parsing errors */ }
+        try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch { /* ignore parsing errors */ }
 
         const hashedPassword = await hashData(data.password);
 
-        let payLoad = {
+        const payLoad = {
             name: data.name,
             email: data.email,
             phone: data.phone,
@@ -70,7 +70,7 @@ export const workerSignupService = async ({ files, data }) => {
             };
         }
 
-        console.log("files", files);
+        // console.log("files", files);
 
         const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 
@@ -91,12 +91,12 @@ export const workerSignupService = async ({ files, data }) => {
         await createdUser.save({ validateBeforeSave: false });
         const { _id, name, email, verificationDocuments, activeRole } = createdUser;
         const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role: activeRole };
-        console.log(responseUser);
+        // console.log(responseUser);
         return { responseUser, accessToken, refreshToken };
 
 
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         return { error: "User with same credentials exists, Try with different mobile number" };
     }
 }

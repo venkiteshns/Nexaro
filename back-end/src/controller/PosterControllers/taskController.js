@@ -1,8 +1,7 @@
 import { getTasksService } from "../../services/posterServices.js";
-import { createTaskService, handleNewBid, cancelTaskByPosterService } from "../../services/taskServices.js";
+import { createTaskService, handleNewBid, cancelTaskByPosterService, updateTaskService } from "../../services/taskServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { response } from "express";
 
 export const createTask = async (req, res) => {
     try {
@@ -62,7 +61,7 @@ export const getMyTasks = async (req, res) => {
 
 export const addNewBid = async (req, res) => {
     try {
-        let response = await handleNewBid(req.body, req.user)
+        const response = await handleNewBid(req.body, req.user)
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -84,8 +83,8 @@ export const addNewBid = async (req, res) => {
 
 export const cancelTaskByPoster = async (req, res) => {
     try {
-        let response = await cancelTaskByPosterService(req.params.taskId);
-        console.log("controller side response", response);
+        const response = await cancelTaskByPosterService(req.params.taskId);
+        // console.log("controller side response", response);
 
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -105,3 +104,31 @@ export const cancelTaskByPoster = async (req, res) => {
         });
     }
 }
+
+export const updateTask = async (req, res) => {
+    try {
+        const posterId = req.user._id;
+        const { taskId } = req.params;
+
+        const response = await updateTaskService(taskId, posterId, req.body, req.files);
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Task updated successfully",
+            task: response.task,
+        });
+    } catch (error) {
+        console.error("updateTask controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};

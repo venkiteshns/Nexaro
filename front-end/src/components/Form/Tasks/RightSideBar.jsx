@@ -1,5 +1,4 @@
 import { Camera, Eye, MapPin, Tag, Zap } from 'lucide-react'
-import React from 'react'
 
 const RightSideBar = ({ title, location, budget }) => {
     return (

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Clock, Tag, AlertTriangle, DollarSign, Layers } from 'lucide-react';
 
 function InfoRow({ icon, label, value }) {

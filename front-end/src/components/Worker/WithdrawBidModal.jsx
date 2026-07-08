@@ -1,4 +1,3 @@
-import React from "react";
 import { AlertTriangle, Wrench } from "lucide-react";
 import { useWithdrawBidMutation } from "../../store/services/api";
 import { showError, showSuccess } from "../../utils/toast";
@@ -22,9 +21,10 @@ const WithdrawBidModal = ({
   bidId,
   isWithdrawSuccess
 }) => {
-  if (!isOpen) return null;
-
+  // Hook must be called unconditionally — before any early return
   const [withdrawBid, { isLoading, isSuccess }] = useWithdrawBidMutation();
+
+  if (!isOpen) return null;
 
   const onConfirm = async () => {
     try {

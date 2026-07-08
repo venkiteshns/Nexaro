@@ -1,11 +1,7 @@
-import React, { useState } from "react";
 import {
   ArrowLeft,
   MapPin,
   Clock,
-  ChevronDown,
-  Calendar,
-  Lightbulb,
   Image,
   Loader2,
 } from "lucide-react";
@@ -14,14 +10,9 @@ import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import { useAddNewBidMutation, useGetTaskForBidQuery } from "../../store/services/api";
 import { FormProvider, useForm } from "react-hook-form";
-import FormError from "../../components/Form/FormComponents/FormError";
-import Dropdown from "../../components/Custom/Dropdown";
 import BidForm from "../../components/Form/Bids/BidForm";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
 
-
-
-/* ─────────────────── Photos ─────────────────── */
 function PhotoStrip({ photos }) {
   return (
     <div className="overflow-x-auto mt-4 pb-1">
@@ -60,9 +51,9 @@ const PlaceBid = () => {
 
   const { taskId } = useParams();
 
-  const { data, isLoading, isError } = useGetTaskForBidQuery(taskId);
+  const { data } = useGetTaskForBidQuery(taskId);
 
-  const [addbid, { data: bidData, error: bidError, isSuccess: bidSuccess, isLoading: bidLoading, trigger: triggerBid }] = useAddNewBidMutation();
+  const [addbid, { isSuccess: bidSuccess, isLoading: bidLoading, isError: bidError }] = useAddNewBidMutation();
 
   if (data) {
     task = data?.task[0];

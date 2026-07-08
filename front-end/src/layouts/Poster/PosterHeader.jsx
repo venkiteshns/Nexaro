@@ -1,4 +1,3 @@
-import React from "react";
 import { Bell } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -6,7 +5,7 @@ const PosterHeader = () => {
   const user = useSelector((state) => state.auth.user);
 
   return (
-    <div className="flex-shrink-0 h-14 z-10 bg-white border-b border-gray-200 px-6 flex items-center justify-end gap-4 shadow-sm">
+    <div className="shrink-0 h-14 z-10 bg-white border-b border-gray-200 pl-16 md:pl-6 pr-6 flex items-center justify-end gap-4 shadow-sm">
       <button className="relative text-gray-500 hover:text-[#0A6E5C] transition-colors">
         <Bell size={20} />
         <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />

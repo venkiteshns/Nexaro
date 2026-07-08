@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import Logo from "../Logo/Logo";
 import { useVerifyOtpMutation } from "../../store/services/api";
@@ -7,7 +7,7 @@ const OTP_LENGTH = 6;
 
 const OtpModal = (props) => {
 
-  const {show, email, reSendOtp, isVerified} = props;
+  const { show, email, reSendOtp, isVerified } = props;
 
   const [time, setTime] = useState(60);
   const [resendCount, setResendCount] = useState(0);
@@ -17,20 +17,16 @@ const OtpModal = (props) => {
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const inputRefs = useRef([]);
 
-  const [verifyOtp, { isLoading, isSuccess, isError, error, data }] =
+  const [verifyOtp, { isLoading, isSuccess, isError, error }] =
     useVerifyOtpMutation();
 
   const handleOtp = async (otp) => {
     try {
-      const res = await verifyOtp({
-        otp,
-        email,
-      }).unwrap();
-      setTimeout(() => {
-        show(false);
-      }, 1500);
+      const res = await verifyOtp({ otp, email }).unwrap();
+      console.log('OTP verified:', res);
+      setTimeout(() => { show(false); }, 1500);
       isVerified(true);
-    } catch (err) {
+    } catch {
       setOtpError(true);
 
       setTimeout(() => {
@@ -42,7 +38,7 @@ const OtpModal = (props) => {
       }, 800);
     }
   };
-  //   useEffect Timer
+
   useEffect(() => {
     if (time <= 0) {
       setCanResend(true);
@@ -56,6 +52,7 @@ const OtpModal = (props) => {
     return () => clearInterval(interval);
   }, [time]);
 
+
   // Functions
 
   const handleResendOtp = () => {
@@ -63,7 +60,7 @@ const OtpModal = (props) => {
     setResendCount((prev) => prev + 1);
     setCanResend(false);
     setTime(60);
-    reSendOtp({email});
+    reSendOtp({ email });
   };
 
   const handleClose = () => {
@@ -167,13 +164,12 @@ const OtpModal = (props) => {
                   rounded-xl border outline-none transition-all
                   bg-gray-700/10
 
-                  ${
-                    isSuccess
-                      ? "border-2 border-green-600 bg-green-50"
-                      : otpError
-                        ? "border-2 border-red-500 bg-red-50 shake"
-                        : "border border-dashed border-green-800/70 focus:ring-2 focus:ring-green-800/20 focus:border-black"
-                  }
+                  ${isSuccess
+                  ? "border-2 border-green-600 bg-green-50"
+                  : otpError
+                    ? "border-2 border-red-500 bg-red-50 shake"
+                    : "border border-dashed border-green-800/70 focus:ring-2 focus:ring-green-800/20 focus:border-black"
+                }
                 `}
             />
           ))}
@@ -190,11 +186,10 @@ const OtpModal = (props) => {
             disabled={!canResend}
             onClick={handleResendOtp}
             className={`text-sm font-semibold transition
-                ${
-                  canResend
-                    ? "text-blue-700  cursor-pointer"
-                    : "text-gray-400 cursor-not-allowed"
-                }`}
+                ${canResend
+                ? "text-blue-700  cursor-pointer"
+                : "text-gray-400 cursor-not-allowed"
+              }`}
           >
             {canResend ? "Resend OTP" : `Resend OTP in ${time}s`}
           </button>
@@ -210,11 +205,11 @@ const OtpModal = (props) => {
           onClick={() => handleOtp(finalOtp)}
           className={`w-full rounded-xl py-3 font-semibold md:font-bold text-white transition
                 ${isSuccess ? "bg-[#0A6E5C]/50 cursor-not-allowed" :
-                  finalOtp.length === 6
-                    ? "bg-green-900/90 hover:bg-green-800 cursor-pointer" 
-                    
-                    : "bg-gray-400 cursor-not-allowed opacity-70"
-                }`}
+              finalOtp.length === 6
+                ? "bg-green-900/90 hover:bg-green-800 cursor-pointer"
+
+                : "bg-gray-400 cursor-not-allowed opacity-70"
+            }`}
         >
           {isLoading
             ? "Verifing OTP"

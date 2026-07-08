@@ -15,10 +15,8 @@ const useSocketNotification = () => {
     const activeToken = accessToken || adminToken;
 
     useEffect(() => {
-        // Connect for any logged-in user (worker, poster, or admin)
         if (!activeUser || !activeToken) return;
 
-        // Token sent via auth — backend handles room joining (workers only)
         connectSocket(activeToken);
 
         const socket = getSocket();

@@ -1,0 +1,519 @@
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Admin/AdminLoginForm.jsx
+   1:8  error    'React' is defined but never used                                                                                         no-unused-vars
+  31:6  warning  React Hook useEffect has missing dependencies: 'methods' and 'reset'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Admin/TaskDetails/PosterCard.jsx
+  1:8   error  'React' is defined but never used  no-unused-vars
+  2:23  error  'User' is defined but never used   no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Admin/TaskDetails/TaskDetailsBanner.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Admin/TaskDetails/TaskInfoCard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Admin/TaskDetails/WorkerAssignedCard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Custom/Dropdown.jsx
+   2:8   error    'React' is defined but never used                                                                                                    no-unused-vars
+   3:26  error    'Watch' is defined but never used                                                                                                    no-unused-vars
+  16:8   warning  React Hook useEffect has missing dependencies: 'name', 'option', and 'setValue'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/Bids/BidForm.jsx
+  34:8  warning  React Hook useEffect has a missing dependency: 'setValue'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/CustomSelector.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/ForgotPasswordModal.jsx
+  25:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  23 |   useEffect(() => {
+  24 |     if (isSuccess) {
+> 25 |       setShowOtp(true);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  26 |     }
+  27 |   }, [isSuccess]);
+  28 |  react-hooks/set-state-in-effect
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/FormError.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/IdentityVerification.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/Location.jsx
+    1:8   error  'React' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                no-unused-vars
+   15:5   error  'trigger' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  132:59  error  'city' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+  180:14  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                no-unused-vars
+  195:27  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  193 |
+  194 |   useEffect(() => {
+> 195 |     if (selectedDistrict) setDistrict(selectedDistrict);
+      |                           ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  196 |   }, [selectedDistrict]);
+  197 |
+  198 |   const fieldClass =  react-hooks/set-state-in-effect
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/Password.jsx
+  1:8  error  'React' is defined but never used                no-unused-vars
+  4:8  error  'ForgotPasswordModal' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/PersonalInfo.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/TaskDetails.jsx
+  2:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/FormComponents/TermsAndConditions.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/LoginForm.jsx
+   1:8   error    'React' is defined but never used                                                                                            no-unused-vars
+  27:43  error    'isSuccess' is assigned a value but never used                                                                               no-unused-vars
+  27:61  error    'data' is assigned a value but never used                                                                                    no-unused-vars
+  33:5   error    'updatePassword' is assigned a value but never used                                                                          no-unused-vars
+  35:16  error    'updateError' is assigned a value but never used                                                                             no-unused-vars
+  36:18  error    'updateSuccess' is assigned a value but never used                                                                           no-unused-vars
+  37:18  error    'updateLoading' is assigned a value but never used                                                                           no-unused-vars
+  38:14  error    'updateErrorData' is assigned a value but never used                                                                         no-unused-vars
+  39:13  error    'updateData' is assigned a value but never used                                                                              no-unused-vars
+  48:6   warning  React Hook useEffect has missing dependencies: 'loginReset' and 'reset'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/PosterSignupForm.jsx
+   1:8   error  'React' is defined but never used                     no-unused-vars
+   3:10  error  'Mail' is defined but never used                      no-unused-vars
+   4:10  error  'Link' is defined but never used                      no-unused-vars
+  12:20  error  'isSuccess' is assigned a value but never used        no-unused-vars
+  12:47  error  'data' is assigned a value but never used             no-unused-vars
+  13:9   error  'signUpLoading' is assigned a value but never used    no-unused-vars
+  13:24  error  'isSignUpSuccess' is assigned a value but never used  no-unused-vars
+  13:69  error  'signUpData' is assigned a value but never used       no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/Tasks/RightSideBar.jsx
+  2:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/Tasks/TaskForm.jsx
+   1:8   error    'React' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+  20:37  error    'isError' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+  20:46  error    'isSuccess' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+  43:26  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+  41 |     };
+  42 |
+> 43 |     const previewTitle = methods.watch("taskTitle");
+     |                          ^^^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  44 |     const previewLocation = methods.watch("area");
+  45 |     const previewBudget = methods.watch("budget");
+  46 |  react-hooks/incompatible-library
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/Tasks/TaskLocation.jsx
+    1:8   error    'React' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   33:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  31 |
+  32 |     useEffect(() => {
+> 33 |         setFetchCords('idle');
+     |         ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |     }, [selectedState, selectedDistrict, city, area, locationLat, locationLng])
+  35 |
+  36 |     const handleMapPositionChange = (pos) => {                                                       react-hooks/set-state-in-effect
+   62:22  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+   62:25  error    Empty block statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-empty
+   76:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  74 |             setValue('district', match, { shouldValidate: true });
+  75 |         }
+> 76 |         setPendingDistrict(null);
+     |         ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  77 |     }, [districts, pendingDistrict]);
+  78 |
+  79 |     const districtAreas = selectedDistrict && DISTRICT_AREAS[selectedDistrict]  react-hooks/set-state-in-effect
+   77:8   warning  React Hook useEffect has a missing dependency: 'setValue'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+   85:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  83 |     useEffect(() => {
+  84 |         if (locationLat && locationLng) {
+> 85 |             setMapPosition({ lat: locationLat, lng: locationLng });
+     |             ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  86 |         }
+  87 |     }, [locationLat, locationLng]);
+  88 |                                                    react-hooks/set-state-in-effect
+  118:18  error    'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  121:17  error    'n' is not defined                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-undef
+  167:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  165 |                                 />
+  166 |                             </div>
+> 167 |                             <FieldError name="state" />
+      |                              ^^^^^^^^^^ This component is created during render
+  168 |                         </div>
+  169 |
+  170 |                         <div>
+
+  125 |     };
+  126 |
+> 127 |     const FieldError = ({ name }) =>
+      |                        ^^^^^^^^^^^^^
+> 128 |         errors[name] ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 129 |             <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 130 |         ) : null;
+      | ^^^^^^^^^^^^^^^^^ The component is created during render here
+  131 |
+  132 |     return (
+  133 |         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">                                     react-hooks/static-components
+  194:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  192 |                                 />
+  193 |                             </div>
+> 194 |                             <FieldError name="district" />
+      |                              ^^^^^^^^^^ This component is created during render
+  195 |                         </div>
+  196 |                     </div>
+  197 |
+
+  125 |     };
+  126 |
+> 127 |     const FieldError = ({ name }) =>
+      |                        ^^^^^^^^^^^^^
+> 128 |         errors[name] ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 129 |             <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 130 |         ) : null;
+      | ^^^^^^^^^^^^^^^^^ The component is created during render here
+  131 |
+  132 |     return (
+  133 |         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">                                     react-hooks/static-components
+  236:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  234 |                                 />
+  235 |                             )}
+> 236 |                             <FieldError name="city" />
+      |                              ^^^^^^^^^^ This component is created during render
+  237 |                         </div>
+  238 |
+  239 |                         <div>
+
+  125 |     };
+  126 |
+> 127 |     const FieldError = ({ name }) =>
+      |                        ^^^^^^^^^^^^^
+> 128 |         errors[name] ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 129 |             <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 130 |         ) : null;
+      | ^^^^^^^^^^^^^^^^^ The component is created during render here
+  131 |
+  132 |     return (
+  133 |         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">                                          react-hooks/static-components
+  251:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  249 |                                     }`}
+  250 |                             />
+> 251 |                             <FieldError name="area" />
+      |                              ^^^^^^^^^^ This component is created during render
+  252 |                         </div>
+  253 |                     </div>
+  254 |
+
+  125 |     };
+  126 |
+> 127 |     const FieldError = ({ name }) =>
+      |                        ^^^^^^^^^^^^^
+> 128 |         errors[name] ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 129 |             <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 130 |         ) : null;
+      | ^^^^^^^^^^^^^^^^^ The component is created during render here
+  131 |
+  132 |     return (
+  133 |         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">                                        react-hooks/static-components
+  267:26  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  265 |                                 }`}
+  266 |                         />
+> 267 |                         <FieldError name="houseNumber" />
+      |                          ^^^^^^^^^^ This component is created during render
+  268 |                     </div>
+  269 |
+  270 |                     {/* Full Address */}
+
+  125 |     };
+  126 |
+> 127 |     const FieldError = ({ name }) =>
+      |                        ^^^^^^^^^^^^^
+> 128 |         errors[name] ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 129 |             <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 130 |         ) : null;
+      | ^^^^^^^^^^^^^^^^^ The component is created during render here
+  131 |
+  132 |     return (
+  133 |         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">                                       react-hooks/static-components
+  283:26  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  281 |                                 }`}
+  282 |                         />
+> 283 |                         <FieldError name="fullAddress" />
+      |                          ^^^^^^^^^^ This component is created during render
+  284 |                     </div>
+  285 |
+  286 |                     {selectedState && selectedDistrict && city && area && (
+
+  125 |     };
+  126 |
+> 127 |     const FieldError = ({ name }) =>
+      |                        ^^^^^^^^^^^^^
+> 128 |         errors[name] ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 129 |             <p className="text-xs text-red-500 mt-1">{errors[name].message}</p>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^
+> 130 |         ) : null;
+      | ^^^^^^^^^^^^^^^^^ The component is created during render here
+  131 |
+  132 |     return (
+  133 |         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">    react-hooks/static-components
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/Tasks/TaskPhotos.jsx
+  2:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Form/WorkerSignupForm.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Landing/Footer.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Landing/GetStarted.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Landing/Header.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Landing/Hero.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Landing/Status.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Landing/Workflow.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Logo/Logo.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Maps/Map.jsx
+   1:8   error    'React' is defined but never used                                                                       no-unused-vars
+   1:28  error    'useRef' is defined but never used                                                                      no-unused-vars
+  32:8   warning  React Hook useEffect has a missing dependency: 'map'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  62:27  error    'L' is not defined                                                                                      no-undef
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/OtpModal/OtpModal.jsx
+   1:8   error  'React' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 no-unused-vars
+  20:61  error  'data' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+  25:13  error  'res' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+  33:14  error  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+  48:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  46 |   useEffect(() => {
+  47 |     if (time <= 0) {
+> 48 |       setCanResend(true);
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |       return;
+  50 |     }
+  51 |  react-hooks/set-state-in-effect
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Poster/CompletedTask/FinalInvoiceCard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Poster/CompletedTask/ReviewCard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Poster/CompletedTask/TaskHeaderBanner.jsx
+  1:8   error  'React' is defined but never used    no-unused-vars
+  2:34  error  'History' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Poster/CompletedTask/TaskSummaryCard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Poster/PosterSignUpBanner.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Worker/HeaderWorkerSignup.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/components/Worker/WithdrawBidModal.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/customHooks/useSocketNotification.js
+  75:8  warning  React Hook useEffect has a missing dependency: 'dispatch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/layouts/Admin/AdminNavBar.jsx
+  1:8   error  'React' is defined but never used     no-unused-vars
+  1:17  error  'useState' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/layouts/Poster/PosterHeader.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/layouts/Poster/PosterNavBar.jsx
+   1:8   error  'React' is defined but never used  no-unused-vars
+  33:14  error  'error' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/layouts/Worker/WorkerHeader.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/layouts/Worker/WorkerNavBar.jsx
+   1:8   error  'React' is defined but never used  no-unused-vars
+  34:14  error  'error' is defined but never used  no-unused-vars
+  34:21  error  Empty block statement              no-empty
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/Landing/Landing.jsx
+   1:8  error    'React' is defined but never used                                                                                                      no-unused-vars
+  32:6  warning  React Hook useEffect has a missing dependency: 'location.state?.scrollToGetStarted'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/admin/AdminDashboard.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/admin/AdminTaskDetails.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/admin/AdminTaskManagement.jsx
+    1:8   error  'React' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  280:23  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  278 |     const debouncedSearch = useDebounce({ searchText, delay: 400 });
+  279 |
+> 280 |     useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter, categoryFilter]);
+      |                       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  281 |
+  282 |     const { data, isLoading, isError } = useAdminGetAllTasksQuery({
+  283 |         page: currentPage,  react-hooks/set-state-in-effect
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/admin/UserMangement.jsx
+    1:8   error  'React' is defined but never used  no-unused-vars
+  197:13  error  Empty block statement              no-empty
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/admin/UserVerificationPanel.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/auth/PosterSignup.jsx
+  81:6  warning  React Hook useEffect has a missing dependency: 'sendDataToBackend'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/auth/WorkerSignup.jsx
+  33:7  error  Error: Cannot access variable before it is declared
+
+`sendDataToBackend` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  31 |   useEffect(() => {
+  32 |     if (isVerified && formData) {
+> 33 |       sendDataToBackend();
+     |       ^^^^^^^^^^^^^^^^^ `sendDataToBackend` accessed before it is declared
+  34 |     }
+  35 |     // eslint-disable-next-line react-hooks/exhaustive-deps
+  36 |   }, [isVerified]);
+
+  36 |   }, [isVerified]);
+  37 |
+> 38 |   const sendDataToBackend = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |     if (!isVerified) return;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |     const fd = new FormData();
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 77 |   };
+     | ^^^^^ `sendDataToBackend` is declared here
+  78 |
+  79 |   const resendOtp = async () => {
+  80 |     const response = await sendOtp({  react-hooks/immutability
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/pages/poster/ReviewBids.jsx
+  329:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  327 |     useEffect(() => {
+  328 |         if (isSuccessAcceptBid) {
+> 329 |             setCountdown(5);
+      |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  330 |             countdownRef.current = setInterval(() => {
+  331 |                 setCountdown((prev) => {
+  332 |                     if (prev <= 1) {  react-hooks/set-state-in-effect
+  342:8   warning  React Hook useEffect has missing dependencies: 'navigate' and 'taskData?._id'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+/home/venkitesh/Brocamp/First Project/NEXARO/front-end/src/services/placeToCoords.js
+  22:5  error  There is no `cause` attached to the symptom error being thrown  preserve-caught-error
+
+✖ 113 problems (102 errors, 11 warnings)
+

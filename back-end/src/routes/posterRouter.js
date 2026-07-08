@@ -1,8 +1,8 @@
 import express from "express";
 import upload from "../middlewares/upload.js";
 import verifyToken from "../middlewares/verifyToken.js";
-import { createTask, getMyTasks, cancelTaskByPoster } from "../controller/PosterControllers/taskController.js";
-import { getPosterBids, acceptBid, getPosterTaskProgress, updateUserProfile, getCompletedTaskPosterSide } from "../controller/PosterControllers/posterController.js";
+import { createTask, getMyTasks, cancelTaskByPoster, updateTask } from "../controller/PosterControllers/taskController.js";
+import { getPosterBids, acceptBid, getPosterTaskProgress, updateUserProfile, getCompletedTaskPosterSide, getPosterProfile } from "../controller/PosterControllers/posterController.js";
 
 const router = express.Router();
 
@@ -25,7 +25,9 @@ router.get('/task/completed/:taskId', verifyToken, getCompletedTaskPosterSide);
 
 router.patch('/bid/accept/:bidId', verifyToken, acceptBid);
 router.patch('/task/cancel/:taskId', verifyToken, cancelTaskByPoster)
+router.patch('/task/update/:taskId', verifyToken, upload.array('photos', 5), updateTask)
+router.patch('/profile/update', verifyToken, updateUserProfile);
 
-router.patch('/profile/update/:role', verifyToken, updateUserProfile);
+router.get('/profile', verifyToken, getPosterProfile);
 
 export default router;

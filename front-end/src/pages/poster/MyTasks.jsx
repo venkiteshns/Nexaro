@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import {
     Plus,
     MapPin,
@@ -13,12 +12,15 @@ import {
     User,
     Trash2,
     Loader,
+    Pencil,
+    Lock,
 } from 'lucide-react';
 
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
 import { useCancelTaskByPosterMutation, useGetPosterTasksQuery } from '../../store/services/api';
 import { showError, showSuccess } from '../../utils/toast';
+import EditTaskModal from '../../components/Poster/EditTaskModal';
 
 function getStatusConfig(status) {
     switch (status) {
@@ -49,7 +51,7 @@ function CancelConfirmModal({ task, onConfirm, onClose }) {
                 className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="h-1 w-full bg-gradient-to-r from-red-400 to-red-500" />
+                <div className="h-1 w-full bg-linear-to-r from-red-400 to-red-500" />
 
                 <div className="p-7 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mb-5">
@@ -87,8 +89,11 @@ function TaskCard({ task }) {
     const navigate = useNavigate();
     const { badge, border, label } = getStatusConfig(task.status);
     const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
 
-    const [cancelTask, { isLoading, isSuccess, isError, error }] = useCancelTaskByPosterMutation()
+    const hasBids = task.bidCount > 0;
+
+    const [cancelTask, { isLoading, isSuccess }] = useCancelTaskByPosterMutation()
 
     const handleCancelConfirm = async () => {
         setTimeout(() => {
@@ -152,9 +157,9 @@ function TaskCard({ task }) {
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-center px-5 pb-4 pt-2 border-t border-gray-100">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 pb-4 pt-2 border-t border-gray-100 gap-2">
 
-                    <div className=" mb-2 sm:mb-0 text-xs text-gray-500">
+                    <div className="text-xs text-gray-500">
                         {task.status === 'open' && task.bidCount > 0 && (
                             <span className="text-[#0A6E5C] font-semibold">
                                 {task.bidCount} new bid{task.bidCount > 1 ? 's' : ''} waiting
@@ -178,27 +183,47 @@ function TaskCard({ task }) {
                         )}
                     </div>
 
-                    <div className="flex  gap-2">
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                         {task.status === 'open' && (
                             <>
                                 {!isLoading && <button
                                     onClick={() => setShowCancelModal(true)}
-                                    className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-red-200 bg-red-50 text-red-600 cursor-pointer hover:bg-red-100 transition-colors">
+                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-red-200 bg-red-50 text-red-600 cursor-pointer hover:bg-red-100 transition-colors">
                                     Cancel
                                 </button>}
                                 {isLoading && <button
-                                    className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold border border-red-200 bg-red-50 text-red-600 cursor-pointer hover:bg-red-100 transition-colors">
+                                    className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold border border-red-200 bg-red-50 text-red-600 transition-colors">
                                     Cancelling Task <Loader className="animate-spin" size={14} />
                                 </button>}
                                 {isSuccess && <button
-                                    className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold border border-green-200 bg-green-50 text-green-600 cursor-pointer hover:bg-green-100 transition-colors">
+                                    className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold border border-green-200 bg-green-50 text-green-600 transition-colors">
                                     Task Cancelled
                                 </button>}
+
+                                {/* Edit button — only when no bids */}
+                                {!hasBids ? (
+                                    <button
+                                        onClick={() => setShowEditModal(true)}
+                                        className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold border border-[#0A6E5C] bg-emerald-50 text-[#0A6E5C] cursor-pointer hover:bg-emerald-100 transition-colors"
+                                    >
+                                        <Pencil size={13} />
+                                        Edit
+                                    </button>
+                                ) : (
+                                    <button
+                                        disabled
+                                        title="Bids are waiting — editing is disabled"
+                                        className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed select-none"
+                                    >
+                                        <Lock size={13} />
+                                        Bids Waiting
+                                    </button>
+                                )}
 
                                 {task.bidCount > 0 && (
                                     <button
                                         onClick={() => navigate(`/poster/review-bids/${task._id}`)}
-                                        className="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors"
+                                        className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors"
                                     >
                                         Review Bids
                                     </button>)}
@@ -209,7 +234,7 @@ function TaskCard({ task }) {
                             <>
                                 <button
                                     onClick={() => navigate(`/poster/work-progress/${task._id}`)}
-                                    className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-green-200 bg-green-50 text-green-700 cursor-pointer hover:bg-green-100 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-green-200 bg-green-50 text-green-700 cursor-pointer hover:bg-green-100 transition-colors"
                                 >
                                     View Progress
                                 </button>
@@ -220,11 +245,11 @@ function TaskCard({ task }) {
                             <>
                                 <button
                                     onClick={() => navigate(`/poster/work-progress/${task._id}`)}
-                                    className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
                                 >
                                     View Progress
                                 </button>
-                                <button className="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
+                                <button className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
                                     Release Payment
                                 </button>
                             </>
@@ -233,7 +258,7 @@ function TaskCard({ task }) {
                         {task.status === 'completed' && (
                             <button
                                 onClick={() => navigate(`/poster/completed-task/${task._id}`)}
-                                className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
+                                className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
                             >
                                 View Details
                             </button>
@@ -253,6 +278,13 @@ function TaskCard({ task }) {
                     task={task}
                     onConfirm={handleCancelConfirm}
                     onClose={() => setShowCancelModal(false)}
+                />
+            )}
+
+            {showEditModal && (
+                <EditTaskModal
+                    task={task}
+                    onClose={() => setShowEditModal(false)}
                 />
             )}
         </>
@@ -276,12 +308,12 @@ function StatCard({ icon, count, label, topColor }) {
 
 const MyTasks = () => {
     const navigate = useNavigate();
-    const user = useSelector((state) => state.auth.user);
 
     const [activeTab, setActiveTab] = useState('all');
     const [searchText, setSearchText] = useState('');
 
     const { data, isLoading, isError } = useGetPosterTasksQuery();
+
 
     const allTasks = data?.tasks || [];
 

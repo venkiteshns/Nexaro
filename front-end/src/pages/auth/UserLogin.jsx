@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PosterSignUpBanner from "../../components/Poster/PosterSignUpBanner";
-import Header from "../../components/Landing/Header";
 import Logo from "../../components/Logo/Logo";
 import LoginForm from "../../components/Form/LoginForm";
 import { useForm, FormProvider } from "react-hook-form";
-import { Mail } from "lucide-react";
 
 const UserLogin = () => {
 

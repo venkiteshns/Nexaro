@@ -1,4 +1,3 @@
-import React from 'react';
 import { ClipboardList, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react';
 
 function getStatusConfig(status) {

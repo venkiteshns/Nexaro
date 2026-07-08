@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
-import { useFormContext, Watch } from 'react-hook-form';
+import { useEffect, useState } from 'react'
+import { useFormContext } from 'react-hook-form';
 import FormError from '../Form/FormComponents/FormError';
 
 const Dropdown = ({ options, name, field }) => {

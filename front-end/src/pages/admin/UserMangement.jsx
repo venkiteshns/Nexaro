@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AdminNavBar from "../../layouts/Admin/AdminNavBar";
 import AdminHeader from "../../layouts/Admin/AdminHeader";
 import {
@@ -192,9 +192,11 @@ const UserManagement = () => {
   const selectedUser = users.find((u) => u._id === selectedUserId) || null;
 
   const handleSuspensionStatus = (id, isSuspended) => {
-    try {
-      isSuspended ? unsuspendUser(id) : suspendUser(id);
-    } catch { }
+    // try {
+    isSuspended ? unsuspendUser(id) : suspendUser(id);
+    // } catch {
+    // errors handled by RTK Query's isError state
+    // }
   };
 
   const handleSelectUser = (id) => {

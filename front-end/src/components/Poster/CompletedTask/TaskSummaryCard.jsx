@@ -1,4 +1,3 @@
-import React from 'react';
 import { Wrench, Star, CalendarCheck, BadgeCheck } from 'lucide-react';
 
 /* ── Stat pill inside the summary card ── */

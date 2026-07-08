@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star, MessageSquareOff } from 'lucide-react';
 
 const ReviewCard = ({ review }) => {

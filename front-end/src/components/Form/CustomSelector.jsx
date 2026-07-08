@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {SKILLS, LANGUAGES} from '../../utils/constants'
 import { useFormContext } from "react-hook-form";
 

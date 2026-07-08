@@ -1,4 +1,4 @@
-import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService, updateUserProfileService, getCompletedTaskPosterSideService } from "../../services/posterServices.js";
+import { posterSignupService, getPosterBidsService, acceptBidService, getPosterTaskProgressService, updateUserProfileService, getCompletedTaskPosterSideService, getPosterProfileService } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -33,10 +33,8 @@ export const posterSignup = async (req, res) => {
 };
 
 export const getPosterBids = async (req, res) => {
-    console.log("query : ", req.query.sort);
-
     try {
-        let response = await getPosterBidsService(req.params.taskId, req.query.sort);
+        const response = await getPosterBidsService(req.params.taskId, req.query.sort);
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -91,7 +89,7 @@ export const acceptBid = async (req, res) => {
 
 export const getPosterTaskProgress = async (req, res) => {
     try {
-        let response = await getPosterTaskProgressService(req.params.taskId);
+        const response = await getPosterTaskProgressService(req.params.taskId);
         if (response.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -113,7 +111,7 @@ export const getPosterTaskProgress = async (req, res) => {
 }
 
 export const updateUserProfile = async (req, res) => {
-    let response = await updateUserProfileService({ userId: req.user.id, role: req.params.role, body: req.body });
+    const response = await updateUserProfileService({ userId: req.user.id, body: req.body });
     if (response.error) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error });
     }
@@ -142,3 +140,29 @@ export const getCompletedTaskPosterSide = async (req, res) => {
     });
 
 }
+
+export const getPosterProfile = async (req, res) => {
+    try {
+        const posterId = req.user._id;
+        const response = await getPosterProfileService(posterId);
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: "Poster profile fetched successfully",
+            data: response,
+        });
+    } catch (error) {
+        console.error("getPosterProfile controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};

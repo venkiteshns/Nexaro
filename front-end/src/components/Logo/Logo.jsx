@@ -1,4 +1,3 @@
-import React from "react";
 import logo from '../../assets/Nex_Logo.png'
 
 const Logo = () => {

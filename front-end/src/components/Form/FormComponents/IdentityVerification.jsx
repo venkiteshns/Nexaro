@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Upload } from "lucide-react";
 import { ID_TYPES } from "../../../utils/constants";
 import { useFormContext } from "react-hook-form";

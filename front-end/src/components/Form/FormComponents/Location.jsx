@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Country, State } from "country-state-city";
 import { useFormContext } from "react-hook-form";
 import { KERALA_DISTRICTS, DISTRICT_AREAS } from "../../../utils/constants";
@@ -12,7 +12,6 @@ const Location = ({ worker }) => {
     register,
     setValue,
     watch,
-    trigger,
     getValues,
     formState: { errors, isSubmitted },
   } = useFormContext();
@@ -103,10 +102,9 @@ const Location = ({ worker }) => {
       shouldValidate: true,
       shouldDirty: true,
     });
-    // Clear coords silently — no shouldValidate so errors.locationLat never fires on onChange
     setValue("locationLat", "", { shouldDirty: true });
     setValue("locationlng", "", { shouldDirty: true });
-    setLocationConfirmNeeded(false); // hide warning until next failed confirm or submit
+    setLocationConfirmNeeded(false);
     setAfterChangeLocation("changed");
   };
 
@@ -115,7 +113,6 @@ const Location = ({ worker }) => {
       shouldValidate: true,
       shouldDirty: true,
     });
-    // Clear coords silently on change
     setValue("workPlacelat", "", { shouldDirty: true });
     setValue("workPlacelng", "", { shouldDirty: true });
     setWorkConfirmNeeded(false);
@@ -129,7 +126,7 @@ const Location = ({ worker }) => {
     try {
       const coords = await getCoords();
       const locationData = await reverseCoords(coords);
-      const { country, state, district: detectedDistrict, city } = locationData;
+      const { country, state, district: detectedDistrict } = locationData;
 
       const foundCountry = countries.find((c) => c.name === country);
       if (foundCountry) setCountryCode(foundCountry.isoCode);
@@ -140,8 +137,6 @@ const Location = ({ worker }) => {
 
       if (detectedDistrict) setDistrict(detectedDistrict);
 
-      // Wait for the district select to re-render as enabled (isKerala=true)
-      // before shouldValidate reads from the DOM ref, otherwise it reads "" from a disabled select
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       setValue("district", detectedDistrict, { shouldValidate: true });
@@ -157,10 +152,10 @@ const Location = ({ worker }) => {
   const handleLocationCoords = async (type) => {
     type === "city" ? setFetchCoords("fetching") : setWFetchCords("fetching");
     let value = getValues();
-    let city = type === "city" ? value.city : value.workPlace;
+    const cityValue = type === "city" ? value.city : value.workPlace;
     let payload = {
       country: value.country,
-      city,
+      city: cityValue,
       state: value.state,
       district: value.district,
     };
@@ -168,7 +163,6 @@ const Location = ({ worker }) => {
       let res = await placeToCoords(payload);
       setValue(type === "city" ? "locationLat" : "workPlacelat", res.lat, { shouldValidate: true });
       setValue(type === "city" ? "locationlng" : "workPlacelng", res.lng, { shouldValidate: true });
-      // Success — clear the warning flag
       type === "city" ? setLocationConfirmNeeded(false) : setWorkConfirmNeeded(false);
       setTimeout(() => {
         type == "city"
@@ -177,9 +171,8 @@ const Location = ({ worker }) => {
         type === "city" ? setFetchCoords("idle") : setWFetchCords("idle");
       }, 500);
       type === "city" ? setFetchCoords("success") : setWFetchCords("success");
-    } catch (error) {
+    } catch {
       type === "city" ? setFetchCoords("fail") : setWFetchCords("fail");
-      // Failed confirm — show the warning message now
       type === "city" ? setLocationConfirmNeeded(true) : setWorkConfirmNeeded(true);
 
       setTimeout(() => {
@@ -192,7 +185,9 @@ const Location = ({ worker }) => {
   };
 
   useEffect(() => {
-    if (selectedDistrict) setDistrict(selectedDistrict);
+    if (selectedDistrict) {
+      setDistrict(selectedDistrict);
+    }
   }, [selectedDistrict]);
 
   const fieldClass =

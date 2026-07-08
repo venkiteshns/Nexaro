@@ -1,4 +1,3 @@
-import React from "react";
 import { Bell, ToggleLeft, ToggleRight } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useState } from "react";

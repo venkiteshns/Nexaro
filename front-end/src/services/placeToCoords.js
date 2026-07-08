@@ -19,6 +19,6 @@ export const placeToCoords = async ({ city, area, district, state, country }) =>
     };
     // throw new Error("test");
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message, { cause: error });
   }
 };
