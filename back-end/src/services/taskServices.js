@@ -8,6 +8,13 @@ import ngeohash from 'ngeohash';
 
 
 
+const deleteImagesFromCloudinary = async (publicIds) => {
+    if (!publicIds || publicIds.length === 0) return;
+    await Promise.all(
+        publicIds.map((id) => cloudinary.uploader.destroy(id))
+    );
+};
+
 const uploadImagesToCloudinary = async (files) => {
     const uploadPromises = files.map((file) =>
         cloudinary.uploader.upload(file.path, {
@@ -569,6 +576,83 @@ export const cancelTaskByPosterService = async (taskId) => {
     }
 }
 
+export const updateTaskService = async (taskId, posterId, body, newFiles) => {
+    try {
+        const task = await Task.findOne({ _id: taskId, posterId });
+        if (!task) {
+            return { error: "Task not found or unauthorized" };
+        }
+
+        if (task.status !== "open") {
+            return { error: "Only open tasks can be edited" };
+        }
+
+        const bidCount = await Bid.countDocuments({ taskId });
+        if (bidCount > 0) {
+            return { error: "Cannot edit task — bids are already waiting" };
+        }
+
+        let imagesToKeep = [];
+        if (body.retainedImages) {
+            try {
+                imagesToKeep = JSON.parse(body.retainedImages);
+            } catch (_) {
+                imagesToKeep = [];
+            }
+        }
+
+        const removedImages = task.images.filter(
+            (img) => !imagesToKeep.some((r) => r.public_id === img.public_id)
+        );
+        if (removedImages.length > 0) {
+            await deleteImagesFromCloudinary(removedImages.map((i) => i.public_id));
+        }
+
+        let uploadedImages = [];
+        if (newFiles && newFiles.length > 0) {
+            uploadedImages = await uploadImagesToCloudinary(newFiles);
+        }
+
+        const finalImages = [...imagesToKeep, ...uploadedImages].slice(0, 5);
+
+        if (finalImages.length === 0) {
+            return { error: "At least 1 image is required" };
+        }
+
+        let address = task.address;
+        if (body.address) {
+            try { address = JSON.parse(body.address); } catch (_) { /* keep existing */ }
+        }
+        let location = task.location;
+        if (body.location) {
+            try { location = JSON.parse(body.location); } catch (_) { /* keep existing */ }
+        }
+
+        const updatedTask = await Task.findByIdAndUpdate(
+            taskId,
+            {
+                $set: {
+                    title: body.title || task.title,
+                    description: body.description || task.description,
+                    category: body.category || task.category,
+                    deadline: body.deadline ? new Date(body.deadline) : task.deadline,
+                    urgencyLevel: body.urgencyLevel || task.urgencyLevel,
+                    amount: body.amount !== undefined ? Number(body.amount) : task.amount,
+                    images: finalImages,
+                    address,
+                    location,
+                },
+            },
+            { new: true }
+        );
+
+        return { task: updatedTask };
+    } catch (error) {
+        console.error("updateTaskService error:", error.message);
+        return { error: error.message };
+    }
+};
+
 export const getWorkerActiveJobService = async (taskId, workerId) => {
     try {
         const result = await Task.aggregate([
@@ -578,7 +662,6 @@ export const getWorkerActiveJobService = async (taskId, workerId) => {
                     workerId: new mongoose.Types.ObjectId(workerId),
                 }
             },
-            // Join poster (user)
             {
                 $lookup: {
                     from: 'users',
@@ -588,7 +671,6 @@ export const getWorkerActiveJobService = async (taskId, workerId) => {
                 }
             },
             { $unwind: { path: '$poster', preserveNullAndEmptyArrays: true } },
-            // Join accepted bid
             {
                 $lookup: {
                     from: 'bids',

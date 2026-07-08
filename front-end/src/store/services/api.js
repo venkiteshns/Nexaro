@@ -103,7 +103,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithReauth,
-    tagTypes: ["Users", "Tasks", "Worker_Tasks", "Worker_Bids", "Active_Job"],
+    tagTypes: ["Users", "Tasks", "Worker_Tasks", "Worker_Bids", "Active_Job", "Poster_Profile"],
 
     endpoints: (builder) => ({
         sendOtp: builder.mutation({
@@ -350,6 +350,33 @@ export const api = createApi({
             invalidatesTags: ["Poster_Tasks", "Worker_Tasks"]
         }),
 
+        updateTask: builder.mutation({
+            query: ({ taskId, formValues, retainedImages }) => {
+                const formData = new FormData();
+                formData.append("title", formValues.title);
+                formData.append("description", formValues.description);
+                formData.append("category", formValues.category);
+                formData.append("deadline", formValues.deadline);
+                formData.append("urgencyLevel", formValues.urgencyLevel);
+                formData.append("amount", formValues.amount);
+                formData.append("retainedImages", JSON.stringify(retainedImages || []));
+
+                if (formValues.newPhotos && formValues.newPhotos.length > 0) {
+                    Array.from(formValues.newPhotos).forEach((file) => {
+                        formData.append("photos", file);
+                    });
+                }
+
+                return {
+                    url: `/poster/task/update/${taskId}`,
+                    method: "PATCH",
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Poster_Tasks"],
+        }),
+
         getWorkerBids: builder.query({
             query: ({ status = "all", page = 1, limit = 5 } = {}) => {
                 const params = new URLSearchParams({ status, page, limit });
@@ -441,6 +468,14 @@ export const api = createApi({
             }),
             providesTags: ["Poster_Completed_Task"],
         }),
+
+        getPosterProfile: builder.query({
+            query: () => ({
+                url: "/poster/profile",
+                method: "GET",
+            }),
+            providesTags: ["Poster_Profile"],
+        }),
     }),
 });
 
@@ -480,4 +515,6 @@ export const {
     useAdminTaskDeleteMutation,
     useAdminGetTaskDetailsQuery,
     useGetCompletedTaskPosterSideQuery,
+    useUpdateTaskMutation,
+    useGetPosterProfileQuery,
 } = api;
