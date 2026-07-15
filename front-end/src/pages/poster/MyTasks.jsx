@@ -18,7 +18,7 @@ import {
 
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
-import { useCancelTaskByPosterMutation, useGetPosterTasksQuery } from '../../store/services/api';
+import { useCancelTaskByPosterMutation, useGetPosterTasksQuery } from '../../store/services/posterApi';
 import { showError, showSuccess } from '../../utils/toast';
 import EditTaskModal from '../../components/Poster/EditTaskModal';
 

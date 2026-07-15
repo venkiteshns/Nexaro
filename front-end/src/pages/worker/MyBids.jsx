@@ -16,7 +16,7 @@ import {
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import WithdrawBidModal from "../../components/Worker/WithdrawBidModal.jsx";
-import { useGetWorkerBidsQuery } from "../../store/services/api";
+import { useGetWorkerBidsQuery } from "../../store/services/workerApi";
 
 const LIMIT = 5;
 

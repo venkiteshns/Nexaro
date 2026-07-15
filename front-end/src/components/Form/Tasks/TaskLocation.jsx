@@ -330,7 +330,7 @@ const TaskLocation = () => {
             </div>
 
             <div className="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-4 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#0A6E5C] flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#0A6E5C] flex items-center justify-center shrink-0">
                     <CheckCircle2 size={16} className="text-white" />
                 </div>
                 <div>

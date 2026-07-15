@@ -35,7 +35,7 @@ const WorkflowProgressCard = () => {
     <div className=" hidden lg:block w-full rounded-3xl bg-white/90  p-3 shadow-2xl">
       {/* Progress Bar */}
       <div className="w-full h-2 mb-3 mt-3 rounded-full bg-green-300/40 overflow-hidden">
-        <div className="h-full rounded-xl w-1/3 bg-gradient-to-r from-green-400 to-emerald-500" />
+        <div className="h-full rounded-xl w-1/3 bg-linear-to-r from-green-400 to-emerald-500" />
       </div>
 
       {/* Text */}
@@ -65,7 +65,7 @@ const WorkerSearchCard = () => {
           </div>
 
           <div className="rounded-full bg-green-500 flex items-center justify-center p-2">
-            <Check className="text-white stroke-[2]" />
+            <Check className="text-white stroke-2" />
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ const WorkerSearchCard = () => {
               Finding workers nearby...
             </p>
             <div className="mt-2 h-1 rounded-full bg-green-100 overflow-hidden">
-              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500" />
+              <div className="h-full w-2/3 rounded-full bg-linear-to-r from-green-400 to-emerald-500" />
             </div>
           </div>
         </div>

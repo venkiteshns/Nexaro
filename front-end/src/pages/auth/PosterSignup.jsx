@@ -7,7 +7,7 @@ import OtpModal from "../../components/OtpModal/OtpModal";
 import {
   usePosterSignUpMutation,
   useSendOtpMutation,
-} from "../../store/services/api";
+} from "../../store/services/authApi";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +36,6 @@ const PosterSignup = () => {
   const dispatch = useDispatch();
 
   const resendOtp = async (email) => {
-    console.log("resend", email, formData.phone, formData.email);
     try {
       await sendOtp({
         email: formData.email,
@@ -98,7 +97,13 @@ const PosterSignup = () => {
           onSubmitForm={handleFormData}
           isVerified={isVerified}
           otpStatus={{ isLoading, isSuccess, isError, error, data }}
-          formStatus={{ signUpLoading, isSignUpSuccess, isSignUpError, signUpError, signUpData }}
+          formStatus={{
+            signUpLoading,
+            isSignUpSuccess,
+            isSignUpError,
+            signUpError,
+            signUpData,
+          }}
         />
       </span>
       {showOtp && (

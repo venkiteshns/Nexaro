@@ -34,7 +34,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
 
   const onSubmit = (data) => {
     console.log("Saving profile:", data);
-    // TODO: dispatch RTK mutation here
+
     onClose();
   };
 

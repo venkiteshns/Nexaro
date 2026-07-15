@@ -71,7 +71,7 @@ const RightSideBar = ({ title, location, budget }) => {
                             },
                         ].map((tip, i) => (
                             <div key={i} className="flex gap-2.5">
-                                <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div className="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
                                     {tip.icon}
                                 </div>
                                 <div>

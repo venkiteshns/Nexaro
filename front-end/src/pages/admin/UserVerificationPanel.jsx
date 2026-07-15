@@ -14,7 +14,7 @@ import {
   useAdminApproveUserMutation,
   useAdminGetPendingVerificationUsersQuery,
   useAdminRejectUserMutation,
-} from "../../store/services/api";
+} from "../../store/services/adminApi";
 import { useLocation } from "react-router-dom";
 
 const UserVerificationPanel = () => {

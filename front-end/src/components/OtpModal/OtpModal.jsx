@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import Logo from "../Logo/Logo";
-import { useVerifyOtpMutation } from "../../store/services/api";
+import { useVerifyOtpMutation } from "../../store/services/authApi";
 
 const OTP_LENGTH = 6;
 
 const OtpModal = (props) => {
-
   const { show, email, reSendOtp, isVerified } = props;
 
   const [time, setTime] = useState(60);
@@ -23,8 +22,10 @@ const OtpModal = (props) => {
   const handleOtp = async (otp) => {
     try {
       const res = await verifyOtp({ otp, email }).unwrap();
-      console.log('OTP verified:', res);
-      setTimeout(() => { show(false); }, 1500);
+      console.log("OTP verified:", res);
+      setTimeout(() => {
+        show(false);
+      }, 1500);
       isVerified(true);
     } catch {
       setOtpError(true);
@@ -51,7 +52,6 @@ const OtpModal = (props) => {
 
     return () => clearInterval(interval);
   }, [time]);
-
 
   // Functions
 
@@ -164,12 +164,13 @@ const OtpModal = (props) => {
                   rounded-xl border outline-none transition-all
                   bg-gray-700/10
 
-                  ${isSuccess
-                  ? "border-2 border-green-600 bg-green-50"
-                  : otpError
-                    ? "border-2 border-red-500 bg-red-50 shake"
-                    : "border border-dashed border-green-800/70 focus:ring-2 focus:ring-green-800/20 focus:border-black"
-                }
+                  ${
+                    isSuccess
+                      ? "border-2 border-green-600 bg-green-50"
+                      : otpError
+                        ? "border-2 border-red-500 bg-red-50 shake"
+                        : "border border-dashed border-green-800/70 focus:ring-2 focus:ring-green-800/20 focus:border-black"
+                  }
                 `}
             />
           ))}
@@ -186,10 +187,11 @@ const OtpModal = (props) => {
             disabled={!canResend}
             onClick={handleResendOtp}
             className={`text-sm font-semibold transition
-                ${canResend
-                ? "text-blue-700  cursor-pointer"
-                : "text-gray-400 cursor-not-allowed"
-              }`}
+                ${
+                  canResend
+                    ? "text-blue-700  cursor-pointer"
+                    : "text-gray-400 cursor-not-allowed"
+                }`}
           >
             {canResend ? "Resend OTP" : `Resend OTP in ${time}s`}
           </button>
@@ -204,12 +206,13 @@ const OtpModal = (props) => {
           disabled={finalOtp.length != 6}
           onClick={() => handleOtp(finalOtp)}
           className={`w-full rounded-xl py-3 font-semibold md:font-bold text-white transition
-                ${isSuccess ? "bg-[#0A6E5C]/50 cursor-not-allowed" :
-              finalOtp.length === 6
-                ? "bg-green-900/90 hover:bg-green-800 cursor-pointer"
-
-                : "bg-gray-400 cursor-not-allowed opacity-70"
-            }`}
+                ${
+                  isSuccess
+                    ? "bg-[#0A6E5C]/50 cursor-not-allowed"
+                    : finalOtp.length === 6
+                      ? "bg-green-900/90 hover:bg-green-800 cursor-pointer"
+                      : "bg-gray-400 cursor-not-allowed opacity-70"
+                }`}
         >
           {isLoading
             ? "Verifing OTP"

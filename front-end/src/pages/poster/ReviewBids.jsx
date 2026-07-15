@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
-import { useAcceptBidMutation, useGetPosterBidsQuery } from '../../store/services/api';
+import { useAcceptBidMutation, useGetPosterBidsQuery } from '../../store/services/posterApi';
 import { showError, showSuccess } from '../../utils/toast';
 
 
@@ -38,7 +38,7 @@ function AcceptModal({ bid, onConfirm, onCancel }) {
                 className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="h-1 w-full bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
+                <div className="h-1 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
 
                 <div className="p-7 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center mb-5">
@@ -229,7 +229,7 @@ function SuccessState({ bid, countdown, taskId, navigate }) {
             </div>
 
             <div className="bg-white border border-emerald-200 rounded-2xl shadow-sm w-full max-w-sm overflow-hidden">
-                <div className="h-1 bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
+                <div className="h-1 bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
                 <div className="p-5 flex items-center gap-4">
                     <div className="w-14 h-14 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center shrink-0 overflow-hidden">
                         {bid?.worker?.selfie ? (

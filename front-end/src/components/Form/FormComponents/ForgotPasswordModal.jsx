@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import PersonalInfo from "./PersonalInfo";
-import OtpModal from '../../OtpModal/OtpModal';
+import OtpModal from "../../OtpModal/OtpModal";
 import { FormProvider, useForm } from "react-hook-form";
-import { useForgotPasswordMutation, useUpdatePasswordMutation } from "../../../store/services/api";
+import {
+  useForgotPasswordMutation,
+  useUpdatePasswordMutation,
+} from "../../../store/services/authApi";
 import Password from "./Password";
 
 const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
@@ -81,7 +84,9 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
         {/* Form */}
         <form
           className="mt-10 space-y-7"
-          onSubmit={methods.handleSubmit(isVerified ? updateNewPassword : handlePasswordResetOtp)}
+          onSubmit={methods.handleSubmit(
+            isVerified ? updateNewPassword : handlePasswordResetOtp,
+          )}
         >
           <div>
             <FormProvider {...methods}>
@@ -110,7 +115,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
             <button
               type="submit"
               disabled={isLoading || updateLoading}
-              className={(isLoading || updateLoading) ? disabledBtn : activeBtn}
+              className={isLoading || updateLoading ? disabledBtn : activeBtn}
             >
               {isLoading
                 ? "Sending OTP.."

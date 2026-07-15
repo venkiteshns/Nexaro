@@ -22,7 +22,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
-import { useGetWorkerBidDetailsQuery } from "../../store/services/api";
+import { useGetWorkerBidDetailsQuery } from "../../store/services/workerApi";
 import WithdrawBidModal from "../../components/Worker/WithdrawBidModal.jsx";
 import Map from "../../components/Maps/Map";
 
@@ -100,7 +100,7 @@ function PhotoGallery({ photos }) {
           <div
             key={i}
             onClick={() => setLightbox(i)}
-            className="relative h-28 w-36 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 cursor-pointer group border border-gray-200 hover:border-[#0A6E5C] transition-colors"
+            className="relative h-28 w-36 rounded-xl overflow-hidden shrink-0 bg-gray-100 cursor-pointer group border border-gray-200 hover:border-[#0A6E5C] transition-colors"
           >
             <img
               src={img?.url || img}
@@ -361,7 +361,7 @@ function LocationCard({ address, location }) {
             showButton={false}
           />
         ) : (
-          <div className="h-48 bg-gradient-to-br from-emerald-50 to-teal-100 flex flex-col items-center justify-center text-gray-400">
+          <div className="h-48 bg-linear-to-br from-emerald-50 to-teal-100 flex flex-col items-center justify-center text-gray-400">
             <MapPin size={28} className="text-[#0A6E5C]/40 mb-1" />
             <span className="text-xs">Location not available</span>
           </div>
