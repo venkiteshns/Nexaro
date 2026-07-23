@@ -134,6 +134,26 @@ export const posterApi = api.injectEndpoints({
       }),
       providesTags: ["Poster_Profile"],
     }),
+
+    updatePosterProfile: builder.mutation({
+      query: (formValues) => {
+        console.log("formValues", formValues);
+
+        const formData = new FormData();
+        formData.append("email", formValues.email);
+        formData.append("phone", formValues.phone);
+        if (formValues.avatar && formValues.avatar.length > 0) {
+          formData.append("avatar", formValues.avatar[0]);
+        }
+        return {
+          url: "/poster/profile/update",
+          method: "PATCH",
+          body: formData,
+          formData: true,
+        };
+      },
+      invalidatesTags: ["Poster_Profile"],
+    }),
   }),
 });
 
@@ -147,4 +167,5 @@ export const {
   useGetCompletedTaskPosterSideQuery,
   useUpdateTaskMutation,
   useGetPosterProfileQuery,
+  useUpdatePosterProfileMutation,
 } = posterApi;
