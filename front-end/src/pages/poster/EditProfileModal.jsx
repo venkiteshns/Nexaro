@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useUpdatePosterProfileMutation } from "../../store/services/posterApi";
 import {
   MapPin,
   Lock,
@@ -12,6 +13,7 @@ import {
 
 const EditProfileModal = ({ onClose, posterInfo }) => {
   const avatarInputRef = useRef(null);
+  const [updatePosterProfile, { isLoading }] = useUpdatePosterProfileMutation();
 
   const {
     register,
@@ -32,10 +34,13 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     ? URL.createObjectURL(avatarFileList[0])
     : null;
 
-  const onSubmit = (data) => {
-    console.log("Saving profile:", data);
-    // TODO: dispatch RTK mutation here
-    onClose();
+  const onSubmit = async (data) => {
+    try {
+      await updatePosterProfile(data).unwrap();
+      onClose();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -211,21 +216,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
                     {errors.phone.message}
                   </p>
                 )}
-              </div>
-
-              <div>
-                <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">
-                  Location
-                </p>
-                <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 border border-gray-200 focus-within:border-[#0A6E5C] focus-within:ring-2 focus-within:ring-emerald-100 transition-all">
-                  <MapPin size={13} className="text-[#0A6E5C] shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="City, State"
-                    className="flex-1 bg-transparent text-gray-900 text-sm outline-none placeholder-gray-400"
-                    {...register("city")}
-                  />
-                </div>
               </div>
             </div>
 

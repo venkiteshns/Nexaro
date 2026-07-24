@@ -16,7 +16,7 @@ import logo from "../../assets/Nex_Logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
-import { useUserLogoutMutation } from "../../store/services/api";
+import { useUserLogoutMutation } from "../../store/services/authApi";
 
 const WorkerNavBar = () => {
   const dispatch = useDispatch();
@@ -79,7 +79,7 @@ const WorkerNavBar = () => {
 
   return (
     <div
-      className={`h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between flex-shrink-0 ${sidebarOpen
+      className={`h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex flex-col justify-between shrink-0 ${sidebarOpen
           ? "fixed top-0 left-0 w-[220px]"
           : "relative w-[72px]"
         }`}
@@ -101,7 +101,7 @@ const WorkerNavBar = () => {
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-gray-500 hover:text-[#0A6E5C] transition-colors flex-shrink-0"
+            className="text-gray-500 hover:text-[#0A6E5C] transition-colors shrink-0"
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -109,7 +109,7 @@ const WorkerNavBar = () => {
 
         {sidebarOpen && (
           <div className="px-4 py-4 flex items-center gap-3 border-b border-gray-100">
-            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
               {user?.name ? user.name.charAt(0).toUpperCase() : "W"}
             </div>
             <div className="overflow-hidden">

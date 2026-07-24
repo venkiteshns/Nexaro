@@ -8,7 +8,7 @@ import TaskHeaderBanner from '../../components/Poster/CompletedTask/TaskHeaderBa
 import TaskSummaryCard from '../../components/Poster/CompletedTask/TaskSummaryCard';
 import FinalInvoiceCard from '../../components/Poster/CompletedTask/FinalInvoiceCard';
 import ReviewCard from '../../components/Poster/CompletedTask/ReviewCard';
-import { useGetCompletedTaskPosterSideQuery } from '../../store/services/api';
+import { useGetCompletedTaskPosterSideQuery } from '../../store/services/posterApi';
 
 // ─── Loader ────────────────────────────────────────────────────────────────────
 function PageLoader() {

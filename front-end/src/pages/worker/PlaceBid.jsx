@@ -8,7 +8,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
-import { useAddNewBidMutation, useGetTaskForBidQuery } from "../../store/services/api";
+import { useAddNewBidMutation, useGetTaskForBidQuery } from "../../store/services/workerApi";
 import { FormProvider, useForm } from "react-hook-form";
 import BidForm from "../../components/Form/Bids/BidForm";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
@@ -20,7 +20,7 @@ function PhotoStrip({ photos }) {
         {photos.map((img, i) => (
           <div
             key={i}
-            className="relative h-24 w-28 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100"
+            className="relative h-24 w-28 rounded-xl overflow-hidden shrink-0 bg-gray-100"
           >
             <img
               src={img?.url}

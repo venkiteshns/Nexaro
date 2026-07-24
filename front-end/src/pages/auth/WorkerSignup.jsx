@@ -7,7 +7,7 @@ import OtpModal from "../../components/OtpModal/OtpModal";
 import {
   useSendOtpMutation,
   useWorkerSignUpMutation,
-} from "../../store/services/api";
+} from "../../store/services/authApi";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -22,8 +22,10 @@ const WorkerSignup = () => {
   const [formData, setFormData] = useState();
   const [isVerified, setIsVerified] = useState(false);
 
-  const [sendOtp, { isSuccess: isOtpSuccess, isError: isOtpError, error: otpError }] =
-    useSendOtpMutation();
+  const [
+    sendOtp,
+    { isSuccess: isOtpSuccess, isError: isOtpError, error: otpError },
+  ] = useSendOtpMutation();
 
   const [workerSignUp] = useWorkerSignUpMutation();
 
@@ -32,9 +34,21 @@ const WorkerSignup = () => {
     const fd = new FormData();
 
     const textFields = [
-      'name', 'email', 'phone', 'bio', 'country', 'state',
-      'district', 'city', 'workPlace', 'id_type', 'password',
-      'locationLat', 'locationlng', 'workPlacelat', 'workPlacelng',
+      "name",
+      "email",
+      "phone",
+      "bio",
+      "country",
+      "state",
+      "district",
+      "city",
+      "workPlace",
+      "id_type",
+      "password",
+      "locationLat",
+      "locationlng",
+      "workPlacelat",
+      "workPlacelng",
     ];
 
     textFields.forEach((key) => {
@@ -43,10 +57,11 @@ const WorkerSignup = () => {
       }
     });
 
-    if (formData.skill) fd.append('skill', JSON.stringify(formData.skill));
-    if (formData.language) fd.append('language', JSON.stringify(formData.language));
+    if (formData.skill) fd.append("skill", JSON.stringify(formData.skill));
+    if (formData.language)
+      fd.append("language", JSON.stringify(formData.language));
 
-    const fileFields = ['id_front', 'id_back', 'selfie'];
+    const fileFields = ["id_front", "id_back", "selfie"];
     fileFields.forEach((key) => {
       const fileList = formData[key];
       if (fileList && fileList[0] instanceof File) {
@@ -57,11 +72,13 @@ const WorkerSignup = () => {
     try {
       const res = await workerSignUp(fd).unwrap();
       console.log("signUpResponse Res", res);
-      dispatch(setCredentials({
-        user: res.user,
-        accessToken: res.accessToken,
-        refreshToken: res.refreshToken,
-      }));
+      dispatch(
+        setCredentials({
+          user: res.user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        }),
+      );
       navigate("/worker/dashboard");
     } catch (err) {
       console.log("Sign up error", err);

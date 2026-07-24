@@ -20,7 +20,7 @@ import {
 
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
-import { useGetWorkerNearbyTasksQuery } from "../../store/services/api";
+import { useGetWorkerNearbyTasksQuery } from "../../store/services/workerApi";
 import { useNavigate } from "react-router-dom";
 import useDebounce from "../../customHooks/useDebounce";
 

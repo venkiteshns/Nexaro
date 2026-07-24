@@ -1,6 +1,6 @@
 import { useState, Fragment } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPosterTaskProgressQuery } from '../../store/services/api';
+import { useGetPosterTaskProgressQuery } from '../../store/services/posterApi';
 import {
     ArrowLeft,
     Phone,
@@ -112,7 +112,7 @@ function ReleaseModal({ amount, workerName, onConfirm, onCancel }) {
                 className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="h-1 w-full bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
+                <div className="h-1 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
 
                 <div className="p-7 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center mb-5">
@@ -249,7 +249,7 @@ const WorkProgress = () => {
                                     const Icon = step.icon;
                                     return (
                                         <Fragment key={step.key}>
-                                            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                                            <div className="flex flex-col items-center gap-2 shrink-0">
                                                 <div
                                                     className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all
                                                         ${step.done

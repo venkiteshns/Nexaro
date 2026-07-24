@@ -15,7 +15,7 @@ import logo from "../../assets/Nex_Logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
-import { useUserLogoutMutation } from "../../store/services/api";
+import { useUserLogoutMutation } from "../../store/services/authApi";
 
 const PosterNavBar = () => {
   const dispatch = useDispatch();
@@ -47,12 +47,32 @@ const PosterNavBar = () => {
   };
 
   const posterNav = [
-    { label: "Dashboard",     icon: <LayoutDashboard size={20} />, redirect: "/poster/dashboard"      },
-    { label: "Post Task",     icon: <PlusSquare size={20} />,      redirect: "/poster/post-task"      },
-    { label: "My Tasks",      icon: <ClipboardList size={20} />,   redirect: "/poster/my-tasks"       },
-    { label: "Payments",      icon: <Wallet size={20} />,          redirect: "/poster/payments"       },
-    { label: "Notifications", icon: <Bell size={20} />,            redirect: "/poster/notifications"  },
-    { label: "Profile",       icon: <User size={20} />,            redirect: "/poster/profile"        },
+    {
+      label: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+      redirect: "/poster/dashboard",
+    },
+    {
+      label: "Post Task",
+      icon: <PlusSquare size={20} />,
+      redirect: "/poster/post-task",
+    },
+    {
+      label: "My Tasks",
+      icon: <ClipboardList size={20} />,
+      redirect: "/poster/my-tasks",
+    },
+    {
+      label: "Payments",
+      icon: <Wallet size={20} />,
+      redirect: "/poster/payments",
+    },
+    {
+      label: "Notifications",
+      icon: <Bell size={20} />,
+      redirect: "/poster/notifications",
+    },
+    { label: "Profile", icon: <User size={20} />, redirect: "/poster/profile" },
   ];
 
   const myTasksGroup = [
@@ -72,7 +92,9 @@ const PosterNavBar = () => {
             {isExpanded ? (
               <div>
                 <Logo />
-                <p className="text-xs text-gray-400 mt-0.5 pl-1">MARKETPLACE POSTER</p>
+                <p className="text-xs text-gray-400 mt-0.5 pl-1">
+                  MARKETPLACE POSTER
+                </p>
               </div>
             ) : (
               <img src={logo} alt="Nexaro" className="w-9 h-9 object-contain" />
@@ -93,8 +115,12 @@ const PosterNavBar = () => {
               {user?.name ? user.name.charAt(0).toUpperCase() : "R"}
             </div>
             <div className="overflow-hidden">
-              <p className="text-[#111827] text-sm font-semibold truncate">{user?.name || "Poster"}</p>
-              <p className="text-xs text-[#0A6E5C] font-medium">Premium Poster</p>
+              <p className="text-[#111827] text-sm font-semibold truncate">
+                {user?.name || "Poster"}
+              </p>
+              <p className="text-xs text-[#0A6E5C] font-medium">
+                Premium Poster
+              </p>
             </div>
           </div>
         )}
@@ -105,7 +131,9 @@ const PosterNavBar = () => {
             const isActive =
               location.pathname === item.redirect ||
               (item.redirect === "/poster/my-tasks" &&
-                myTasksGroup.some((prefix) => location.pathname.startsWith(prefix)));
+                myTasksGroup.some((prefix) =>
+                  location.pathname.startsWith(prefix),
+                ));
             return (
               <button
                 key={index}

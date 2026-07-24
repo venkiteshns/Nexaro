@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import WorkerNavBar from '../../layouts/Worker/WorkerNavBar';
 import WorkerHeader from '../../layouts/Worker/WorkerHeader';
-import { useGetWorkerActiveJobQuery, useUpdateJobProgressMutation } from '../../store/services/api';
+import { useGetWorkerActiveJobQuery, useUpdateJobProgressMutation } from '../../store/services/workerApi';
 import { showSuccess, showError } from '../../utils/toast';
 
 // ── Checklist steps ──────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ function CompleteModal({ onConfirm, onClose, isLoading }) {
             onClick={onClose}>
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
                 onClick={(e) => e.stopPropagation()}>
-                <div className="h-1 w-full bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
+                <div className="h-1 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
                 <div className="p-7 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center mb-5">
                         <Flag size={28} className="text-[#0A6E5C]" />
@@ -217,7 +217,7 @@ const ActiveJob = () => {
                                 <div className="lg:col-span-2 space-y-4">
 
                                     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                                        <div className="h-1 bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
+                                        <div className="h-1 bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
                                         <div className="p-5 flex items-center justify-between gap-4 flex-wrap">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-12 h-12 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden shrink-0">
@@ -326,7 +326,7 @@ const ActiveJob = () => {
                                             <button
                                                 onClick={() => setShowCompleteModal(true)}
                                                 className="flex items-center gap-2 px-6 py-3 rounded-2xl
-                                                           bg-gradient-to-r from-[#0A6E5C] to-emerald-500 text-white
+                                                           bg-linear-to-r from-[#0A6E5C] to-emerald-500 text-white
                                                            text-sm font-bold shadow-md hover:from-[#085e4e] hover:to-emerald-600
                                                            active:scale-[0.98] transition-all duration-150 shrink-0">
                                                 <Flag size={16} />
@@ -339,7 +339,7 @@ const ActiveJob = () => {
                                 <div className="space-y-4">
 
                                     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                                        <div className="h-1 bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
+                                        <div className="h-1 bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
                                         <div className="p-5">
                                             <div className="flex items-center gap-2 mb-3">
                                                 <Navigation size={16} className="text-[#0A6E5C]" />

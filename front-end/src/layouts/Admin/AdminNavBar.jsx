@@ -12,7 +12,7 @@ import {
 import logo from '../../assets/Nex_Logo.png'
 import Logo from '../../components/Logo/Logo'
 import { setSideBar, adminLogOut, setActivePage } from "../../store/Slices/AdminSlice";
-import { useAdminLogoutMutation } from "../../store/services/api";
+import { useAdminLogoutMutation } from "../../store/services/authApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 

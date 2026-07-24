@@ -14,7 +14,7 @@ import {
     ChevronRight,
     AlertTriangle,
 } from 'lucide-react';
-import { useAdminGetAllTasksQuery, useAdminTaskDeleteMutation } from '../../store/services/api';
+import { useAdminGetAllTasksQuery, useAdminTaskDeleteMutation } from '../../store/services/adminApi';
 import useDebounce from '../../customHooks/useDebounce';
 import { useNavigate } from 'react-router-dom';
 

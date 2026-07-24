@@ -6,7 +6,7 @@ import Logo from "../Logo/Logo";
 import PersonalInfo from "../Form/FormComponents/PersonalInfo";
 import Password from "../Form/FormComponents/Password";
 import { useDispatch } from "react-redux";
-import { useAdminLoginMutation } from "../../store/services/api";
+import { useAdminLoginMutation } from "../../store/services/authApi";
 import { setAdminCredentials } from "../../store/Slices/AdminSlice";
 import { useNavigate } from "react-router-dom";
 import ForgotPasswordModal from "../Form/FormComponents/ForgotPasswordModal";
@@ -15,7 +15,8 @@ const AdminLoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [adminLogin, { isLoading, isError, error, reset }] = useAdminLoginMutation();
+  const [adminLogin, { isLoading, isError, error, reset }] =
+    useAdminLoginMutation();
 
   const [isAdmin, setIsAdmin] = useState(true);
   const [forgotPassword, setForgotPassword] = useState(false);
@@ -26,7 +27,7 @@ const AdminLoginForm = () => {
   useEffect(() => {
     if (forgotPassword) {
       methods.reset();
-      reset()
+      reset();
     }
   }, [forgotPassword]);
 
@@ -59,7 +60,7 @@ const AdminLoginForm = () => {
   }, [forgotPassword]);
 
   return (
-    <div className="min-h-[100vh] flex-1 flex items-center  justify-center px-6 py-12 ">
+    <div className="min-h-screen flex-1 flex items-center  justify-center px-6 py-12 ">
       {/* Mobile Logo */}
       <div className="absolute top-8 left-6 lg:hidden flex items-center gap-3">
         <div>
@@ -140,7 +141,7 @@ const AdminLoginForm = () => {
           onClose={() => {
             setForgotPassword(false);
           }}
-          role={'admin'}
+          role={"admin"}
           isUpdateSuccess={setIsPasswordUpdated}
         />
       )}

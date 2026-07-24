@@ -9,7 +9,7 @@ import {
   useAdminGetUsersQuery,
   useAdminSuspendUserMutation,
   useAdminUnsuspendUserMutation,
-} from "../../store/services/api";
+} from "../../store/services/adminApi";
 import { useNavigate } from "react-router-dom";
 
 const DEFAULT_AVATAR =

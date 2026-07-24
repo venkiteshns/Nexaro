@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import PosterNavBar from "../../layouts/Poster/PosterNavBar";
 import PosterHeader from "../../layouts/Poster/PosterHeader";
-import { useGetPosterProfileQuery } from "../../store/services/api";
+import { useGetPosterProfileQuery } from "../../store/services/posterApi";
 
 import ProfileBanner from "../../components/Poster/Profile/ProfileBanner";
 import StatCard from "../../components/Poster/Profile/StatCard";

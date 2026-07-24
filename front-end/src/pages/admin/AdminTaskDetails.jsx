@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import AdminNavBar from '../../layouts/Admin/AdminNavBar';
 import AdminHeader from '../../layouts/Admin/AdminHeader';
-import { useAdminGetTaskDetailsQuery } from '../../store/services/api';
+import { useAdminGetTaskDetailsQuery } from '../../store/services/adminApi';
 import TaskDetailsBanner from '../../components/Admin/TaskDetails/TaskDetailsBanner';
 import TaskInfoCard from '../../components/Admin/TaskDetails/TaskInfoCard';
 import PosterCard from '../../components/Admin/TaskDetails/PosterCard';
