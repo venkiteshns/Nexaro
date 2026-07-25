@@ -72,16 +72,21 @@ const RETRY_BASE_DELAY_MS = 300;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const createOtp = async (email, phone) => {
-    const userData = await User.findOne({ $or: [{ email }, { phone }] });
-    if (userData) {
-      return {
-        success: false,
-        message: "User already exists with same email or mobile number",
-      };
+export const createOtp = async (email, phone, resendFlag) => {
+  console.log(email, phone, resendFlag);
+  
+    if(!resendFlag) {
+      const userData = await User.findOne({ $or: [{ email }, { phone }] });
+      if (userData) {
+        
+        return {
+          success: false,
+          message: "User already exists with same email or mobile number",
+        };
+      }
     }
     const otp = crypto.randomInt(100000, 999999).toString();
-    // console.log("OTP", otp);
+    console.log("OTP", otp);
 
     const existingOtp = await Otp.findOne({ email });
     if (existingOtp) {

@@ -120,7 +120,7 @@ export const getPosterTaskProgress = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
   const response = await updateUserProfileService({
-    userId: req.user.id,
+    userId: req.user._id,
     body: req.body,
     avatar: req.files?.avatar,
   });

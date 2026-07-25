@@ -1,6 +1,9 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUpdatePosterProfileMutation } from "../../store/services/posterApi";
+import OtpModal from '../../components/OtpModal/OtpModal'
+import {useSendOtpMutation} from '../../store/services/authApi'
+
 import {
   MapPin,
   Lock,
@@ -10,10 +13,20 @@ import {
   Mail,
   CheckCircle2,
 } from "lucide-react";
+import { showSuccess } from "../../utils/toast";
 
 const EditProfileModal = ({ onClose, posterInfo }) => {
+
   const avatarInputRef = useRef(null);
-  const [updatePosterProfile, { isLoading }] = useUpdatePosterProfileMutation();
+  const [emailChanged, setEmailChanged] = useState(false);
+  const [newEmail, setNewEmail] = useState( "");
+  const [isVerified, setIsVerified] = useState(false);
+  const [pendingData, setPendingData] = useState(null);
+
+  const [updatePosterProfile, { isLoading, isError, isSuccess }] = useUpdatePosterProfileMutation();
+
+  console.log( "isVerified", isVerified);
+  
 
   const {
     register,
@@ -34,9 +47,31 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     ? URL.createObjectURL(avatarFileList[0])
     : null;
 
+  const [sendOtp] = useSendOtpMutation();
+
+  const resendOtp = ({email}) => {
+    sendOtp({ email, phone: posterInfo.phone, resendFlag: true });
+  }
+
+  useEffect(() => {
+    if(isVerified && pendingData) {
+      onSubmit(pendingData);
+    }
+  },[isVerified])
+   
+
   const onSubmit = async (data) => {
+
+    if(data.email != posterInfo?.email && !isVerified) {
+      resendOtp({email: data.email, phone: posterInfo.phone, resendFlag: true });
+      setNewEmail(data.email);
+      setEmailChanged(true);
+      setPendingData(data);
+      return;
+    }
     try {
       await updatePosterProfile(data).unwrap();
+      showSuccess("Profile updated successfully");
       onClose();
     } catch (error) {
       console.log(error);
@@ -243,11 +278,13 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
                   background: "linear-gradient(135deg, #0A6E5C, #10b981)",
                 }}
               >
-                Save Changes
+                {isSuccess ? "Changes Saved" : isLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
         </form>
+
+        {emailChanged &&  <OtpModal show={setEmailChanged}  email={newEmail} reSendOtp={resendOtp} isVerified={setIsVerified} />}
       </div>
     </div>
   );

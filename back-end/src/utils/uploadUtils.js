@@ -1,8 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 
 export const uploadManyFiles = async (files, folder) => {
-    
-    
+
     try {
         if (!files || Object.keys(files).length === 0) {
             throw new Error("No files received for uploading ")
@@ -10,6 +9,7 @@ export const uploadManyFiles = async (files, folder) => {
 
         const uploadPromises = Object.entries(files).map(
             async ([fieldName, fileArray]) => {
+                // console.log("fileArray", fieldName, fileArray);
                 const result = await cloudinary.uploader.upload(
                     fileArray[0].path, {
                     folder: `Nexaro/${folder}`,
@@ -35,7 +35,6 @@ export const uploadManyFiles = async (files, folder) => {
             };
         });
     console.log("-------------------------------------------------");
-
         console.log("res", result)
     console.log("-------------------------------------------------");
 
