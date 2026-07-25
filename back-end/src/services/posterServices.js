@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import Bid from "../models/bidsSchema.js";
 import Review from "../models/reviewSchema.js";
 import { getIo } from "../socket.js";
+import { uploadManyFiles } from "../utils/uploadUtils.js";
 
 export const posterSignupService = async (data) => {
   // console.log("signUp data", data);
@@ -310,20 +311,27 @@ export const getPosterTaskProgressService = async (taskId) => {
 
 export const updateUserProfileService = async ({ userId, body, avatar }) => {
   try {
-    console.log(body, avatar);
+    console.log(userId, body, avatar);
 
-    const user = await User.find({ _id: mongoose.Types.ObjectId(userId) });
+    const user = await User.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    // console.log("user", user);
     if (!user) {
       return { error: "user not found" };
     }
-    // const { email, locat } = body;
-    // user.email = email,
-    //     user.address = address;
-    // user.phone = phone,
-    //     user.bio = bio;
-    // await user.save();
-    // return ({ message: "user profile updated successfully" })
+    const { email, phone } = body;
+    user.email = email;
+    user.phone = phone; 
+    if(avatar && avatar.length > 0) {
+      let uploadedAvatar = await uploadManyFiles([avatar], "avatars");
+      user.verificationDocuments.selfie = uploadedAvatar[0];
+    }
+    let savedUser = await user.save();
+    console.log(savedUser);
+    
+    return ({ message: "user profile updated successfully" })
   } catch (error) {
+    console.log(error);
+    
     return { error: error.message };
   }
 };
@@ -406,7 +414,7 @@ export const getPosterProfileService = async (posterId) => {
         phone: posterUser?.phone || null,
         city: posterUser?.city || null,
         createdAt: posterUser?.createdAt || null,
-        selfie: posterUser?.verificationDocuments?.selfie?.url || null,
+        selfie: posterUser?.verificationDocuments?.selfie?.url || process.env.DEFAULT_AVATAR_URL,
       },
     };
   } catch (error) {

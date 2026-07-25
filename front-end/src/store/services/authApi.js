@@ -3,11 +3,15 @@ import { api } from "./api";
 export const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
         sendOtp: builder.mutation({
-            query: ({ email, phone }) => ({
-                url: "/auth/get-otp",
-                method: "POST",
-                body: { email, phone },
-            }),
+            query: (params) => {
+                let {email, phone} = params;
+                let resendFlag = params.resendFlag || false;
+                return {
+                    url: "/auth/get-otp",
+                    method: "POST",
+                    body: { email, phone, resendFlag },
+                };
+            },
         }),
 
         verifyOtp: builder.mutation({
