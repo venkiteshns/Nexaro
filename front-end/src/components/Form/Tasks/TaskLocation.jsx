@@ -14,6 +14,7 @@ const FieldError = ({ name, errors }) =>
 
 const TaskLocation = () => {
     const { register, watch, setValue, clearErrors, getValues, formState: { errors } } = useFormContext();
+
     const [fetchCords, setFetchCords] = useState("idle");
     const selectedState = watch('state');
     const selectedDistrict = watch('district');
