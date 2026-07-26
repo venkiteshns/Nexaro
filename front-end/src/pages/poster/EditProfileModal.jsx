@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { showError, showSuccess } from "../../utils/toast";
-import UpdatePasswordModal from "../../components/sharedComponents/updatePasswordModal";
+import UpdatePasswordModal from "../../components/sharedComponents/UpdatePasswordModal";
 
 const EditProfileModal = ({ onClose, posterInfo }) => {
 
