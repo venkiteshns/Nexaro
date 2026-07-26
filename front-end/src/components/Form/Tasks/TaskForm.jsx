@@ -6,6 +6,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useCreateTaskMutation } from "../../../store/services/posterApi";
 import { showError, showSuccess } from "../../../utils/toast";
 import { useNavigate } from "react-router-dom";
+import LocationSelection from "../../sharedComponents/LocationSelection";
 
 const TaskForm = () => {
   const methods = useForm({
@@ -49,6 +50,8 @@ const TaskForm = () => {
             <div className="space-y-5">
               <TaskDetails />
               <TaskPhotos />
+              <LocationSelection/>
+
               <TaskLocation />
             </div>
             <RightSideBar
