@@ -182,3 +182,4 @@ export const getPosterProfile = async (req, res) => {
     });
   }
 };
+

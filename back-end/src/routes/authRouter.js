@@ -2,7 +2,8 @@ import express from "express";
 import upload from "../middlewares/upload.js";
 import { workerSignup } from "../controller/WorkerControllers/workerController.js";
 import { posterSignup } from "../controller/PosterControllers/posterController.js";
-import { getOtpForSignUp, login, logout, refreshAccessToken, verifySignUpOtp, forgotPasswordOtp, updatePassword, googleLogin } from "../controller/authController.js";
+import { getOtpForSignUp, login, logout, refreshAccessToken, verifySignUpOtp, forgotPasswordOtp, updatePassword, googleLogin, updateUserPassword } from "../controller/authController.js";
+import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
@@ -27,5 +28,8 @@ router.post("/forgot-password/:role", forgotPasswordOtp);
 router.post("/update-password", updatePassword);
 
 router.post("/google-login", googleLogin);
+
+router.patch('/profile/update-password', verifyToken, updateUserPassword);
+
 
 export default router;

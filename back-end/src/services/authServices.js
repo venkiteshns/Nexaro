@@ -334,7 +334,7 @@ export const forgotPasswordOtpService = async (email, role) => {
     }
 
     const otp = crypto.randomInt(100000, 999999).toString();
-    // console.log("Forgot Password OTP", otp);
+    console.log("Forgot Password OTP", otp);
 
     const existingOtp = await Otp.findOne({ email });
     if (existingOtp) {
@@ -370,3 +370,25 @@ export const updatePasswordService = async (email, password) => {
 
     return { success: true, message: "Password updated successfully" };
 };
+
+export const updateUserPasswordService = async ( data, userId) => {
+  try {
+    let user = await User.findById(userId);
+    if(!user){
+      return { success: false, message: "User not found" };
+    }
+    console.log("data in updateUserPasswordService", data);
+    let { oldPassword, password } = data;
+    const isPasswordValid = await compareHash(oldPassword, user.password);
+    if(!isPasswordValid){
+      return { success: false, message: "Old password is incorrect" };
+    }
+    const hashedPassword = await hashData(password);
+    user.password = hashedPassword;
+    await user.save();
+    return { success: true, message: "Password updated successfully" };
+  } catch (error) {
+    console.error("Update user password error:", error.message);
+    return { success: false, message: "Failed to update password" };
+  }
+}

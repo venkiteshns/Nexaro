@@ -26,10 +26,12 @@ router.post(
 );
 
 router.get("/tasks", verifyToken, getMyTasks);
-
 router.get("/task/bids/:taskId", verifyToken, getPosterBids);
 router.get("/task/:taskId/progress", verifyToken, getPosterTaskProgress);
 router.get("/task/completed/:taskId", verifyToken, getCompletedTaskPosterSide);
+
+router.get("/profile", verifyToken, getPosterProfile);
+
 
 router.patch("/bid/accept/:bidId", verifyToken, acceptBid);
 router.patch("/task/cancel/:taskId", verifyToken, cancelTaskByPoster);
@@ -45,7 +47,5 @@ router.patch(
   upload.fields([{ name: "avatar", maxCount: 1 }]),
   updateUserProfile,
 );
-
-router.get("/profile", verifyToken, getPosterProfile);
 
 export default router;
