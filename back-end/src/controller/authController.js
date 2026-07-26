@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
-import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePasswordService, googleLoginService } from '../services/authServices.js';
+import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePasswordService, googleLoginService, updateUserPasswordService } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/generateTokens.js';
 import STATUS_CODES from '../constants/statusCodes.js';
 import MESSAGES from '../constants/messages.js';
@@ -180,3 +180,12 @@ export const googleLogin = async (req, res) => {
         });
     }
 };
+
+export const updateUserPassword =  async (req, res) => {
+    let response = await updateUserPasswordService(req.body, req.user._id);
+    if (response.success) {
+        return res.status(STATUS_CODES.OK).json({ success: true, message: response.message });
+    } else {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
+    }
+}

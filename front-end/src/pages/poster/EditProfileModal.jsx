@@ -13,7 +13,9 @@ import {
   Mail,
   CheckCircle2,
 } from "lucide-react";
-import { showSuccess } from "../../utils/toast";
+
+import { showError, showSuccess } from "../../utils/toast";
+import UpdatePasswordModal from "../../components/sharedComponents/updatePasswordModal";
 
 const EditProfileModal = ({ onClose, posterInfo }) => {
 
@@ -22,11 +24,10 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
   const [newEmail, setNewEmail] = useState( "");
   const [isVerified, setIsVerified] = useState(false);
   const [pendingData, setPendingData] = useState(null);
+  const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
 
   const [updatePosterProfile, { isLoading, isError, isSuccess }] = useUpdatePosterProfileMutation();
-
-  console.log( "isVerified", isVerified);
-  
 
   const {
     register,
@@ -41,10 +42,8 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     },
   });
 
-  const { ref: avatarRhfRef, ...avatarRest } = register("avatar");
-  const avatarFileList = watch("avatar");
-  const previewUrl = avatarFileList?.[0]
-    ? URL.createObjectURL(avatarFileList[0])
+  const previewUrl = selectedAvatar
+    ? URL.createObjectURL(selectedAvatar)
     : null;
 
   const [sendOtp] = useSendOtpMutation();
@@ -58,10 +57,8 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       onSubmit(pendingData);
     }
   },[isVerified])
-   
 
   const onSubmit = async (data) => {
-
     if(data.email != posterInfo?.email && !isVerified) {
       resendOtp({email: data.email, phone: posterInfo.phone, resendFlag: true });
       setNewEmail(data.email);
@@ -69,12 +66,25 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       setPendingData(data);
       return;
     }
+
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("phone", data.phone);
+    if (selectedAvatar) {
+      formData.append("avatar", selectedAvatar);
+    }
+
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    } 
+
     try {
-      await updatePosterProfile(data).unwrap();
+      await updatePosterProfile(formData).unwrap();
       showSuccess("Profile updated successfully");
       onClose();
     } catch (error) {
       console.log(error);
+      showError(error?.data?.message || "Failed to update profile");
     }
   };
 
@@ -94,6 +104,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
         <div className="h-1.5 w-full bg-linear-to-r from-[#0A6E5C] via-emerald-500 to-teal-400" />
 
         <div className="flex items-center justify-between px-7 pt-6 pb-2">
+        <p>isDirty: {String(isDirty)} selected: {String(!!selectedAvatar)}</p>
           <h2 className="text-lg font-bold text-gray-900">Edit Profile</h2>
           <button
             type="button"
@@ -155,10 +166,12 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
               type="file"
               accept="image/*"
               className="hidden"
-              {...avatarRest}
+              onChange={(e) => {
+                console.log(e.target.files);
+                setSelectedAvatar(e.target.files[0]);
+              }}
               ref={(el) => {
-                avatarRhfRef(el); // RHF internal ref
-                avatarInputRef.current = el; // local ref for click trigger
+                avatarInputRef.current = el;
               }}
             />
 
@@ -167,7 +180,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
             </p>
             {previewUrl && (
               <p className="text-[10px] text-gray-400 mt-0.5">
-                {(avatarFileList[0].size / 1024).toFixed(0)} KB
+                {(selectedAvatar?.size / 1024).toFixed(0)} KB
               </p>
             )}
           </div>
@@ -254,7 +267,8 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
               </div>
             </div>
 
-            <button
+            <button 
+              onClick={() => { setShowUpdatePasswordModal(true) }}
               type="button"
               className="w-full flex items-center justify-center gap-2 py-2.5 mb-6 rounded-xl border border-dashed border-gray-300 text-gray-500 text-sm font-semibold hover:border-[#0A6E5C] hover:text-[#0A6E5C] hover:bg-emerald-50 transition-all"
             >
@@ -272,7 +286,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
               </button>
               <button
                 type="submit"
-                disabled={!isDirty && !previewUrl}
+                disabled={(!isDirty && !selectedAvatar) || isLoading }
                 className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{
                   background: "linear-gradient(135deg, #0A6E5C, #10b981)",
@@ -284,7 +298,9 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
           </div>
         </form>
 
+        {showUpdatePasswordModal && <UpdatePasswordModal onClose={() => setShowUpdatePasswordModal(false)} />}
         {emailChanged &&  <OtpModal show={setEmailChanged}  email={newEmail} reSendOtp={resendOtp} isVerified={setIsVerified} />}
+
       </div>
     </div>
   );
