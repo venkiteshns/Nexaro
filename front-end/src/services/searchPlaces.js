@@ -11,9 +11,15 @@ export const searchPlaces = async (query) => {
     }
 
     const data = await res.json();
+    const addr = data?.address || {};
 
     return data.map((place) => ({
         displayName: place.display_name,
+        country: addr.country || "",
+        state: addr.state || "",
+        district: addr.state_district || addr.county || addr.district || "",
+        city: addr.city || addr.town || addr.village || addr.suburb || "",
+        area: addr.suburb || addr.neighbourhood || addr.quarter || addr.residential || "",
         lat: place.lat,
         lon: place.lon,
         address: place.address,
