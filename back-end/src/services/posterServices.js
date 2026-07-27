@@ -72,11 +72,52 @@ export const posterSignupService = async (data) => {
   }
 };
 
-export const getTasksService = async (posterId) => {
+export const getTasksService = async (posterId, query) => {
+
+  const {status, search = "", page = 1, limit = 5} = query;
+ 
+  let matchingCriteria= {
+    posterId: new mongoose.Types.ObjectId(posterId),
+  };
+
+  if(status!=='all'){
+    matchingCriteria.status = query.status;
+  }
+
+  if(search.trim()){
+    matchingCriteria.$or =[
+      {
+        titile:{
+          $regex: search,
+          $options: "i"
+        },
+      }, 
+      {
+        "address.landmark": {
+          $regex: search,
+          $options: "i"
+        },
+      },
+      {
+        "address.area": {
+          $regex: search,
+          $options: "i"
+        }
+      },
+      {
+        "address.city": {
+          $regex: search,
+          $options: "i"
+        }
+      }
+    ]
+  }
+
+  let skip = (Number(page) - 1 ) * Number(limit);
+
   try {
-    // const tasks = await Task.find({ posterId });
     const tasks = await Task.aggregate([
-      { $match: { posterId: new mongoose.Types.ObjectId(posterId) } },
+      { $match: matchingCriteria },
       {
         $lookup: {
           from: "bids",
@@ -96,6 +137,12 @@ export const getTasksService = async (posterId) => {
         },
       },
       {
+        $skip:skip,
+      },
+      {
+        $limit: Number(limit)
+      },
+      {
         $project: {
           _id: 1,
           title: 1,
@@ -113,12 +160,34 @@ export const getTasksService = async (posterId) => {
         },
       },
     ]);
-    // console.log(tasks);
+    console.log(tasks);
+    const totalCount = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId)})
+    const openTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "open"});
+    const inProgressTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "in_progress"});
+    const assignedTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "assigned"});
+    const completedTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "completed"});
+    const cancelledTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "cancelled"});
+
 
     if (!tasks) {
       throw new Error("No tasks found");
     }
-    return tasks;
+    return {
+      tasks,
+      stats:{
+        openTasks,
+        assignedTasks,
+        inProgressTasks,
+        completedTasks,
+        cancelledTasks,
+      },
+      paginations: {
+        total: totalCount,
+        page: Number(page),
+        limit:Number(limit),
+        totalPages: Math.ceil(totalCount/Number(limit))
+      }
+    };
   } catch (error) {
     console.error("getTasksService error:", error.message);
     return { error: error.message };

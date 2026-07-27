@@ -49,8 +49,8 @@ export const posterApi = api.injectEndpoints({
     }),
 
     getPosterTasks: builder.query({
-      query: () => ({
-        url: "/poster/tasks",
+      query: ({status, page, limit = 5, search}) => ({
+        url: `/poster/tasks?page=${page}&limit=${limit}&status=${status}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Poster_Tasks"],

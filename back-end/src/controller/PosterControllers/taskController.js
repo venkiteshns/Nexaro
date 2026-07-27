@@ -32,10 +32,11 @@ export const createTask = async (req, res) => {
 };
 
 export const getMyTasks = async (req, res) => {
+    console.log(req.query);
     try {
         const posterId = req.user._id;
 
-        const tasks = await getTasksService(posterId);
+        const tasks = await getTasksService(posterId, req.query);
 
         if (tasks.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
