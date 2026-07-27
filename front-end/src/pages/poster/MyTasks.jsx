@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Plus,
@@ -21,6 +21,8 @@ import PosterHeader from '../../layouts/Poster/PosterHeader';
 import { useCancelTaskByPosterMutation, useGetPosterTasksQuery } from '../../store/services/posterApi';
 import { showError, showSuccess } from '../../utils/toast';
 import EditTaskModal from '../../components/Poster/EditTaskModal';
+import useDebounce from '../../customHooks/useDebounce'
+import PaginationSections from '../../components/sharedComponents/PaginationSections';
 
 function getStatusConfig(status) {
     switch (status) {
@@ -127,7 +129,7 @@ function TaskCard({ task }) {
                                 {task.address?.city && (
                                     <span className="flex items-center gap-1 text-xs text-gray-500">
                                         <MapPin size={12} />
-                                        {task.address.city}
+                                        {task.address.area}
                                     </span>
                                 )}
                                 {postedDate && (
@@ -311,19 +313,27 @@ const MyTasks = () => {
 
     const [activeTab, setActiveTab] = useState('all');
     const [searchText, setSearchText] = useState('');
+    const [page, setPage] = useState(1)
 
-    const { data, isLoading, isError } = useGetPosterTasksQuery();
+    const debounceText = useDebounce({searchText});
 
+    const { data, isLoading, isError } = useGetPosterTasksQuery({search:debounceText, status: activeTab, page});
 
-    const allTasks = data?.tasks || [];
+    const allTasks = data?.tasks.tasks || [];
+    
+    const stats = data?.tasks?.stats;
+
+    console.log(data);
+    
+    const pagination = data?.tasks?.paginations;
 
     const counts = {
-        total: allTasks.length,
-        open: allTasks.filter((t) => t.status === 'open').length,
-        assigned: allTasks.filter((t) => t.status === 'assigned').length,
-        in_progress: allTasks.filter((t) => t.status === 'in_progress').length,
-        completed: allTasks.filter((t) => t.status === 'completed').length,
-        cancelled: allTasks.filter((t) => t.status === 'cancelled').length,
+        total: data?.tasks?.paginations?.total,
+        open: stats?.openTasks,
+        assigned: stats?.assignedTasks,
+        in_progress: stats?.inProgressTasks,
+        completed: stats?.completedTasks,
+        cancelled: stats?.cancelledTasks,
     };
 
     const tabs = [
@@ -333,7 +343,6 @@ const MyTasks = () => {
         { key: 'in_progress', label: 'In Progress', count: counts.in_progress },
         { key: 'completed', label: 'Completed', count: counts.completed },
         { key: 'cancelled', label: 'Cancelled', count: counts.cancelled },
-
     ];
 
     const filteredTasks = allTasks.filter((task) => {
@@ -444,6 +453,8 @@ const MyTasks = () => {
                     {!isLoading && !isError && filteredTasks.map((task) => (
                         <TaskCard key={task._id} task={task} />
                     ))}
+
+                    <PaginationSections currentPage={page} onPageChange={setPage} totalPages={pagination?.totalPages} />
 
                 </div>
             </div>
