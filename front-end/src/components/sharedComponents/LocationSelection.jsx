@@ -66,10 +66,16 @@ const LocationSelection = ({SectionName}) => {
             setSearchText(selectedPlace.displayName);
             setSuggestions([]);
             setPlaceOptions([]);
+            console.log("selectedPlace",selectedPlace,"__________________________");
             let lat = Number(selectedPlace?.lat)
             let lng = Number(selectedPlace?.lon)
-            setValue('locationLat', lat, { shouldValidate: true });
-            setValue('locationlng', lng, { shouldValidate: true });
+            setValue('locationLat', lat);
+            setValue('locationlng', lng);
+            setValue("fullAddress", selectedPlace.displayName);
+            setValue("district", selectedPlace.district || "");
+            setValue("city", selectedPlace.city || "");
+            setValue('area',selectedPlace.area||"");
+            setValue('state',selectedPlace.state|| "");
             setMapPosition({lat,lng})
             setIsOpen(false);
             setShowResult(false);
@@ -84,15 +90,22 @@ const LocationSelection = ({SectionName}) => {
             setTimeout(async () => {
                 try {
                     const place = await reverseCoords(pos);
-                    console.log(place);
+                    console.log("place",place);
                     let payload = {
                         displayName:place.displayName,
+                        district: place.district,
+                        area: place.area,
+                        state: place.state,
+                        city: place.city,
                         lat:Number(place.lat),
                         lon:Number(place.lng)
                     }
-                    setSelectedPlace(payload);
+                    console.log("payload"); 
+                    setSearchText(place.displayName) 
+                    setSelectedPlace(payload); 
                     setPlaceOptions([]);
                 } catch(err) {
+                    console.log(err);
                     setSuggestions([]);
                     setPlaceOptions([]);
                 }

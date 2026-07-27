@@ -52,7 +52,7 @@ const TaskForm = () => {
               <TaskPhotos />
               <LocationSelection SectionName={"Task Location"} />
 
-              <TaskLocation />
+              {/* <TaskLocation /> */}
             </div>
             <RightSideBar
               title={previewTitle}
