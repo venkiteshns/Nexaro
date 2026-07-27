@@ -50,7 +50,7 @@ const TaskForm = () => {
             <div className="space-y-5">
               <TaskDetails />
               <TaskPhotos />
-              <LocationSelection/>
+              <LocationSelection SectionName={"Task Location"} />
 
               <TaskLocation />
             </div>

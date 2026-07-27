@@ -18,5 +18,7 @@ export const reverseCoords = async ({ lat, lng }) => {
     city: addr.city || addr.town || addr.village || addr.suburb || "",
     area: addr.suburb || addr.neighbourhood || addr.quarter || addr.residential || "",
     displayName: data.display_name || "",
+    lat:data.lat,
+    lng:data.lon
   };
 };
