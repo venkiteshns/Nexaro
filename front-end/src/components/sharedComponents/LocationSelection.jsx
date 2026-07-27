@@ -6,8 +6,11 @@ import DropDownUnRegister from '../Custom/DropDownUnRegister';
 import { reverseCoords } from '../../services/reverseCoords';
 import Map from '../Maps/Map';
 import { setOptions } from 'leaflet';
+import { useFormContext } from 'react-hook-form';
 
 const LocationSelection = ({SectionName}) => {
+
+    const {register, setValue} = useFormContext();
 
     const [searchText, setSearchText] = useState("");
     const [placeOptions, setPlaceOptions] = useState([]);
@@ -65,6 +68,8 @@ const LocationSelection = ({SectionName}) => {
             setPlaceOptions([]);
             let lat = Number(selectedPlace?.lat)
             let lng = Number(selectedPlace?.lon)
+            setValue('locationLat', lat, { shouldValidate: true });
+            setValue('locationlng', lng, { shouldValidate: true });
             setMapPosition({lat,lng})
             setIsOpen(false);
             setShowResult(false);

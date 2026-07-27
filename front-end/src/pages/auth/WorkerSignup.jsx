@@ -11,6 +11,7 @@ import {
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {showWarning} from '../../utils/toast.js'
 
 const WorkerSignup = () => {
   const methods = useForm();
@@ -32,6 +33,7 @@ const WorkerSignup = () => {
   async function sendDataToBackend() {
     if (!isVerified) return;
     const fd = new FormData();
+    console.log("called");
 
     const textFields = [
       "name",
@@ -81,11 +83,14 @@ const WorkerSignup = () => {
       );
       navigate("/worker/dashboard");
     } catch (err) {
+      showWarning(err.data?.message)
       console.log("Sign up error", err);
     }
   }
 
   useEffect(() => {
+    console.log("isVerified",isVerified,"\nformData", formData);
+    
     if (isVerified && formData) {
       sendDataToBackend();
     }
