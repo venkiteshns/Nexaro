@@ -124,10 +124,6 @@ const TaskLocation = () => {
             setValue("city", place.city || "", { shouldValidate: true });
             clearErrors("city");
             console.log("place : ", place);
-
-            // setTimeout(() => {
-            //     setFetchCords("idle");
-            // }, 1500);
             setFetchCords("success");
         } catch {
             setFetchCords("fail");

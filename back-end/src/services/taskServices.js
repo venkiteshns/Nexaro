@@ -33,7 +33,7 @@ const uploadImagesToCloudinary = async (files) => {
 };
 
 export const createTaskService = async (body, files, posterId) => {
-    // console.log(body, files, posterId)
+    console.log(body, files, posterId)
     try {
         const address = JSON.parse(body.address);
         const location = JSON.parse(body.location);
