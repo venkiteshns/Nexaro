@@ -76,7 +76,7 @@ export const getTasksService = async (posterId, query) => {
 
   const {status, search = "", page = 1, limit = 5} = query;
  
-  let matchingCriteria= {
+  const matchingCriteria= {
     posterId: new mongoose.Types.ObjectId(posterId),
   };
 
@@ -113,7 +113,7 @@ export const getTasksService = async (posterId, query) => {
     ]
   }
 
-  let skip = (Number(page) - 1 ) * Number(limit);
+  const skip = (Number(page) - 1 ) * Number(limit);
 
   try {
     const tasks = await Task.aggregate([
@@ -391,10 +391,10 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
     user.email = email;
     user.phone = phone; 
     if(avatar && avatar.length > 0) {
-      let uploadedAvatar = await uploadManyFiles([avatar], "avatars");
+      const uploadedAvatar = await uploadManyFiles([avatar], "avatars");
       user.verificationDocuments.selfie = uploadedAvatar[0];
     }
-    let savedUser = await user.save();
+    const savedUser = await user.save();
     console.log(savedUser);
     
     return ({ message: "user profile updated successfully" })

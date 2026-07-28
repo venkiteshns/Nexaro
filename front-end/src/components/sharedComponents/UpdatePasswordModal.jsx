@@ -1,5 +1,5 @@
 import { X, Eye, EyeOff } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
 import Password from '../Form/FormComponents/Password';
 import { useUpdateProfilePasswordMutation } from '../../store/services/sharedApi';
@@ -9,7 +9,7 @@ const UpdatePasswordModal = ({ onClose }) => {
     const methods = useForm();
     const [showOldPassword, setShowOldPassword] = useState(false);
 
-    const [updateProfilePassword, {isLoading, isError, isSuccess}] = useUpdateProfilePasswordMutation();
+    const [updateProfilePassword, {isLoading, isSuccess}] = useUpdateProfilePasswordMutation();
 
     const onSubmit = async (data) => {
         try {

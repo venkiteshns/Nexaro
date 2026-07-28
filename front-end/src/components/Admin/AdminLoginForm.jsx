@@ -29,7 +29,7 @@ const AdminLoginForm = () => {
       methods.reset();
       reset();
     }
-  }, [forgotPassword]);
+  }, [forgotPassword, methods, reset]);
 
   const handleLogin = async (data) => {
     try {

@@ -70,7 +70,7 @@ const useSocketNotification = () => {
             disconnectSocket();
         };
 
-    }, [activeUser, activeToken]);
+    }, [activeUser, activeToken, dispatch]);
 };
 
 export default useSocketNotification;

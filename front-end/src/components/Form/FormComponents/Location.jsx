@@ -185,9 +185,9 @@ const Location = ({ worker }) => {
   };
 
   useEffect(() => {
-    if (selectedDistrict) {
+   (() =>  { if (selectedDistrict) {
       setDistrict(selectedDistrict);
-    }
+    }})()
   }, [selectedDistrict]);
 
   const fieldClass =

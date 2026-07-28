@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUpdatePosterProfileMutation } from "../../store/services/posterApi";
 import OtpModal from '../../components/OtpModal/OtpModal'
@@ -50,26 +50,18 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     sendOtp({ email, phone: posterInfo.phone, resendFlag: true });
   }
 
-  const onSubmit = async (data) => {
-    if(data.email != posterInfo?.email && !isVerified) {
-      resendOtp({email: data.email, phone: posterInfo.phone, resendFlag: true });
-      setNewEmail(data.email);
-      setEmailChanged(true);
-      setPendingData(data);
-      return;
-    }
-
+  const updateProfile = useCallback( async (data) => {
+    console.log(isVerified);
+    
     const formData = new FormData();
     formData.append("email", data.email);
     formData.append("phone", data.phone);
     if (selectedAvatar) {
       formData.append("avatar", selectedAvatar);
     }
-
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    } 
-
+    if(!isVerified){
+      return;
+    }
     try {
       await updatePosterProfile(formData).unwrap();
       showSuccess("Profile updated successfully");
@@ -78,13 +70,25 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       console.log(error);
       showError(error?.data?.message || "Failed to update profile");
     }
+  },[isVerified, selectedAvatar, updatePosterProfile, onClose])
+
+  const onSubmit = async (data) => {
+    if(data.email != posterInfo?.email && !isVerified) {
+      resendOtp({email: data.email, phone: posterInfo.phone, resendFlag: true });
+      setNewEmail(data.email);
+      setEmailChanged(true);
+      setPendingData(data);
+      return;
+    }
+    await updateProfile(data);
   };
+
 
   useEffect(() => {
     if(isVerified && pendingData) {
-      onSubmit(pendingData);
+      updateProfile(pendingData);
     }
-  },[isVerified, pendingData, onSubmit])
+  },[isVerified, pendingData, updateProfile])
 
 
   return (
@@ -103,7 +107,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
         <div className="h-1.5 w-full bg-linear-to-r from-[#0A6E5C] via-emerald-500 to-teal-400" />
 
         <div className="flex items-center justify-between px-7 pt-6 pb-2">
-        <p>isDirty: {String(isDirty)} selected: {String(!!selectedAvatar)}</p>
           <h2 className="text-lg font-bold text-gray-900">Edit Profile</h2>
           <button
             type="button"

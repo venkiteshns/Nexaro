@@ -23,10 +23,10 @@ const OtpModal = (props) => {
     try {
       const res = await verifyOtp({ otp, email }).unwrap();
       console.log("OTP verified:", res);
+      isVerified(true);
       setTimeout(() => {
         show(false);
       }, 1500);
-      isVerified(true);
     } catch {
       setOtpError(true);
 
@@ -41,14 +41,18 @@ const OtpModal = (props) => {
   };
 
   useEffect(() => {
-    if (time <= 0) {
+
+    let interval = null;
+
+    (() => {if (time <= 0) {
       setCanResend(true);
       return;
     }
 
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       setTime((prev) => prev - 1);
     }, 1000);
+  })()
 
     return () => clearInterval(interval);
   }, [time]);

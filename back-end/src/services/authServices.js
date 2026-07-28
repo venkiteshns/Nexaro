@@ -113,12 +113,12 @@ export const createOtp = async (email, phone, resendFlag) => {
     };
 };
 
-export const sendOtp = async (email, otp) => {
+export const sendOtp = (email, otp) => {
   let lastError;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      const response = fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -137,7 +137,7 @@ export const sendOtp = async (email, otp) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = response.json();
         console.error("Brevo API Error:", errorData);
         throw new Error(
           `Brevo API rejected the request: ${errorData?.message ?? response.status}`,
@@ -166,7 +166,7 @@ export const sendOtp = async (email, otp) => {
       console.warn(
         `sendOtp: transient error on attempt ${attempt}, retrying in ${delay}ms...`,
       );
-      await sleep(delay);
+      sleep(delay);
     }
   }
 
@@ -175,7 +175,6 @@ export const sendOtp = async (email, otp) => {
 
 export const verifyOtp = async (email, otp) => {
   // console.log(email, otp);
-  try {
     const otpRecord = await Otp.findOne({
       email,
       expiresAt: { $gt: new Date() },
@@ -189,10 +188,7 @@ export const verifyOtp = async (email, otp) => {
     }
     await Otp.deleteOne({ email });
     return { success: true, message: "OTP verified successfully" };
-  } catch (error) {
-    // console.log(error);
-    throw error;
-  }
+  
 };
 
 export const loginService = async (userData, isAdmin) => {
@@ -249,12 +245,12 @@ export const loginService = async (userData, isAdmin) => {
     };
 };
 
-export const sendForgotPasswordEmail = async (email, otp) => {
+export const sendForgotPasswordEmail = (email, otp) => {
   let lastError;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      const response = fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -273,7 +269,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = response.json();
         console.error("Brevo API Error:", errorData);
         throw new Error(
           `Brevo API rejected the request: ${errorData?.message ?? response.status}`,
@@ -302,7 +298,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
       console.warn(
         `sendForgotPasswordEmail: transient error on attempt ${attempt}, retrying in ${delay}ms...`,
       );
-      await sleep(delay);
+      sleep(delay);
     }
   }
 
@@ -373,12 +369,12 @@ export const updatePasswordService = async (email, password) => {
 
 export const updateUserPasswordService = async ( data, userId) => {
   try {
-    let user = await User.findById(userId);
+    const user = await User.findById(userId);
     if(!user){
       return { success: false, message: "User not found" };
     }
     console.log("data in updateUserPasswordService", data);
-    let { oldPassword, password } = data;
+    const { oldPassword, password } = data;
     const isPasswordValid = await compareHash(oldPassword, user.password);
     if(!isPasswordValid){
       return { success: false, message: "Old password is incorrect" };

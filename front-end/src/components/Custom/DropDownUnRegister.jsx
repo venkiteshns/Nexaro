@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const DropDownUnRegister = ({options, onValueSelect}) => {
 

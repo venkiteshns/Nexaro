@@ -182,7 +182,7 @@ export const googleLogin = async (req, res) => {
 };
 
 export const updateUserPassword =  async (req, res) => {
-    let response = await updateUserPasswordService(req.body, req.user._id);
+    const response = await updateUserPasswordService(req.body, req.user._id);
     if (response.success) {
         return res.status(STATUS_CODES.OK).json({ success: true, message: response.message });
     } else {

@@ -31,7 +31,7 @@ const BidForm = ({ task, bidLoading }) => {
     useEffect(() => {
         setValue('taskId', task._id);
         // setValue('workerId',)
-    }, [task])
+    }, [task, setValue])
 
     return (
         <div>

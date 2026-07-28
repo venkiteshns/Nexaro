@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React from 'react'
 
 const PaginationSections = ({totalPages, onPageChange, page}) => {
 

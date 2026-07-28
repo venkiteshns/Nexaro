@@ -86,7 +86,7 @@ const WorkerSignup = () => {
       showWarning(err.data?.message)
       console.log("Sign up error", err);
     }
-  },[formData])
+  },[formData, workerSignUp, navigate, isVerified, dispatch])
 
   useEffect(() => {
     if (isVerified && formData) {

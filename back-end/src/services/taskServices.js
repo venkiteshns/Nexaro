@@ -224,25 +224,6 @@ export const handleNewBid = async (task, user) => {
             return { error: "You have already bid on this task" }
         }
 
-        const bidsDetails = await Bid.aggregate([
-            {
-                $match: {workerId: new mongoose.Types.ObjectId(user._id)}
-            },
-            {
-                $sort: {
-                    createdAt: -1
-                }
-            }, 
-            {
-                $lookup: {
-                    from: 'tasks',
-                    localField: 'taskId',
-                    foreignField: '_id',
-                    as:'taskDetails'
-                }
-            }
-        ]);
-
         const payload = {
             taskId,
             workerId: user._id,
@@ -581,7 +562,7 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
         if (body.retainedImages) {
             try {
                 imagesToKeep = JSON.parse(body.retainedImages);
-            } catch (_) {
+            } catch {
                 imagesToKeep = [];
             }
         }
@@ -606,11 +587,11 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
 
         let address = task.address;
         if (body.address) {
-            try { address = JSON.parse(body.address); } catch (_) { /* keep existing */ }
+            try { address = JSON.parse(body.address); } catch { /* keep existing */ }
         }
         let location = task.location;
         if (body.location) {
-            try { location = JSON.parse(body.location); } catch (_) { /* keep existing */ }
+            try { location = JSON.parse(body.location); } catch { /* keep existing */ }
         }
 
         const updatedTask = await Task.findByIdAndUpdate(

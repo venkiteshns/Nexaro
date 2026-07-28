@@ -1,8 +1,7 @@
 import TaskDetails from "../FormComponents/TaskDetails";
 import TaskPhotos from "./TaskPhotos";
-import TaskLocation from "./TaskLocation";
 import RightSideBar from "./RightSideBar";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { useCreateTaskMutation } from "../../../store/services/posterApi";
 import { showError, showSuccess } from "../../../utils/toast";
 import { useNavigate } from "react-router-dom";
@@ -38,9 +37,13 @@ const TaskForm = () => {
     }
   };
 
-  const previewTitle = methods.watch("taskTitle");
-  const previewLocation = methods.watch("area");
-  const previewBudget = methods.watch("budget");
+  // const previewTitle = methods.watch("taskTitle");
+  // const previewLocation = methods.watch("area");
+  // const previewBudget = methods.watch("budget");
+
+  const previewTitle = useWatch({ control: methods.control, name: "taskTitle" });
+  const previewLocation = useWatch({ control: methods.control, name: "area" });
+  const previewBudget = useWatch({ control: methods.control, name: "budget" });
 
   return (
     <div>

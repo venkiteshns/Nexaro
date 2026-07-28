@@ -29,7 +29,7 @@ const Landing = () => {
         });
       }, 100);
     }
-  }, []);
+  }, [location.state?.scrollToGetStarted]);
 
 
   return (
