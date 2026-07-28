@@ -203,11 +203,12 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
 };
 
 export const handleNewBid = async (task, user) => {
-    // console.log(task, user);
 
     try {
         const { taskId, bidAmount, estimatedTime, pitch } = task;
-        const isTask = await Task.find({ _id: taskId });
+        console.log("taskId",taskId);
+        
+        const isTask = await Task.findOne({ _id: taskId });
         if (!isTask) {
             return { error: "No task found" }
         }
@@ -215,47 +216,13 @@ export const handleNewBid = async (task, user) => {
             taskId,
             workerId: user._id
         })
-        const posterId = isTask[0].posterId;
-        // console.log("posterId", isTask);
+        const posterId = isTask.posterId;
+        console.log("posterId", posterId,"____________");
         // console.log("already bid", isAlreadyBid);
 
         if (isAlreadyBid) {
             return { error: "You have already bid on this task" }
         }
-
-        const bidsDetails = await Bid.aggregate([
-            {
-                $match: {workerId: mongoose.Types.ObjectId(user._id)}
-            },
-            {
-                $sort: {
-                    createdAt: -1
-                }
-            }, 
-            {
-                $lookup: {
-                    from: 'tasks',
-                    localField: 'taskId',
-                    foreignField: '_id',
-                    as:'taskDetails'
-                }
-            }
-        ]);
-
-        // const date = Date.now();
-
-        // let filteredMonthData = bidsDetails[0].filter((bid) => date - createdAt < 30);
-
-        // const category = isTask.category;
-
-        // const categoryCount = filteredMonthData.redcue((acc, task) => {
-        //     acc[task.category] ? acc[task.category]+1 : 1;
-        //     return acc;
-        // },{})
-
-        // if(categoryCount[category] >= 1){
-        //     return {error: `cannot add new bid for category ${category} in this month`}
-        // }
 
         const payload = {
             taskId,
@@ -266,19 +233,18 @@ export const handleNewBid = async (task, user) => {
             availability: new Date(task.availableDate + "T" + task.availableTime),
             status: "pending"
         }
-        // console.log(payload, "bid payload");
-        // user:${userId}
+       
         const io = getIo()
 
         io.to(`user:${posterId}`).emit('new-bid-added', {
-            taskTitle: isTask[0].title,
+            taskTitle: isTask.title,
             bidAmount,
         })
 
         await Bid.create(payload)
         return "bid created successfully"
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         if (error.message) {
             return { error: error.message }
         }
@@ -596,7 +562,7 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
         if (body.retainedImages) {
             try {
                 imagesToKeep = JSON.parse(body.retainedImages);
-            } catch (_) {
+            } catch {
                 imagesToKeep = [];
             }
         }
@@ -621,11 +587,11 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
 
         let address = task.address;
         if (body.address) {
-            try { address = JSON.parse(body.address); } catch (_) { /* keep existing */ }
+            try { address = JSON.parse(body.address); } catch { /* keep existing */ }
         }
         let location = task.location;
         if (body.location) {
-            try { location = JSON.parse(body.location); } catch (_) { /* keep existing */ }
+            try { location = JSON.parse(body.location); } catch { /* keep existing */ }
         }
 
         const updatedTask = await Task.findByIdAndUpdate(

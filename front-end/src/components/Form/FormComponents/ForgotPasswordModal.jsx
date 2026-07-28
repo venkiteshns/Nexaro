@@ -23,9 +23,9 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
   const methods = useForm();
 
   useEffect(() => {
-    if (isSuccess) {
+    (() =>  {if (isSuccess) {
       setShowOtp(true);
-    }
+    }})()
   }, [isSuccess]);
 
   if (!isOpen) return null;

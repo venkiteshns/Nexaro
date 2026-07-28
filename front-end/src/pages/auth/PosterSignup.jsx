@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PosterSignUpBanner from "../../components/Poster/PosterSignUpBanner";
 import PosterSignupForm from "../../components/Form/PosterSignupForm";
 import Logo from "../../components/Logo/Logo";
@@ -35,7 +35,7 @@ const PosterSignup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const resendOtp = async (email) => {
+  const resendOtp = async () => {
     try {
       await sendOtp({
         email: formData.email,
@@ -61,7 +61,7 @@ const PosterSignup = () => {
     }
   };
 
-  const sendDataToBackend = async () => {
+  const sendDataToBackend = useCallback( async () => {
     if (!isVerified) return;
     let res = await posterSignUp(formData).unwrap();
     console.log("signUpResponse Res ", res);
@@ -73,11 +73,11 @@ const PosterSignup = () => {
       }),
     );
     navigate("/poster/dashboard");
-  };
+  },[isVerified, navigate, dispatch, posterSignUp, formData]);
 
   useEffect(() => {
     sendDataToBackend();
-  }, [isVerified]);
+  }, [isVerified, sendDataToBackend]);
 
   return (
     <div className="grid grid-cols-16">

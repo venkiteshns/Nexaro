@@ -111,5 +111,5 @@ export const api = createApi({
     "Active_Job",
     "Poster_Profile",
   ],
-  endpoints: (builder) => ({}),
+  endpoints: () => ({}),
 });

@@ -277,7 +277,11 @@ const AdminTaskManagement = () => {
 
     const debouncedSearch = useDebounce({ searchText, delay: 400 });
 
-    useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter, categoryFilter]);
+    useEffect(() => { 
+        (() => {
+            setCurrentPage(1); 
+        })()
+    }, [debouncedSearch, statusFilter, categoryFilter]);
 
     const { data, isLoading, isError } = useAdminGetAllTasksQuery({
         page: currentPage,

@@ -17,34 +17,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
 
-const PosterNavBar = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const user = useSelector((state) => state.auth.user);
-
-  // md+ desktop: collapsed (icon-only) ↔ expanded
-  const [desktopOpen, setDesktopOpen] = useState(false);
-  // <md mobile: hidden ↔ overlay open
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const [userLogout] = useUserLogoutMutation();
-
-  const handleLogout = async () => {
-    try {
-      await userLogout().unwrap();
-    } catch {
-      // log out locally even if API fails
-    } finally {
-      dispatch(logOut());
-      navigate("/user/login");
-    }
-  };
-
-  const handleNav = (redirect) => {
-    navigate(redirect);
-    setMobileOpen(false); // auto-close overlay on navigation (mobile)
-  };
 
   const posterNav = [
     {
@@ -82,8 +54,11 @@ const PosterNavBar = () => {
     "/poster/completed-task",
   ];
 
-  // ── Shared inner content ──────────────────────────────────────────────────
-  const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout }) => (
+ const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user }) =>{
+  const location = useLocation();
+
+  return (
+  
     <div className="h-full flex flex-col justify-between">
       <div>
         {/* Logo + toggle */}
@@ -164,7 +139,39 @@ const PosterNavBar = () => {
         </button>
       </div>
     </div>
-  );
+  )};
+
+const PosterNavBar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+
+  // md+ desktop: collapsed (icon-only) ↔ expanded
+  const [desktopOpen, setDesktopOpen] = useState(false);
+  // <md mobile: hidden ↔ overlay open
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const [userLogout] = useUserLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await userLogout().unwrap();
+    } catch {
+      // log out locally even if API fails
+    } finally {
+      dispatch(logOut());
+      navigate("/user/login");
+    }
+  };
+
+  const handleNav = (redirect) => {
+    navigate(redirect);
+    setMobileOpen(false); // auto-close overlay on navigation (mobile)
+  };
+
+
+  // ── Shared inner content ──────────────────────────────────────────────────
+ 
 
   return (
     <>
@@ -192,6 +199,7 @@ const PosterNavBar = () => {
         }`}
       >
         <NavContent
+          user={user}
           isExpanded={true}
           onToggle={() => setMobileOpen(false)}
           onNavClick={handleNav}
@@ -206,6 +214,7 @@ const PosterNavBar = () => {
         }`}
       >
         <NavContent
+          user={user}
           isExpanded={desktopOpen}
           onToggle={() => setDesktopOpen(!desktopOpen)}
           onNavClick={handleNav}

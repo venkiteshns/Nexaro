@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUpdatePosterProfileMutation } from "../../store/services/posterApi";
 import OtpModal from '../../components/OtpModal/OtpModal'
 import {useSendOtpMutation} from '../../store/services/authApi'
 
 import {
-  MapPin,
   Lock,
   X,
   Camera,
@@ -27,12 +26,11 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
   const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
 
-  const [updatePosterProfile, { isLoading, isError, isSuccess }] = useUpdatePosterProfileMutation();
+  const [updatePosterProfile, { isLoading, isSuccess }] = useUpdatePosterProfileMutation();
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isDirty },
   } = useForm({
     defaultValues: {
@@ -52,11 +50,27 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     sendOtp({ email, phone: posterInfo.phone, resendFlag: true });
   }
 
-  useEffect(() => {
-    if(isVerified && pendingData) {
-      onSubmit(pendingData);
+  const updateProfile = useCallback( async (data) => {
+    console.log(isVerified);
+    
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("phone", data.phone);
+    if (selectedAvatar) {
+      formData.append("avatar", selectedAvatar);
     }
-  },[isVerified])
+    if(!isVerified){
+      return;
+    }
+    try {
+      await updatePosterProfile(formData).unwrap();
+      showSuccess("Profile updated successfully");
+      onClose();
+    } catch (error) {
+      console.log(error);
+      showError(error?.data?.message || "Failed to update profile");
+    }
+  },[isVerified, selectedAvatar, updatePosterProfile, onClose])
 
   const onSubmit = async (data) => {
     if(data.email != posterInfo?.email && !isVerified) {
@@ -66,27 +80,16 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       setPendingData(data);
       return;
     }
-
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("phone", data.phone);
-    if (selectedAvatar) {
-      formData.append("avatar", selectedAvatar);
-    }
-
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    } 
-
-    try {
-      await updatePosterProfile(formData).unwrap();
-      showSuccess("Profile updated successfully");
-      onClose();
-    } catch (error) {
-      console.log(error);
-      showError(error?.data?.message || "Failed to update profile");
-    }
+    await updateProfile(data);
   };
+
+
+  useEffect(() => {
+    if(isVerified && pendingData) {
+      updateProfile(pendingData);
+    }
+  },[isVerified, pendingData, updateProfile])
+
 
   return (
     <div
@@ -104,7 +107,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
         <div className="h-1.5 w-full bg-linear-to-r from-[#0A6E5C] via-emerald-500 to-teal-400" />
 
         <div className="flex items-center justify-between px-7 pt-6 pb-2">
-        <p>isDirty: {String(isDirty)} selected: {String(!!selectedAvatar)}</p>
           <h2 className="text-lg font-bold text-gray-900">Edit Profile</h2>
           <button
             type="button"

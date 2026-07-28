@@ -6,6 +6,7 @@ import { KERALA_DISTRICTS, DISTRICT_AREAS } from "../../../utils/constants";
 import { placeToCoords } from "../../../services/placeToCoords";
 import { reverseCoords } from "../../../services/reverseCoords";
 import Map from '../../Maps/Map';
+import {showWarning} from '../../../utils/toast'
 
 const FieldError = ({ name, errors }) =>
     errors[name] ? (
@@ -38,9 +39,9 @@ const TaskLocation = () => {
     ), [isKerala, selectedState]);
 
     useEffect(() => {
-        if (fetchCords !== 'idle') {
+       ( () => {if (fetchCords !== 'idle') {
             setFetchCords('idle');
-        }
+        }})()
     }, [selectedState, selectedDistrict, city, area, locationLat, locationLng, fetchCords])
 
     const handleMapPositionChange = (pos) => {
@@ -70,13 +71,14 @@ const TaskLocation = () => {
                 if (place.area) setValue('area', place.area, { shouldValidate: true });
                 if (place.displayName) setValue('fullAddress', place.displayName, { shouldValidate: true });
             } catch {
+                showWarning("Unexpexted Error Occoured")
             }
         }, 600);
     };
 
 
     useEffect(() => {
-        if (!pendingDistrict || districts.length === 0) return;
+        (() => {if (!pendingDistrict || districts.length === 0) return;
         const match = districts.find(
             (d) => d.toLowerCase() === pendingDistrict.toLowerCase()
         );
@@ -85,7 +87,7 @@ const TaskLocation = () => {
         }
         if (pendingDistrict !== null) {
             setPendingDistrict(null);
-        }
+        }})()
     }, [districts, pendingDistrict, setValue]);
 
     const districtAreas = selectedDistrict && DISTRICT_AREAS[selectedDistrict]
@@ -93,11 +95,11 @@ const TaskLocation = () => {
         : [];
 
     useEffect(() => {
-        if (locationLat && locationLng) {
+        (() =>  {if (locationLat && locationLng) {
             if (mapPosition.lat !== locationLat || mapPosition.lng !== locationLng) {
                 setMapPosition({ lat: locationLat, lng: locationLng });
             }
-        }
+        }})()
     }, [locationLat, locationLng, mapPosition.lat, mapPosition.lng]);
 
     const handleLocationCoords = async () => {

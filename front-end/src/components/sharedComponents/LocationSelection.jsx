@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 import useDebounce from '../../customHooks/useDebounce'
 import { searchPlaces } from '../../services/searchPlaces'
-import { MapPin, Search } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import DropDownUnRegister from '../Custom/DropDownUnRegister';
 import { reverseCoords } from '../../services/reverseCoords';
 import Map from '../Maps/Map';
-import { setOptions } from 'leaflet';
 import { useFormContext } from 'react-hook-form';
 
 const LocationSelection = ({SectionName}) => {
 
-    const {register, setValue} = useFormContext();
+    const {setValue} = useFormContext();
 
     const [searchText, setSearchText] = useState("");
     const [placeOptions, setPlaceOptions] = useState([]);
@@ -26,10 +25,8 @@ const LocationSelection = ({SectionName}) => {
     const debouncedSearch  = useDebounce({ searchText, delay: 800 })
 
     useEffect(() => {
-        setSuggestions([]);
-        setPlaceOptions([]);
-        setIsOpen(false);
-
+        
+        let cancelled = false;
         const getPlaceSuggestions = async () => {
             
             if(mapChange){
@@ -37,32 +34,39 @@ const LocationSelection = ({SectionName}) => {
                 return;
             }
             
-            console.log("called");
-            
             try {
                 let response = await searchPlaces(debouncedSearch);
-                setSuggestions(response);
-                console.log(response);
-                
+
                 if(response.length>0){
+                    setSuggestions(response);
                     response.map((p) => {
                         setPlaceOptions((prev) =>[...prev, p.displayName])
                     })
                     setIsOpen(true);
                     setShowResult(true);
-
+                }else{
+                    setSuggestions([]);
+                    setPlaceOptions([]);
+                    setIsOpen(false);
                 }
-            } catch (error) {
-                
+            } catch {
+                if(!cancelled){
+                    setSuggestions([]);
+                    setPlaceOptions([]);
+                    setIsOpen(false);
+                }
             }
         }
         getPlaceSuggestions();
-    },[debouncedSearch])
+
+        return () => {
+            cancelled = true; // avoids setting state on a stale/unmounted search
+        };
+    },[debouncedSearch, mapChange])
 
     useEffect(() => {
-        console.log("______\n",selectedPlace,"____________\n");
-        
-        if(!!selectedPlace){
+        (() => {    
+        if(selectedPlace){
             setSearchText(selectedPlace.displayName);
             setSuggestions([]);
             setPlaceOptions([]);
@@ -79,8 +83,9 @@ const LocationSelection = ({SectionName}) => {
             setMapPosition({lat,lng})
             setIsOpen(false);
             setShowResult(false);
-        }
-    },[selectedPlace])
+        }})()
+
+    },[selectedPlace, setValue])
 
 
      const handleMapPositionChange = (pos) => {

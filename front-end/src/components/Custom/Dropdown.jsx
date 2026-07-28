@@ -13,7 +13,7 @@ const Dropdown = ({ options, name, field }) => {
 
     useEffect(() => {
         setValue(name, option);
-    }, []);
+    }, [name, option, setValue]);
 
     return (
         <div>
