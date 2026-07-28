@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import HeaderWorkerSignup from "../../components/Worker/HeaderWorkerSignup";
 import Header from "../../components/Landing/Header";
@@ -30,7 +30,7 @@ const WorkerSignup = () => {
 
   const [workerSignUp] = useWorkerSignUpMutation();
 
-  async function sendDataToBackend() {
+  const sendDataToBackend = useCallback( async () => {
     if (!isVerified) return;
     const fd = new FormData();
     console.log("called");
@@ -86,15 +86,13 @@ const WorkerSignup = () => {
       showWarning(err.data?.message)
       console.log("Sign up error", err);
     }
-  }
+  },[formData])
 
   useEffect(() => {
-    console.log("isVerified",isVerified,"\nformData", formData);
-    
     if (isVerified && formData) {
       sendDataToBackend();
     }
-  }, [isVerified]);
+  }, [isVerified, formData, sendDataToBackend]);
 
   const resendOtp = async () => {
     const response = await sendOtp({

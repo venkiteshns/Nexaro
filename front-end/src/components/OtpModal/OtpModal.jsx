@@ -60,7 +60,7 @@ const OtpModal = (props) => {
     setResendCount((prev) => prev + 1);
     setCanResend(false);
     setTime(60);
-    reSendOtp({ email });
+    reSendOtp();
   };
 
   const handleClose = () => {

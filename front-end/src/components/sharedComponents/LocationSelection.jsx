@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 import useDebounce from '../../customHooks/useDebounce'
 import { searchPlaces } from '../../services/searchPlaces'
-import { MapPin, Search } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import DropDownUnRegister from '../Custom/DropDownUnRegister';
 import { reverseCoords } from '../../services/reverseCoords';
 import Map from '../Maps/Map';
-import { setOptions } from 'leaflet';
 import { useFormContext } from 'react-hook-form';
 
 const LocationSelection = ({SectionName}) => {
 
-    const {register, setValue} = useFormContext();
+    const {setValue} = useFormContext();
 
     const [searchText, setSearchText] = useState("");
     const [placeOptions, setPlaceOptions] = useState([]);

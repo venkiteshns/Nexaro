@@ -1,43 +1,69 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React from 'react'
 
-const PaginationSections = ({totalPages, onPageChange, currentPage}) => {
+const PaginationSections = ({totalPages, onPageChange, page}) => {
 
-    const handlePrevPage = () => {
-        if (currentPage > 1) onPageChange((p) => p - 1);
-    };
-    const handleNextPage = () => {
-        if (currentPage < totalPages) onPageChange((p) => p + 1);
-    };
-
-  return (
-    <div>
-        <div className="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500 order-2 sm:order-1">
-                Showing page {currentPage} of {totalPages}
-            </p>
-            <div className="flex items-center gap-2 order-1 sm:order-2">
-                <button
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                    <ChevronLeft size={18} />
-                </button>
-                <span className="text-sm font-medium text-gray-700 px-2">
-                    {currentPage}
-                </span>
-                <button
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                    <ChevronRight size={18} />
-                </button>
-            </div>
+     console.log(page, totalPages);
+    
+      if (totalPages <= 1) return null;
+    
+      // Build page number array with ellipsis logic
+      const getPages = () => {
+        if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+        const pages = [];
+        pages.push(1);
+        console.log("initial pages", pages);
+    
+        if (page > 3) pages.push("...");
+        console.log("after ellipsis pages", pages);
+    
+        for (let p = Math.max(2, page - 1); p <= Math.min(totalPages - 1, page + 1); p++) {
+          pages.push(p);
+        }
+        console.log("after for loop pages", pages);
+        if (page < totalPages - 2) pages.push("...");
+        pages.push(totalPages);
+        return pages;
+      };
+    
+      return (
+        <div className="flex items-center justify-center gap-2 mt-6 pb-2">
+          <button
+            onClick={() => onPageChange(page - 1)}
+            disabled={page === 1}
+            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft size={16} />
+          </button>
+    
+          {getPages().map((p, i) =>
+            p === "..." ? (
+              <span key={`ellipsis-${i}`} className="w-8 text-center text-gray-400 text-sm">
+                …
+              </span>
+            ) : (
+              <button
+                key={p}
+                onClick={() => onPageChange(p)}
+                className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${p === page
+                  ? "bg-[#0A6E5C] text-white"
+                  : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                  }`}
+              >
+                {p}
+              </button>
+            )
+          )}
+    
+          <button
+            onClick={() => onPageChange(page + 1)}
+            disabled={page === totalPages}
+            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
-    </div>
-  )
+      );
 }
 
 export default PaginationSections

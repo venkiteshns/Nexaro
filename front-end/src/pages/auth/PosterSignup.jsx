@@ -35,7 +35,7 @@ const PosterSignup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const resendOtp = async (email) => {
+  const resendOtp = async () => {
     try {
       await sendOtp({
         email: formData.email,

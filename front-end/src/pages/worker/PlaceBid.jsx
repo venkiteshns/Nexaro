@@ -50,6 +50,7 @@ const PlaceBid = () => {
   const methods = useForm();
 
   const { taskId } = useParams();
+  
 
   const { data } = useGetTaskForBidQuery(taskId);
 

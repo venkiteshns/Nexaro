@@ -5,7 +5,6 @@ import OtpModal from '../../components/OtpModal/OtpModal'
 import {useSendOtpMutation} from '../../store/services/authApi'
 
 import {
-  MapPin,
   Lock,
   X,
   Camera,
@@ -27,12 +26,11 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
   const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
 
-  const [updatePosterProfile, { isLoading, isError, isSuccess }] = useUpdatePosterProfileMutation();
+  const [updatePosterProfile, { isLoading, isSuccess }] = useUpdatePosterProfileMutation();
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isDirty },
   } = useForm({
     defaultValues: {
@@ -51,12 +49,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
   const resendOtp = ({email}) => {
     sendOtp({ email, phone: posterInfo.phone, resendFlag: true });
   }
-
-  useEffect(() => {
-    if(isVerified && pendingData) {
-      onSubmit(pendingData);
-    }
-  },[isVerified])
 
   const onSubmit = async (data) => {
     if(data.email != posterInfo?.email && !isVerified) {
@@ -87,6 +79,13 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       showError(error?.data?.message || "Failed to update profile");
     }
   };
+
+  useEffect(() => {
+    if(isVerified && pendingData) {
+      onSubmit(pendingData);
+    }
+  },[isVerified, pendingData, onSubmit])
+
 
   return (
     <div
