@@ -79,15 +79,15 @@ function TaskCard({ task, handleNavigate, handleActiveJob }) {
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        {task.address?.city && (
+      <div className="flex flex-col md:flex-row items-center gap-3">
+        {task.address && (
           <p className="text-xs text-gray-400 flex items-center gap-1">
             <MapPin size={12} />
-            {task.address.city}
+            {task.address.landmark}
           </p>
         )}
         {task.distance != null && (
-          <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full whitespace-nowrap">
             {formatDistance(task.distance)}
           </span>
         )}
