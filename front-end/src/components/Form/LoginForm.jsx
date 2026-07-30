@@ -118,24 +118,43 @@ const LoginForm = () => {
         )}
         <button
           type="submit"
-          className="w-full mt-1 rounded-xl bg-[#0a6e5c] py-2 font-semibold text-white transition hover:opacity-90"
+          className="w-full mt-1 rounded-xl py-2.5 font-semibold text-white transition-all duration-200 hover:opacity-90 hover:-translate-y-px"
+          style={{
+            background: "linear-gradient(135deg, #0a6e5c, #10b981)",
+            boxShadow: "0 4px 16px rgba(10,110,92,0.28)",
+            fontFamily: '"DM Sans", sans-serif',
+            letterSpacing: "0.01em",
+          }}
         >
-          {isLoading ? "Validating Credentials.." : "Login to Nexaro"}
+          {isLoading ? "Validating Credentials…" : "Login to Nexaro"}
         </button>
       </form>
 
       {/* divider */}
-      <div className="flex items-center gap-3 my-4">
-        <hr className="flex-1 border-gray-200" />
-        <span className="text-xs text-gray-400">or</span>
-        <hr className="flex-1 border-gray-200" />
+      <div className="flex items-center gap-3 my-5">
+        <div className="flex-1 h-px" style={{ background: "rgba(10,110,92,0.1)" }} />
+        <span
+          className="text-xs font-medium px-2"
+          style={{ color: "#9ca3af", fontFamily: '"DM Sans", sans-serif', letterSpacing: "0.06em" }}
+        >
+          or
+        </span>
+        <div className="flex-1 h-px" style={{ background: "rgba(10,110,92,0.1)" }} />
       </div>
 
       {/* google login btn */}
       <button
         onClick={() => signInWithGoogle()}
         disabled={isGoogleLoading}
-        className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-2.5 font-medium text-gray-700 hover:bg-gray-50 transition"
+        className="w-full flex items-center justify-center gap-3 rounded-xl py-2.5 font-medium transition-all duration-200 hover:-translate-y-px"
+        style={{
+          border: "1px solid rgba(10,110,92,0.15)",
+          color: "#374151",
+          background: "rgba(255,255,255,0.85)",
+          boxShadow: "0 2px 8px rgba(10,110,92,0.06)",
+          fontFamily: '"DM Sans", sans-serif',
+          fontSize: "0.875rem",
+        }}
       >
         <svg width="18" height="18" viewBox="0 0 48 48">
           <path
