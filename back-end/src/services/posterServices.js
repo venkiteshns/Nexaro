@@ -87,7 +87,7 @@ export const getTasksService = async (posterId, query) => {
   if(search.trim()){
     matchingCriteria.$or =[
       {
-        titile:{
+        title:{
           $regex: search,
           $options: "i"
         },

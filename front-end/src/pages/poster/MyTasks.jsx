@@ -126,10 +126,10 @@ function TaskCard({ task }) {
                         <div className='flex flex-col  ' >
                             <p className="font-semibold text-[15px] text-gray-900">{task.title}</p>
                             <div className="flex items-center gap-3 mt-1 flex-wrap">
-                                {task.address?.city && (
+                                {task.address && (
                                     <span className="flex items-center gap-1 text-xs text-gray-500">
                                         <MapPin size={12} />
-                                        {task.address.area}
+                                        {task.address.landmark}
                                     </span>
                                 )}
                                 {postedDate && (
