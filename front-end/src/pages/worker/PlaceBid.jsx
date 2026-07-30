@@ -13,37 +13,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import BidForm from "../../components/Form/Bids/BidForm";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
 import { api } from "../../store/services/api";
+import { PhotoStrip } from "../../components/sharedComponents/PhotoStrip";
 
-function PhotoStrip({ photos }) {
-  return (
-    <div className="overflow-x-auto mt-4 pb-1">
-      <div className="flex gap-3 w-max">
-        {photos.map((img, i) => (
-          <div
-            key={i}
-            className="relative h-24 w-28 rounded-xl overflow-hidden shrink-0 bg-gray-100"
-          >
-            <img
-              src={img?.url}
-              alt={`task-photo-${i}`}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        ))}
-        {photos.length === 0 && (
-          <div className="relative h-24 w-28 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
-            <Image className="text-gray-400" size={24} />
-            <div className="absolute bottom-0 left-0 w-full bg-black/50 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">No Photos</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
-/* ─────────────────── Bid Form ─────────────────── */
 const PlaceBid = () => {
   const navigate = useNavigate();
   let task = null;
@@ -71,7 +43,6 @@ const PlaceBid = () => {
       }, 3200);
       methods.reset()
     } catch (error) {
-      // console.log("error", error.data.message);
       if (error.data.message === "You have already bid on this task") {
         showWarning(error.data.message)
       } else if ( error.data.message === 'This task has been cancelled by the poster, Cannot place bid for a cancelled task') {
