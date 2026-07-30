@@ -26,8 +26,8 @@ const Password = (props) => {
         className={` ${login ? "grid-cols-2 gap-5" : "grid grid-cols-1 md:grid-cols-2 gap-5 "} `}
       >
         <div className="relative">
-          <label className="text-xs text-gray-700/80">
-            Password <span className="text-red-500">*</span>
+          <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
+            Password <span className="text-red-400">*</span>
           </label>
 
           <input
@@ -53,7 +53,8 @@ const Password = (props) => {
             type={showPassword ? "text" : "password"}
             placeholder="••••••••••••"
             autoComplete={login ? "current-password" : "new-password"}
-            className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
+            className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+            style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
           />
 
           <span
@@ -77,7 +78,8 @@ const Password = (props) => {
                 forgot(true);
               }}
               type="button"
-              className="text-xs font-semibold text-[#0A6E5C]/80 hover:text-[#075848] transition"
+            className="text-xs font-semibold transition-all duration-200 hover:underline"
+              style={{ color: "#0a6e5c" }}
             >
               Forgot Password?
             </button>
@@ -99,7 +101,8 @@ const Password = (props) => {
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm password"
               autoComplete="new-password"
-              className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
+              className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+            style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
             />
             <span
               onClick={() => {

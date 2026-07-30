@@ -13,8 +13,8 @@ const PersonalInfo = (props) => {
     <div className={`${login ? "w-full" :"mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}>
       {/* Name */}
       {!login && <div >
-        <label className="text-xs text-gray-700/80">
-          Name <span className="text-red-500">*</span>
+        <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
+          Name <span className="text-red-400">*</span>
         </label>
 
         <input
@@ -24,7 +24,8 @@ const PersonalInfo = (props) => {
           type="text"
           autoComplete="name"
           placeholder="Enter your name"
-          className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
+          className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+          style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
         />
         {errors.name && (
           <span className="italic text-red-400/90 text-xs">
@@ -36,8 +37,8 @@ const PersonalInfo = (props) => {
       <div className="flex flex-col md:flex-row gap-3">
         {/* Email */}
         <div className="w-full" >
-          <label className="text-xs text-gray-700/80">
-            Email <span className="text-red-500">*</span>
+          <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
+            Email <span className="text-red-400">*</span>
           </label>
 
           <input
@@ -51,7 +52,8 @@ const PersonalInfo = (props) => {
             type="email"
             autoComplete="email"
             placeholder="Enter your email"
-            className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
+            className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+          style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
           />
           {errors.email && (
             <span className="italic text-red-400/90 text-xs">
@@ -77,7 +79,8 @@ const PersonalInfo = (props) => {
             type="tel"
             autoComplete="tel"
             placeholder="Enter your phone number"
-            className="placeholder:text-sm placeholder:text-gray-900/40 w-full rounded-xl border border-gray-300 px-4 py-2 outline-none focus:ring-1 focus:ring-green-800"
+            className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+          style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
           />
           {errors.phone && (
             <span className="italic text-red-400/90 text-xs">

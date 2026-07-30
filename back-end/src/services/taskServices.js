@@ -6,8 +6,6 @@ import user from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
 
-
-
 const deleteImagesFromCloudinary = async (publicIds) => {
     if (!publicIds || publicIds.length === 0) return;
     await Promise.all(
@@ -212,6 +210,9 @@ export const handleNewBid = async (task, user) => {
         if (!isTask) {
             return { error: "No task found" }
         }
+        if(isTask.status == 'cancelled'){
+            return {error: "This task has been cancelled by the poster, Cannot place bid for a cancelled task"}
+        }
         const isAlreadyBid = await Bid.findOne({
             taskId,
             workerId: user._id
@@ -274,7 +275,9 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
         const [lng, lat] = worker.serviceArea.coordinates;
         const skip = (page - 1) * limit;
 
-        const matchCriterias = {};
+        const matchCriterias = {
+            status:"open"
+        };
 
         if (search) {
             matchCriterias.title = { $regex: search, $options: "i" };

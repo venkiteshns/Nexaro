@@ -299,6 +299,7 @@ const UserManagement = () => {
                     <tr className="text-left text-gray-500 text-sm">
                       <th className="px-6 py-5 font-medium">Name</th>
                       <th className="px-6 py-5 font-medium">Role</th>
+                      <th className="px-6 py-5 font-medium">Tasks Posted</th>
                       <th className="px-6 py-5 font-medium">Verification</th>
                       <th className="px-6 py-5 font-medium">Status</th>
                     </tr>
@@ -355,6 +356,11 @@ const UserManagement = () => {
                           <td className="px-6 py-5">
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-[#0A6E5C] capitalize">
                               {user.activeRole}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5">
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-[#0A6E5C] capitalize">
+                              { user.taskCount}
                             </span>
                           </td>
                           <td className="px-6 py-5">

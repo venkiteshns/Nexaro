@@ -79,10 +79,10 @@ const taskSchema = new mongoose.Schema(
         address: {
             state: { type: String, required: true },
             district: { type: String, required: true },
-            city: { type: String },
-            area: { type: String },
-            houseNumber: { type: String },
             landmark: { type: String },
+            // city: { type: String },
+            // area: { type: String },
+            // houseNumber: { type: String },
         },
 
         location: {

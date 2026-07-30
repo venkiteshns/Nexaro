@@ -2,24 +2,19 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PaginationSections = ({totalPages, onPageChange, page}) => {
 
-     console.log(page, totalPages);
     
       if (totalPages <= 1) return null;
     
-      // Build page number array with ellipsis logic
       const getPages = () => {
         if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
         const pages = [];
         pages.push(1);
-        console.log("initial pages", pages);
     
         if (page > 3) pages.push("...");
-        console.log("after ellipsis pages", pages);
     
         for (let p = Math.max(2, page - 1); p <= Math.min(totalPages - 1, page + 1); p++) {
           pages.push(p);
         }
-        console.log("after for loop pages", pages);
         if (page < totalPages - 2) pages.push("...");
         pages.push(totalPages);
         return pages;

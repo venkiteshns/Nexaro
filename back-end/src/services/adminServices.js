@@ -6,23 +6,47 @@ import MESSAGES from "../constants/messages.js";
 export const getAllUsersService = async (page, limit) => {
     const skip = (page - 1) * limit;
 
-        const users = await User.find({ activeRole: { $ne: "admin" } })
-            .select("name email phone activeRole isVerified isSuspended createdAt skills location verificationDocuments")
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
-
-        const totalUsers = await User.countDocuments({ activeRole: { $ne: "admin" } });
-
-        const totalPages = Math.ceil(totalUsers / limit);
-
-        return {
-            success: true,
-            users,
-            currentPage: page,
-            totalPages,
-            totalUsers,
-        };
+    const users = await User.aggregate([
+        {
+            $match: { activeRole : {$ne: "admin"}}
+        },
+        {
+            $lookup:{
+                from: "tasks",
+                localField: "_id",
+                foreignField: "posterId",
+                as: "tasks"
+            }
+        },
+        {
+            $addFields:{
+                taskCount: {$size: "$tasks"}
+            }
+        },
+        {
+            $sort: {createdAt: -1}
+        },
+        {
+            $skip: skip
+        },
+        {
+            $limit: limit
+        },
+        {
+            $project: {
+                name: 1, email: 1, phone: 1, activeRole: 1, isVerified: 1, isSuspended: 1, createdAt: 1, skills: 1, location: 1, verificationDocuments: 1, taskCount: 1,
+            }
+        }, 
+    ])
+    const totalUsers = await User.countDocuments({ activeRole: { $ne: "admin" } });
+    const totalPages = Math.ceil(totalUsers / limit);
+    return {
+        success: true,
+        users,
+        currentPage: page,
+        totalPages,
+        totalUsers,
+    };
 };
 
 export const suspendUserService = async (userId) => {
@@ -209,7 +233,6 @@ export const getAllTasksService = async (page, limit, search = '', status = 'all
         };
 
 };
-
 
 export const cancelTaskByAdminService = async (taskId) => {
     const task = await Task.findById(taskId);

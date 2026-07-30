@@ -100,5 +100,3 @@ export const workerSignupService = async ({ files, data }) => {
         return { error: "User with same credentials exists, Try with different mobile number" };
     }
 }
-
-

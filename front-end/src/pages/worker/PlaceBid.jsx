@@ -12,6 +12,7 @@ import { useAddNewBidMutation, useGetTaskForBidQuery } from "../../store/service
 import { FormProvider, useForm } from "react-hook-form";
 import BidForm from "../../components/Form/Bids/BidForm";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
+import { api } from "../../store/services/api";
 
 function PhotoStrip({ photos }) {
   return (
@@ -51,7 +52,6 @@ const PlaceBid = () => {
 
   const { taskId } = useParams();
   
-
   const { data } = useGetTaskForBidQuery(taskId);
 
   const [addbid, { isSuccess: bidSuccess, isLoading: bidLoading, isError: bidError }] = useAddNewBidMutation();
@@ -74,6 +74,12 @@ const PlaceBid = () => {
       // console.log("error", error.data.message);
       if (error.data.message === "You have already bid on this task") {
         showWarning(error.data.message)
+      } else if ( error.data.message === 'This task has been cancelled by the poster, Cannot place bid for a cancelled task') {
+        showWarning(error.data.message)
+        setTimeout(() => {
+          api.util.invalidateTags(['Worker_Tasks']);
+          navigate("/worker/nearby-tasks");
+        }, 3200);
       } else {
         showError(error.data.message)
         methods.reset()
