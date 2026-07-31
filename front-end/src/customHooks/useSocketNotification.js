@@ -56,6 +56,10 @@ const useSocketNotification = () => {
             dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job', 'Worker_Tasks']));
         })
 
+        socket.on('task_updated',() => {
+            dispatch(api.util.invalidateTags(['Worker_Tasks']));
+        })
+
         socket.on("task-update", (data) => {
             if (data.update === "completed") {
                 showSuccess(`Task : ${data.taskTitle} has been completed`)

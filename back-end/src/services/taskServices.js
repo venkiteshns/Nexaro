@@ -615,6 +615,21 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
             { new: true }
         );
 
+         const [task_lng, task_lat] = task.location.coordinates;
+
+        const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
+        // console.log(taskGeoHash, "taskGeoHash");
+
+        const neighbors = ngeohash.neighbors(taskGeoHash);
+        console.log(neighbors, "neighbours");
+
+        const zonesToNotiffy = [taskGeoHash, ...neighbors];
+
+        const io = getIo();
+        zonesToNotiffy.forEach((zone) => {
+            io.to(`zone:${zone}`).emit('task_updated', {})
+        })
+
         return { task: updatedTask };
     } catch (error) {
         console.error("updateTaskService error:", error.message);
