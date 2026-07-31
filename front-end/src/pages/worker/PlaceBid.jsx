@@ -132,7 +132,7 @@ const PlaceBid = () => {
               {/* ── Place Your Bid Form ── */}
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(handleBidSubmission)}>
-                  <BidForm task={task} bidLoading={bidLoading} bidError={bidError} bidSuccess={bidSuccess} />
+                  <BidForm task={task} bidLoading={bidLoading} bidError={bidError} bidSuccess={bidSuccess} deadline={task?.deadline} />
                 </form>
               </FormProvider>
             </div>)}

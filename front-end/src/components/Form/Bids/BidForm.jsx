@@ -17,10 +17,13 @@ const TIME_OPTIONS = [
 ];
 
 
-const BidForm = ({ task, bidLoading }) => {
+const BidForm = ({ task, bidLoading, deadline }) => {
 
+    const minDate = deadline.split('T')[0];
+
+    // console.log(Math.floor(new Date - new Date(deadline)) / (24 * 60 * 60 * 1000));
+    
     const navigate = useNavigate();
-
 
     const { register, formState: { errors }, watch, setValue } = useFormContext();
     const timeInputRef = useRef(null);
@@ -28,10 +31,7 @@ const BidForm = ({ task, bidLoading }) => {
     const bidAmount = watch("bidAmount") || 0;
     const estimatedTime = watch("estimatedTime") || "";
 
-    useEffect(() => {
-        setValue('taskId', task._id);
-        // setValue('workerId',)
-    }, [task, setValue])
+    setValue('taskId', task?._id);
 
     return (
         <div>
@@ -102,7 +102,15 @@ const BidForm = ({ task, bidLoading }) => {
                             <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3 focus-within:border-[#0A6E5C] focus-within:ring-2 focus-within:ring-emerald-100 transition-all bg-white">
                                 <Calendar size={15} className="text-[#0A6E5C] shrink-0" />
                                 <input
-                                    {...register("availableDate", { required: "Please select your availability date" })}
+                                    {...register("availableDate", { 
+                                        required: "Please select your availability date",
+                                        validate:(value) => {
+                                            return (
+                                                value >= minDate || "Availability date must be on or after the deadline"
+                                            )
+                                            
+                                        }
+                                     })}
                                     type="date"
                                     className="flex-1 outline-none text-sm text-gray-800 font-semibold bg-transparent"
                                 />

@@ -61,6 +61,7 @@ export const getMyTasks = async (req, res) => {
 };
 
 export const addNewBid = async (req, res) => {
+    
     try {
         const response = await handleNewBid(req.body, req.user)
         if (response.error) {
