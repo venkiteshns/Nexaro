@@ -202,6 +202,16 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
 
 export const handleNewBid = async (task, user) => {
 
+    if(!task.bidAmount || task.bidAmount < 1){
+        return {error: "Amount required"}
+    }
+    if(!task.pitch){
+        return {error: "Please enter yout pitch"}
+    }
+    if(!task.availableDate ||  !task.availableTime || !task.estimatedTime){
+        return {error: "Please fill your available dates or ETA"}
+    }
+    
     try {
         const { taskId, bidAmount, estimatedTime, pitch } = task;
         console.log("taskId",taskId);
@@ -218,7 +228,7 @@ export const handleNewBid = async (task, user) => {
             workerId: user._id
         })
         const posterId = isTask.posterId;
-        console.log("posterId", posterId,"____________");
+        // console.log("posterId", posterId,"____________");
         // console.log("already bid", isAlreadyBid);
 
         if (isAlreadyBid) {
