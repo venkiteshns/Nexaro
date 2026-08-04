@@ -10,6 +10,7 @@ import Bid from "../models/bidsSchema.js";
 import Review from "../models/reviewSchema.js";
 import { getIo } from "../socket.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
+import MESSAGES from "../constants/messages.js";
 
 export const posterSignupService = async (data) => {
   // console.log("signUp data", data);
@@ -383,11 +384,21 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
     console.log(userId, body, avatar);
 
     const user = await User.findOne({ _id: new mongoose.Types.ObjectId(userId) });
-    // console.log("user", user);
     if (!user) {
       return { error: "user not found" };
     }
     const { email, phone } = body;
+
+    const isDuplicateEmail = await User.findOne({ email, _id: { $ne: userId } });
+    if (isDuplicateEmail) {
+      return { error: MESSAGES.EMAIL_ALREADY_IN_USE };
+    }
+
+    const isDuplicatePhone = await User.findOne({phone, _id: {$ne:userId}});
+    if(isDuplicatePhone){
+      return {error: MESSAGES.PHONE_ALREADY_IN_USE};
+    }
+    
     user.email = email;
     user.phone = phone; 
     if(avatar && avatar.length > 0) {

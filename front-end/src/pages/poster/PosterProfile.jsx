@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ClipboardList,
   CheckCircle,
@@ -36,6 +36,15 @@ const PosterProfile = () => {
   const recentTasks = profileData.recentTasks || [];
   const reviews = profileData.reviews || [];
   const posterInfo = profileData.poster || {};
+
+
+  const closeDeleteModal = useCallback(() => {
+    setShowDeleteModal(false);
+  },[]);
+
+  const closeEditModal = useCallback (() => {
+    setShowEditModal(false);
+  },[]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -100,12 +109,12 @@ const PosterProfile = () => {
       </div>
 
       {showDeleteModal && (
-        <DeleteProfileModal userId={profileData?.poster?._id} onClose={() => setShowDeleteModal(false)} />
+        <DeleteProfileModal userId={profileData?.poster?._id} onClose={closeDeleteModal} />
       )}
       {showEditModal && (
         <EditProfileModal
           posterInfo={posterInfo}
-          onClose={() => setShowEditModal(false)}
+          onClose={closeEditModal}
         />
       )}
     </div>

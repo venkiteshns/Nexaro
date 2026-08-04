@@ -20,7 +20,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
 
   const avatarInputRef = useRef(null);
   const [emailChanged, setEmailChanged] = useState(false);
-  const [newEmail, setNewEmail] = useState( "");
+  const [newEmail, setNewEmail] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [pendingData, setPendingData] = useState(null);
   const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
@@ -51,7 +51,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
   }
 
   const updateProfile = useCallback( async (data) => {
-    console.log(isVerified);
     
     const formData = new FormData();
     formData.append("email", data.email);
@@ -69,6 +68,10 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     } catch (error) {
       console.log(error);
       showError(error?.data?.message || "Failed to update profile");
+    } finally {
+      setPendingData(null);
+      setIsVerified(false);
+      setEmailChanged(false);
     }
   },[isVerified, selectedAvatar, updatePosterProfile, onClose])
 
