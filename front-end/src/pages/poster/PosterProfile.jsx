@@ -100,7 +100,7 @@ const PosterProfile = () => {
       </div>
 
       {showDeleteModal && (
-        <DeleteProfileModal onClose={() => setShowDeleteModal(false)} />
+        <DeleteProfileModal userId={profileData?.poster?._id} onClose={() => setShowDeleteModal(false)} />
       )}
       {showEditModal && (
         <EditProfileModal
