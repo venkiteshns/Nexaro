@@ -61,6 +61,8 @@ const MESSAGES = {
     PROFILE_DELETE_FAILED: "Failed to delete profile",
 
     INVALID_CREDENTIALS: "Invalid email or password",
+    EMAIL_ALREADY_IN_USE: "Email already in use by another user",
+    PHONE_ALREADY_IN_USE: "Phone number already in use by another user",
 
 };
 
