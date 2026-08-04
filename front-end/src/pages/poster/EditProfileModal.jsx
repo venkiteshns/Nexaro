@@ -59,7 +59,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     if (selectedAvatar) {
       formData.append("avatar", selectedAvatar);
     }
-    if(!isVerified){
+    if(!isVerified && emailChanged) {
       return;
     }
     try {
