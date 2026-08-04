@@ -8,10 +8,18 @@ export const sharedApi = api.injectEndpoints({
                 method: "PATCH",
                 body: formValues
             })
+        }),
+
+        deleteProfile: builder.mutation({
+            query: (userId) => ({
+                url: "/auth/profile/delete",
+                method: "DELETE"
+            })
         })
     })
 })
 
 export const {
-    useUpdateProfilePasswordMutation
+    useUpdateProfilePasswordMutation,
+    useDeleteProfileMutation
 }= sharedApi;

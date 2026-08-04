@@ -4,10 +4,12 @@ import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 import Otp from "../models/otpSchems.js";
 import User from "../models/userSchema.js";
 import { hashData, compareHash } from "../utils/hasing.js";
+import messages from "../constants/messages.js";
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
+import mongoose from "mongoose";
 
 export const googleLoginService = async (accessToken) => {
   // try {
@@ -66,7 +68,6 @@ export const googleLoginService = async (accessToken) => {
   // }
 };
 
-
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 300;
 
@@ -81,7 +82,7 @@ export const createOtp = async (email, phone, resendFlag) => {
         
         return {
           success: false,
-          message: "User already exists with same email or mobile number",
+          message: messages.USER_NOT_EXIST_WITH_EMAIL_MOBILE,
         };
       }
     }
@@ -104,21 +105,21 @@ export const createOtp = async (email, phone, resendFlag) => {
     const otpSend = await sendOtp(email, otp);
     if (!otpSend) {
       await Otp.deleteOne({ email });
-      return { success: false, response: "Failed to send OTP" };
+      return { success: false, response: messages.FAILED_TO_SEND_OTP };
     }
     return {
       success: true,
-      message: "OTP sent successfully",
+      message: messages.OTP_SENT,
       response: otpRecord,
     };
 };
 
-export const sendOtp = (email, otp) => {
+export const sendOtp = async (email, otp) => {
   let lastError;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = fetch("https://api.brevo.com/v3/smtp/email", {
+      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -137,7 +138,7 @@ export const sendOtp = (email, otp) => {
       });
 
       if (!response.ok) {
-        const errorData = response.json();
+        const errorData = await response.json();
         console.error("Brevo API Error:", errorData);
         throw new Error(
           `Brevo API rejected the request: ${errorData?.message ?? response.status}`,
@@ -180,14 +181,14 @@ export const verifyOtp = async (email, otp) => {
       expiresAt: { $gt: new Date() },
     });
     if (!otpRecord) {
-      return { success: false, message: "Invalid or expired OTP" };
+      return { success: false, message: messages.INVALID_OTP };
     }
     const isOtpValid = await compareHash(otp, otpRecord.otp);
     if (!isOtpValid) {
-      return { success: false, message: "Invalid or expired OTP" };
+      return { success: false, message: messages.INVALID_OTP };
     }
     await Otp.deleteOne({ email });
-    return { success: true, message: "OTP verified successfully" };
+    return { success: true, message: messages.OTP_VERIFIED };
   
 };
 
@@ -197,13 +198,13 @@ export const loginService = async (userData, isAdmin) => {
     if (isAdmin) {
       const existingUser = await User.findOne({ email, activeRole: "admin" });
       if (!existingUser) {
-        return { success: false, message: "Invalid admin credentials" };
+        return { success: false, message: messages.INVALID_ADMIN_CREDENTIALS };
       }
     }
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      return { success: false, message: "User not found" };
+      return { success: false, message: messages.USER_NOT_FOUND };
     }
 
     if (existingUser.isSuspended) {
@@ -213,7 +214,7 @@ export const loginService = async (userData, isAdmin) => {
     // 2. Check if the password matches
     const isPasswordValid = await compareHash(password, existingUser.password);
     if (!isPasswordValid) {
-      return { success: false, message: "Invalid password" };
+      return { success: false, message: messages.INVALID_PASSWORD };
     }
 
     // 3. Generate tokens
@@ -313,7 +314,7 @@ export const forgotPasswordOtpService = async (email, role) => {
       if (!userData) {
         return {
           success: false,
-          message: "Invalid admin credentials",
+          message: messages.INVALID_ADMIN_CREDENTIALS,
         };
       }
     } else {
@@ -324,7 +325,7 @@ export const forgotPasswordOtpService = async (email, role) => {
       if (!userData) {
         return {
           success: false,
-          message: "User does not exist with this email",
+          message: messages.USER_NOT_EXIST_WITH_EMAIL,
         };
       }
     }
@@ -348,43 +349,62 @@ export const forgotPasswordOtpService = async (email, role) => {
     const otpSend = await sendForgotPasswordEmail(email, otp);
     if (!otpSend) {
       await Otp.deleteOne({ email });
-      return { success: false, message: "Failed to send password reset OTP" };
+      return { success: false, message: messages.FAILED_TO_SEND_OTP };
     }
 
-    return { success: true, message: "Password reset OTP sent successfully" };
+    return { success: true, message: messages.RESET_OTP_SENT };
 };
 
 export const updatePasswordService = async (email, password) => {
     const user = await User.findOne({ email });
     if (!user) {
-      return { success: false, message: "User does not exist with this email" };
+      return { success: false, message: messages.USER_NOT_EXIST_WITH_EMAIL };
     }
 
     const hashedPassword = await hashData(password);
     user.password = hashedPassword;
     await user.save();
 
-    return { success: true, message: "Password updated successfully" };
+    return { success: true, message: messages.PASSWORD_UPDATED };
 };
 
 export const updateUserPasswordService = async ( data, userId) => {
   try {
     const user = await User.findById(userId);
     if(!user){
-      return { success: false, message: "User not found" };
+      return { success: false, message: messages.USER_NOT_FOUND };
     }
     console.log("data in updateUserPasswordService", data);
     const { oldPassword, password } = data;
     const isPasswordValid = await compareHash(oldPassword, user.password);
     if(!isPasswordValid){
-      return { success: false, message: "Old password is incorrect" };
+      return { success: false, message: messages.INVALID_CREDENTIALS };
     }
     const hashedPassword = await hashData(password);
     user.password = hashedPassword;
     await user.save();
-    return { success: true, message: "Password updated successfully" };
+    return { success: true, message: messages.PASSWORD_UPDATED };
   } catch (error) {
     console.error("Update user password error:", error.message);
-    return { success: false, message: "Failed to update password" };
+    return { success: false, message: messages.PASSWORD_UPDATE_FAILED };
+  }
+}
+
+export const deleteUserProfileService = async (user) => {
+  try {
+    if(!user._id){
+      return { success: false, message: messages.USER_NOT_FOUND };
+    }
+    let userDetails = await User.findById(new mongoose.Types.ObjectId(user._id));
+    if(!userDetails){
+      return { success: false, message: messages.USER_NOT_FOUND };
+    }
+
+    // await User.findByIdAndDelete(new mongoose.Types.ObjectId(user._id));
+    return { success: true, message: messages.PROFILE_DELETED };
+    
+  } catch (error) {
+    console.log("Delete user profile error:", error.message);
+    return { success: false, message: messages.PROFILE_DELETE_FAILED };
   }
 }

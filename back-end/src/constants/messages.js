@@ -14,6 +14,13 @@ const MESSAGES = {
     REFRESH_TOKEN_REQUIRED: "Invalid Access Token - Refresh token is required",
     INVALID_REFRESH_TOKEN: "Invalid or expired refresh token",
 
+    FAILED_TO_SEND_OTP: "Failed to send OTP",
+
+    INVALID_ADMIN_CREDENTIALS: "Invalid admin credentials",
+    RESET_OTP_SENT: "Password reset OTP sent successfully",
+    INVALID_PASSWORD: "Invalid password",
+    INVALID_OTP: "Invalid or expired OTP",
+
     EMAIL_REQUIRED: "Email is required",
 
     EMAIL_AND_PASSWORD_REQUIRED: "Email and password are required",
@@ -23,6 +30,9 @@ const MESSAGES = {
     USER_SUSPENDED: "User suspended successfully",
     USER_NOT_SUSPENDED: "User is not suspended",
     USER_UNSUSPENDED: "User unsuspended successfully",
+
+    USER_NOT_EXIST_WITH_EMAIL: "User does not exist with this email",
+    USER_NOT_EXIST_WITH_EMAIL_MOBILE: "User does not exist with this email or mobile number",
 
     USER_ALREADY_VERIFIED: "User is already verified",
     USER_APPROVED: "User approved successfully",
@@ -43,6 +53,14 @@ const MESSAGES = {
     TASK_CANCELLED: "Task cancelled successfully",
     FAILED_TO_FETCH_TASKS: "Failed to fetch tasks",
     GOOGLE_TOKEN_REQUIRED: "Google token is required",
+
+    USER_PROFILE_UPDATED: "User profile updated successfully",
+    PASSWORD_UPDATED: "Password updated successfully",
+    PASSWORD_UPDATE_FAILED: "Failed to update password",
+    PROFILE_DELETED: "Profile deleted successfully",
+    PROFILE_DELETE_FAILED: "Failed to delete profile",
+
+    INVALID_CREDENTIALS: "Invalid email or password",
 
 };
 
