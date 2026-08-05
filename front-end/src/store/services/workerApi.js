@@ -1,3 +1,4 @@
+import { WORKER } from "../../constants/urls";
 import { api } from "./api";
 
 export const workerApi = api.injectEndpoints({
@@ -10,7 +11,7 @@ export const workerApi = api.injectEndpoints({
         params.append("page", page);
         params.append("limit", limit);
         return {
-          url: `/worker/tasks/nearby?${params}`,
+          url: `${WORKER.GET_TASKS}?${params}`,
           method: "GET",
         };
       },
@@ -19,14 +20,14 @@ export const workerApi = api.injectEndpoints({
 
     getTaskForBid: builder.query({
       query: (taskId) => ({
-        url: `/worker/task/${taskId}`,
+        url:WORKER.GET_TASK_FOR_BID.REAPLCE(":taskId",taskId),
         method: "GET",
       }),
     }),
 
     addNewBid: builder.mutation({
       query: (payload) => ({
-        url: "/worker/tasks/add_bid",
+        url: WORKER.ADD_BID,
         method: "POST",
         body: payload,
       }),
@@ -37,7 +38,7 @@ export const workerApi = api.injectEndpoints({
       query: ({ status = "all", page = 1, limit = 5 } = {}) => {
         const params = new URLSearchParams({ status, page, limit });
         return {
-          url: `/worker/my-bids?${params.toString()}`,
+          url: `${WORKER.GET_WORKER_BIDS}?${params.toString()}`,
           method: "GET",
         };
       },
@@ -46,7 +47,7 @@ export const workerApi = api.injectEndpoints({
 
     getWorkerBidDetails: builder.query({
       query: (bidId) => ({
-        url: `/worker/bid-details/${bidId}`,
+        url: WORKER.GET_BID_DETAILS.replace(":bidId",bidId),
         method: "GET",
       }),
       providesTags: ["Worker_Bid_Details"],
@@ -54,7 +55,7 @@ export const workerApi = api.injectEndpoints({
 
     withdrawBid: builder.mutation({
       query: (bidId) => ({
-        url: `/worker/bid/withdraw/${bidId}`,
+        url: WORKER.WITHDRAW_BID.replace(':bidId',bidId),
         method: "DELETE",
       }),
       invalidatesTags: ["Worker_Bids", "Worker_Bid_Details"],
@@ -62,7 +63,7 @@ export const workerApi = api.injectEndpoints({
 
     getWorkerActiveJob: builder.query({
       query: (taskId) => ({
-        url: `/worker/task/${taskId}/active-job`,
+        url: WORKER.GET_ACTIVE_JOB.replace(":taskId", taskId),
         method: "GET",
       }),
       providesTags: ["Active_Job"],
@@ -70,7 +71,7 @@ export const workerApi = api.injectEndpoints({
 
     updateJobProgress: builder.mutation({
       query: ({ taskId, update }) => ({
-        url: `/worker/task/${taskId}/progress`,
+        url: WORKER.UPDATE_JOB_PROGRESS.replace(":taskId", taskId),
         method: "PATCH",
         body: { update },
       }),
