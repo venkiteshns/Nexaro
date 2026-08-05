@@ -1,3 +1,4 @@
+import { POSTER } from "../../constants/urls";
 import { api } from "./api";
 
 export const posterApi = api.injectEndpoints({
@@ -37,9 +38,10 @@ export const posterApi = api.injectEndpoints({
           ],
         };
         formData.append("location", JSON.stringify(location));
-
+        console.log(formValues);
+        
         return {
-          url: "/poster/tasks/create",
+          url: POSTER.CREATE_TASK,
           method: "POST",
           body: formData,
           formData: true,
@@ -50,7 +52,7 @@ export const posterApi = api.injectEndpoints({
 
     getPosterTasks: builder.query({
       query: ({status, page, limit = 5, search}) => ({
-        url: `/poster/tasks?page=${page}&limit=${limit}&status=${status}&search=${search}`,
+        url: `${POSTER.GET_TASKS}?page=${page}&limit=${limit}&status=${status}&search=${search}`,
         method: "GET",
       }),
       providesTags: ["Poster_Tasks"],
@@ -58,7 +60,7 @@ export const posterApi = api.injectEndpoints({
 
     cancelTaskByPoster: builder.mutation({
       query: (taskId) => ({
-        url: `/poster/task/cancel/${taskId}`,
+        url: POSTER.CANCEL_TASK.replace(":taskId", taskId),
         method: "PATCH",
       }),
       invalidatesTags: ["Poster_Tasks", "Worker_Tasks"],
@@ -82,7 +84,7 @@ export const posterApi = api.injectEndpoints({
         }
 
         return {
-          url: `/poster/task/update/${taskId}`,
+          url: POSTER.UPDATE_TASK.replace(":taskId", taskId),
           method: "PATCH",
           body: formData,
           formData: true,
@@ -93,7 +95,7 @@ export const posterApi = api.injectEndpoints({
 
     getPosterBids: builder.query({
       query: ({ taskId, sort }) => ({
-        url: `/poster/task/bids/${taskId}?sort=${sort}`,
+        url:`${POSTER.GET_BIDS.replace(":taskId",taskId)}?sort=${sort}`,
         method: "GET",
       }),
       providesTags: ["Poster_Bids"],
@@ -101,7 +103,7 @@ export const posterApi = api.injectEndpoints({
 
     acceptBid: builder.mutation({
       query: (bidId) => ({
-        url: `/poster/bid/accept/${bidId}`,
+        url:POSTER.ACCEPT_BID.replace(":bidId", bidId),
         method: "PATCH",
       }),
       invalidatesTags: [
@@ -114,7 +116,7 @@ export const posterApi = api.injectEndpoints({
 
     getPosterTaskProgress: builder.query({
       query: (taskId) => ({
-        url: `/poster/task/${taskId}/progress`,
+        url: POSTER.TASK_PROGRESS.replace(':taskId', taskId),
         method: "GET",
       }),
       providesTags: ["Poster_Task_Progress"],
@@ -122,7 +124,7 @@ export const posterApi = api.injectEndpoints({
 
     getCompletedTaskPosterSide: builder.query({
       query: (taskId) => ({
-        url: `/poster/task/completed/${taskId}`,
+        url: POSTER.COMPLETED_TASK.replace(":taskId", taskId),
         method: "GET",
       }),
       providesTags: ["Poster_Completed_Task"],
@@ -130,7 +132,7 @@ export const posterApi = api.injectEndpoints({
 
     getPosterProfile: builder.query({
       query: () => ({
-        url: "/poster/profile",
+        url: POSTER.PROFILE,
         method: "GET",
       }),
       providesTags: ["Poster_Profile"],
@@ -141,7 +143,7 @@ export const posterApi = api.injectEndpoints({
         console.log("formValues", formValues);
 
         return {
-          url: "/poster/profile/update",
+          url: POSTER.UPDATE_PROFILE,
           method: "PATCH",
           body: formValues,
           formData: true,

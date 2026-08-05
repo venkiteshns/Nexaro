@@ -1,3 +1,4 @@
+import { AUTH } from "../../constants/urls";
 import { api } from "./api";
 
 export const authApi = api.injectEndpoints({
@@ -7,7 +8,7 @@ export const authApi = api.injectEndpoints({
                 let {email, phone} = params;
                 let resendFlag = params.resendFlag || false;
                 return {
-                    url: "/auth/get-otp",
+                    url: AUTH.SEND_OTP,
                     method: "POST",
                     body: { email, phone, resendFlag },
                 };
@@ -16,7 +17,7 @@ export const authApi = api.injectEndpoints({
 
         verifyOtp: builder.mutation({
             query: ({ email, otp }) => ({
-                url: "/auth/verify-otp",
+                url: AUTH.VERIFY_OTP,
                 method: "POST",
                 body: { email, otp },
             }),
@@ -24,7 +25,7 @@ export const authApi = api.injectEndpoints({
 
         posterSignUp: builder.mutation({
             query: (payload) => ({
-                url: "/auth/signup/poster",
+                url: AUTH.POSTER_SIGNUP,
                 method: "POST",
                 body: payload,
                 formData: true,
@@ -33,7 +34,7 @@ export const authApi = api.injectEndpoints({
 
         workerSignUp: builder.mutation({
             query: (formData) => ({
-                url: "/auth/signup/worker",
+                url: AUTH.WORKER_SIGNUP,
                 method: "POST",
                 body: formData,
                 formData: true,
@@ -42,7 +43,7 @@ export const authApi = api.injectEndpoints({
 
         userLogin: builder.mutation({
             query: (credentials) => ({
-                url: "/auth/login",
+                url: AUTH.USER_LOGIN,
                 method: "POST",
                 body: credentials,
             }),
@@ -50,7 +51,7 @@ export const authApi = api.injectEndpoints({
 
         googleLogin: builder.mutation({
             query: (idToken) => ({
-                url: "/auth/google-login",
+                url: AUTH.GOOGLE_LOGIN,
                 method: "POST",
                 body: { idToken },
             }),
@@ -58,7 +59,7 @@ export const authApi = api.injectEndpoints({
 
         adminLogin: builder.mutation({
             query: (credentials) => ({
-                url: "/auth/login/admin",
+                url: AUTH.ADMIN_LOGIN,
                 method: "POST",
                 body: credentials,
             }),
@@ -66,21 +67,21 @@ export const authApi = api.injectEndpoints({
 
         userLogout: builder.mutation({
             query: () => ({
-                url: "/auth/logout",
+                url: AUTH.USER_LOGOUT,
                 method: "POST",
             }),
         }),
 
         adminLogout: builder.mutation({
             query: () => ({
-                url: "/auth/logout",
+                url: AUTH.ADMIN_LOGOUT,
                 method: "POST",
             }),
         }),
 
         forgotPassword: builder.mutation({
             query: ({ email, role }) => ({
-                url: `/auth/forgot-password/${role}`,
+                url: `${AUTH.FORGOT_PASSWORD}/${role}`,
                 method: "POST",
                 body: { email },
             }),
@@ -88,7 +89,7 @@ export const authApi = api.injectEndpoints({
 
         updatePassword: builder.mutation({
             query: ({ email, password }) => ({
-                url: "/auth/update-password",
+                url: AUTH.UPDATE_PASSWORD,
                 method: "POST",
                 body: { email, password },
             }),

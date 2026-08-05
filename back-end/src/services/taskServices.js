@@ -85,7 +85,7 @@ export const createTaskService = async (body, files, posterId) => {
                 amount: createdTask.amount,
                 category: createdTask.category,
                 urgencyLevel: createdTask.urgencyLevel,
-                city: createdTask.address.city,
+                city: createdTask.address.landmark,
             })
         })
 
