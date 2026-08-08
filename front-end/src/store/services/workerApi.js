@@ -20,7 +20,7 @@ export const workerApi = api.injectEndpoints({
 
     getTaskForBid: builder.query({
       query: (taskId) => ({
-        url:WORKER.GET_TASK_FOR_BID.REAPLCE(":taskId",taskId),
+        url:WORKER.GET_TASK_FOR_BID.replace(":taskId",taskId),
         method: "GET",
       }),
     }),

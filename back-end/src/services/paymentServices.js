@@ -91,9 +91,8 @@ export const createOrderService = async (orderDetails) => {
 }
 
 export const captureOrderService = async ( orderId ) => {
-    try {
+  try {
     const accessToken = await generateAccessToken();
-
     // 1. Instruct PayPal to capture the funds
     const response = await fetch(`${process.env.PAYPAL_API_URL}/v2/checkout/orders/${orderId}/capture`, {
       method: 'POST',
@@ -102,34 +101,48 @@ export const captureOrderService = async ( orderId ) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
+    if (!response.ok) {
+      console.error('PayPal capture failed:', captureData);
+      dbOrder.status = 'Failed';
+      await dbOrder.save();
+      return {
+        success: false,
+        status: 'Failed',
+        reason: captureData?.details?.[0]?.issue || captureData?.name || 'UNKNOWN_ERROR',
+        data: captureData,
+      };
+    }
     const captureData = await response.json();
     // console.log("captureData", captureData.purchase_units?.[0]?.payments?.captures?.[0]);
     
-
     // 2. Find the corresponding local order in MongoDB
     const dbOrder = await Order.findOne({ paypalOrderId: orderId });
     if (!dbOrder) {
       return { success: false, error: 'Order not found in database' };
     }
-
+    if (dbOrder.status === 'Paid') {
+      return { success: true, status: 'Success', message: 'Order already captured', order: dbOrder };
+    }
     // 3. SECURE VERIFICATION: Check if PayPal successfully completed the capture
     const captureStatus = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+    const capturedAmount = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value;
     const captureId = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id;
+    const capturedCurrency = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code;
     
-    if (captureStatus === 'COMPLETED') {
-      // Payment is fully verified
-      dbOrder.status = 'Paid';
-      dbOrder.paypalCaptureId = captureId;
-      await dbOrder.save();
-
-      return { success: true, status: 'Success', message: 'Payment verified and saved', order: dbOrder };
-    } else {
-      // Payment failed or is flagged as pending verification by PayPal fraud checks
-      dbOrder.status = 'Failed';
-      await dbOrder.save();
-
-      return { success: false,  status: 'Failed', reason: captureStatus, data: captureData };
+    if (
+        captureStatus === 'COMPLETED' &&
+        Number(capturedAmount) === Number(dbOrder.totalAmount) &&
+        capturedCurrency === 'USD' // or dbOrder.currency
+      ) {
+        dbOrder.status = 'Paid';
+        dbOrder.paypalCaptureId = captureId;
+        await dbOrder.save();
+        return { success: true, status: 'Success', order: dbOrder };
+      } else {
+        console.error('Amount mismatch or unverified capture', { capturedAmount, expected: dbOrder.totalAmount });
+        dbOrder.status = 'Failed';
+        await dbOrder.save();
+        return { success: false, status: 'Failed', reason: 'AMOUNT_MISMATCH_OR_INCOMPLETE' };
     }
   } catch (error) {
     console.error('Error capturing order:', error);
