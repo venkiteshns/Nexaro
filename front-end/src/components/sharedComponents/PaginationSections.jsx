@@ -37,7 +37,7 @@ const PaginationSections = ({totalPages, onPageChange, page}) => {
               </span>
             ) : (
               <button
-                key={p}
+                key={i}
                 onClick={() => onPageChange(p)}
                 className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${p === page
                   ? "bg-[#0A6E5C] text-white"

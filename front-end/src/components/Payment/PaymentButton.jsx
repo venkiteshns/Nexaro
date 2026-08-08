@@ -7,7 +7,7 @@ export default function PaymentButton({ amount, onSuccess }) {
     const [capturePayment] = useCapturePaymentMutation();
     const [createOrder] = useCreateOrderMutation();
 
-    const decAmount = Number(`${amount}.00`);
+    const decAmount = amount.toFixed(2);
 
     return (
         <>
@@ -19,7 +19,7 @@ export default function PaymentButton({ amount, onSuccess }) {
                 <PayPalButtons
                     style={{ layout: "vertical", shape: "pill", height: 55 }}
                     createOrder={async () => {
-                        try {
+                       try {
                             const order = await createOrder({
                                 totalAmount: decAmount,
                                 items: [{ name: "Test Product", price: decAmount, quantity: 1 }],
@@ -28,15 +28,36 @@ export default function PaymentButton({ amount, onSuccess }) {
                         } catch (error) {
                             console.error("Failed to initiate PayPal order:", error);
                             showError("Unexpected error occurred! Could not start checkout. Please try again later.");
+                            throw error;
                         }
                     }}
-                    onApprove={async (data) => {
-                        const captureResult = await capturePayment(data.orderID);
-                        if (captureResult.data?.status === "Success") {
-                            showSuccess("Payment successful!");
-                            onSuccess?.();
-                        } else {
-                            showWarning("Payment not completed !!");
+                    onApprove={async (data, actions) => {
+                        try {
+                            const captureResult = await capturePayment(data.orderID).unwrap();
+                            const result = captureResult.data;
+    
+                            switch (result?.status) {
+                                case "Success":
+                                case "AlreadyCaptured":
+                                    showSuccess("Payment successful!");
+                                    onSuccess?.();
+                                    break;
+    
+                                case "Pending":
+                                    showWarning("Payment is under review. We'll confirm once it clears.");
+                                    onSuccess?.(); // or a distinct "pending" handler if your flow treats this differently
+                                    break;
+    
+                                case "InstrumentDeclined":
+                                    showWarning("That payment method was declined. Please try another.");
+                                    return actions.restart();
+                                    
+                                default:
+                                    showWarning(result?.reason || "Payment could not be completed. Please try again.");
+                            }
+                        } catch (error) {
+                            console.error("Capture request failed:", error);
+                            showError("Could not confirm your payment. If money was deducted, contact support.");
                         }
                     }}
                     onCancel={() => {

@@ -162,6 +162,7 @@ export const {
   useAcceptBidMutation,
   useCancelTaskByPosterMutation,
   useGetPosterTaskProgressQuery,
+  useLazyGetPosterTaskProgressQuery,
   useGetCompletedTaskPosterSideQuery,
   useUpdateTaskMutation,
   useGetPosterProfileQuery,

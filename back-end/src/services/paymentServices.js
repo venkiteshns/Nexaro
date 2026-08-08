@@ -67,9 +67,9 @@ export const createOrderService = async (orderDetails) => {
             {
                 amount: {
                 currency_code: 'USD',
-                value: totalAmount.toFixed(2), // Ensure exactly 2 decimal places
+                value: totalAmount.toFixed(2), 
                 },
-                custom_id: dbOrder._id.toString(), // Link your DB order ID to PayPal
+                custom_id: dbOrder._id.toString(), 
             },
             ],
         }),
@@ -101,6 +101,29 @@ export const captureOrderService = async ( orderId ) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+
+    const captureData = await response.json();
+    const dbOrder = await Order.findOne({ paypalOrderId: orderId });
+    if (!dbOrder) {
+      return { success: false, error: 'Order not found in database' };
+    }
+    if (dbOrder.status === 'Paid') {
+      return { success: true, status: 'Success', message: 'Order already captured', order: dbOrder };
+    }
+
+    if (captureData.details?.[0]?.issue === 'ORDER_ALREADY_CAPTURED') {
+      return { success: true, status: 'AlreadyCaptured', order: dbOrder };
+    }
+
+    if (captureData.details?.[0]?.issue === "INSTRUMENT_DECLINED") {
+      return {
+        success: false,
+        status: "InstrumentDeclined",
+        reason: "INSTRUMENT_DECLINED",
+        data: captureData,
+      };
+    }
+    
     if (!response.ok) {
       console.error('PayPal capture failed:', captureData);
       dbOrder.status = 'Failed';
@@ -112,38 +135,61 @@ export const captureOrderService = async ( orderId ) => {
         data: captureData,
       };
     }
-    const captureData = await response.json();
     // console.log("captureData", captureData.purchase_units?.[0]?.payments?.captures?.[0]);
     
     // 2. Find the corresponding local order in MongoDB
-    const dbOrder = await Order.findOne({ paypalOrderId: orderId });
-    if (!dbOrder) {
-      return { success: false, error: 'Order not found in database' };
-    }
-    if (dbOrder.status === 'Paid') {
-      return { success: true, status: 'Success', message: 'Order already captured', order: dbOrder };
-    }
+   
     // 3. SECURE VERIFICATION: Check if PayPal successfully completed the capture
     const captureStatus = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+    const statusReason = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status_details?.reason;
     const capturedAmount = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value;
     const captureId = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id;
     const capturedCurrency = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code;
     
-    if (
-        captureStatus === 'COMPLETED' &&
-        Number(capturedAmount) === Number(dbOrder.totalAmount) &&
-        capturedCurrency === 'USD' // or dbOrder.currency
-      ) {
-        dbOrder.status = 'Paid';
-        dbOrder.paypalCaptureId = captureId;
-        await dbOrder.save();
-        return { success: true, status: 'Success', order: dbOrder };
-      } else {
-        console.error('Amount mismatch or unverified capture', { capturedAmount, expected: dbOrder.totalAmount });
-        dbOrder.status = 'Failed';
-        await dbOrder.save();
-        return { success: false, status: 'Failed', reason: 'AMOUNT_MISMATCH_OR_INCOMPLETE' };
+     if (captureStatus === "PENDING") {
+      dbOrder.status = "Pending";
+      dbOrder.paypalCaptureId = captureId;
+      await dbOrder.save();
+      return {
+        success: true,
+        status: "Pending",
+        reason: statusReason || "PENDING_REVIEW",
+        message: "Payment is pending review by PayPal. Awaiting final confirmation.",
+        order: dbOrder,
+      };
     }
+ 
+    if (
+      captureStatus === "COMPLETED" &&
+      Number(capturedAmount) === Number(dbOrder.totalAmount) &&
+      capturedCurrency === "USD" 
+    ) {
+      dbOrder.status = "Paid";
+      dbOrder.paypalCaptureId = captureId;
+      await dbOrder.save();
+      return { success: true, status: "Success", order: dbOrder };
+    }
+ 
+    if (captureStatus === "COMPLETED") {
+      console.error("Amount/currency mismatch on completed capture", {
+        capturedAmount,
+        capturedCurrency,
+        expectedAmount: dbOrder.totalAmount,
+      });
+      dbOrder.status = "Failed";
+      dbOrder.paypalCaptureId = captureId; 
+      await dbOrder.save();
+      return { success: false, status: "Failed", reason: "AMOUNT_MISMATCH" };
+    }
+ 
+    dbOrder.status = "Failed";
+    await dbOrder.save();
+    return {
+      success: false,
+      status: "Failed",
+      reason: captureStatus || "UNKNOWN_CAPTURE_STATUS",
+      data: captureData,
+    };
   } catch (error) {
     console.error('Error capturing order:', error);
     return { success: false, error: 'Failed to process capture' };
