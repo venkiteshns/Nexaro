@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Plus,
@@ -18,11 +18,12 @@ import {
 
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
-import { useCancelTaskByPosterMutation, useGetPosterTasksQuery } from '../../store/services/posterApi';
-import { showError, showSuccess } from '../../utils/toast';
+import { useCancelTaskByPosterMutation, useLazyGetPosterTaskProgressQuery, useGetPosterTasksQuery } from '../../store/services/posterApi';
+import { showError, showSuccess, showWarning } from '../../utils/toast';
 import EditTaskModal from '../../components/Poster/EditTaskModal';
 import useDebounce from '../../customHooks/useDebounce'
 import PaginationSections from '../../components/sharedComponents/PaginationSections';
+import ReleaseModal from '../../components/sharedComponents/poster/ReleasePaymentModal';
 
 function getStatusConfig(status) {
     switch (status) {
@@ -92,10 +93,29 @@ function TaskCard({ task }) {
     const { badge, border, label } = getStatusConfig(task.status);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showReleasePaymentModal, setShowReleasePaymentModal] = useState(false);
+    const [work, setWork] = useState(null);
 
     const hasBids = task.bidCount > 0;
 
     const [cancelTask, { isLoading, isSuccess }] = useCancelTaskByPosterMutation()
+
+    const [triggerGetWorkerData,{ data, isLoading:isDataLoading, isSuccess:isDataSuccess, isError:isDataError }] = useLazyGetPosterTaskProgressQuery();
+
+    const handleOpenPaymentReleaseModal = async (taskId) => {
+        try {
+            const result = await triggerGetWorkerData(taskId);
+            const payload = {
+                workerName: result.data.data.worker.name,
+                amount: result.data.data.bid.amount
+            }
+            setWork(payload);
+            setShowReleasePaymentModal(true);
+        } catch (error) {
+            showWarning("Unable to intiate payment, Please click view progress")
+            console.log(error);
+        }
+    }
 
     const handleCancelConfirm = async () => {
         setTimeout(() => {
@@ -175,7 +195,12 @@ function TaskCard({ task }) {
                         )}
                         {task.status === 'completed' && (
                             <span className="flex items-center gap-1">
-                                Completed
+                                Completed, Payment pending
+                            </span>
+                        )}
+                         {task.status === 'payment' && (
+                            <span className="flex items-center gap-1">
+                                Completed, Payment Completed
                                 <Star size={13} fill="#FBBF24" color="#FBBF24" />
                                 You rated 5 stars
                             </span>
@@ -243,7 +268,7 @@ function TaskCard({ task }) {
                             </>
                         )}
 
-                        {task.status === 'in_progress' && (
+                        {(task.status === 'in_progress' || task.status === 'completed') && (
                             <>
                                 <button
                                     onClick={() => navigate(`/poster/work-progress/${task._id}`)}
@@ -251,13 +276,13 @@ function TaskCard({ task }) {
                                 >
                                     View Progress
                                 </button>
-                                <button className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
+                                <button onClick={() => {handleOpenPaymentReleaseModal(task._id)}} className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
                                     Release Payment
                                 </button>
                             </>
                         )}
 
-                        {task.status === 'completed' && (
+                        {(task.status === 'completed' && task.update === 'payment' ) && (
                             <button
                                 onClick={() => navigate(`/poster/completed-task/${task._id}`)}
                                 className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -288,6 +313,10 @@ function TaskCard({ task }) {
                     task={task}
                     onClose={() => setShowEditModal(false)}
                 />
+            )}
+
+            {(showReleasePaymentModal && work) && (
+                <ReleaseModal amount={work.amount} workerName={work.workerName} onCancel={() => setShowReleasePaymentModal(false)} />
             )}
         </>
     );
@@ -323,8 +352,6 @@ const MyTasks = () => {
     
     const stats = data?.tasks?.stats;
 
-    console.log(data);
-    
     const pagination = data?.tasks?.paginations;
 
     const counts = {

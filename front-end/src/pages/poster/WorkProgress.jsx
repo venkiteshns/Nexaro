@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
+import ReleaseModal from '../../components/sharedComponents/poster/ReleasePaymentModal';
 
 const STEPS = [
     { key: 'posted', label: 'TASK POSTED', icon: CheckCircle, done: false, active: false },
@@ -101,51 +102,6 @@ function PageError({ onBack }) {
 }
 
 
-function ReleaseModal({ amount, workerName, onConfirm, onCancel }) {
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
-            onClick={onCancel}
-        >
-            <div
-                className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="h-1 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
-
-                <div className="p-7 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center mb-5">
-                        <ShieldCheck size={30} className="text-[#0A6E5C]" />
-                    </div>
-
-                    <h2 className="text-xl font-extrabold text-gray-900 mb-2">Release Payment?</h2>
-                    <p className="text-sm text-gray-500 leading-relaxed mb-6 px-2">
-                        By confirming, <span className="font-semibold text-gray-700">₹{amount}.00</span> will be
-                        released immediately to{' '}
-                        <span className="font-semibold text-gray-700">{workerName}</span>. This action cannot be
-                        undone.
-                    </p>
-
-                    <button
-                        onClick={onConfirm}
-                        className="w-full py-3 rounded-2xl bg-[#0A6E5C] text-white text-sm font-bold
-                                   hover:bg-[#085e4e] active:scale-[0.98] transition-all duration-150 shadow-sm mb-3"
-                    >
-                        Confirm & Release ₹{amount}.00
-                    </button>
-                    <button
-                        onClick={onCancel}
-                        className="text-sm text-gray-400 hover:text-gray-600 transition-colors py-1"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
 
 // ─── Main Page ─────────────────────────────────────────────────────────────
 const WorkProgress = () => {
@@ -197,10 +153,6 @@ const WorkProgress = () => {
         done: updateCount ? i < updateCount : false,
     }));
 
-    const handleRelease = () => {
-        setShowReleaseModal(false);
-        setReleased(true);
-    };
 
     return (
         <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -373,7 +325,7 @@ const WorkProgress = () => {
                                     {[
                                         { icon: Clock, label: 'POSTED', value: new Date(mainData?.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) },
                                         { icon: Calendar, label: 'EST. DURATION', value: bid?.eta },
-                                        { icon: MapPin, label: 'LOCATION', value: `${mainData?.address?.city}, ${mainData?.address?.state}` },
+                                        { icon: MapPin, label: 'LOCATION', value: `${mainData?.address?.landmark}` },
                                     ].map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="flex items-start justify-between gap-2">
                                             <div className="flex items-center gap-1.5">
@@ -446,7 +398,6 @@ const WorkProgress = () => {
                 <ReleaseModal
                     amount={bid?.amount}
                     workerName={workerData?.name}
-                    onConfirm={handleRelease}
                     onCancel={() => setShowReleaseModal(false)}
                 />
             )}

@@ -346,23 +346,23 @@ const ActiveJob = () => {
                                                 <p className="font-extrabold text-gray-900">Get Directions</p>
                                             </div>
 
-                                            <div className="w-full h-36 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4 overflow-hidden">
-                                                <div className="text-center">
-                                                    <MapPin size={28} className="text-[#0A6E5C] mx-auto mb-1" />
-                                                    <p className="text-xs text-emerald-700 font-medium">
-                                                        {mainData.address?.area || mainData.address?.city}
+                                            {/* <div style={{backgroundImage: `url(${import.meta.env.VITE_MAP_IMG})`}} className="w-full h-36 rounded-xl bg-center bg-cover bg-emerald-50 border border-emerald-100 flex items-end  justify-center mb-4 overflow-hidden">
+                                                <div className="text-center bg-emerald-600/60 pb-2 pt-1">
+                                                    <p className="text-xs text-white mx-1">
+                                                        {mainData.address?.landmark}
                                                     </p>
                                                 </div>
-                                            </div>
+                                            </div> */}
 
-                                            <div className="mb-4">
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Site Address</p>
-                                                <p className="text-sm text-gray-700 leading-relaxed">
-                                                    {mainData.address?.houseNumber && `${mainData.address.houseNumber}, `}
-                                                    {mainData.address?.area && `${mainData.address.area}, `}
-                                                    {mainData.address?.city}
-                                                    {mainData.address?.district && `, ${mainData.address.district}`}
-                                                </p>
+                                            <div
+                                                style={{ backgroundImage: `url(${import.meta.env.VITE_MAP_IMG})` }}
+                                                className="relative w-full h-36 rounded-xl bg-center bg-cover bg-emerald-50 border border-emerald-100 mb-4 overflow-hidden"
+                                            >
+                                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-900/80 via-emerald-800/50 to-transparent px-3 pt-6 pb-2.5">
+                                                    <p className="text-xs font-medium text-white text-center leading-snug line-clamp-2">
+                                                        {mainData.address?.landmark}
+                                                    </p>
+                                                </div>
                                             </div>
 
                                             <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer"
