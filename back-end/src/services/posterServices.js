@@ -421,7 +421,7 @@ export const getPosterProfileService = async (posterId) => {
     const posterObjectId = new mongoose.Types.ObjectId(posterId);
 
     const [taskStats] = await Task.aggregate([
-      { $match: { posterId: posterObjectId } },
+      { $match: { posterId: posterObjectId} },
       {
         $group: {
           _id: null,
@@ -433,7 +433,7 @@ export const getPosterProfileService = async (posterId) => {
       },
     ]);
 
-    const posterUser = await User.findById(posterObjectId).select(
+    const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
       "poster.spent verificationDocuments.selfie.url name email phone city createdAt",
     );
 
@@ -443,7 +443,7 @@ export const getPosterProfileService = async (posterId) => {
       totalSpent: posterUser?.poster?.spent || 0,
     };
 
-    const recentTasks = await Task.find({ posterId: posterObjectId })
+    const recentTasks = await Task.find({ posterId: posterObjectId, activeRole: "poster" })
       .sort({ createdAt: -1 })
       .limit(3)
       .select("_id title status amount category createdAt address");

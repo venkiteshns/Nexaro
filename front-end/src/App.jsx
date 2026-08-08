@@ -44,8 +44,8 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin />} />
           </Route>
 
-          <Route element={<PublicRoute user={"user"} />}>
             <Route path="/" element={<Landing />} />
+          <Route element={<PublicRoute user={"user"} />}>
             <Route path="/map" element={<Map />} />
             <Route path="/signup/poster" element={<PosterSignup />} />
             <Route path="/signup/worker" element={<WorkerSignup />} />

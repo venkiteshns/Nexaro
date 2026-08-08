@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
 import Header from "../../components/Landing/Header";
 import Hero from "../../components/Landing/Hero";
 import Status from "../../components/Landing/Status";
@@ -36,7 +35,7 @@ const Landing = () => {
     <>
       <Header landing={true} onRedirect={goGetStart} />
       <Hero />
-      <Status />
+        <Status />   
       <Workflow />
 
       <div ref={getStartRef}>
