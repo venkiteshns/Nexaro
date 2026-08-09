@@ -7,8 +7,10 @@ import {
   getWorkerBidDetails,
   withdrawBid,
   getWorkerActiveJob,
+  getWorkerCurrentActiveJob,
   updateJobProgress,
 } from "../controller/WorkerControllers/workerController.js";
+
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
 
 const router = express.Router();
@@ -17,7 +19,9 @@ router.get("/tasks/nearby", verifyToken, getNearbyTasks);
 router.get("/task/:taskId", verifyToken, getTaskForBid);
 router.get("/my-bids", verifyToken, getWorkerBids);
 router.get("/bid-details/:bidId", verifyToken, getWorkerBidDetails);
+router.get("/active-job", verifyToken, getWorkerCurrentActiveJob); // param collision
 router.get("/task/:taskId/active-job", verifyToken, getWorkerActiveJob);
+
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 

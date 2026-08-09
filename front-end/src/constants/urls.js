@@ -33,9 +33,11 @@ export const WORKER = {
     GET_WORKER_BIDS: "/worker/my-bids",
     GET_BID_DETAILS: "/worker/bid-details/:bidId",
     WITHDRAW_BID: "/worker/bid/withdraw/:bidId",
+    GET_CURRENT_ACTIVE_JOB: "/worker/active-job",
     GET_ACTIVE_JOB: "/worker/task/:taskId/active-job",
     UPDATE_JOB_PROGRESS: "/worker/task/:taskId/progress",
 }
+
 export const PAYMENT = {
     CREATE_ORDER : `${import.meta.env.VITE_API_URL}/payment/orders`,
     CAPTURE_PAYMENT : `${import.meta.env.VITE_API_URL}/payment/orders/:orderId/capture`,

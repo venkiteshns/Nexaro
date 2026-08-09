@@ -1,7 +1,8 @@
 import { workerSignupService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
+import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
+
 
 export const workerSignup = async (req, res) => {
     console.log(req.body, "body", req.files, "files");
@@ -229,3 +230,23 @@ export const updateJobProgress = async (req, res) => {
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
+
+export const getWorkerCurrentActiveJob = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const result = await getWorkerCurrentActiveJobService(workerId);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.error });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            taskFound: result.taskFound,
+            taskId: result.taskId ?? null,
+            title: result.title ?? null,
+        });
+    } catch (error) {
+        console.error("getWorkerCurrentActiveJob controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
