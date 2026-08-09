@@ -739,3 +739,27 @@ export const updateJobProgressService = async (taskId, workerId, update) => {
         return { error: error.message };
     }
 };
+
+export const getWorkerCurrentActiveJobService = async (workerId) => {
+    try {
+        const task = await Task.findOne({
+            workerId: new mongoose.Types.ObjectId(workerId),
+            status: { $in: ['assigned', 'in_progress'] },
+        })
+            .select('_id title')
+            .lean();
+
+        if (!task) {
+            return { taskFound: false };
+        }
+
+        return {
+            taskFound: true,
+            taskId: task._id.toString(),
+            title: task.title,
+        };
+    } catch (error) {
+        console.error("getWorkerCurrentActiveJobService error:", error.message);
+        return { error: error.message };
+    }
+};

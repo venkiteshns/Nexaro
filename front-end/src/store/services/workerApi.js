@@ -69,6 +69,14 @@ export const workerApi = api.injectEndpoints({
       providesTags: ["Active_Job"],
     }),
 
+    getWorkerCurrentActiveJob: builder.query({
+      query: () => ({
+        url: WORKER.GET_CURRENT_ACTIVE_JOB,
+        method: "GET",
+      }),
+      providesTags: ["Active_Job"],
+    }),
+
     updateJobProgress: builder.mutation({
       query: ({ taskId, update }) => ({
         url: WORKER.UPDATE_JOB_PROGRESS.replace(":taskId", taskId),
@@ -88,5 +96,7 @@ export const {
   useGetWorkerBidDetailsQuery,
   useWithdrawBidMutation,
   useGetWorkerActiveJobQuery,
+  useGetWorkerCurrentActiveJobQuery,
   useUpdateJobProgressMutation,
 } = workerApi;
+

@@ -26,6 +26,8 @@ import PlaceBid from "./pages/worker/PlaceBid.jsx";
 import MyBids from "./pages/worker/MyBids.jsx";
 import TaskBidDetails from './pages/worker/TaskBidDetails.jsx'
 import ActiveJob from './pages/worker/ActiveJob.jsx'
+import ActiveJobEntry from './pages/worker/ActiveJobEntry.jsx'
+
 import AdminLogin from "./pages/auth/AdminLogin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import UserManagement from "./pages/admin/UserMangement.jsx";
@@ -46,7 +48,7 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin />} />
           </Route>
 
-            <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Landing />} />
           <Route element={<PublicRoute user={"user"} />}>
             <Route path="/map" element={<Map />} />
             <Route path="/signup/poster" element={<PosterSignup />} />
@@ -75,6 +77,7 @@ function App() {
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
               <Route path="my-bids" element={<MyBids />} />
               <Route path='task-bid-details/:bidId' element={<TaskBidDetails />} />
+              <Route path='active-job' element={<ActiveJobEntry />} />
               <Route path='active-job/:taskId' element={<ActiveJob />} />
             </Route>
           </Route>
