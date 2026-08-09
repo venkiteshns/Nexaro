@@ -15,6 +15,8 @@ import {
   getCompletedTaskPosterSide,
   getPosterProfile,
 } from "../controller/PosterControllers/posterController.js";
+import { createReview } from "../controller/PosterControllers/reviewController.js";
+
 
 const router = express.Router();
 
@@ -48,4 +50,7 @@ router.patch(
   updateUserProfile,
 );
 
+router.post("/review", verifyToken, createReview);
+
 export default router;
+

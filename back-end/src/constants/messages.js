@@ -65,7 +65,16 @@ const MESSAGES = {
     PHONE_ALREADY_IN_USE: "Phone number already in use by another user",
 
     AMOUNT_MISMATCH:  "Amount mismatch",
-    
+
+    REVIEW_SUBMITTED: "Review submitted successfully",
+    REVIEW_ALREADY_EXISTS: "You have already submitted a review for this task",
+    TASK_NOT_ELIGIBLE_FOR_REVIEW: "This task is not eligible for a review. Payment must be released first.",
+    UNAUTHORIZED_REVIEWER: "You are not authorized to review this task",
+    INVALID_RATING: "Rating must be a number between 1 and 5",
+    REVIEW_TOO_SHORT: "Review must be at least 10 characters",
+    REVIEW_TOO_LONG: "Review must not exceed 1000 characters",
+    REVIEWEE_MISMATCH: "The reviewee does not match the worker assigned to this task",
+    REVIEW_REQUIRED: "Review text is required",
 
 };
 

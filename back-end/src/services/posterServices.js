@@ -144,6 +144,33 @@ export const getTasksService = async (posterId, query) => {
         $limit: Number(limit)
       },
       {
+        $lookup: {
+          from: "reviews",
+          let: { taskId: "$_id", posterId: { $toObjectId: posterId } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$taskId", "$$taskId"] },
+                    { $eq: ["$reviewer", "$$posterId"] },
+                    { $eq: ["$isDeleted", false] },
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+            { $project: { _id: 1 } },
+          ],
+          as: "posterReview",
+        },
+      },
+      {
+        $addFields: {
+          hasReview: { $gt: [{ $size: "$posterReview" }, 0] },
+        },
+      },
+      {
         $project: {
           _id: 1,
           title: 1,
@@ -153,12 +180,15 @@ export const getTasksService = async (posterId, query) => {
           urgencyLevel: 1,
           createdAt: 1,
           status: 1,
+          update: 1,
           amount: 1,
           bidCount: 1,
-          acceptedBid:1,
+          acceptedBid: 1,
+          workerId: 1,
           address: 1,
           location: 1,
           images: 1,
+          hasReview: 1,
         },
       },
     ]);

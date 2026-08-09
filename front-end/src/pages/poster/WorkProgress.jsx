@@ -13,9 +13,7 @@ import {
     Wrench,
     Flag,
     ChevronRight,
-    ShieldCheck,
     AlertTriangle,
-    BookDashed,
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
@@ -343,15 +341,28 @@ const WorkProgress = () => {
                         </div>
 
                         {/* ── Release Payment Banner ── */}
-                        {released ? (
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-6 py-5 flex items-center gap-4">
-                                <CheckCircle size={24} className="text-[#0A6E5C] shrink-0" />
-                                <div>
-                                    <p className="font-bold text-[#0A6E5C]">Payment Released!</p>
-                                    <p className="text-sm text-emerald-700 mt-0.5">
-                                        ₹{bid?.amount}.00 has been transferred to {workerData?.name}.
-                                    </p>
+                        {(released || update === 'payment') ? (
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 sm:px-6 py-5
+                                            flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <CheckCircle size={24} className="text-[#0A6E5C] shrink-0" />
+                                    <div>
+                                        <p className="font-bold text-[#0A6E5C]">Payment Released!</p>
+                                        <p className="text-sm text-emerald-700 mt-0.5">
+                                            ₹{bid?.amount}.00 has been transferred to {workerData?.name}.
+                                        </p>
+                                    </div>
                                 </div>
+
+                                <button
+                                    onClick={() => navigate(`/poster/review/${taskId}`)}
+                                    className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-[#0A6E5C] text-white
+                                               text-sm font-bold hover:bg-[#085e4e] active:scale-[0.98]
+                                               transition-all duration-150 shadow-md whitespace-nowrap shrink-0"
+                                >
+                                    Write a Review
+                                    <ChevronRight size={16} />
+                                </button>
                             </div>
                         ) : (
                             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 sm:px-6 py-5
@@ -387,6 +398,7 @@ const WorkProgress = () => {
                             </div>
                         )}
 
+
                     </div>
                 </div>}
 
@@ -398,9 +410,15 @@ const WorkProgress = () => {
             {showReleaseModal && (
                 <ReleaseModal
                     bidId={bid._id}
+                    taskId={taskId}
                     amount={bid?.amount}
                     workerName={workerData?.name}
                     onCancel={() => setShowReleaseModal(false)}
+                    onSuccess={(tid) => {
+                        setShowReleaseModal(false);
+                        setReleased(true);
+                        navigate(`/poster/review/${tid}`);
+                    }}
                 />
             )}
         </div>
@@ -408,3 +426,4 @@ const WorkProgress = () => {
 };
 
 export default WorkProgress;
+

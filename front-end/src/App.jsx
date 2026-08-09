@@ -18,6 +18,8 @@ import ReviewBids from "./pages/poster/ReviewBids.jsx";
 import WorkProgress from "./pages/poster/WorkProgress.jsx";
 import CompletedTaskDetails from "./pages/poster/CompletedTaskDetails.jsx";
 import PosterProfile from "./pages/poster/PosterProfile.jsx";
+import ReviewPage from "./pages/poster/ReviewPage.jsx";
+
 import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
@@ -61,8 +63,10 @@ function App() {
               <Route path="work-progress/:taskId" element={<WorkProgress />} />
               <Route path="completed-task/:taskId" element={<CompletedTaskDetails />} />
               <Route path="profile" element={<PosterProfile />} />
+              <Route path="review/:taskId" element={<ReviewPage />} />
             </Route>
           </Route>
+
 
           <Route element={<PrivateRoute allowedRoles="worker" />}>
             <Route path="/worker">
