@@ -1,5 +1,6 @@
-import { POSTER } from "../../constants/urls";
+import { POSTER, REVIEWS } from "../../constants/urls";
 import { api } from "./api";
+
 
 export const posterApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -151,9 +152,19 @@ export const posterApi = api.injectEndpoints({
       },
       invalidatesTags: ["Poster_Profile"],
     }),
+
+    submitReview: builder.mutation({
+      query: (body) => ({
+        url: REVIEWS.CREATE_REVIEW,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Poster_Completed_Task", "Poster_Profile"],
+    }),
     
   }),
 });
+
 
 export const {
   useCreateTaskMutation,
@@ -167,4 +178,6 @@ export const {
   useUpdateTaskMutation,
   useGetPosterProfileQuery,
   useUpdatePosterProfileMutation,
+  useSubmitReviewMutation,
 } = posterApi;
+

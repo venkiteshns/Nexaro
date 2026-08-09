@@ -41,3 +41,7 @@ export const PAYMENT = {
     CAPTURE_PAYMENT : `${import.meta.env.VITE_API_URL}/payment/orders/:orderId/capture`,
     PAYOUT:`${import.meta.env.VITE_API_URL}/payment/orders/:bidId/payout`
 }
+
+export const REVIEWS = {
+    CREATE_REVIEW: "/poster/review",
+};
