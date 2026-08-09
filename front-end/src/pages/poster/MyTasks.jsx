@@ -316,7 +316,7 @@ function TaskCard({ task }) {
             )}
 
             {(showReleasePaymentModal && work) && (
-                <ReleaseModal amount={work.amount} workerName={work.workerName} onCancel={() => setShowReleasePaymentModal(false)} />
+                <ReleaseModal bidId={task?.acceptedBid} amount={work.amount} workerName={work.workerName} onCancel={() => setShowReleasePaymentModal(false)} />
             )}
         </>
     );
@@ -349,7 +349,7 @@ const MyTasks = () => {
     const { data, isLoading, isError } = useGetPosterTasksQuery({search:debounceText, status: activeTab, page});
 
     const allTasks = data?.tasks.tasks || [];
-    
+
     const stats = data?.tasks?.stats;
 
     const pagination = data?.tasks?.paginations;

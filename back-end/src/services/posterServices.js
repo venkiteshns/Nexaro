@@ -155,6 +155,7 @@ export const getTasksService = async (posterId, query) => {
           status: 1,
           amount: 1,
           bidCount: 1,
+          acceptedBid:1,
           address: 1,
           location: 1,
           images: 1,
@@ -356,6 +357,7 @@ export const getPosterTaskProgressService = async (taskId) => {
           "worker.selfie": "$worker.verificationDocuments.selfie.url",
           "bid.amount": 1,
           "bid.eta": 1,
+          "bid._id": 1
         },
       },
     ]);

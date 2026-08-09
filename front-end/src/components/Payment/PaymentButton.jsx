@@ -2,12 +2,13 @@ import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { useCapturePaymentMutation, useCreateOrderMutation } from "../../store/services/paymentApi";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
 
-export default function PaymentButton({ amount, onSuccess }) {
+export default function PaymentButton({ amount, bidId, onSuccess }) {
     const [{ isPending }] = usePayPalScriptReducer();
     const [capturePayment] = useCapturePaymentMutation();
     const [createOrder] = useCreateOrderMutation();
 
     const decAmount = amount.toFixed(2);
+    // console.log(bidId);
 
     return (
         <>
@@ -23,6 +24,7 @@ export default function PaymentButton({ amount, onSuccess }) {
                             const order = await createOrder({
                                 totalAmount: decAmount,
                                 items: [{ name: "Test Product", price: decAmount, quantity: 1 }],
+                                bidId: bidId
                             }).unwrap();
                             return order.id;
                         } catch (error) {
@@ -34,12 +36,15 @@ export default function PaymentButton({ amount, onSuccess }) {
                     onApprove={async (data, actions) => {
                         try {
                             const captureResult = await capturePayment(data.orderID).unwrap();
-                            const result = captureResult.data;
+                            // const result = captureResult.data;
+
+                            console.log(captureResult);
+                            
     
-                            switch (result?.status) {
+                            switch (captureResult?.status) {
                                 case "Success":
                                 case "AlreadyCaptured":
-                                    showSuccess("Payment successful!");
+                                    showSuccess("Payment successful!",{autoClose:4000});
                                     onSuccess?.();
                                     break;
     

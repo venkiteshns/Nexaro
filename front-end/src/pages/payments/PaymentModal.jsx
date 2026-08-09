@@ -2,9 +2,9 @@ import { X } from "lucide-react";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import PaymentButton from "../../components/Payment/PaymentButton";
 
-export default function PaymentModal({ amount, onClose, onSuccess }) {
+export default function PaymentModal({ amount, bidId, onClose, onSuccess }) {
     return (
-         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <div
                 className="absolute inset-0"
                 style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
@@ -12,10 +12,10 @@ export default function PaymentModal({ amount, onClose, onSuccess }) {
             />
 
             <div
-                className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
+                className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto overscroll-contain"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="h-1 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
+                <div className="h-1 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400 sticky top-0" />
 
                 <div className="flex items-center justify-between px-6 pt-5">
                     <h3 className="text-base font-bold text-gray-900">Complete Payment</h3>
@@ -40,7 +40,7 @@ export default function PaymentModal({ amount, onClose, onSuccess }) {
                             currency: "USD",
                         }}
                     >
-                        <PaymentButton amount={amount} onSuccess={onSuccess} />
+                        <PaymentButton bidId={bidId} amount={amount} onSuccess={onSuccess} />
                     </PayPalScriptProvider>
 
                     <button

@@ -1,10 +1,21 @@
 import { ShieldCheck } from "lucide-react";
+import { useInitiatePaymentMutation } from "../../../store/services/paymentApi";
 
-export default function ReleaseModal({ amount, workerName, onCancel }) {
+export default function ReleaseModal({ amount, workerName, onCancel, bidId }) {
 
-    const onConfirm = () => {
-        console.log("Payment Transferring...")
+    const [initiatePayout] = useInitiatePaymentMutation();
+
+    const onConfirm = async () => {
+        try {
+            let res = await initiatePayout(bidId).unwrap();
+        } catch (error) {
+
+        }
+        console.log("Payment Transferring...", bidId);
     }
+
+    console.log(bidId);
+    
 
     return (
         <div

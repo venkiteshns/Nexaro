@@ -70,6 +70,11 @@ const useSocketNotification = () => {
             dispatch(api.util.invalidateTags(["Poster_Task_Progress"]));
         })
 
+        socket.on ('payment-received', (data) => {
+            showSuccess(`Payment of ${data.amount} recieved for ${data.taskTitle}!!`);
+            dispatch(api.util.invalidateTags(['Active_Job']))
+        })
+
         return () => {
             disconnectSocket();
         };

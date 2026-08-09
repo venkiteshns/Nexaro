@@ -38,5 +38,6 @@ export const WORKER = {
 }
 export const PAYMENT = {
     CREATE_ORDER : `${import.meta.env.VITE_API_URL}/payment/orders`,
-    CAPTURE_PAYMENT : `${import.meta.env.VITE_API_URL}/payment/orders/:orderId/capture`
+    CAPTURE_PAYMENT : `${import.meta.env.VITE_API_URL}/payment/orders/:orderId/capture`,
+    PAYOUT:`${import.meta.env.VITE_API_URL}/payment/orders/:bidId/payout`
 }

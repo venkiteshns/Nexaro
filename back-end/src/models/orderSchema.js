@@ -19,7 +19,12 @@ const OrderSchema = new mongoose.Schema({
   }, 
   paypalCaptureId: { 
     type: String 
-  }, 
+  },
+  bidId:{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Bid'
+  } 
 }, { timestamps: true });
 
 export default mongoose.model('Order', OrderSchema);

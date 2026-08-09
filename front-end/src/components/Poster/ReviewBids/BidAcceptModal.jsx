@@ -57,6 +57,7 @@ export default function AcceptModal({ bid, onConfirm, onCancel }) {
                 <PaymentModal
                     amount={bid.amount}
                     onClose={() => setShowPayment(false)}
+                    bidId={bid._id}
                     onSuccess={() => {
                         onConfirm?.();
                         setShowPayment(false);
