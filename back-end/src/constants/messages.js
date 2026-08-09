@@ -64,6 +64,9 @@ const MESSAGES = {
     EMAIL_ALREADY_IN_USE: "Email already in use by another user",
     PHONE_ALREADY_IN_USE: "Phone number already in use by another user",
 
+    AMOUNT_MISMATCH:  "Amount mismatch",
+    
+
 };
 
 export default MESSAGES;

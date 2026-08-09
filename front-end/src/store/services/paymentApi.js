@@ -6,10 +6,10 @@ export const paymentApi = api.injectEndpoints({
     endpoints : (builder) => ({
 
         createOrder : builder.mutation({
-            query: ({totalAmount, items}) => ({
+            query: (body) => ({
                 url: PAYMENT.CREATE_ORDER,
                 method: "POST",
-                body: {totalAmount, items},
+                body,
             })
 
         }),
@@ -19,6 +19,13 @@ export const paymentApi = api.injectEndpoints({
                 url: PAYMENT.CAPTURE_PAYMENT.replace(':orderId', orderId),
                 method:"POST",
             })
+        }),
+
+        initiatePayment: builder.mutation({
+            query: (bidId) => ({
+                url: PAYMENT.PAYOUT.replace(':bidId',bidId),
+                method:"POST"
+            })
         })
 
     })
@@ -27,5 +34,6 @@ export const paymentApi = api.injectEndpoints({
 
 export const {
     useCreateOrderMutation,
-    useCapturePaymentMutation
+    useCapturePaymentMutation,
+    useInitiatePaymentMutation
 } = paymentApi;

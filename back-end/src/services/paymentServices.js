@@ -1,8 +1,80 @@
 import { generateAccessToken } from "../utils/paypalAccessToken.js";
 import Order from "../models/orderSchema.js"; // Import the Order model
+import Bid from '../models/bidsSchema.js'
+import User from '../models/userSchema.js'
+import Wallet from "../models/walletSchema.js";
+import MESSAGES from "../constants/messages.js";
+import { getIo } from "../socket.js";
+import Task from "../models/taskSchema.js";
 
-export async function payoutTransferService (receiverEmail, amount, currency) {
-  console.log("called payout");
+async function getPayoutStatus(payoutBatchId, accessToken) {
+  const response = await fetch(
+    `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+  return data;
+}
+
+async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts = 6, delayMs = 2000) {
+  const TERMINAL_STATUSES = [
+    'SUCCESS', 'FAILED', 'RETURNED', 'ONHOLD',
+    'BLOCKED', 'REFUNDED', 'REVERSED', 'UNCLAIMED', 'DENIED'
+  ];
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const res = await fetch(
+      `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    const item = data.items?.[0]; // single-item batch, so index 0 is safe
+    const itemStatus = item?.transaction_status;
+
+    console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
+
+    if (itemStatus && TERMINAL_STATUSES.includes(itemStatus)) {
+      return {
+        success: itemStatus === 'SUCCESS',
+        stage: 'final',
+        batchStatus: data.batch_header?.batch_status,
+        itemStatus,
+        payoutItemId: item.payout_item_id,
+        transactionId: item.transaction_id,
+        errors: item.errors || null,
+        raw: data
+      };
+    }
+
+    if (attempt < maxAttempts) {
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+
+  // Still not resolved after polling — don't block the caller forever
+  return {
+    success: null, // unknown yet
+    stage: 'still_pending',
+    message: 'Payout is still processing after polling window. Rely on webhook for final confirmation.',
+    payoutBatchId
+  };
+}
+
+async function payoutTransferService (receiverEmail, amount, currency) {
   
   try {
     let accessToken = await generateAccessToken();
@@ -37,42 +109,64 @@ export async function payoutTransferService (receiverEmail, amount, currency) {
       },
       body: JSON.stringify(payoutPayload)
     });
-         
+
+    
+    
     const data = await response.json();
     console.log("Payout Response:", data);
+
+    if (!response.ok) {
+      return {
+        success: false,
+        stage: 'create',
+        error: data
+      };
+    }
+
+    const payoutBatchId = data.batch_header.payout_batch_id;
+
+    const finalStatus = await pollPayoutStatus( payoutBatchId, accessToken )
+
+    console.log("finalStatus", finalStatus);
+    
     
   } catch (error) {
     console.log("error", error);
+    return { success: false, stage: 'exception', error: error.message };
   }
 }
 
 export const createOrderService = async (orderDetails) => {
+
+  console.log(orderDetails);
+  
     try {
-        const { items, totalAmount } = orderDetails;
-            // 1. Save the initial pending order to MongoDB
-        const dbOrder = new Order({ items, totalAmount, status: 'Pending' });
+        const { items, totalAmount, bidId } = orderDetails;
+          
+        // 1. Save the initial pending order to MongoDB
+        const dbOrder = new Order({ items, totalAmount, status: 'Pending', bidId });
         await dbOrder.save();
 
         // 2. Request order creation from PayPal
         const accessToken = await generateAccessToken();
         const response = await fetch(`${process.env.PAYPAL_API_URL}/v2/checkout/orders`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-            intent: 'CAPTURE',
-            purchase_units: [
-            {
-                amount: {
-                currency_code: 'USD',
-                value: totalAmount.toFixed(2), 
-                },
-                custom_id: dbOrder._id.toString(), 
-            },
-            ],
-        }),
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+              intent: 'CAPTURE',
+              purchase_units: [
+              {
+                  amount: {
+                  currency_code: 'USD',
+                  value: Number(totalAmount).toFixed(2), 
+                  },
+                  custom_id: dbOrder._id.toString(), 
+              },
+              ],
+          }),
         });
 
         const paypalOrder = await response.json();
@@ -90,7 +184,7 @@ export const createOrderService = async (orderDetails) => {
   }
 }
 
-export const captureOrderService = async ( orderId ) => {
+export const captureOrderService = async ( orderId, user ) => {
   try {
     const accessToken = await generateAccessToken();
     // 1. Instruct PayPal to capture the funds
@@ -117,7 +211,7 @@ export const captureOrderService = async ( orderId ) => {
 
     if (captureData.details?.[0]?.issue === "INSTRUMENT_DECLINED") {
       return {
-        success: false,
+        success: true,
         status: "InstrumentDeclined",
         reason: "INSTRUMENT_DECLINED",
         data: captureData,
@@ -167,6 +261,14 @@ export const captureOrderService = async ( orderId ) => {
       dbOrder.status = "Paid";
       dbOrder.paypalCaptureId = captureId;
       await dbOrder.save();
+      const updatedPoster = await User.findOneAndUpdate(
+        {_id: user._id},
+        {$inc : {
+          'poster.spent': Number(dbOrder.totalAmount),
+          'poster.inEscrow': Number(dbOrder.totalAmount)
+        }},
+        {returnDocument: 'after'},
+      )
       return { success: true, status: "Success", order: dbOrder };
     }
  
@@ -193,5 +295,56 @@ export const captureOrderService = async ( orderId ) => {
   } catch (error) {
     console.error('Error capturing order:', error);
     return { success: false, error: 'Failed to process capture' };
+  }
+}
+
+export const orderPayoutService = async ({bidId, user}) => {
+  console.log(bidId, user);
+  try {
+    const order = await Order.findOne({bidId}) 
+    // console.log("order",order)
+    const bid = await Bid.findById(bidId) 
+    // console.log("bid",bid)
+    const worker = await User.findOne({_id:bid.workerId}) 
+    // console.log("worker",worker)
+    const poster = await User.findOne({_id: user._id}) 
+    // console.log("poster")
+    const task = await Task.findOne({acceptedBid:bid._id})
+    console.log("task ", task);
+    
+    
+    if(order.totalAmount != bid.amount){
+      return {success: false, message: MESSAGES.AMOUNT_MISMATCH};
+    }
+    // console.log("amount okay");
+    
+    const workerWallet = await Wallet.findOneAndUpdate(
+      {userId: bid.workerId},
+      {$inc: {walletAmount: Number(bid.amount)}},
+      {
+        returnDocument: 'after', 
+        upsert: true
+      }
+    );
+
+    task.update = 'payment';
+    await task.save();
+
+    const io = getIo()
+
+     io.to(`user:${bid.workerId}`).emit("payment-received", {
+      taskTitle: task.title,
+      amount: bid.amount,
+    });
+
+
+    poster.poster.inEscrow -= bid.amount;
+    await poster.save();
+
+    return {success: true, message: "Payment has been released to Worker"}
+    
+  } catch (error) {
+    return {success: false, message: "Unexpected error occoured"}
+    console.error(error)
   }
 }

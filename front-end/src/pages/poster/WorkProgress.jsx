@@ -15,6 +15,7 @@ import {
     ChevronRight,
     ShieldCheck,
     AlertTriangle,
+    BookDashed,
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
@@ -396,6 +397,7 @@ const WorkProgress = () => {
             {/* ── Release Modal ── */}
             {showReleaseModal && (
                 <ReleaseModal
+                    bidId={bid._id}
                     amount={bid?.amount}
                     workerName={workerData?.name}
                     onCancel={() => setShowReleaseModal(false)}
