@@ -1,4 +1,4 @@
-import { workerSignupService } from "../../services/workerServices.js";
+import { workerSignupService, getWorkerProfileService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
@@ -250,3 +250,10 @@ export const getWorkerCurrentActiveJob = async (req, res) => {
     }
 };
 
+export const getWorkerProfile = async (req, res) => {
+    const response = await getWorkerProfileService(req.user)
+    if(response.error){
+        return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error || MESSAGES.UNEXPECTED_ERROR})
+    }
+    return res.status(STATUS_CODES.OK).json({success: true, message: MESSAGES.PROFILE_FETCH_SUCCESS, profileData: response.profileData})
+}

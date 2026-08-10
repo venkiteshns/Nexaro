@@ -67,7 +67,7 @@ const ReviewPage = () => {
     const { data, isLoading, isError } = useGetCompletedTaskPosterSideQuery(taskId);
     const raw = data?.data?.[0];
 
-    // ── Derived data ──────────────────────────────────────────────────────────
+    // ── Derived data ──
     const workerProps = raw?.worker
         ? {
             name: raw.worker.name,
@@ -175,9 +175,7 @@ const ReviewPage = () => {
                                     </button>
                                 </div>
                             ) : (
-                                /* ── Two-column layout: form + worker sidebar ── */
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                                    {/* Form — takes 2/3 on large */}
                                     <div className="lg:col-span-2 space-y-4">
                                         {revieweeId && (
                                             <ReviewForm
@@ -189,7 +187,6 @@ const ReviewPage = () => {
                                         )}
                                     </div>
 
-                                    {/* Sidebar — takes 1/3 on large */}
                                     <div>
                                         <WorkerReviewCard
                                             worker={workerProps}

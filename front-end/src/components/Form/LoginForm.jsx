@@ -146,7 +146,7 @@ const LoginForm = () => {
       <button
         onClick={() => signInWithGoogle()}
         disabled={isGoogleLoading}
-        className="w-full flex items-center justify-center gap-3 rounded-xl py-2.5 font-medium transition-all duration-200 hover:-translate-y-px"
+        className="w-full flex items-center justify-center gap-3 rounded-xl px-4 py-2.5 font-medium transition-all duration-200 hover:-translate-y-px whitespace-nowrap"
         style={{
           border: "1px solid rgba(10,110,92,0.15)",
           color: "#374151",

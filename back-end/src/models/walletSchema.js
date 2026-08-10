@@ -11,14 +11,17 @@ const walletSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    withDrawn: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     totalEarned: {
         type: Number,
         required: true,
         default: 0
     },
-    },
-    {timestamps: true}
-);
+},{timestamps: true});
 
 const Wallet = mongoose.model("Wallet", walletSchema);
 

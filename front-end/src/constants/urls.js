@@ -31,6 +31,7 @@ export const WORKER = {
     GET_TASK_FOR_BID: "/worker/task/:taskId",
     ADD_BID: "/worker/tasks/add_bid",
     GET_WORKER_BIDS: "/worker/my-bids",
+    GET_WORKER_PROFILE: '/worker/profile',
     GET_BID_DETAILS: "/worker/bid-details/:bidId",
     WITHDRAW_BID: "/worker/bid/withdraw/:bidId",
     GET_CURRENT_ACTIVE_JOB: "/worker/active-job",
@@ -46,4 +47,4 @@ export const PAYMENT = {
 
 export const REVIEWS = {
     CREATE_REVIEW: "/poster/review",
-};
+};

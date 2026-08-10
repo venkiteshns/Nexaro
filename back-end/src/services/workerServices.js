@@ -2,6 +2,9 @@ import User from "../models/userSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
+import MESSAGES from "../constants/messages.js";
+import user from "../models/userSchema.js";
+import mongoose from "mongoose";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -9,7 +12,7 @@ export const workerSignupService = async ({ files, data }) => {
         const user = await User.findOne({ email: data.email })
 
         if (user) {
-            throw new Error("User Already Exists")
+            throw new Error(MESSAGES.USER_NOT_EXIST_WITH_EMAIL)
         }
 
         const locationLat = parseFloat(data.locationLat);
@@ -23,7 +26,8 @@ export const workerSignupService = async ({ files, data }) => {
         let parsedSkills = [];
         let parsedLanguages = [];
         try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch { /* ignore parsing errors */ }
-        try { parsedLanguages = typeof data.languages === 'string' ? JSON.parse(data.languages) : data.languages; } catch { /* ignore parsing errors */ }
+        try { parsedLanguages = typeof data.language === 'string' ? JSON.parse(data.language) : data.language; } catch(e) { console.log("Parse error", e);
+         }
 
         const hashedPassword = await hashData(data.password);
 
@@ -64,13 +68,13 @@ export const workerSignupService = async ({ files, data }) => {
         // Only attach serviceArea when we have real coordinates
         if (hasValidServiceArea) {
             payLoad.serviceArea = {
-                area: data.serviceArea,
+                area: data.workPlace,
                 type: "Point",
                 coordinates: [serviceAreaLng, serviceAreaLat]
             };
         }
 
-        // console.log("files", files);
+        console.log("files", files);
 
         const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 
@@ -81,6 +85,9 @@ export const workerSignupService = async ({ files, data }) => {
         payLoad.verificationDocuments.selfie = uploadStatus.selfie;
         payLoad.verificationDocuments.idFront = uploadStatus.id_front;
         payLoad.verificationDocuments.idBack = uploadStatus.id_back;
+
+        console.log(payLoad);
+        
 
         const createdUser = await User.create(payLoad);
 
@@ -96,7 +103,157 @@ export const workerSignupService = async ({ files, data }) => {
 
 
     } catch {
-        // console.log(error)
-        return { error: "User with same credentials exists, Try with different mobile number" };
+        console.log(error)
+        return { error: error.message ||  MESSAGES.UNEXPECTED_ERROR };
+    }
+}
+
+export const getWorkerProfileService = async (user) => {
+    
+    // 1 Check the user object
+    if(!user){
+        return {error: MESSAGES.USER_NOT_FOUND}
+    }
+
+    try {
+
+        // 2 Check if user exists in database
+
+        const isUserExist = await User.findById(user._id)
+        if(!isUserExist) {
+           return {error: MESSAGES.USER_NOT_FOUND}
+        }  
+
+        // 3 Prepare response 
+        const userData = await User.aggregate([
+            {
+                $match: {_id: new mongoose.Types.ObjectId(user._id)}
+            },
+            {
+                $lookup: {
+                    from: 'tasks',
+                    localField: "_id",
+                    foreignField: "workerId",
+                    as: "jobs"
+                }
+            },
+            {
+                $addFields: {
+                    jobsCompleted: {$size:{ $ifNull : [ "$jobs", [] ]}}
+                }
+            },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    let: {userId: '$_id'},
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {$eq: ["$reviewee", "$$userId"]}
+                            }
+                        },
+                       {
+                            $facet: {
+                                totalCount: [
+                                    {
+                                        $count: 'count'
+                                    }
+                                ],
+                                latestReviews: [
+                                    {
+                                        $lookup: {
+                                            from: 'users',
+                                            localField: 'reviewer',
+                                            foreignField: '_id',
+                                            as: "reviewerData"
+                                        }
+                                    },
+                                    {
+                                        $unwind:{
+                                            path: "$reviewerData"
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            review:1,
+                                            rating: 1,
+                                            "reviewerData.name" :1,
+                                            "reviewerData.avatar": "$reviewerData.verificationDocuments.selfie.url"
+                                        }
+                                    },
+                                    {
+                                        $sort: {createdAt: -1}
+                                    },
+                                    {
+                                        $limit: 2
+                                    }
+                                ],
+                                topRating: [
+                                    {
+                                        $sort: {rating: -1}
+                                    },
+                                    {
+                                        $limit: 1
+                                    }
+                                ]
+                            }
+                       }
+                    ],
+                    as: 'reviews'
+                }
+            }, 
+            {
+                $lookup: {
+                    from: "wallet",
+                    localField: '_id',
+                    foreignField: 'userId',
+                    as: 'wallet'
+                }
+            },
+            {
+                $project: {
+                    _id:1,
+                    name: 1,
+                    avatar: '$verificationDocuments.selfie.url' ||  process.env.DEFAULT_AVATAR_URL,
+                    worker:1,
+                    jobsCompleted:1,
+                    "reviewDetails.reviews": {
+                        $arrayElemAt: ["$reviews.latestReviews", 0]
+                    },
+                    "reviewDetails.Totalcount": {
+                        $ifNull: [
+                            {
+                                $first: { $arrayElemAt: ["$reviews.totalCount.count", 0] }
+                            }, 0
+                        ]
+                       
+                    },
+                    "reviewDetails.topRating": {
+                        $ifNull: [
+                            {
+                                $first: {$arrayElemAt: ["$reviews.topRating.rating", 0]}
+                            }, 0
+                        ]
+                    },
+                    wallet:1,
+                    bio:1,
+                    languages:1,
+                    skills:1,
+                    "address": {
+                        $concat: ["$city",", ", "$district"]
+                    },
+                    isVerified: 1,
+                    phone:1,
+                    email:1,
+                }
+            }
+        ]);
+        console.log(userData[0]);
+
+        return {success: true, profileData: userData[0]}
+        
+    } catch (error) {
+        console.log("Worker profile service error ",error);
+        return {error: error.message || MESSAGES.UNEXPECTED_ERROR}
     }
 }

@@ -6,6 +6,7 @@ import Wallet from "../models/walletSchema.js";
 import MESSAGES from "../constants/messages.js";
 import { getIo } from "../socket.js";
 import Task from "../models/taskSchema.js";
+import mongoose from "mongoose";
 
 async function getPayoutStatus(payoutBatchId, accessToken) {
   const response = await fetch(
@@ -319,8 +320,13 @@ export const orderPayoutService = async ({bidId, user}) => {
     // console.log("amount okay");
     
     const workerWallet = await Wallet.findOneAndUpdate(
-      {userId: bid.workerId},
-      {$inc: {walletAmount: Number(bid.amount)}},
+      {userId: new mongoose.Types.ObjectId(bid.workerId) },
+      {
+        $inc: {
+          walletAmount: Number(bid.amount),
+          totalEarned: Number(bid.amount)
+        },
+      },
       {
         returnDocument: 'after', 
         upsert: true
@@ -344,7 +350,7 @@ export const orderPayoutService = async ({bidId, user}) => {
     return {success: true, message: "Payment has been released to Worker"}
     
   } catch (error) {
-    return {success: false, message: "Unexpected error occoured"}
     console.error(error)
+    return {success: false, message: "Unexpected error occoured"}
   }
 }

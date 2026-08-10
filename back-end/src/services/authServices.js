@@ -400,7 +400,7 @@ export const deleteUserProfileService = async (user) => {
       return { success: false, message: messages.USER_NOT_FOUND };
     }
 
-    // await User.findByIdAndDelete(new mongoose.Types.ObjectId(user._id));
+    await User.findByIdAndDelete(new mongoose.Types.ObjectId(user._id));
     return { success: true, message: messages.PROFILE_DELETED };
     
   } catch (error) {
