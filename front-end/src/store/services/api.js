@@ -110,6 +110,7 @@ export const api = createApi({
     "Worker_Bids",
     "Active_Job",
     "Poster_Profile",
+    "Worker_Profile"
   ],
   endpoints: () => ({}),
 });

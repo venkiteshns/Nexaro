@@ -8,14 +8,13 @@ const MIN_CHARS = 10;
 const MAX_CHARS = 1000;
 
 /**
- * ReviewForm — react-hook-form powered review form.
- *
  * Props:
  *   taskId      {string}
  *   revieweeId  {string}  worker's user ID
  *   workerName  {string}
  *   onSuccess   {function} called with taskId after successful submission
  */
+
 const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
     const [submitReview, { isLoading }] = useSubmitReviewMutation();
 

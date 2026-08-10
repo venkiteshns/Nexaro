@@ -8,7 +8,7 @@ const WorkerHeader = () => {
   const [isLive, setIsLive] = useState(true);
 
   return (
-    <div className="shrink-0 h-14 z-10 bg-white border-b border-gray-200 px-6 flex items-center justify-end gap-4 shadow-sm">
+    <div className="shrink-0 h-14 z-10 bg-white border-b border-gray-200 pl-14 pr-6 md:px-6 flex items-center justify-end gap-4 shadow-sm">
 
       <button
         onClick={() => setIsLive(!isLive)}

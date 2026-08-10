@@ -2,6 +2,7 @@
 const MESSAGES = {
 
     INTERNAL_SERVER_ERROR: "Internal server error",
+    UNEXPECTED_ERROR: 'Unexpected Error Occoured Please Try again later!',
     INVALID_PAGE_OR_LIMIT: "Invalid page or limit value",
     FAILED_TO_FETCH_USERS: "Failed to fetch users",
     USER_ID_REQUIRED: "User ID is required",
@@ -55,6 +56,7 @@ const MESSAGES = {
     GOOGLE_TOKEN_REQUIRED: "Google token is required",
 
     USER_PROFILE_UPDATED: "User profile updated successfully",
+    PROFILE_FETCH_SUCCESS: "User profile fetched successfully",
     PASSWORD_UPDATED: "Password updated successfully",
     PASSWORD_UPDATE_FAILED: "Failed to update password",
     PROFILE_DELETED: "Profile deleted successfully",

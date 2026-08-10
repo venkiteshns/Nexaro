@@ -16,7 +16,7 @@ import PersonalInfo from "../../components/Poster/Profile/PersonalInfo";
 import RecentTasks from "../../components/Poster/Profile/RecentTasks";
 import ReviewsSection from "../../components/Poster/Profile/ReviewsSection";
 import DangerZone from "../../components/Poster/Profile/DangerZone";
-import DeleteProfileModal from "../../components/Poster/Profile/DeleteProfileModal";
+import DeleteProfileModal from "../../components/sharedComponents/DeleteProfileModal";
 import EditProfileModal from "./EditProfileModal";
 
 const PosterProfile = () => {

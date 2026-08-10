@@ -3,6 +3,7 @@ import { api } from "./api";
 
 export const workerApi = api.injectEndpoints({
   endpoints: (builder) => ({
+
     getWorkerNearbyTasks: builder.query({
       query: ({ search = "", category = "", page = 1, limit = 9 } = {}) => {
         let params = new URLSearchParams();
@@ -85,6 +86,14 @@ export const workerApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Active_Job"],
     }),
+
+    getWorkerProfile : builder.query({
+      query: () => ({
+        url: WORKER.GET_WORKER_PROFILE,
+        method: "GET"
+      }),
+      providesTags:['Worker_Profile'] 
+    })
   }),
 });
 
@@ -98,5 +107,6 @@ export const {
   useGetWorkerActiveJobQuery,
   useGetWorkerCurrentActiveJobQuery,
   useUpdateJobProgressMutation,
+  useGetWorkerProfileQuery
 } = workerApi;
 

@@ -26,6 +26,8 @@ router.post(
   upload.array("photos", 5),
   createTask,
 );
+router.post("/review", verifyToken, createReview);
+
 
 router.get("/tasks", verifyToken, getMyTasks);
 router.get("/task/bids/:taskId", verifyToken, getPosterBids);
@@ -50,7 +52,6 @@ router.patch(
   updateUserProfile,
 );
 
-router.post("/review", verifyToken, createReview);
 
 export default router;
 
