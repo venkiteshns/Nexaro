@@ -20,7 +20,7 @@ const WorkerProfile = () => {
     const {isLoading, isError, isSuccess, data} = useGetWorkerProfileQuery();
     
     const raw = data?.profileData;
-    console.log(raw);
+    // console.log(raw);
     
     const workerData = {
         name: raw?.name,

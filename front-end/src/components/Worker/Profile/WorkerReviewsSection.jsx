@@ -79,7 +79,7 @@ const WorkerReviewsSection = ({ reviews, totalCount, onViewAll }) => {
                     </p>
 
                     <p className="mt-1 max-w-xs text-xs sm:text-sm text-gray-500 leading-relaxed">
-                        You hasn't received any reviews yet.
+                        You haven't received any reviews yet.
                     </p>
                 </div>
             }
