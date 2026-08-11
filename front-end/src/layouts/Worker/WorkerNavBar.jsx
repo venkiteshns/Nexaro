@@ -18,16 +18,142 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
 
+const workerNav = [
+  {
+    label: "Dashboard",
+    icon: <LayoutDashboard size={20} />,
+    redirect: "/worker/dashboard",
+  },
+  {
+    label: "Nearby Tasks",
+    icon: <ListChecks size={20} />,
+    redirect: "/worker/nearby-tasks",
+  },
+  {
+    label: "My Bids",
+    icon: <Briefcase size={20} />,
+    redirect: "/worker/my-bids",
+  },
+  {
+    label: "Active Job",
+    icon: <Wrench size={20} />,
+    redirect: "/worker/active-job",
+  },
+  {
+    label: "Earnings",
+    icon: <Wallet size={20} />,
+    redirect: "/worker/earnings",
+  },
+  {
+    label: "Notifications",
+    icon: <Bell size={20} />,
+    redirect: "/worker/notifications",
+  },
+  {
+    label: "Profile",
+    icon: <User size={20} />,
+    redirect: "/worker/profile",
+  },
+];
+
+const routeGroups = {
+  "/worker/my-bids": ["/worker/my-bids", "/worker/task-bid-details"],
+  "/worker/nearby-tasks": ["/worker/nearby-tasks", "/worker/place-bid"],
+  "/worker/active-job": ["/worker/active-job"],
+};
+
+const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user }) => {
+  const location = useLocation();
+
+  const isActive = (redirect) => {
+    const group = routeGroups[redirect];
+    return (
+      location.pathname === redirect ||
+      (group ? group.some((prefix) => location.pathname.startsWith(prefix)) : false)
+    );
+  };
+
+  return (
+    <div className="h-full flex flex-col justify-between">
+      <div>
+        <div className="h-20 flex items-center justify-between px-4 border-b border-gray-100">
+          <div className="flex items-center gap-2 overflow-hidden">
+            {isExpanded ? (
+              <div>
+                <Logo />
+                <p className="text-xs text-gray-400 mt-0.5 pl-1">
+                  MARKETPLACE WORKER
+                </p>
+              </div>
+            ) : (
+              <img src={logo} alt="Nexaro" className="w-9 h-9 object-contain" />
+            )}
+          </div>
+          <button
+            onClick={onToggle}
+            className="text-gray-500 hover:text-[#0A6E5C] transition-colors shrink-0"
+          >
+            {isExpanded ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+
+        {isExpanded && (
+          <div className="px-4 py-4 flex items-center gap-3 border-b border-gray-100">
+            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
+              {user?.name ? user.name.charAt(0).toUpperCase() : "W"}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-[#111827] text-sm font-semibold truncate">
+                {user?.name || "Worker"}
+              </p>
+              <p className="text-xs text-[#0A6E5C] font-medium">
+                Elite Contractor
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="p-3 space-y-1 mt-1">
+          {workerNav.map((item, index) => (
+            <button
+              key={index}
+              onClick={() => onNavClick(item.redirect)}
+              title={!isExpanded ? item.label : undefined}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium ${
+                isActive(item.redirect)
+                  ? "bg-[#0A6E5C] text-white"
+                  : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
+              } ${!isExpanded ? "justify-center" : ""}`}
+            >
+              {item.icon}
+              {isExpanded && <span>{item.label}</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-3 border-t border-gray-100">
+        <button
+          onClick={onLogout}
+          title={!isExpanded ? "Logout" : undefined}
+          className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all text-sm font-medium ${
+            !isExpanded ? "justify-center" : ""
+          }`}
+        >
+          <LogOut size={20} />
+          {isExpanded && <span>Logout</span>}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const WorkerNavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
   const user = useSelector((state) => state.auth.user);
 
-  // Desktop sidebar collapsed/expanded state
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Mobile drawer open/closed state
+  const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const [userLogout] = useUserLogoutMutation();
@@ -43,79 +169,21 @@ const WorkerNavBar = () => {
     }
   };
 
-  const workerNav = [
-    {
-      label: "Dashboard",
-      icon: <LayoutDashboard size={20} />,
-      redirect: "/worker/dashboard",
-    },
-    {
-      label: "Nearby Tasks",
-      icon: <ListChecks size={20} />,
-      redirect: "/worker/nearby-tasks",
-    },
-    {
-      label: "My Bids",
-      icon: <Briefcase size={20} />,
-      redirect: "/worker/my-bids",
-    },
-    {
-      label: "Active Job",
-      icon: <Wrench size={20} />,
-      redirect: "/worker/active-job",
-    },
-    {
-      label: "Earnings",
-      icon: <Wallet size={20} />,
-      redirect: "/worker/earnings",
-    },
-    {
-      label: "Notifications",
-      icon: <Bell size={20} />,
-      redirect: "/worker/notifications",
-    },
-    {
-      label: "Profile",
-      icon: <User size={20} />,
-      redirect: "/worker/profile",
-    },
-  ];
-
-  const routeGroups = {
-    "/worker/my-bids": ["/worker/my-bids", "/worker/task-bid-details"],
-    "/worker/nearby-tasks": ["/worker/nearby-tasks", "/worker/place-bid"],
-    "/worker/active-job": ["/worker/active-job"],
-  };
-
-  const isActive = (redirect) => {
-    const group = routeGroups[redirect];
-    return (
-      location.pathname === redirect ||
-      (group ? group.some((prefix) => location.pathname.startsWith(prefix)) : false)
-    );
-  };
-
-  const handleNavClick = (redirect) => {
+  const handleNav = (redirect) => {
     navigate(redirect);
     setMobileOpen(false);
   };
 
   return (
     <>
-      {/* ─────────────────────────────────────────────────────
-          MOBILE — hamburger button (fixed, always visible < md)
-      ───────────────────────────────────────────────────── */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-3.5 left-4 z-50 p-2 text-gray-600 hover:text-[#0A6E5C] transition-colors"
+        className="md:hidden fixed top-3 left-4 z-50 w-10 h-10 rounded-full flex items-center justify-center text-gray-600 hover:text-[#0A6E5C] transition-colors"
         aria-label="Open navigation"
       >
         <Menu size={20} />
       </button>
 
-      {/* ─────────────────────────────────────────────────────
-          MOBILE — backdrop
-      ───────────────────────────────────────────────────── */}
       {mobileOpen && (
         <div
           className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
@@ -123,148 +191,32 @@ const WorkerNavBar = () => {
         />
       )}
 
-      {/* ─────────────────────────────────────────────────────
-          MOBILE — slide-down drawer
-      ───────────────────────────────────────────────────── */}
       <div
-        className={`md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-xl
-          transition-transform duration-300 ease-in-out
-          ${mobileOpen ? "translate-y-0" : "-translate-y-full"}`}
+        className={`md:hidden fixed top-0 left-0 h-full z-50 w-[220px] bg-white border-r border-gray-200 shadow-2xl transition-transform duration-300 ease-in-out ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        {/* Drawer header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Nexaro" className="w-8 h-8 object-contain" />
-            <div>
-              <Logo />
-              <p className="text-[10px] text-gray-400 pl-0.5">MARKETPLACE WORKER</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setMobileOpen(false)}
-            className="p-2 rounded-xl text-gray-500 hover:text-[#0A6E5C] hover:bg-emerald-50 transition-colors"
-            aria-label="Close navigation"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* User info strip */}
-        <div className="px-5 py-3 flex items-center gap-3 border-b border-gray-100 bg-gray-50/60">
-          <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
-            {user?.name ? user.name.charAt(0).toUpperCase() : "W"}
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-900">{user?.name || "Worker"}</p>
-            <p className="text-xs text-[#0A6E5C] font-medium">Elite Contractor</p>
-          </div>
-        </div>
-
-        {/* Nav items */}
-        <div className="px-4 py-3 grid grid-cols-2 gap-2">
-          {workerNav.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => handleNavClick(item.redirect)}
-              className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                ${isActive(item.redirect)
-                  ? "bg-[#0A6E5C] text-white"
-                  : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
-                }`}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Logout */}
-        <div className="px-4 pb-4">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all"
-          >
-            <LogOut size={20} />
-            <span>Logout</span>
-          </button>
-        </div>
+        <NavContent
+          user={user}
+          isExpanded={true}
+          onToggle={() => setMobileOpen(false)}
+          onNavClick={handleNav}
+          onLogout={handleLogout}
+        />
       </div>
 
-      {/* ─────────────────────────────────────────────────────
-          DESKTOP — original collapsible sidebar (md+)
-      ───────────────────────────────────────────────────── */}
       <div
-        className={`hidden md:flex h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex-col justify-between shrink-0 ${sidebarOpen ? "w-[220px]" : "w-[72px]"
-          }`}
+        className={`hidden md:flex h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex-col justify-between shrink-0 ${
+          desktopOpen ? "w-[220px]" : "w-[72px]"
+        }`}
       >
-        <div>
-          <div className="h-20 flex items-center justify-between px-4 border-b border-gray-100">
-            <div className="flex items-center gap-2 overflow-hidden">
-              {sidebarOpen ? (
-                <div>
-                  <Logo />
-                  <p className="text-xs text-gray-400 mt-0.5 pl-1">
-                    MARKETPLACE WORKER
-                  </p>
-                </div>
-              ) : (
-                <img src={logo} alt="Nexaro" className="w-9 h-9 object-contain" />
-              )}
-            </div>
-
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-gray-500 hover:text-[#0A6E5C] transition-colors shrink-0"
-            >
-              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-
-          {sidebarOpen && (
-            <div className="px-4 py-4 flex items-center gap-3 border-b border-gray-100">
-              <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "W"}
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-[#111827] text-sm font-semibold truncate">
-                  {user?.name || "Worker"}
-                </p>
-                <p className="text-xs text-[#0A6E5C] font-medium">
-                  Elite Contractor
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="p-3 space-y-1 mt-1">
-            {workerNav.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => navigate(item.redirect)}
-                title={!sidebarOpen ? item.label : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium ${isActive(item.redirect)
-                  ? "bg-[#0A6E5C] text-white"
-                  : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
-                  } ${!sidebarOpen ? "justify-center" : ""}`}
-              >
-                {item.icon}
-                {sidebarOpen && <span>{item.label}</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="p-3 border-t border-gray-100">
-          <button
-            onClick={handleLogout}
-            title={!sidebarOpen ? "Logout" : undefined}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all text-sm font-medium ${!sidebarOpen ? "justify-center" : ""
-              }`}
-          >
-            <LogOut size={20} />
-            {sidebarOpen && <span>Logout</span>}
-          </button>
-        </div>
+        <NavContent
+          user={user}
+          isExpanded={desktopOpen}
+          onToggle={() => setDesktopOpen(!desktopOpen)}
+          onNavClick={handleNav}
+          onLogout={handleLogout}
+        />
       </div>
     </>
   );

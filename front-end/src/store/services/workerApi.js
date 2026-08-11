@@ -21,7 +21,7 @@ export const workerApi = api.injectEndpoints({
 
     getTaskForBid: builder.query({
       query: (taskId) => ({
-        url:WORKER.GET_TASK_FOR_BID.replace(":taskId",taskId),
+        url: WORKER.GET_TASK_FOR_BID.replace(":taskId", taskId),
         method: "GET",
       }),
     }),
@@ -48,7 +48,7 @@ export const workerApi = api.injectEndpoints({
 
     getWorkerBidDetails: builder.query({
       query: (bidId) => ({
-        url: WORKER.GET_BID_DETAILS.replace(":bidId",bidId),
+        url: WORKER.GET_BID_DETAILS.replace(":bidId", bidId),
         method: "GET",
       }),
       providesTags: ["Worker_Bid_Details"],
@@ -56,7 +56,7 @@ export const workerApi = api.injectEndpoints({
 
     withdrawBid: builder.mutation({
       query: (bidId) => ({
-        url: WORKER.WITHDRAW_BID.replace(':bidId',bidId),
+        url: WORKER.WITHDRAW_BID.replace(':bidId', bidId),
         method: "DELETE",
       }),
       invalidatesTags: ["Worker_Bids", "Worker_Bid_Details"],
@@ -87,12 +87,33 @@ export const workerApi = api.injectEndpoints({
       invalidatesTags: ["Active_Job"],
     }),
 
-    getWorkerProfile : builder.query({
+    getWorkerProfile: builder.query({
       query: () => ({
         url: WORKER.GET_WORKER_PROFILE,
         method: "GET"
       }),
-      providesTags:['Worker_Profile'] 
+      providesTags: ['Worker_Profile']
+    }),
+
+    updateWorkerProfile: builder.mutation({
+      query: (data) => {
+        const profileData = new FormData();
+        profileData.append('email', data.email)
+        profileData.append('bio', data.bio)
+        profileData.append('phone', data.phone)
+        profileData.append('skills', JSON.stringify(data.skills))
+        profileData.append('languages', JSON.stringify(data.languages))
+        if (data.avatar) {
+          console.log(data.avatar);
+          profileData.append('avatar', data?.avatar)
+        }
+        return {
+          url: WORKER.UPDATE_PROFILE,
+          method: "PATCH",
+          body: profileData,
+        }
+      }, 
+      invalidatesTags:["Worker_Profile"]
     })
   }),
 });
@@ -107,6 +128,7 @@ export const {
   useGetWorkerActiveJobQuery,
   useGetWorkerCurrentActiveJobQuery,
   useUpdateJobProgressMutation,
-  useGetWorkerProfileQuery
+  useGetWorkerProfileQuery,
+  useUpdateWorkerProfileMutation
 } = workerApi;
 

@@ -37,6 +37,7 @@ export const WORKER = {
     GET_CURRENT_ACTIVE_JOB: "/worker/active-job",
     GET_ACTIVE_JOB: "/worker/task/:taskId/active-job",
     UPDATE_JOB_PROGRESS: "/worker/task/:taskId/progress",
+    UPDATE_PROFILE: "/worker/profile/update"
 }
 
 export const PAYMENT = {

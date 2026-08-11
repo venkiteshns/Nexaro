@@ -1,4 +1,4 @@
-import { ShieldCheck, Phone, MapPin, CheckCircle, TriangleAlert } from 'lucide-react';
+import { ShieldCheck, Phone, MapPin, CheckCircle, TriangleAlert, Clock } from 'lucide-react';
 
 const CredentialRow = ({ icon, label, detail, verified }) => (
     <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
@@ -28,10 +28,12 @@ const WorkerCredentialsCard = ({ credentials }) => {
     return (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
             <div className="flex items-center gap-2 mb-1">
-                <div className= {`w-7 h-7 md:w-8 md:h-8 rounded-xl ${ isVerified ? "bg-emerald-50" : "bg-red-50" } flex items-center justify-center`}>
-                    { isVerified ? <ShieldCheck size={13} className="text-[#0A6E5C] md:w-4 md:h-4" /> : <TriangleAlert size={13} className='text-red-500 md:w-4 md:h-4' />}
+                <div className={`w-7 h-7 md:w-8 md:h-8 rounded-xl ${isVerified ? "bg-emerald-50" : "bg-amber-100"} flex items-center justify-center`}>
+                    {isVerified ? <ShieldCheck size={13} className="text-[#0A6E5C] md:w-4 md:h-4" /> : <TriangleAlert size={13} className='text-amber-700 md:w-4 md:h-4' />}
                 </div>
-                <h2 className="font-extrabold text-gray-900 text-sm md:text-base">{isVerified ? "Verified Credentials" : <> Credentials <span className='text-red-500 text-xs md:text-sm italic ' > ( Not Verified ) </span> </>}</h2>
+                <h2 className="font-extrabold text-gray-900 text-sm md:text-base">{isVerified ? "Verified Credentials" : <> Credentials <span className="ms-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-amber-100/80 text-amber-700 border border-amber-200 shadow-sm">
+                    Verification Pending
+                </span> </>}</h2>
             </div>
 
             <div className="mt-2">
@@ -49,7 +51,7 @@ const WorkerCredentialsCard = ({ credentials }) => {
                 />
                 <CredentialRow
                     icon={<MapPin size={12} className="text-[#0A6E5C] md:w-[15px] md:h-[15px]" />}
-                    label= "Location"
+                    label="Location"
                     detail={address}
                     isVerified
                 />

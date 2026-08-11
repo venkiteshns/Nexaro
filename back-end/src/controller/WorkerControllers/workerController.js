@@ -1,4 +1,4 @@
-import { workerSignupService, getWorkerProfileService } from "../../services/workerServices.js";
+import { workerSignupService, getWorkerProfileService, updateWorkerProfileService } from "../../services/workerServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
@@ -256,4 +256,18 @@ export const getWorkerProfile = async (req, res) => {
         return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error || MESSAGES.UNEXPECTED_ERROR})
     }
     return res.status(STATUS_CODES.OK).json({success: true, message: MESSAGES.PROFILE_FETCH_SUCCESS, profileData: response.profileData})
+}
+
+export const updateWorkerProfile = async (req, res) => {
+    let response = await updateWorkerProfileService({user:req.user, data: req.body, avatar: req.files})
+    console.log(response);
+    if(response.unauthorized){
+        return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.unauthorized})
+    }
+    if(response.error){
+        return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error})
+    }
+
+    return res.status(STATUS_CODES.OK).json({success: true, message: response.message})
+    
 }

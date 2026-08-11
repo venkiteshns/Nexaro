@@ -257,3 +257,67 @@ export const getWorkerProfileService = async (user) => {
         return {error: error.message || MESSAGES.UNEXPECTED_ERROR}
     }
 }
+
+export const updateWorkerProfileService = async ({user, data, avatar}) => {
+   console.log(user);
+   
+    // 1 Check Form Values
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!user){
+        return {unauthorized: MESSAGES.UNAUTHORIZED_USER}
+    }
+    if(!data.email){
+        return {error:MESSAGES.EMAIL_REQUIRED}
+    }
+    if(!emailRegex.test(data.email)){
+        return {error: MESSAGES.INVALID_EMAIL}
+    }
+    if(!data.phone){
+        return {error:MESSAGES.PHONE_REQUIRED}
+    }
+    if(!data.bio){
+        return {error : "Bio is required"}
+    }
+    if(!data.skills){
+       return {error: "Please enter atleast one skill"}
+    }
+    if(!data.languages){
+       return {error: "Please enter atleast one language"}
+    }
+    try {
+        const parsedLanguages = JSON.parse(data.languages)
+        const parsedSkills = JSON.parse(data.skills)
+        let isEmailExist = await User.findOne({_id :{$ne: new mongoose.Types.ObjectId(user._id)}, email:data.email});
+        if(isEmailExist){
+            return {error: MESSAGES.EMAIL_ALREADY_IN_USE};
+        }
+        let isPhoneExist = await User.findOne({_id :{$ne: new mongoose.Types.ObjectId(user._id)}, phone:data.phone});
+        if(isPhoneExist){
+            return {error: MESSAGES.PHONE_ALREADY_IN_USE};
+        }
+        let userData = await User.findOne({_id: new mongoose.Types.ObjectId(user._id), activeRole:"worker"})      
+        if(!userData){
+            return {error: MESSAGES.USER_NOT_FOUND}
+        }  
+        if(avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
+            // upload avatar
+            let uploadStatus = await uploadManyFiles(avatar, `user/${data.email}/verification`);
+            if(uploadStatus.error) {
+                return {error: "Unable to upload profile picture, Please try again."}
+            }
+            userData.verificationDocuments.selfie = uploadStatus.avatar;
+        }
+        userData.email = data.email;
+        userData.phone = data.phone;
+        userData.bio = data.bio;
+        userData.skills = parsedSkills;
+        userData.languages = parsedLanguages;
+
+        await userData.save()
+
+        return {success: true, message: MESSAGES.USER_PROFILE_UPDATED}
+    } catch (error) {
+        console.error("Worker profile update service error ", error);
+        return {error: "Unexpected error occoured"}
+    }
+}
