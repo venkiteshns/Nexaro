@@ -24,6 +24,8 @@ export const POSTER = {
     COMPLETED_TASK: "/poster/task/completed/:taskId",
     PROFILE: "/poster/profile",
     UPDATE_PROFILE: "/poster/profile/update",
+    ROLE_SWITCH: "/poster/switch/role",
+    ROLE_SWITCH_ACTIVE_WORKER: '/poster/switch/to_worker'
 }
 
 export const WORKER = {

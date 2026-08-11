@@ -75,43 +75,43 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const createOtp = async (email, phone, resendFlag) => {
   console.log(email, phone, resendFlag);
-  
-    if(!resendFlag) {
-      const userData = await User.findOne({ $or: [{ email }, { phone }] });
-      if (userData) {
-        
-        return {
-          success: false,
-          message: messages.USER_NOT_EXIST_WITH_EMAIL_MOBILE,
-        };
-      }
-    }
-    const otp = crypto.randomInt(100000, 999999).toString();
-    console.log("OTP", otp);
 
-    const existingOtp = await Otp.findOne({ email });
-    if (existingOtp) {
-      await Otp.deleteOne({ email });
-    }
+  if (!resendFlag) {
+    const userData = await User.findOne({ $or: [{ email }, { phone }] });
+    if (userData) {
 
-    const hashedOtp = await hashData(otp);
-    // console.log(email);
-    const otpRecord = await Otp.create({
-      email,
-      otp: hashedOtp,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-    });
-    const otpSend = await sendOtp(email, otp);
-    if (!otpSend) {
-      await Otp.deleteOne({ email });
-      return { success: false, response: messages.FAILED_TO_SEND_OTP };
+      return {
+        success: false,
+        message: messages.USER_NOT_EXIST_WITH_EMAIL_MOBILE,
+      };
     }
-    return {
-      success: true,
-      message: messages.OTP_SENT,
-      response: otpRecord,
-    };
+  }
+  const otp = crypto.randomInt(100000, 999999).toString();
+  console.log("OTP", otp);
+
+  const existingOtp = await Otp.findOne({ email });
+  if (existingOtp) {
+    await Otp.deleteOne({ email });
+  }
+
+  const hashedOtp = await hashData(otp);
+  // console.log(email);
+  const otpRecord = await Otp.create({
+    email,
+    otp: hashedOtp,
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+  });
+  const otpSend = await sendOtp(email, otp);
+  if (!otpSend) {
+    await Otp.deleteOne({ email });
+    return { success: false, response: messages.FAILED_TO_SEND_OTP };
+  }
+  return {
+    success: true,
+    message: messages.OTP_SENT,
+    response: otpRecord,
+  };
 };
 
 export const sendOtp = async (email, otp) => {
@@ -176,74 +176,74 @@ export const sendOtp = async (email, otp) => {
 
 export const verifyOtp = async (email, otp) => {
   // console.log(email, otp);
-    const otpRecord = await Otp.findOne({
-      email,
-      expiresAt: { $gt: new Date() },
-    });
-    if (!otpRecord) {
-      return { success: false, message: messages.INVALID_OTP };
-    }
-    const isOtpValid = await compareHash(otp, otpRecord.otp);
-    if (!isOtpValid) {
-      return { success: false, message: messages.INVALID_OTP };
-    }
-    await Otp.deleteOne({ email });
-    return { success: true, message: messages.OTP_VERIFIED };
-  
+  const otpRecord = await Otp.findOne({
+    email,
+    expiresAt: { $gt: new Date() },
+  });
+  if (!otpRecord) {
+    return { success: false, message: messages.INVALID_OTP };
+  }
+  const isOtpValid = await compareHash(otp, otpRecord.otp);
+  if (!isOtpValid) {
+    return { success: false, message: messages.INVALID_OTP };
+  }
+  await Otp.deleteOne({ email });
+  return { success: true, message: messages.OTP_VERIFIED };
+
 };
 
 export const loginService = async (userData, isAdmin) => {
   const { email, password } = userData;
-    // 1. Find user by email
-    if (isAdmin) {
-      const existingUser = await User.findOne({ email, activeRole: "admin" });
-      if (!existingUser) {
-        return { success: false, message: messages.INVALID_ADMIN_CREDENTIALS };
-      }
-    }
-    const existingUser = await User.findOne({ email });
-
+  // 1. Find user by email
+  if (isAdmin) {
+    const existingUser = await User.findOne({ email, activeRole: "admin" });
     if (!existingUser) {
-      return { success: false, message: messages.USER_NOT_FOUND };
+      return { success: false, message: messages.INVALID_ADMIN_CREDENTIALS };
     }
+  }
+  const existingUser = await User.findOne({ email });
 
-    if (existingUser.isSuspended) {
-      return { success: false, message: "Access Restricted : Your account is suspended by admin" };
-    }
+  if (!existingUser) {
+    return { success: false, message: messages.USER_NOT_FOUND };
+  }
 
-    // 2. Check if the password matches
-    const isPasswordValid = await compareHash(password, existingUser.password);
-    if (!isPasswordValid) {
-      return { success: false, message: messages.INVALID_PASSWORD };
-    }
+  if (existingUser.isSuspended) {
+    return { success: false, message: "Access Restricted : Your account is suspended by admin" };
+  }
 
-    // 3. Generate tokens
-    const accessToken = generateAccessToken(existingUser);
-    const refreshToken = generateRefreshToken(existingUser);
+  // 2. Check if the password matches
+  const isPasswordValid = await compareHash(password, existingUser.password);
+  if (!isPasswordValid) {
+    return { success: false, message: messages.INVALID_PASSWORD };
+  }
 
-    // 4. refresh token to database
-    existingUser.refreshToken = refreshToken;
-    await existingUser.save({ validateBeforeSave: false });
-    const selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
-    // console.log("selfie ", selfie);
+  // 3. Generate tokens
+  const accessToken = generateAccessToken(existingUser);
+  const refreshToken = generateRefreshToken(existingUser);
 
-    // 5. response user
-    const { _id, name, email: userEmail, activeRole } = existingUser;
-    const responseUser = {
-      id: _id,
-      name,
-      email: userEmail,
-      role: activeRole,
-      selfie,
-    };
+  // 4. refresh token to database
+  existingUser.refreshToken = refreshToken;
+  await existingUser.save({ validateBeforeSave: false });
+  const selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
+  // console.log("selfie ", selfie);
 
-    return {
-      success: true,
-      message: "Login successful",
-      responseUser,
-      accessToken,
-      refreshToken,
-    };
+  // 5. response user
+  const { _id, name, email: userEmail, activeRole } = existingUser;
+  const responseUser = {
+    id: _id,
+    name,
+    email: userEmail,
+    role: activeRole,
+    selfie,
+  };
+
+  return {
+    success: true,
+    message: "Login successful",
+    responseUser,
+    accessToken,
+    refreshToken,
+  };
 };
 
 export const sendForgotPasswordEmail = (email, otp) => {
@@ -309,75 +309,75 @@ export const sendForgotPasswordEmail = (email, otp) => {
 export const forgotPasswordOtpService = async (email, role) => {
   // console.log("role", role);
 
-    if (role === "admin") {
-      const userData = await User.findOne({ email, activeRole: role });
-      if (!userData) {
-        return {
-          success: false,
-          message: messages.INVALID_ADMIN_CREDENTIALS,
-        };
-      }
-    } else {
-      const userData = await User.findOne({
-        email,
-        activeRole: { $in: ["worker", "poster"] },
-      });
-      if (!userData) {
-        return {
-          success: false,
-          message: messages.USER_NOT_EXIST_WITH_EMAIL,
-        };
-      }
+  if (role === "admin") {
+    const userData = await User.findOne({ email, activeRole: role });
+    if (!userData) {
+      return {
+        success: false,
+        message: messages.INVALID_ADMIN_CREDENTIALS,
+      };
     }
-
-    const otp = crypto.randomInt(100000, 999999).toString();
-    console.log("Forgot Password OTP", otp);
-
-    const existingOtp = await Otp.findOne({ email });
-    if (existingOtp) {
-      await Otp.deleteOne({ email });
-    }
-
-    const hashedOtp = await hashData(otp);
-    await Otp.create({
+  } else {
+    const userData = await User.findOne({
       email,
-      otp: hashedOtp,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      activeRole: { $in: ["worker", "poster"] },
     });
-
-    const otpSend = await sendForgotPasswordEmail(email, otp);
-    if (!otpSend) {
-      await Otp.deleteOne({ email });
-      return { success: false, message: messages.FAILED_TO_SEND_OTP };
+    if (!userData) {
+      return {
+        success: false,
+        message: messages.USER_NOT_EXIST_WITH_EMAIL,
+      };
     }
+  }
 
-    return { success: true, message: messages.RESET_OTP_SENT };
+  const otp = crypto.randomInt(100000, 999999).toString();
+  console.log("Forgot Password OTP", otp);
+
+  const existingOtp = await Otp.findOne({ email });
+  if (existingOtp) {
+    await Otp.deleteOne({ email });
+  }
+
+  const hashedOtp = await hashData(otp);
+  await Otp.create({
+    email,
+    otp: hashedOtp,
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+  });
+
+  const otpSend = await sendForgotPasswordEmail(email, otp);
+  if (!otpSend) {
+    await Otp.deleteOne({ email });
+    return { success: false, message: messages.FAILED_TO_SEND_OTP };
+  }
+
+  return { success: true, message: messages.RESET_OTP_SENT };
 };
 
 export const updatePasswordService = async (email, password) => {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return { success: false, message: messages.USER_NOT_EXIST_WITH_EMAIL };
-    }
+  const user = await User.findOne({ email });
+  if (!user) {
+    return { success: false, message: messages.USER_NOT_EXIST_WITH_EMAIL };
+  }
 
-    const hashedPassword = await hashData(password);
-    user.password = hashedPassword;
-    await user.save();
+  const hashedPassword = await hashData(password);
+  user.password = hashedPassword;
+  await user.save();
 
-    return { success: true, message: messages.PASSWORD_UPDATED };
+  return { success: true, message: messages.PASSWORD_UPDATED };
 };
 
-export const updateUserPasswordService = async ( data, userId) => {
+export const updateUserPasswordService = async (data, userId) => {
   try {
     const user = await User.findById(userId);
-    if(!user){
+    if (!user) {
       return { success: false, message: messages.USER_NOT_FOUND };
     }
     console.log("data in updateUserPasswordService", data);
     const { oldPassword, password } = data;
     const isPasswordValid = await compareHash(oldPassword, user.password);
-    if(!isPasswordValid){
+    if (!isPasswordValid) {
       return { success: false, message: messages.INVALID_CREDENTIALS };
     }
     const hashedPassword = await hashData(password);
@@ -392,17 +392,17 @@ export const updateUserPasswordService = async ( data, userId) => {
 
 export const deleteUserProfileService = async (user) => {
   try {
-    if(!user._id){
+    if (!user._id) {
       return { success: false, message: messages.USER_NOT_FOUND };
     }
     let userDetails = await User.findById(new mongoose.Types.ObjectId(user._id));
-    if(!userDetails){
+    if (!userDetails) {
       return { success: false, message: messages.USER_NOT_FOUND };
     }
 
     await User.findByIdAndDelete(new mongoose.Types.ObjectId(user._id));
     return { success: true, message: messages.PROFILE_DELETED };
-    
+
   } catch (error) {
     console.log("Delete user profile error:", error.message);
     return { success: false, message: messages.PROFILE_DELETE_FAILED };

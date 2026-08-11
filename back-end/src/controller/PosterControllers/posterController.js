@@ -6,6 +6,8 @@ import {
   updateUserProfileService,
   getCompletedTaskPosterSideService,
   getPosterProfileService,
+  switchRoleToWorkerService,
+  posterRoleSwitchAlreadyDataUploadedService
 } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
@@ -183,3 +185,27 @@ export const getPosterProfile = async (req, res) => {
   }
 };
 
+export const switchRoleToWorker = async (req, res) => {
+  let response = await switchRoleToWorkerService ({user: req.user, data: req.body, files: req.files});
+  if(response.forbidden){
+    return res.status(STATUS_CODES.FORBIDDEN).json({success: false, message: response.forbidden})
+  }
+  if( response.error ){
+    return res.status(STATUS_CODES.BAD_REQUEST).json({success: false, message: response.error});
+  }
+
+  return res.status(STATUS_CODES.OK).json({success: true, message: response.message})
+}
+
+export const posterRoleSwitchAlreadyDataUploaded = async (req, res) => {
+  let response = await posterRoleSwitchAlreadyDataUploadedService({user: req.user});
+  if(response.forbidden){
+    return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
+  }
+  
+  if(response.error){
+    return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error});
+  }
+
+  return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
+}

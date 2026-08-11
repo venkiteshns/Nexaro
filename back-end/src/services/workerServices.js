@@ -249,7 +249,7 @@ export const getWorkerProfileService = async (user) => {
             }
         ]);
         console.log(userData[0]);
-
+        
         return {success: true, profileData: userData[0]}
         
     } catch (error) {

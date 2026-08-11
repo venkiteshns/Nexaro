@@ -5,9 +5,7 @@ import { User, Globe } from 'lucide-react';
  * Props: bio: string, languages: string[]
  */
 const WorkerAboutCard = ({ bio, languages }) => {
-    const bioText = bio ||
-        'Dedicated professional with over 8 years of specialist experience in high-end residential plumbing and electrical systems. I specialize in identifying complex leaks and modernizing outdated heating systems. My goal is to provide lasting solutions with precision craftsmanship and minimal disruption to your home environment.';
-
+    const bioText = bio || "No Bio added !";
 
     return (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 h-full flex flex-col">

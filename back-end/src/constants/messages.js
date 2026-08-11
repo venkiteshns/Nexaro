@@ -2,7 +2,7 @@
 const MESSAGES = {
 
     INTERNAL_SERVER_ERROR: "Internal server error",
-    UNEXPECTED_ERROR: 'Unexpected Error Occoured Please Try again later!',
+    UNEXPECTED_ERROR: 'Unexpected Error Occoured !!, Please Try again later !!',
     INVALID_PAGE_OR_LIMIT: "Invalid page or limit value",
     FAILED_TO_FETCH_USERS: "Failed to fetch users",
     USER_ID_REQUIRED: "User ID is required",
@@ -20,6 +20,7 @@ const MESSAGES = {
     INVALID_ADMIN_CREDENTIALS: "Invalid admin credentials",
     RESET_OTP_SENT: "Password reset OTP sent successfully",
     INVALID_PASSWORD: "Invalid password",
+    CURRENT_PASSWORD_INVALID: "Invalid Current Password",
     INVALID_OTP: "Invalid or expired OTP",
 
     EMAIL_REQUIRED: "Email is required",
@@ -31,6 +32,8 @@ const MESSAGES = {
     USER_NOT_FOUND: "User not found",
     UNAUTHORIZED_USER: "Unauthorized User",
     USER_ALREADY_SUSPENDED: "User is already suspended",
+    USER_BLOCKED: "User is blocked by admin",
+    SUSPENDED_USER: "User is suspended. Please contact admin for more information.",
     USER_SUSPENDED: "User suspended successfully",
     USER_NOT_SUSPENDED: "User is not suspended",
     USER_UNSUSPENDED: "User unsuspended successfully",
@@ -69,7 +72,7 @@ const MESSAGES = {
     EMAIL_ALREADY_IN_USE: "Email already in use by another user",
     PHONE_ALREADY_IN_USE: "Phone number already in use by another user",
 
-    AMOUNT_MISMATCH:  "Amount mismatch",
+    AMOUNT_MISMATCH: "Amount mismatch",
 
     REVIEW_SUBMITTED: "Review submitted successfully",
     REVIEW_ALREADY_EXISTS: "You have already submitted a review for this task",

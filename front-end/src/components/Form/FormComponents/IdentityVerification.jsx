@@ -11,10 +11,10 @@ const IdentityVerification = () => {
   } = useFormContext();
   const selected = watch("id_type");
   return (
-    <div className="mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm">
+    <div className="mt-4 sm:mt-5 w-full rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-10 shadow-sm">
       {/* Select */}
-      <div className="mb-8">
-        <label className="mb-3 block text-xs  uppercase tracking-wide text-gray-700">
+      <div className="mb-6 sm:mb-8">
+        <label className="mb-2 sm:mb-3 block text-[10px] sm:text-xs uppercase tracking-wide text-gray-700">
           Government ID Type <span className="text-red-500">*</span>
         </label>
 
@@ -24,7 +24,7 @@ const IdentityVerification = () => {
             {...register("id_type", {
               required: "Please select an id and upload the mentioned data",
             })}
-            className={` w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:ring-1 focus:ring-green-800 ${selected ? "text-gray-700" : "text-gray-400"}`}
+            className={` w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:ring-1 focus:ring-green-800 text-xs sm:text-sm ${selected ? "text-gray-700" : "text-gray-400"}`}
           >
             <option value="" disabled>
               Select ID type
@@ -44,7 +44,7 @@ const IdentityVerification = () => {
       </div>
 
       {/* Upload Cards */}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
         <UploadCard
           title="Upload Front Side"
           subtitle="Clear photo of the front — PNG, JPG"
@@ -59,13 +59,13 @@ const IdentityVerification = () => {
       </div>
 
       {/* Selfie Text */}
-      <p className="mt-6 text-xs text-gray-500">
+      <p className="mt-4 sm:mt-6 text-[10px] sm:text-xs text-gray-500">
         Upload a clear selfie for identity matching.{" "}
         <span className="text-red-600">*</span>
       </p>
 
       {/* Selfie Upload */}
-      <div className="mt-5 flex justify-center">
+      <div className="mt-4 sm:mt-5 flex justify-center">
         <div className="w-full md:w-[420px]">
           <UploadCard
             title="Upload Selfie Photo"
@@ -107,7 +107,7 @@ const UploadCard = ({ title, subtitle, type }) => {
 
   return (
     <div>
-      <label className="flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-50/40 p-6 text-center hover:border-green-800 hover:bg-green-50/30">
+      <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-gray-300 bg-gray-50/40 p-4 sm:p-6 text-center hover:border-green-800 hover:bg-green-50/30">
         <input
           type="file"
           className="hidden"
@@ -117,20 +117,20 @@ const UploadCard = ({ title, subtitle, type }) => {
           })}
         />
         {preview ?
-          <div className="w-45 h-45 flex items-center justify-center ">
+          <div className="w-32 h-32 sm:w-44 sm:h-44 flex items-center justify-center ">
             <img className="w-full h-full object-contain" src={preview} alt="" />
           </div>
           : <>
-            <div className=" mb-6 flex h-10 w-10 items-center justify-center rounded-2xl">
-              <Upload className="h-5 w-5 text-green-600" />
+            <div className="mb-3 sm:mb-6 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl sm:rounded-2xl">
+              <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
             </div>
 
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900">
               {title}
               <span className="text-red-500">*</span>
             </h3>
 
-            <p className="mt-2 text-xs text-gray-400">{subtitle}</p>
+            <p className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-400">{subtitle}</p>
           </>}
       </label>
       <div className="mt-1">

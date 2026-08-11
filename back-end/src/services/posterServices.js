@@ -1,5 +1,5 @@
 import User from "../models/userSchema.js";
-import { hashData } from "../utils/hasing.js";
+import { compareHash, hashData } from "../utils/hasing.js";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -75,24 +75,24 @@ export const posterSignupService = async (data) => {
 
 export const getTasksService = async (posterId, query) => {
 
-  const {status, search = "", page = 1, limit = 5} = query;
- 
-  const matchingCriteria= {
+  const { status, search = "", page = 1, limit = 5 } = query;
+
+  const matchingCriteria = {
     posterId: new mongoose.Types.ObjectId(posterId),
   };
 
-  if(status!=='all'){
+  if (status !== 'all') {
     matchingCriteria.status = query.status;
   }
 
-  if(search.trim()){
-    matchingCriteria.$or =[
+  if (search.trim()) {
+    matchingCriteria.$or = [
       {
-        title:{
+        title: {
           $regex: search,
           $options: "i"
         },
-      }, 
+      },
       {
         "address.landmark": {
           $regex: search,
@@ -114,7 +114,7 @@ export const getTasksService = async (posterId, query) => {
     ]
   }
 
-  const skip = (Number(page) - 1 ) * Number(limit);
+  const skip = (Number(page) - 1) * Number(limit);
 
   try {
     const tasks = await Task.aggregate([
@@ -138,7 +138,7 @@ export const getTasksService = async (posterId, query) => {
         },
       },
       {
-        $skip:skip,
+        $skip: skip,
       },
       {
         $limit: Number(limit)
@@ -193,12 +193,12 @@ export const getTasksService = async (posterId, query) => {
       },
     ]);
     console.log(tasks);
-    const totalCount = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId)})
-    const openTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "open"});
-    const inProgressTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "in_progress"});
-    const assignedTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "assigned"});
-    const completedTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "completed"});
-    const cancelledTasks = await Task.countDocuments({posterId: new mongoose.Types.ObjectId(posterId), status: "cancelled"});
+    const totalCount = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId) })
+    const openTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "open" });
+    const inProgressTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "in_progress" });
+    const assignedTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "assigned" });
+    const completedTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "completed" });
+    const cancelledTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "cancelled" });
 
 
     if (!tasks) {
@@ -206,7 +206,7 @@ export const getTasksService = async (posterId, query) => {
     }
     return {
       tasks,
-      stats:{
+      stats: {
         openTasks,
         assignedTasks,
         inProgressTasks,
@@ -216,8 +216,8 @@ export const getTasksService = async (posterId, query) => {
       paginations: {
         total: totalCount,
         page: Number(page),
-        limit:Number(limit),
-        totalPages: Math.ceil(totalCount/Number(limit))
+        limit: Number(limit),
+        totalPages: Math.ceil(totalCount / Number(limit))
       }
     };
   } catch (error) {
@@ -426,24 +426,24 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
       return { error: MESSAGES.EMAIL_ALREADY_IN_USE };
     }
 
-    const isDuplicatePhone = await User.findOne({phone, _id: {$ne:userId}});
-    if(isDuplicatePhone){
-      return {error: MESSAGES.PHONE_ALREADY_IN_USE};
+    const isDuplicatePhone = await User.findOne({ phone, _id: { $ne: userId } });
+    if (isDuplicatePhone) {
+      return { error: MESSAGES.PHONE_ALREADY_IN_USE };
     }
-    
+
     user.email = email;
-    user.phone = phone; 
-    if(avatar && avatar.length > 0) {
+    user.phone = phone;
+    if (avatar && avatar.length > 0) {
       const uploadedAvatar = await uploadManyFiles([avatar], "avatars");
       user.verificationDocuments.selfie = uploadedAvatar[0];
     }
     const savedUser = await user.save();
     console.log(savedUser);
-    
+
     return ({ message: "user profile updated successfully" })
   } catch (error) {
     console.log(error);
-    
+
     return { error: error.message };
   }
 };
@@ -453,7 +453,7 @@ export const getPosterProfileService = async (posterId) => {
     const posterObjectId = new mongoose.Types.ObjectId(posterId);
 
     const [taskStats] = await Task.aggregate([
-      { $match: { posterId: posterObjectId} },
+      { $match: { posterId: posterObjectId } },
       {
         $group: {
           _id: null,
@@ -465,9 +465,15 @@ export const getPosterProfileService = async (posterId) => {
       },
     ]);
 
+    // const posterUser = await User.findOne({ _id: posterObjectId }).select(
+    //   "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea",
+    // );
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
-      "poster.spent verificationDocuments.selfie.url name email phone city createdAt",
+      "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea",
     );
+    const isWorkerActive = posterUser?.skills?.length > 0 && posterUser?.languages?.length > 0 && posterUser?.serviceArea?.coordinates?.length === 2;
+    console.log(isWorkerActive);
+
 
     const stats = {
       totalPosted: taskStats?.totalPosted || 0,
@@ -524,6 +530,7 @@ export const getPosterProfileService = async (posterId) => {
         name: posterUser?.name || null,
         email: posterUser?.email || null,
         phone: posterUser?.phone || null,
+        isWorkerActive,
         city: posterUser?.city || null,
         createdAt: posterUser?.createdAt || null,
         selfie: posterUser?.verificationDocuments?.selfie?.url || process.env.DEFAULT_AVATAR_URL,
@@ -610,3 +617,96 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
     return { error };
   }
 };
+
+export const switchRoleToWorkerService = async ({ user, data, files }) => {
+  console.log(data);
+  if (!user._id) {
+    return { forbidden: "Access Restricted!" }
+  }
+  if (!data.state || !data.country || !data.city || !data.state || !data.lat || !data.lng) {
+    return { error: "Service Area Details are required!" };
+  }
+  if (!data.skills) {
+    return { error: "Skills are required" };
+  }
+  if (!data.languages) {
+    return { error: "Languages are required" };
+  }
+  if (!Array.isArray(files?.id_back) || files?.id_back.length <= 0) {
+    return { error: "Please upload back side of the document" };
+  }
+  if (!Array.isArray(files?.id_front) || files?.id_front.length <= 0) {
+    return { error: "Please upload front side of the document" };
+  }
+  if (!Array.isArray(files?.selfie) || files?.selfie.length <= 0) {
+    return { error: "Please upload your selfie image for verification" };
+  }
+
+  const parsedSkills = JSON.parse(data.skills);
+  const parsedLanguages = JSON.parse(data.languages);
+
+  try {
+    let userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" })
+    // let userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id) })
+    if (!userData) {
+      return { error: MESSAGES.USER_NOT_FOUND }
+    }
+
+    const isPasswordValid = await compareHash(data.password, userData.password);
+    console.log(isPasswordValid);
+    
+    if (!isPasswordValid) {
+      return { error : MESSAGES.CURRENT_PASSWORD_INVALID };
+    }
+
+    if (userData.isSuspended) {
+      return { error: MESSAGES.SUSPENDED_USER }
+    }
+
+
+    userData.activeRole = "worker";
+    userData.skills = parsedSkills;
+    userData.languages = parsedLanguages;
+    userData.serviceArea.type = "Point";
+    userData.isVerified = false;
+    userData.serviceArea.coordinates = [data.lng, data.lat];
+
+    const uploadedFiles = await uploadManyFiles(files, `user/${user._id}/verification`)
+
+    if (uploadedFiles.error) {
+      return { error: "Unable to upload images, try again later" };
+    }
+    userData.verificationDocuments = {
+      idFront: uploadedFiles.id_front,
+      idBack: uploadedFiles.id_back,
+      selfie: uploadedFiles.selfie,
+    };
+
+    await userData.save();
+
+    return { success: true, message: "Data uploaded Successfully" }
+  } catch (error) {
+    console.log(error);
+
+    return { error: MESSAGES.UNEXPECTED_ERROR }
+  }
+}
+
+export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
+  if (!user) {
+    return { forbidden: MESSAGES.UNAUTHORIZED_USER }
+  }
+  try {
+    let isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" });
+    if (!isUser) {
+      return { error: MESSAGES.USER_NOT_FOUND }
+    }
+
+    isUser.activeRole = 'worker';
+    await isUser.save();
+    return { success: true, message: "Role Updated" }
+  } catch (error) {
+    console.log("Role swiitch to poster without Data service error", error);
+    return { error: MESSAGES.UNEXPECTED_ERROR }
+  }
+}

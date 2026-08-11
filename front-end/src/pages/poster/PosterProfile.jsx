@@ -6,9 +6,10 @@ import {
   Star,
   Loader,
 } from "lucide-react";
+import { useGetPosterProfileQuery, useSwitchRoleActiveWorkerMutation, useSwitchtoworkerMutation } from "../../store/services/posterApi";
+
 import PosterNavBar from "../../layouts/Poster/PosterNavBar";
 import PosterHeader from "../../layouts/Poster/PosterHeader";
-import { useGetPosterProfileQuery } from "../../store/services/posterApi";
 
 import ProfileBanner from "../../components/Poster/Profile/ProfileBanner";
 import StatCard from "../../components/Poster/Profile/StatCard";
@@ -18,6 +19,11 @@ import ReviewsSection from "../../components/Poster/Profile/ReviewsSection";
 import DangerZone from "../../components/Poster/Profile/DangerZone";
 import DeleteProfileModal from "../../components/sharedComponents/DeleteProfileModal";
 import EditProfileModal from "./EditProfileModal";
+import SwitchToWorkerModal from "../../components/Poster/RoleSwitch/SwitchToWorkerModal";
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials } from "../../store/Slices/UserSlice";
+import { showError, showSuccess, showWarning } from "../../utils/toast";
+import { replace, useNavigate } from "react-router-dom";
 
 const PosterProfile = () => {
   const { data, isLoading } = useGetPosterProfileQuery();
@@ -25,6 +31,7 @@ const PosterProfile = () => {
   const [reviewPage, setReviewPage] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showRoleSwitchModal, setShowRoleSwitchModal] = useState(false);
 
   const profileData = data?.data || {};
   const stats = profileData.stats || {
@@ -37,14 +44,65 @@ const PosterProfile = () => {
   const reviews = profileData.reviews || [];
   const posterInfo = profileData.poster || {};
 
+  const [switchRole, { isLoading: isSubmitting }] = useSwitchtoworkerMutation();
+  const [roleSwitch] = useSwitchRoleActiveWorkerMutation();
+  const { user, accessToken, refreshToken } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleRoleSwitchSubmission = async (data) => {
+    try {
+      let response = await switchRole(data).unwrap();
+      console.log(response);
+      const updatedUser = { ...user, role: 'worker' };
+      showSuccess("Switching to Worker Dashboard");
+      setTimeout(() => {
+        dispatch(setCredentials({
+          user: updatedUser,
+          refreshToken,
+          accessToken
+        }))
+        navigate('/worker/dashboard', { replace: true });
+      }, 2600);
+    } catch (error) {
+      console.log(error);
+      showError(error?.data?.message || "Couldn't switch role now ! Try later..");
+    }
+    console.log("RoleData", data);
+  }
+
+  const handleRoleSwitch = async () => {
+    if (posterInfo.isWorkerActive) {
+      try {
+        let res = await roleSwitch().unwrap();
+        console.log("redirect to worker profile");
+        const updatedUser = { ...user, role: 'worker' };
+        showSuccess("Switching to Worker Dashboard");
+        setTimeout(() => {
+          dispatch(setCredentials({
+            user: updatedUser,
+            refreshToken,
+            accessToken
+          }))
+          navigate('/worker/dashboard', { replace: true });
+        }, 2600);
+        return;
+      } catch (error) {
+        showWarning(error.data.message || "Unable to switch role ! Try again later...");
+      }
+
+    }
+    setShowRoleSwitchModal(true);
+    console.log("redirect to role switch modal");
+  }
 
   const closeDeleteModal = useCallback(() => {
     setShowDeleteModal(false);
-  },[]);
+  }, []);
 
-  const closeEditModal = useCallback (() => {
+  const closeEditModal = useCallback(() => {
     setShowEditModal(false);
-  },[]);
+  }, []);
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
@@ -57,6 +115,7 @@ const PosterProfile = () => {
           <ProfileBanner
             posterInfo={posterInfo}
             onEditClick={() => setShowEditModal(true)}
+            onRoleSwitch={handleRoleSwitch}
           />
 
           {isLoading ? (
@@ -108,6 +167,14 @@ const PosterProfile = () => {
         </div>
       </div>
 
+      {showRoleSwitchModal && (
+        <SwitchToWorkerModal
+          isOpen={showRoleSwitchModal}
+          onClose={() => setShowRoleSwitchModal(false)}
+          onSwitch={handleRoleSwitchSubmission}
+          isSubmitting={isSubmitting}
+        />
+      )}
       {showDeleteModal && (
         <DeleteProfileModal userId={profileData?.poster?._id} onClose={closeDeleteModal} />
       )}
