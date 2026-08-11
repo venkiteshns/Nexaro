@@ -10,7 +10,8 @@ import {
   getWorkerCurrentActiveJob,
   updateJobProgress,
   getWorkerProfile,
-  updateWorkerProfile
+  updateWorkerProfile,
+  switchRoleToPoster
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -31,6 +32,7 @@ router.post("/tasks/add_bid", verifyToken, addNewBid);
 router.delete("/bid/withdraw/:bidId", verifyToken, withdrawBid);
 
 router.patch("/task/:taskId/progress", verifyToken, updateJobProgress);
-router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar',  maxCount: 1}]), updateWorkerProfile)
+router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar',  maxCount: 1}]), updateWorkerProfile);
+router.patch('/switch/role', verifyToken, switchRoleToPoster)
 
 export default router;

@@ -3,7 +3,6 @@ import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 import MESSAGES from "../constants/messages.js";
-import user from "../models/userSchema.js";
 import mongoose from "mongoose";
 
 export const workerSignupService = async ({ files, data }) => {
@@ -320,4 +319,24 @@ export const updateWorkerProfileService = async ({user, data, avatar}) => {
         console.error("Worker profile update service error ", error);
         return {error: "Unexpected error occoured"}
     }
+}
+
+export const switchRoleToPosterService = async ({user}) => {
+    if (!user) {
+    return { forbidden: MESSAGES.UNAUTHORIZED_USER }
+  }
+  try {
+    let isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "worker" });
+    if (!isUser) {
+      return { error: MESSAGES.USER_NOT_FOUND }
+    }
+
+    isUser.activeRole = 'poster';
+    await isUser.save();
+    
+    return { success: true, message: "Role Updated" }
+  } catch (error) {
+    console.log("Role swiitch to poster without Data service error", error);
+    return { error: MESSAGES.UNEXPECTED_ERROR }
+  }
 }

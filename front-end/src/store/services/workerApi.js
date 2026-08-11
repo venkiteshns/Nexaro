@@ -114,7 +114,15 @@ export const workerApi = api.injectEndpoints({
         }
       }, 
       invalidatesTags:["Worker_Profile"]
-    })
+    }),
+
+    switchRoleToPoster: builder.mutation ({
+      query:() => ({
+          url: WORKER.SWITCH_ROLE,
+          method: "PATCH",
+        })
+      }),
+
   }),
 });
 
@@ -129,6 +137,7 @@ export const {
   useGetWorkerCurrentActiveJobQuery,
   useUpdateJobProgressMutation,
   useGetWorkerProfileQuery,
-  useUpdateWorkerProfileMutation
+  useUpdateWorkerProfileMutation,
+  useSwitchRoleToPosterMutation
 } = workerApi;
 
