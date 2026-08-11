@@ -8,10 +8,13 @@ import WorkerAboutCard from '../../components/Worker/Profile/WorkerAboutCard';
 import WorkerCredentialsCard from '../../components/Worker/Profile/WorkerCredentialsCard';
 import WorkerReviewsSection from '../../components/Worker/Profile/WorkerReviewsSection';
 import WorkerDangerZone from '../../components/Worker/Profile/WorkerDangerZone';
-import { useGetWorkerProfileQuery, useUpdateWorkerProfileMutation } from '../../store/services/workerApi';
+import { useGetWorkerProfileQuery, useSwitchRoleToPosterMutation, useUpdateWorkerProfileMutation } from '../../store/services/workerApi';
 import DeleteProfileModal from '../../components/sharedComponents/DeleteProfileModal';
 import EditWorkerProfileModal from '../../components/Worker/Profile/EditWorkerProfileModal'
-import { showSuccess, showWarning } from '../../utils/toast';
+import { showError, showSuccess, showWarning } from '../../utils/toast';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCredentials } from '../../store/Slices/UserSlice';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -22,6 +25,10 @@ const WorkerProfile = () => {
 
     const {isLoading, isError, isSuccess, data} = useGetWorkerProfileQuery();
     const [updateWorkerProfile, {isLoading:isProfileUpdating}] = useUpdateWorkerProfileMutation();
+
+    const { user, accessToken, refreshToken } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleEditProfile = async (data) => {
         try {
@@ -34,6 +41,29 @@ const WorkerProfile = () => {
             showWarning(error.data.message);
         }
         console.log(data);
+    }
+
+    const [switchRole] = useSwitchRoleToPosterMutation();
+
+    const handleRoleChange = async() => {
+        try {
+            await switchRole().unwrap();
+            const updatedUser = {
+                ...user,
+                role:'poster'
+            }
+             showSuccess("Switching to Poster Dashboard");
+                  setTimeout(() => {
+                    dispatch(setCredentials({
+                      user: updatedUser,
+                      refreshToken,
+                      accessToken
+                    }))
+                    navigate('/poster/dashboard', { replace: true });
+                  }, 2600);
+        } catch (error) {
+            showError(error.data.message || "Unable to switch role, try again later !")
+        }
     }
 
     const toggleEditModal = () => {
@@ -98,7 +128,7 @@ const WorkerProfile = () => {
                         <WorkerProfileBanner
                             worker={workerData}
                             onEditClick={toggleEditModal}
-                            onSwitchToPoster={() => console.log('Switch to poster')}
+                            onSwitchToPoster={handleRoleChange}
                         />
 
                         {/* ── Stats ── */}
