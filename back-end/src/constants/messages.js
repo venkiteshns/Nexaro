@@ -23,10 +23,13 @@ const MESSAGES = {
     INVALID_OTP: "Invalid or expired OTP",
 
     EMAIL_REQUIRED: "Email is required",
+    PHONE_REQUIRED: "Phone number is required",
+    INVALID_EMAIL: "Please Enter a valid email id",
 
     EMAIL_AND_PASSWORD_REQUIRED: "Email and password are required",
 
     USER_NOT_FOUND: "User not found",
+    UNAUTHORIZED_USER: "Unauthorized User",
     USER_ALREADY_SUSPENDED: "User is already suspended",
     USER_SUSPENDED: "User suspended successfully",
     USER_NOT_SUSPENDED: "User is not suspended",
@@ -55,7 +58,7 @@ const MESSAGES = {
     FAILED_TO_FETCH_TASKS: "Failed to fetch tasks",
     GOOGLE_TOKEN_REQUIRED: "Google token is required",
 
-    USER_PROFILE_UPDATED: "User profile updated successfully",
+    USER_PROFILE_UPDATED: "Profile updated successfully",
     PROFILE_FETCH_SUCCESS: "User profile fetched successfully",
     PASSWORD_UPDATED: "Password updated successfully",
     PASSWORD_UPDATE_FAILED: "Failed to update password",

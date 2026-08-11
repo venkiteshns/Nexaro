@@ -9,10 +9,12 @@ import {
   getWorkerActiveJob,
   getWorkerCurrentActiveJob,
   updateJobProgress,
-  getWorkerProfile
+  getWorkerProfile,
+  updateWorkerProfile
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
+import upload from "../middlewares/upload.js";
 
 const router = express.Router();
 
@@ -29,5 +31,6 @@ router.post("/tasks/add_bid", verifyToken, addNewBid);
 router.delete("/bid/withdraw/:bidId", verifyToken, withdrawBid);
 
 router.patch("/task/:taskId/progress", verifyToken, updateJobProgress);
+router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar',  maxCount: 1}]), updateWorkerProfile)
 
 export default router;

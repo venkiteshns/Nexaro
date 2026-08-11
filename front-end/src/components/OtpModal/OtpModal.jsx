@@ -7,7 +7,6 @@ const OTP_LENGTH = 6;
 
 const OtpModal = (props) => {
   const { show, email, reSendOtp, isVerified } = props;
-
   const [time, setTime] = useState(60);
   const [resendCount, setResendCount] = useState(0);
   const [canResend, setCanResend] = useState(false);
@@ -128,7 +127,10 @@ const OtpModal = (props) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="relative w-full max-w-md rounded-3xl border-2 border-dashed border-green-800/70 bg-white/90 backdrop-blur-md shadow-2xl px-5 sm:px-8 md:px-12 py-8 sm:py-10 flex flex-col items-center gap-6">
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md rounded-3xl border-2 border-dashed border-green-800/70 bg-white/90 backdrop-blur-md shadow-2xl px-5 sm:px-8 md:px-12 py-8 sm:py-10 flex flex-col items-center gap-6"
+      >
         {/* Close */}
         <button
           onClick={handleClose}

@@ -8,24 +8,46 @@ import WorkerAboutCard from '../../components/Worker/Profile/WorkerAboutCard';
 import WorkerCredentialsCard from '../../components/Worker/Profile/WorkerCredentialsCard';
 import WorkerReviewsSection from '../../components/Worker/Profile/WorkerReviewsSection';
 import WorkerDangerZone from '../../components/Worker/Profile/WorkerDangerZone';
-import { useGetWorkerProfileQuery } from '../../store/services/workerApi';
+import { useGetWorkerProfileQuery, useUpdateWorkerProfileMutation } from '../../store/services/workerApi';
 import DeleteProfileModal from '../../components/sharedComponents/DeleteProfileModal';
+import EditWorkerProfileModal from '../../components/Worker/Profile/EditWorkerProfileModal'
+import { showSuccess, showWarning } from '../../utils/toast';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 const WorkerProfile = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [openEditModal, setOpenEditModal] = useState(false);
 
     const {isLoading, isError, isSuccess, data} = useGetWorkerProfileQuery();
+    const [updateWorkerProfile, {isLoading:isProfileUpdating}] = useUpdateWorkerProfileMutation();
+
+    const handleEditProfile = async (data) => {
+        try {
+            let response = await updateWorkerProfile (data).unwrap();
+            console.log(response);
+            showSuccess(response.message)
+            return setOpenEditModal(false);
+        } catch (error) {
+            console.error(error);
+            showWarning(error.data.message);
+        }
+        console.log(data);
+    }
+
+    const toggleEditModal = () => {
+        setOpenEditModal((p) => !p );
+    }
     
     const raw = data?.profileData;
-    console.log(raw);
+    // console.log(raw);
     
     const workerData = {
         name: raw?.name,
         rating: raw?.reviewDetails?.topRating,
-        avatar: raw?.avatar
+        avatar: raw?.avatar,
+        isVerified: raw?.isVerified
     } || {};
     const stats = {
         jobsCompleted: raw?.jobsCompleted,
@@ -51,7 +73,17 @@ const WorkerProfile = () => {
         }
         return payLoad;
     }) || {};
-    const totalReviewCount = raw?.reviewDetails?.Totalcount
+    const totalReviewCount = raw?.reviewDetails?.Totalcount;
+    const workerEditData = {
+        name:workerData?.name,
+        avatar: workerData?.avatar,
+        email: credentials?.email,
+        phone: credentials?.phone,
+        skills,
+        bio,
+        languages,
+        isVerified: credentials?.isVerified
+    }
     
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -65,7 +97,7 @@ const WorkerProfile = () => {
                         {/* ── Banner ── */}
                         <WorkerProfileBanner
                             worker={workerData}
-                            onEditClick={() => console.log('Edit profile')}
+                            onEditClick={toggleEditModal}
                             onSwitchToPoster={() => console.log('Switch to poster')}
                         />
 
@@ -98,6 +130,10 @@ const WorkerProfile = () => {
                         {/* ── Shared Delete Confirm Modal ── */}
                         {showDeleteConfirm && (
                             <DeleteProfileModal userId={raw?._id} onClose={() => setShowDeleteConfirm(false)} />
+                        )}
+
+                        {openEditModal && (
+                            <EditWorkerProfileModal loading={isProfileUpdating} isOpen={openEditModal}  onClose ={toggleEditModal}  worker ={workerEditData}  onSave={handleEditProfile} />
                         )}
 
                 </div>
