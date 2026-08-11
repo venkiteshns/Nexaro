@@ -1,11 +1,11 @@
-import { Languages, Loader, Loader2, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AvatarUploadField,
   PersonalInfoFields,
   ProfessionalSkillsField,
 } from "../../Form/FormComponents/EditProfileFormFields";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import OtpModal from "../../OtpModal/OtpModal";
 import { useSendOtpMutation } from "../../../store/services/authApi";
 import { SectionHeading } from "../../sharedComponents/SectionHeading";
@@ -24,8 +24,14 @@ import { SectionHeading } from "../../sharedComponents/SectionHeading";
 
 const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) => {
 
-  if (!isOpen) return null;
+  const [dirty, setDirty] = useState(false);
+  const [pendingData, setPendingData] = useState(null);
+  const [showOtp, setShowOtp] = useState(false);
+  const [isVerified, setIsVerified] = useState(false); 
 
+  const [sendOtp] = useSendOtpMutation();
+  
+  
   const methods = useForm({
     defaultValues: {
       name: worker?.name || "",
@@ -37,18 +43,23 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
     },
   });
 
-  const [dirty, setDirty] = useState(false);
-  const [pendingData, setPendingData] = useState(null);
-  const [showOtp, setShowOtp] = useState(false);
-
-  const [sendOtp] = useSendOtpMutation();
+  useEffect(() => {
+    (() => {
+      if (isVerified) {
+        setIsVerified(false);
+        onSave(pendingData)
+      }
+    })()
+    console.log("isVerified status", isVerified)
+  }, [isVerified, onSave, pendingData])
+  
+  if (!isOpen) return null;
 
   const resendOtp = ({ email }) => {
     sendOtp({ email, phone: worker.phone, resendFlag: true });
   }
 
 
-  const isVerifiedRef = useRef(false);
 
   const { formState: { isDirty } } = methods;
 
@@ -67,7 +78,7 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
     }
     if (hasError) return;
     if (data.email !== worker?.email) {
-      if (isVerifiedRef.current) {
+      if (isVerified) {
         if (onSave) onSave(data);
       }
       sendOtp({ email: data.email, phone: worker?.phone, resendFlag: true })
@@ -79,21 +90,6 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
 
     if (onSave) onSave(data);
   });
-
-
-  useEffect(() => {
-    if (isVerifiedRef.current) {
-      isVerifiedRef.current = false;
-      onSave(pendingData)
-    }
-    console.log("isVerified status", isVerifiedRef.current)
-  }, [isVerifiedRef.current])
-
-
-  const setIsVerified = (val) => {
-    isVerifiedRef.current = val;
-    console.log("updating isValid")
-  }
 
   const initials = (worker?.name || "AV")
     .split(" ")

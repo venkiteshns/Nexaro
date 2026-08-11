@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Plus,
@@ -100,7 +100,7 @@ function TaskCard({ task }) {
 
     const [cancelTask, { isLoading, isSuccess }] = useCancelTaskByPosterMutation()
 
-    const [triggerGetWorkerData,{ data, isLoading:isDataLoading, isSuccess:isDataSuccess, isError:isDataError }] = useLazyGetPosterTaskProgressQuery();
+    const [triggerGetWorkerData] = useLazyGetPosterTaskProgressQuery();
 
     const handleOpenPaymentReleaseModal = async (taskId) => {
         try {

@@ -23,7 +23,7 @@ const WorkerProfile = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
 
-    const {isLoading, isError, isSuccess, data} = useGetWorkerProfileQuery();
+    const {data} = useGetWorkerProfileQuery();
     const [updateWorkerProfile, {isLoading:isProfileUpdating}] = useUpdateWorkerProfileMutation();
 
     const { user, accessToken, refreshToken } = useSelector((state) => state.auth);
@@ -78,7 +78,7 @@ const WorkerProfile = () => {
         rating: raw?.reviewDetails?.topRating,
         avatar: raw?.avatar,
         isVerified: raw?.isVerified
-    } || {};
+    };
     const stats = {
         jobsCompleted: raw?.jobsCompleted,
         totalEarned: raw?.wallet ? raw.wallet.totalEarned : 0 ,

@@ -11,7 +11,7 @@ export const sharedApi = api.injectEndpoints({
         }),
 
         deleteProfile: builder.mutation({
-            query: (userId) => ({
+            query: () => ({
                 url: "/auth/profile/delete",
                 method: "DELETE"
             })

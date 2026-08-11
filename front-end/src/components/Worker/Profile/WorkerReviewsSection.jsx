@@ -1,4 +1,4 @@
-import { Star, MapPin, Clock } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 /**
  * WorkerReviewItem — single review card

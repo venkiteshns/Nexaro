@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Brush, CheckCircle, Clock, MapPin, Truck, Users, Wrench, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Brush, CheckCircle, Clock, Hammer, MapPin, Truck, Users, Wrench, X, Zap } from "lucide-react";
 import { formatDistance } from "../../utils/formatDistance";
 
 export function TaskCard({ task, handleNavigate, handleActiveJob }) {

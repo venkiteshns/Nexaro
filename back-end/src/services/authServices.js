@@ -117,6 +117,7 @@ export const createOtp = async (email, phone, resendFlag) => {
 export const sendOtp = async (email, otp) => {
   let lastError;
 
+  /* eslint-disable no-await-in-loop */
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -395,7 +396,7 @@ export const deleteUserProfileService = async (user) => {
     if (!user._id) {
       return { success: false, message: messages.USER_NOT_FOUND };
     }
-    let userDetails = await User.findById(new mongoose.Types.ObjectId(user._id));
+    const userDetails = await User.findById(new mongoose.Types.ObjectId(user._id));
     if (!userDetails) {
       return { success: false, message: messages.USER_NOT_FOUND };
     }

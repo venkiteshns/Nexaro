@@ -101,7 +101,7 @@ export const workerSignupService = async ({ files, data }) => {
         return { responseUser, accessToken, refreshToken };
 
 
-    } catch {
+    } catch (error) {
         console.log(error)
         return { error: error.message ||  MESSAGES.UNEXPECTED_ERROR };
     }
@@ -213,7 +213,7 @@ export const getWorkerProfileService = async (user) => {
                 $project: {
                     _id:1,
                     name: 1,
-                    avatar: '$verificationDocuments.selfie.url' ||  process.env.DEFAULT_AVATAR_URL,
+                    avatar: { $ifNull: ['$verificationDocuments.selfie.url', process.env.DEFAULT_AVATAR_URL] },
                     worker:1,
                     jobsCompleted:1,
                     "reviewDetails.reviews": {
@@ -286,21 +286,21 @@ export const updateWorkerProfileService = async ({user, data, avatar}) => {
     try {
         const parsedLanguages = JSON.parse(data.languages)
         const parsedSkills = JSON.parse(data.skills)
-        let isEmailExist = await User.findOne({_id :{$ne: new mongoose.Types.ObjectId(user._id)}, email:data.email});
+        const isEmailExist = await User.findOne({_id :{$ne: new mongoose.Types.ObjectId(user._id)}, email:data.email});
         if(isEmailExist){
             return {error: MESSAGES.EMAIL_ALREADY_IN_USE};
         }
-        let isPhoneExist = await User.findOne({_id :{$ne: new mongoose.Types.ObjectId(user._id)}, phone:data.phone});
+        const isPhoneExist = await User.findOne({_id :{$ne: new mongoose.Types.ObjectId(user._id)}, phone:data.phone});
         if(isPhoneExist){
             return {error: MESSAGES.PHONE_ALREADY_IN_USE};
         }
-        let userData = await User.findOne({_id: new mongoose.Types.ObjectId(user._id), activeRole:"worker"})      
+        const userData = await User.findOne({_id: new mongoose.Types.ObjectId(user._id), activeRole:"worker"})      
         if(!userData){
             return {error: MESSAGES.USER_NOT_FOUND}
         }  
         if(avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
             // upload avatar
-            let uploadStatus = await uploadManyFiles(avatar, `user/${data.email}/verification`);
+            const uploadStatus = await uploadManyFiles(avatar, `user/${data.email}/verification`);
             if(uploadStatus.error) {
                 return {error: "Unable to upload profile picture, Please try again."}
             }
@@ -326,14 +326,14 @@ export const switchRoleToPosterService = async ({user}) => {
     return { forbidden: MESSAGES.UNAUTHORIZED_USER }
   }
   try {
-    let isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "worker" });
+    const isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "worker" });
     if (!isUser) {
       return { error: MESSAGES.USER_NOT_FOUND }
     }
 
     isUser.activeRole = 'poster';
     await isUser.save();
-    
+
     return { success: true, message: "Role Updated" }
   } catch (error) {
     console.log("Role swiitch to poster without Data service error", error);
