@@ -8,15 +8,9 @@ import {
 import { useEffect, useRef, useState } from "react";
 import OtpModal from "../../OtpModal/OtpModal";
 import { useSendOtpMutation } from "../../../store/services/authApi";
+import { SectionHeading } from "../../sharedComponents/SectionHeading";
 
-const SectionHeading = ({ children }) => (
-  <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
-    <div className="w-0.5 h-4 sm:h-5 rounded-full bg-[#0A6E5C]" />
-    <h3 className="text-[10px] sm:text-xs font-extrabold text-[#0A6E5C] uppercase tracking-widest">
-      {children}
-    </h3>
-  </div>
-);
+
 
 /**
  * EditWorkerProfileModal
@@ -73,7 +67,7 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
     }
     if (hasError) return;
     if (data.email !== worker?.email) {
-      if(isVerifiedRef.current){
+      if (isVerifiedRef.current) {
         if (onSave) onSave(data);
       }
       sendOtp({ email: data.email, phone: worker?.phone, resendFlag: true })
@@ -88,12 +82,12 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
 
 
   useEffect(() => {
-    if(isVerifiedRef.current){
+    if (isVerifiedRef.current) {
       isVerifiedRef.current = false;
       onSave(pendingData)
     }
-    console.log("isVerified status",isVerifiedRef.current)
-  },[isVerifiedRef.current])
+    console.log("isVerified status", isVerifiedRef.current)
+  }, [isVerifiedRef.current])
 
 
   const setIsVerified = (val) => {
@@ -207,7 +201,7 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
               <button
                 id="edit-profile-save-btn"
                 type="submit"
-                disabled={(!isDirty && !dirty)|| loading}
+                disabled={(!isDirty && !dirty) || loading}
                 className={`px-5 py-2.5 sm:px-7 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-sm
                            transition-all duration-150 active:scale-[0.97]
                             ${(!isDirty && !dirty) || loading
@@ -219,7 +213,7 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
                     "linear-gradient(135deg,#0A6E5C 0%,#14b89a 100%)",
                 }}
               >
-                {loading ? <span className="flex items-center gap-2" > <Loader2 size={18} className="animate-spin" /> Saving Changes.. </span>: "Save Changes"}
+                {loading ? <span className="flex items-center gap-2" > <Loader2 size={18} className="animate-spin" /> Saving Changes.. </span> : "Save Changes"}
               </button>
             </div>
           </form>

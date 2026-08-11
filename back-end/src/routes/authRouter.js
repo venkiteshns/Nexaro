@@ -10,11 +10,11 @@ const router = express.Router();
 //POST
 router.post("/signup/poster", posterSignup);
 router.post("/signup/worker", upload.fields([{ name: 'id_front' }, { name: 'id_back' }, { name: 'selfie' }]), workerSignup);
+router.post("/login", login);
 router.post('/login/:admin', login);
 router.post("/refresh-token", refreshAccessToken);
 router.post("/get-otp", getOtpForSignUp);
 router.post("/verify-otp", verifySignUpOtp);
-router.post("/login", login);
 router.post("/logout", logout);
 router.post("/forgot-password/:role", forgotPasswordOtp);
 router.post("/update-password", updatePassword);

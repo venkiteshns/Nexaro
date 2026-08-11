@@ -14,6 +14,8 @@ import {
   updateUserProfile,
   getCompletedTaskPosterSide,
   getPosterProfile,
+  switchRoleToWorker,
+  posterRoleSwitchAlreadyDataUploaded
 } from "../controller/PosterControllers/posterController.js";
 import { createReview } from "../controller/PosterControllers/reviewController.js";
 
@@ -51,6 +53,8 @@ router.patch(
   upload.fields([{ name: "avatar", maxCount: 1 }]),
   updateUserProfile,
 );
+router.patch('/switch/role', verifyToken, upload.fields([{ name: 'id_front' }, { name: 'id_back' }, { name: 'selfie' }]), switchRoleToWorker);
+router.patch('/switch/to_worker', verifyToken, posterRoleSwitchAlreadyDataUploaded)
 
 
 export default router;

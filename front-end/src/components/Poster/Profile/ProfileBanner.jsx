@@ -1,6 +1,6 @@
 import { MapPin, ClipboardList, Edit3, ArrowLeftRight, BadgeCheck } from "lucide-react";
 
-const ProfileBanner = ({ posterInfo, onEditClick }) => (
+const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
   <div className="relative bg-white rounded-2xl border border-gray-100 shadow-sm mb-5">
     {/* Mobile layout */}
     <div className="block min-[668px]:hidden">
@@ -60,7 +60,9 @@ const ProfileBanner = ({ posterInfo, onEditClick }) => (
         >
           <Edit3 size={12} /> Edit Profile
         </button>
-        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 bg-white text-xs font-semibold hover:bg-gray-50 transition-all shadow-sm">
+        <button
+          onClick={onRoleSwitch}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 bg-white text-xs font-semibold hover:bg-gray-50 transition-all shadow-sm">
           <ArrowLeftRight size={12} /> Switch to Worker
         </button>
       </div>
@@ -127,7 +129,9 @@ const ProfileBanner = ({ posterInfo, onEditClick }) => (
             >
               <Edit3 size={14} /> Edit Profile
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 bg-white text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm">
+            <button
+              onClick={onRoleSwitch}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 bg-white text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm">
               <ArrowLeftRight size={14} /> Switch to Worker
             </button>
           </div>

@@ -185,9 +185,11 @@ const Location = ({ worker }) => {
   };
 
   useEffect(() => {
-   (() =>  { if (selectedDistrict) {
-      setDistrict(selectedDistrict);
-    }})()
+    (() => {
+      if (selectedDistrict) {
+        setDistrict(selectedDistrict);
+      }
+    })()
   }, [selectedDistrict]);
 
   const fieldClass =
@@ -201,29 +203,41 @@ const Location = ({ worker }) => {
   return (
     <div className="space-y-5">
       {/* Location Button */}
-      <div className=" mt-5 w-full flex flex-col items-center text-center rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p className="text-sm text-gray-500 mb-4">
-          Click the button below to auto-detect and fill your location, or fill
-          the fields manually.
+      <div className="mt-5 w-full flex flex-col items-center text-center rounded-[24px] sm:rounded-[28px] border border-[rgba(10,110,92,0.15)] bg-white p-5 sm:p-8 shadow-sm">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#0A6E5C]/10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 text-[#0A6E5C]">
+          <MapPin size={20} className="sm:w-6 sm:h-6" strokeWidth={1.5} />
+        </div>
+
+        <h3 className="text-gray-800 font-bold text-base sm:text-lg mb-1.5 sm:mb-2">Auto-Detect Location</h3>
+        <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 max-w-md">
+          Save time by automatically detecting your current location. You can always refine the details manually afterwards.
         </p>
 
         <button
           type="button"
           onClick={handleGetLocation}
           disabled={fetchingLocation}
-          className="flex items-center gap-2 bg-green-800/80 hover:bg-green-700 disabled:opacity-60 
-                     rounded-2xl text-white px-5 py-3 text-sm font-medium transition-all"
+          className="group flex items-center justify-center gap-2 sm:gap-2.5 w-full sm:w-auto sm:min-w-[200px] px-5 py-3 sm:px-6 sm:py-3.5 
+                     rounded-xl sm:rounded-2xl text-white text-xs sm:text-sm font-bold transition-all duration-300
+                     hover:bg-[#085a4a] hover:shadow-md
+                     disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+          style={{ backgroundColor: "#0A6E5C" }}
         >
           {fetchingLocation ? (
-            <Loader2 size={16} className="animate-spin" />
+            <>
+              <Loader2 size={18} className="animate-spin text-white/90" />
+              <span>Detecting...</span>
+            </>
           ) : (
-            <MapPin size={16} />
+            <>
+              <LocateFixed size={18} className="text-white/90 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Get Current Location</span>
+            </>
           )}
-          {fetchingLocation ? "Detecting location..." : "Get My Location"}
         </button>
 
         {locationError && (
-          <p className="italic text-red-400/90 text-xs mt-3">{locationError}</p>
+          <p className="italic text-red-500/90 text-xs mt-4 font-medium px-4 py-2 bg-red-50 rounded-lg border border-red-100">{locationError}</p>
         )}
       </div>
 

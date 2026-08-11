@@ -161,8 +161,41 @@ export const posterApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Poster_Completed_Task", "Poster_Profile"],
     }),
+
+    switchtoworker: builder.mutation({
+      query: (data) => {
+        const roleData = new FormData();
+        console.log(data);
+        roleData.append('city', data.city);
+        roleData.append('country', data.country);
+        roleData.append('district', data.district);
+        if (data.id_back && data.id_back.length > 0) roleData.append('id_back', data.id_back[0]);
+        if (data.id_front && data.id_front.length > 0) roleData.append('id_front', data.id_front[0]);
+        roleData.append('languages', JSON.stringify(data.languages));
+        roleData.append('lat', data.locationLat);
+        roleData.append('lng', data.locationlng);
+        roleData.append('password', data.password);
+        if (data.selfie && data.selfie.length > 0) roleData.append('selfie', data.selfie[0]);
+        roleData.append('skills', JSON.stringify(data.skills));
+        roleData.append('state', data.state);
+        return {
+          url: POSTER.ROLE_SWITCH,
+          method: "PATCH",
+          body: roleData,
+          formData: true
+        }
+      }
+    }),
     
+    switchRoleActiveWorker: builder.mutation ({
+      query:() => ({
+        url: POSTER.ROLE_SWITCH_ACTIVE_WORKER,
+        method: "PATCH",
+      })
+    }),
+
   }),
+
 });
 
 
@@ -179,5 +212,7 @@ export const {
   useGetPosterProfileQuery,
   useUpdatePosterProfileMutation,
   useSubmitReviewMutation,
+  useSwitchtoworkerMutation,
+  useSwitchRoleActiveWorkerMutation
 } = posterApi;
 
