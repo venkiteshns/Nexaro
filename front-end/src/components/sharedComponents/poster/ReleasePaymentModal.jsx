@@ -22,7 +22,7 @@ export default function ReleaseModal({ amount, workerName, onCancel, bidId, task
         try {
             const res = await initiatePayout(bidId).unwrap();
             if (res?.success) {
-                // Payment confirmed — let parent redirect to review page
+                // Payment confirmed — let parent close modal and navigate to review page
                 if (onSuccess) onSuccess(taskId);
             } else {
                 setApiError(res?.message || 'Payment release failed. Please try again.');

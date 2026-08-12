@@ -335,7 +335,6 @@ function TaskCard({ task }) {
             )}
 
             {(showReleasePaymentModal && work) && (
-
                 <ReleaseModal taskId={task._id} bidId={task?.acceptedBid} amount={work.amount} workerName={work.workerName} onCancel={() => setShowReleasePaymentModal(false)} onSuccess={(tid) => { setShowReleasePaymentModal(false); navigate(`/poster/review/${tid}`); }} />
             )}
         </>
