@@ -41,7 +41,7 @@ const WorkerStatCards = ({ stats }) => (
         <StatItem
             icon={<Star size={13} className="text-[#0A6E5C] md:w-4 md:h-4" />}
             label="Rating"
-            value={stats?.rating ?? '4.9'}
+            value={stats?.rating?.toFixed(1) ?? '0'}
             sub="/ 5"
             className="order-2 min-[416px]:order-none min-[416px]:flex-1 min-[416px]:min-w-[120px]"
         />

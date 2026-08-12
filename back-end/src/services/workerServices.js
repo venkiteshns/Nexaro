@@ -203,7 +203,7 @@ export const getWorkerProfileService = async (user) => {
             }, 
             {
                 $lookup: {
-                    from: "wallet",
+                    from: "wallets",
                     localField: '_id',
                     foreignField: 'userId',
                     as: 'wallet'
@@ -234,7 +234,7 @@ export const getWorkerProfileService = async (user) => {
                             }, 0
                         ]
                     },
-                    wallet:1,
+                    wallet: {$arrayElemAt: ["$wallet", 0]},
                     bio:1,
                     languages:1,
                     skills:1,
