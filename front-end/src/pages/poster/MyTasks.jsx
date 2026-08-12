@@ -207,7 +207,7 @@ function TaskCard({ task }) {
                                 )}
                             </span>
                         )}
-                         {task.status === 'payment' && (
+                        {task.status === 'payment' && (
                             <span className="flex items-center gap-1">
                                 Completed, Payment Completed
                                 <Star size={13} fill="#FBBF24" color="#FBBF24" />
@@ -285,7 +285,7 @@ function TaskCard({ task }) {
                                 >
                                     View Progress
                                 </button>
-                                <button onClick={() => {handleOpenPaymentReleaseModal(task._id)}} className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
+                                <button onClick={() => { handleOpenPaymentReleaseModal(task._id) }} className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
                                     Release Payment
                                 </button>
                             </>
@@ -335,7 +335,8 @@ function TaskCard({ task }) {
             )}
 
             {(showReleasePaymentModal && work) && (
-                <ReleaseModal bidId={task?.acceptedBid} amount={work.amount} workerName={work.workerName} onCancel={() => setShowReleasePaymentModal(false)} />
+
+                <ReleaseModal taskId={task._id} bidId={task?.acceptedBid} amount={work.amount} workerName={work.workerName} onCancel={() => setShowReleasePaymentModal(false)} onSuccess={(tid) => { setShowReleasePaymentModal(false); navigate(`/poster/review/${tid}`); }} />
             )}
         </>
     );
@@ -363,9 +364,9 @@ const MyTasks = () => {
     const [searchText, setSearchText] = useState('');
     const [page, setPage] = useState(1)
 
-    const debounceText = useDebounce({searchText});
+    const debounceText = useDebounce({ searchText });
 
-    const { data, isLoading, isError } = useGetPosterTasksQuery({search:debounceText, status: activeTab, page});
+    const { data, isLoading, isError } = useGetPosterTasksQuery({ search: debounceText, status: activeTab, page });
 
     const allTasks = data?.tasks.tasks || [];
 
