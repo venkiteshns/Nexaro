@@ -11,7 +11,8 @@ import {
   updateJobProgress,
   getWorkerProfile,
   updateWorkerProfile,
-  switchRoleToPoster
+  switchRoleToPoster,
+  getAllReviews
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -25,7 +26,8 @@ router.get("/my-bids", verifyToken, getWorkerBids);
 router.get("/bid-details/:bidId", verifyToken, getWorkerBidDetails);
 router.get("/active-job", verifyToken, getWorkerCurrentActiveJob); // param collision
 router.get("/task/:taskId/active-job", verifyToken, getWorkerActiveJob);
-router.get('/profile', verifyToken, getWorkerProfile)
+router.get('/profile', verifyToken, getWorkerProfile);
+router.get('/reviews', verifyToken, getAllReviews);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 

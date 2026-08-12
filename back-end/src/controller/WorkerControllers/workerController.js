@@ -1,6 +1,6 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService } from "../../services/workerServices.js";
+import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService } from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
 
 
@@ -283,4 +283,17 @@ export const switchRoleToPoster = async (req, res) => {
     }
 
     return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
+}
+
+export const getAllReviews = async (req, res) => {
+    const response = await getAllReviewService ({user: req.user, query: req.query})
+    if(response.forbidden){
+        return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
+    }
+    
+    if(response.error){
+      return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error});
+    }
+
+    return res.status(STATUS_CODES.OK).json({success:true, data: response.reviews, message: response.message})
 }
