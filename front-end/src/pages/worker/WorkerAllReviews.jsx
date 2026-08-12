@@ -15,7 +15,7 @@ const PER_PAGE = 5;
 const WorkerAllReviews = () => {
     const [page, setPage] = useState(1);
     const navigate = useNavigate();
-    const { data, isLoading } = useGetReviewsWorkerQuery({ page, limit: PER_PAGE });
+    const { data } = useGetReviewsWorkerQuery({ page, limit: PER_PAGE });
 
     const reviews = data?.data?.reviews || [];
     const total = data?.data?.totalReviews || 0;
