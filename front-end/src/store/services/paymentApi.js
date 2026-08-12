@@ -23,9 +23,10 @@ export const paymentApi = api.injectEndpoints({
 
         initiatePayment: builder.mutation({
             query: (bidId) => ({
-                url: PAYMENT.PAYOUT.replace(':bidId',bidId),
-                method:"POST"
-            })
+                url: PAYMENT.PAYOUT.replace(':bidId', bidId),
+                method: "POST"
+            }),
+            invalidatesTags: ['Poster_Tasks'],
         })
 
     })
