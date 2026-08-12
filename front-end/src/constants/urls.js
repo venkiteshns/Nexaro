@@ -1,16 +1,16 @@
 // Auth
 export const AUTH = {
     SEND_OTP: "/auth/get-otp",
-    VERIFY_OTP:"/auth/verify-otp",
-    POSTER_SIGNUP:"/auth/signup/poster",
-    WORKER_SIGNUP:"/auth/signup/worker",
-    USER_LOGIN:"/auth/login",
-    GOOGLE_LOGIN:"/auth/google-login",
-    ADMIN_LOGIN:"/auth/login/admin",
-    USER_LOGOUT:"/auth/logout",
-    ADMIN_LOGOUT:"/auth/logout/",
-    FORGOT_PASSWORD:"/auth/forgot-password",
-    UPDATE_PASSWORD:"/auth/update-password",
+    VERIFY_OTP: "/auth/verify-otp",
+    POSTER_SIGNUP: "/auth/signup/poster",
+    WORKER_SIGNUP: "/auth/signup/worker",
+    USER_LOGIN: "/auth/login",
+    GOOGLE_LOGIN: "/auth/google-login",
+    ADMIN_LOGIN: "/auth/login/admin",
+    USER_LOGOUT: "/auth/logout",
+    ADMIN_LOGOUT: "/auth/logout/",
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    UPDATE_PASSWORD: "/auth/update-password",
 }
 
 export const POSTER = {
@@ -40,13 +40,14 @@ export const WORKER = {
     GET_ACTIVE_JOB: "/worker/task/:taskId/active-job",
     UPDATE_JOB_PROGRESS: "/worker/task/:taskId/progress",
     UPDATE_PROFILE: "/worker/profile/update",
-    SWITCH_ROLE: '/worker/switch/role'
+    SWITCH_ROLE: '/worker/switch/role',
+    GET_REVIEWS: "/worker/reviews"
 }
 
 export const PAYMENT = {
-    CREATE_ORDER : `${import.meta.env.VITE_API_URL}/payment/orders`,
-    CAPTURE_PAYMENT : `${import.meta.env.VITE_API_URL}/payment/orders/:orderId/capture`,
-    PAYOUT:`${import.meta.env.VITE_API_URL}/payment/orders/:bidId/payout`
+    CREATE_ORDER: `${import.meta.env.VITE_API_URL}/payment/orders`,
+    CAPTURE_PAYMENT: `${import.meta.env.VITE_API_URL}/payment/orders/:orderId/capture`,
+    PAYOUT: `${import.meta.env.VITE_API_URL}/payment/orders/:bidId/payout`
 }
 
 export const REVIEWS = {

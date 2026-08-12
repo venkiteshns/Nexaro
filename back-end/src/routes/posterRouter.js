@@ -38,7 +38,6 @@ router.get("/task/completed/:taskId", verifyToken, getCompletedTaskPosterSide);
 
 router.get("/profile", verifyToken, getPosterProfile);
 
-
 router.patch("/bid/accept/:bidId", verifyToken, acceptBid);
 router.patch("/task/cancel/:taskId", verifyToken, cancelTaskByPoster);
 router.patch(

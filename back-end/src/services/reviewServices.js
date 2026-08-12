@@ -78,7 +78,7 @@ export const createReviewService = async ({ taskId, reviewee, rating, review }, 
       }
     ])
 
-    const newRating = averageReview.length > 0 ? averageReview[0].averageRating : 0;
+    const newRating = averageReview.length > 0 ? averageReview[0].averageRating.toFixed(1) : 0;
 
     await User.updateOne(
       {_id: new mongoose.Types.ObjectId(reviewee)},

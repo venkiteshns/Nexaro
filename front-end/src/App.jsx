@@ -28,6 +28,7 @@ import TaskBidDetails from './pages/worker/TaskBidDetails.jsx'
 import ActiveJob from './pages/worker/ActiveJob.jsx'
 import ActiveJobEntry from './pages/worker/ActiveJobEntry.jsx'
 import WorkerProfile from './pages/worker/WorkerProfile.jsx'
+import WorkerAllReviews from './pages/worker/WorkerAllReviews.jsx'
 
 import AdminLogin from "./pages/auth/AdminLogin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -81,6 +82,7 @@ function App() {
               <Route path='active-job' element={<ActiveJobEntry />} />
               <Route path='active-job/:taskId' element={<ActiveJob />} />
               <Route path='profile' element={<WorkerProfile />} />
+              <Route path='all-reviews' element={<WorkerAllReviews />} />
 
             </Route>
           </Route>

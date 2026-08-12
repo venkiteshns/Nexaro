@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import Review from "../models/reviewSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
@@ -323,20 +324,129 @@ export const updateWorkerProfileService = async ({user, data, avatar}) => {
 
 export const switchRoleToPosterService = async ({user}) => {
     if (!user) {
-    return { forbidden: MESSAGES.UNAUTHORIZED_USER }
-  }
-  try {
-    const isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "worker" });
-    if (!isUser) {
-      return { error: MESSAGES.USER_NOT_FOUND }
+        return { forbidden: MESSAGES.UNAUTHORIZED_USER }
     }
+    try {
+      const isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "worker" });
+      if (!isUser) {
+        return { error: MESSAGES.USER_NOT_FOUND }
+      }
 
-    isUser.activeRole = 'poster';
-    await isUser.save();
+      isUser.activeRole = 'poster';
+      await isUser.save();
 
-    return { success: true, message: "Role Updated" }
-  } catch (error) {
-    console.log("Role swiitch to poster without Data service error", error);
-    return { error: MESSAGES.UNEXPECTED_ERROR }
-  }
+      return { success: true, message: "Role Updated" }
+    } catch (error) {
+      console.log("Role swiitch to poster without Data service error", error);
+      return { error: MESSAGES.UNEXPECTED_ERROR }
+    }
+}
+
+export const getAllReviewService = async ({user, query}) => {
+    if (!user) {
+        return { forbidden: MESSAGES.UNAUTHORIZED_USER }
+    }
+    const page = Number(query.page);
+    const limit = Number(query.limit);
+    const skip = (Number(page) - 1 )* limit; 
+    try {
+        const isUser = await User.findOne({_id: user._id});
+        if(!isUser){
+            return {error: MESSAGES.USER_NOT_FOUND}
+        }
+        console.log(isUser.worker.rating);
+
+        const reviewDatas = await Review.aggregate([
+            {
+                $facet : {
+                    reviews : [
+                        {
+                            $match: {reviewee : isUser._id}
+                        },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'reviewer',
+                                foreignField: '_id',
+                                as: "reviewerDetails"
+                            }
+                        }, 
+                        {
+                            $unwind: {path: "$reviewerDetails"}
+                        },
+                        {
+                            $lookup: {
+                                from: 'tasks',
+                                localField: 'taskId',
+                                foreignField: '_id',
+                                as: "taskDetails"
+                            }
+                        }, 
+                        {
+                            $unwind: {path: "$taskDetails"}
+                        },
+                        {
+                            $sort:{
+                                createdAt: -1
+                            }
+                        },
+                        {
+                            $skip : skip
+                        },
+                        {
+                            $limit: limit
+                        },
+                        {
+                            $project: {
+                                _id:1,
+                                reviewerName: "$reviewerDetails.name",
+                                taskTitle: "$taskDetails.title",
+                                createdAt: 1,
+                                review: 1,
+                                rating:1
+                            }
+                        }
+
+                    ],
+                    totalReviews : [
+                        {
+                            $count: "TotalReviews"
+                        }
+                    ],
+                    ratingCount: [
+                        {
+                            $match: {reviewee : isUser._id}
+                        },
+                        {
+                            $group: {
+                                _id: "$rating",
+                                count: {$sum:1}
+                            }
+                        },
+                        {
+                            $sort: {
+                                _id: -1
+                            }
+                        }
+                    ]
+                }
+            }
+        ])
+        // console.log(reviewDatas[0]);
+        const responseReviews = {
+            reviews: reviewDatas[0].reviews,
+            totalReviews: reviewDatas[0].totalReviews[0].TotalReviews,
+            ratingCount: reviewDatas[0].ratingCount,
+        }
+        responseReviews.totalPages = Math.ceil(responseReviews.totalReviews / limit);
+        responseReviews.overallRating = isUser.worker.rating.toFixed(1);
+        console.log(responseReviews);
+        return {success: true, reviews: responseReviews, message: 'fetched reviews Successfully'}
+        
+    } catch (error) {
+        console.log(error);
+        return {error: MESSAGES.UNEXPECTED_ERROR}
+    }
+    console.log("Review query ", query);
+    
 }

@@ -25,6 +25,7 @@ const WorkerProfile = () => {
 
     const {data} = useGetWorkerProfileQuery();
     const [updateWorkerProfile, {isLoading:isProfileUpdating}] = useUpdateWorkerProfileMutation();
+    const [switchRole] = useSwitchRoleToPosterMutation();
 
     const { user, accessToken, refreshToken } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
@@ -43,8 +44,12 @@ const WorkerProfile = () => {
         console.log(data);
     }
 
-    const [switchRole] = useSwitchRoleToPosterMutation();
+    const navigateReviewPage = () => {
+        // navigate all reviews
+       return navigate('/worker/all-reviews')
+    }
 
+ 
     const handleRoleChange = async() => {
         try {
             await switchRole().unwrap();
@@ -149,7 +154,7 @@ const WorkerProfile = () => {
                         <WorkerReviewsSection
                             reviews={reviewProps}
                             totalCount={totalReviewCount}
-                            onViewAll={() => console.log('View all reviews')}
+                            onViewAll={navigateReviewPage}
                         />
 
                         {/* ── Danger Zone ── */}

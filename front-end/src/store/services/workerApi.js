@@ -112,16 +112,29 @@ export const workerApi = api.injectEndpoints({
           method: "PATCH",
           body: profileData,
         }
-      }, 
-      invalidatesTags:["Worker_Profile"]
+      },
+      invalidatesTags: ["Worker_Profile"]
     }),
 
-    switchRoleToPoster: builder.mutation ({
-      query:() => ({
-          url: WORKER.SWITCH_ROLE,
-          method: "PATCH",
-        })
-      }),
+    switchRoleToPoster: builder.mutation({
+      query: () => ({
+        url: WORKER.SWITCH_ROLE,
+        method: "PATCH",
+      })
+    }),
+
+    getReviewsWorker: builder.query({
+      query: ({ page = 1, limit = 5 } = {}) => {
+        let queryParams = new URLSearchParams();
+        queryParams.append('page', page);
+        queryParams.append('limit', limit);
+        return {
+          url: `${WORKER.GET_REVIEWS}?${queryParams.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Worker_Reviews"],
+    }),
 
   }),
 });
@@ -138,6 +151,7 @@ export const {
   useUpdateJobProgressMutation,
   useGetWorkerProfileQuery,
   useUpdateWorkerProfileMutation,
-  useSwitchRoleToPosterMutation
+  useSwitchRoleToPosterMutation,
+  useGetReviewsWorkerQuery
 } = workerApi;
 
