@@ -89,7 +89,7 @@ const TaskSummaryCard = ({ task, worker }) => {
                     {worker.rating != null && (
                         <div className="flex items-center gap-6 w-full justify-center border-t border-gray-100 pt-3">
                             <div>
-                                <p className="text-xl font-extrabold text-gray-900">{worker.rating}</p>
+                                <p className="text-xl font-extrabold text-gray-900">{worker.rating.toFixed(1)}</p>
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Rating</p>
                             </div>
                         </div>
