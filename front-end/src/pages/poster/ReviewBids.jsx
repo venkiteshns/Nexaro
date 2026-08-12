@@ -4,12 +4,7 @@ import {
     ArrowLeft,
     MapPin,
     Calendar,
-    Star,
-    CheckCircle,
     ChevronDown,
-    Loader2,
-    AlertTriangle,
-    ArrowRight,
 } from 'lucide-react';
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';

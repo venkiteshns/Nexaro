@@ -220,7 +220,7 @@ export const handleNewBid = async (task, user) => {
         if (!isTask) {
             return { error: "No task found" }
         }
-        if(isTask.status == 'cancelled'){
+        if(isTask.status === 'cancelled'){
             return {error: "This task has been cancelled by the poster, Cannot place bid for a cancelled task"}
         }
         const isAlreadyBid = await Bid.findOne({
@@ -762,4 +762,4 @@ export const getWorkerCurrentActiveJobService = async (workerId) => {
         console.error("getWorkerCurrentActiveJobService error:", error.message);
         return { error: error.message };
     }
-};
+};

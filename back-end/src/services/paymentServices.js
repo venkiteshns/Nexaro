@@ -8,134 +8,134 @@ import { getIo } from "../socket.js";
 import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
 
-async function getPayoutStatus(payoutBatchId, accessToken) {
-  const response = await fetch(
-    `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+// async function getPayoutStatus(payoutBatchId, accessToken) {
+//   const response = await fetch(
+//     `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
+//     {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     }
+//   );
 
-  const data = await response.json();
-  return data;
-}
+//   const data = await response.json();
+//   return data;
+// }
 
-async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts = 6, delayMs = 2000) {
-  const TERMINAL_STATUSES = [
-    'SUCCESS', 'FAILED', 'RETURNED', 'ONHOLD',
-    'BLOCKED', 'REFUNDED', 'REVERSED', 'UNCLAIMED', 'DENIED'
-  ];
+// async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts = 6, delayMs = 2000) {
+//   const TERMINAL_STATUSES = [
+//     'SUCCESS', 'FAILED', 'RETURNED', 'ONHOLD',
+//     'BLOCKED', 'REFUNDED', 'REVERSED', 'UNCLAIMED', 'DENIED'
+//   ];
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const res = await fetch(
-      `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+//   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+//     const res = await fetch(
+//       `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
+//       {
+//         method: 'GET',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${accessToken}`,
+//         },
+//       }
+//     );
 
-    const data = await res.json();
-    const item = data.items?.[0]; // single-item batch, so index 0 is safe
-    const itemStatus = item?.transaction_status;
+//     const data = await res.json();
+//     const item = data.items?.[0]; // single-item batch, so index 0 is safe
+//     const itemStatus = item?.transaction_status;
 
-    console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
+//     console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
 
-    if (itemStatus && TERMINAL_STATUSES.includes(itemStatus)) {
-      return {
-        success: itemStatus === 'SUCCESS',
-        stage: 'final',
-        batchStatus: data.batch_header?.batch_status,
-        itemStatus,
-        payoutItemId: item.payout_item_id,
-        transactionId: item.transaction_id,
-        errors: item.errors || null,
-        raw: data
-      };
-    }
+//     if (itemStatus && TERMINAL_STATUSES.includes(itemStatus)) {
+//       return {
+//         success: itemStatus === 'SUCCESS',
+//         stage: 'final',
+//         batchStatus: data.batch_header?.batch_status,
+//         itemStatus,
+//         payoutItemId: item.payout_item_id,
+//         transactionId: item.transaction_id,
+//         errors: item.errors || null,
+//         raw: data
+//       };
+//     }
 
-    if (attempt < maxAttempts) {
-      await new Promise(r => setTimeout(r, delayMs));
-    }
-  }
+//     if (attempt < maxAttempts) {
+//       await new Promise(r => setTimeout(r, delayMs));
+//     }
+//   }
 
-  // Still not resolved after polling — don't block the caller forever
-  return {
-    success: null, // unknown yet
-    stage: 'still_pending',
-    message: 'Payout is still processing after polling window. Rely on webhook for final confirmation.',
-    payoutBatchId
-  };
-}
+//   // Still not resolved after polling — don't block the caller forever
+//   return {
+//     success: null, // unknown yet
+//     stage: 'still_pending',
+//     message: 'Payout is still processing after polling window. Rely on webhook for final confirmation.',
+//     payoutBatchId
+//   };
+// }
 
-async function payoutTransferService (receiverEmail, amount, currency) {
+// async function payoutTransferService (receiverEmail, amount, currency) {
   
-  try {
-    let accessToken = await generateAccessToken();
-    const senderBatchId = `batch_${Date.now()}`; // Unique batch ID for this payout
+//   try {
+//     coonst accessToken = await generateAccessToken();
+//     const senderBatchId = `batch_${Date.now()}`; // Unique batch ID for this payout
 
-    const payoutPayload = {
-      sender_batch_header:{
-        sender_batch_id: senderBatchId,
-        email_subject: "You have a payout!",
-        email_message: "You have received a payout! Thanks for using our service!",
-        recipient_type: "EMAIL"
-      },
-      items:[
-        {
-          recipient_type: "EMAIL",
-          amount: {
-            value:parseFloat(amount).toFixed(2), // Ensure exactly 2 decimal places
-            currency: currency || USD
-          },
-          receiver: receiverEmail,
-          note: "Thank you for your business.",
-          sender_item_id: `item_${Date.now()}` // Unique item ID for this payout
-        }
-      ]
-    }
+//     const payoutPayload = {
+//       sender_batch_header:{
+//         sender_batch_id: senderBatchId,
+//         email_subject: "You have a payout!",
+//         email_message: "You have received a payout! Thanks for using our service!",
+//         recipient_type: "EMAIL"
+//       },
+//       items:[
+//         {
+//           recipient_type: "EMAIL",
+//           amount: {
+//             value:parseFloat(amount).toFixed(2), // Ensure exactly 2 decimal places
+//             currency: currency || "USD"
+//           },
+//           receiver: receiverEmail,
+//           note: "Thank you for your business.",
+//           sender_item_id: `item_${Date.now()}` // Unique item ID for this payout
+//         }
+//       ]
+//     }
 
-    const response = await fetch(`${process.env.PAYPAL_API_URL}/v1/payments/payouts`,{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(payoutPayload)
-    });
+//     const response = await fetch(`${process.env.PAYPAL_API_URL}/v1/payments/payouts`,{
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//       body: JSON.stringify(payoutPayload)
+//     });
 
     
     
-    const data = await response.json();
-    console.log("Payout Response:", data);
+//     const data = await response.json();
+//     console.log("Payout Response:", data);
 
-    if (!response.ok) {
-      return {
-        success: false,
-        stage: 'create',
-        error: data
-      };
-    }
+//     if (!response.ok) {
+//       return {
+//         success: false,
+//         stage: 'create',
+//         error: data
+//       };
+//     }
 
-    const payoutBatchId = data.batch_header.payout_batch_id;
+//     const payoutBatchId = data.batch_header.payout_batch_id;
 
-    const finalStatus = await pollPayoutStatus( payoutBatchId, accessToken )
+//     const finalStatus = await pollPayoutStatus( payoutBatchId, accessToken )
 
-    console.log("finalStatus", finalStatus);
+//     console.log("finalStatus", finalStatus);
     
     
-  } catch (error) {
-    console.log("error", error);
-    return { success: false, stage: 'exception', error: error.message };
-  }
-}
+//   } catch (error) {
+//     console.log("error", error);
+//     return { success: false, stage: 'exception', error: error.message };
+//   }
+// }
 
 export const createOrderService = async (orderDetails) => {
 
@@ -262,7 +262,7 @@ export const captureOrderService = async ( orderId, user ) => {
       dbOrder.status = "Paid";
       dbOrder.paypalCaptureId = captureId;
       await dbOrder.save();
-      const updatedPoster = await User.findOneAndUpdate(
+      await User.findOneAndUpdate(
         {_id: user._id},
         {$inc : {
           'poster.spent': Number(dbOrder.totalAmount),
@@ -306,7 +306,7 @@ export const orderPayoutService = async ({bidId, user}) => {
     // console.log("order",order)
     const bid = await Bid.findById(bidId) 
     // console.log("bid",bid)
-    const worker = await User.findOne({_id:bid.workerId}) 
+    // const worker = await User.findOne({_id:bid.workerId}) 
     // console.log("worker",worker)
     const poster = await User.findOne({_id: user._id}) 
     // console.log("poster")
@@ -314,12 +314,12 @@ export const orderPayoutService = async ({bidId, user}) => {
     console.log("task ", task);
     
     
-    if(order.totalAmount != bid.amount){
+    if(order.totalAmount !== bid.amount){
       return {success: false, message: MESSAGES.AMOUNT_MISMATCH};
     }
     // console.log("amount okay");
     
-    const workerWallet = await Wallet.findOneAndUpdate(
+    await Wallet.findOneAndUpdate(
       {userId: new mongoose.Types.ObjectId(bid.workerId) },
       {
         $inc: {

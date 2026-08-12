@@ -259,7 +259,7 @@ export const getWorkerProfile = async (req, res) => {
 }
 
 export const updateWorkerProfile = async (req, res) => {
-    let response = await updateWorkerProfileService({user:req.user, data: req.body, avatar: req.files})
+    const response = await updateWorkerProfileService({user:req.user, data: req.body, avatar: req.files})
     console.log(response);
     if(response.unauthorized){
         return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.unauthorized})
@@ -273,7 +273,7 @@ export const updateWorkerProfile = async (req, res) => {
 }
 
 export const switchRoleToPoster = async (req, res) => {
-    let response = await switchRoleToPosterService ({user: req.user});
+    const response = await switchRoleToPosterService ({user: req.user});
     if(response.forbidden){
         return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
     }

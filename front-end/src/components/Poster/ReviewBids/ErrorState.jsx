@@ -1,3 +1,5 @@
+import { AlertTriangle } from "lucide-react";
+
 export default function ErrorState({ onRetry }) {
     return (
         <div className="flex flex-col items-center justify-center py-20 gap-5">

@@ -1,5 +1,5 @@
 import { TbCurrencyRupee } from "react-icons/tb";
-import { MapPin, Dot, Wallet, Zap, ShieldUser, ShieldCheck } from "lucide-react";
+import { MapPin, Wallet, Zap, ShieldUser, ShieldCheck } from "lucide-react";
 import "./PosterSignupBanner.css";
 import Logo from "../Logo/Logo";
 

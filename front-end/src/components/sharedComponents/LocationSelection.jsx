@@ -31,17 +31,18 @@ const LocationSelection = ({ SectionName }) => {
     const placeOptions = uniqueSuggestions.map((p) => p.displayName);
 
     useEffect(() => {
-        if (skipNextSearch.current) {
-            skipNextSearch.current = false;
-            return;
-        }
+        ( () => {   
+                if (skipNextSearch.current) {
+                    skipNextSearch.current = false;
+                return;
+            }
 
-        if (!debouncedSearch) {
-            setSuggestions([]);
-            setIsOpen(false);
-            return;
-        }
-
+            if (!debouncedSearch) {
+                setSuggestions([]);
+                setIsOpen(false);
+                return;
+            }
+         })()
         let cancelled = false;
 
         (async () => {
@@ -110,13 +111,13 @@ const LocationSelection = ({ SectionName }) => {
                     lat: place.lat,
                     lon: place.lng,
                 }, { moveMap: false });
-            } catch (err) {
+            } catch {
                 setSuggestions([]);
             }
         })();
     };
 
-    const onPlaceSelect = (place, index) => {
+    const onPlaceSelect = (place) => {
         const match = uniqueSuggestions.find((p) => p.displayName == place)
         if (match) applySelectedPlace(match);
     };

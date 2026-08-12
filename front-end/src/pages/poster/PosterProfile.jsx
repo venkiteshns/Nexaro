@@ -23,7 +23,7 @@ import SwitchToWorkerModal from "../../components/Poster/RoleSwitch/SwitchToWork
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const PosterProfile = () => {
   const { data, isLoading } = useGetPosterProfileQuery();
@@ -74,7 +74,7 @@ const PosterProfile = () => {
   const handleRoleSwitch = async () => {
     if (posterInfo.isWorkerActive) {
       try {
-        let res = await roleSwitch().unwrap();
+        await roleSwitch().unwrap();
         console.log("redirect to worker profile");
         const updatedUser = { ...user, role: 'worker' };
         showSuccess("Switching to Worker Dashboard");

@@ -186,7 +186,7 @@ export const getPosterProfile = async (req, res) => {
 };
 
 export const switchRoleToWorker = async (req, res) => {
-  let response = await switchRoleToWorkerService ({user: req.user, data: req.body, files: req.files});
+  const response = await switchRoleToWorkerService ({user: req.user, data: req.body, files: req.files});
   if(response.forbidden){
     return res.status(STATUS_CODES.FORBIDDEN).json({success: false, message: response.forbidden})
   }
@@ -198,7 +198,7 @@ export const switchRoleToWorker = async (req, res) => {
 }
 
 export const posterRoleSwitchAlreadyDataUploaded = async (req, res) => {
-  let response = await posterRoleSwitchAlreadyDataUploadedService({user: req.user});
+  const response = await posterRoleSwitchAlreadyDataUploadedService({user: req.user});
   if(response.forbidden){
     return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
   }

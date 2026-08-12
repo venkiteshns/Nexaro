@@ -58,7 +58,7 @@ export default function PaymentButton({ amount, bidId, onSuccess }) {
                                     return actions.restart();
                                     
                                 default:
-                                    showWarning(result?.reason || "Payment could not be completed. Please try again.");
+                                    showWarning("Payment could not be completed. Please try again.");
                             }
                         } catch (error) {
                             console.error("Capture request failed:", error);

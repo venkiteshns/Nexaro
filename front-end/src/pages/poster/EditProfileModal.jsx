@@ -73,7 +73,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       setIsVerified(false);
       setEmailChanged(false);
     }
-  },[isVerified, selectedAvatar, updatePosterProfile, onClose])
+  },[isVerified, selectedAvatar, updatePosterProfile, onClose, emailChanged])
 
   const onSubmit = async (data) => {
     if(data.email != posterInfo?.email && !isVerified) {

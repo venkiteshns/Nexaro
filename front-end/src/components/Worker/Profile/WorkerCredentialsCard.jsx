@@ -1,4 +1,4 @@
-import { ShieldCheck, Phone, MapPin, CheckCircle, TriangleAlert, Clock } from 'lucide-react';
+import { ShieldCheck, Phone, MapPin, CheckCircle, TriangleAlert } from 'lucide-react';
 
 const CredentialRow = ({ icon, label, detail, verified }) => (
     <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">

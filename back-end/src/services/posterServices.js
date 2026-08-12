@@ -646,7 +646,7 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
   const parsedLanguages = JSON.parse(data.languages);
 
   try {
-    let userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" })
+    const userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" })
     // let userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id) })
     if (!userData) {
       return { error: MESSAGES.USER_NOT_FOUND }
@@ -697,7 +697,7 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
     return { forbidden: MESSAGES.UNAUTHORIZED_USER }
   }
   try {
-    let isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" });
+    const isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" });
     if (!isUser) {
       return { error: MESSAGES.USER_NOT_FOUND }
     }
