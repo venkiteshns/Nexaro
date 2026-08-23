@@ -10,6 +10,16 @@ import {
   generateRefreshToken,
 } from "../utils/generateTokens.js";
 import mongoose from "mongoose";
+import redisClient from "../config/redisClient.js";
+
+
+const MAX_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 300;
+const OTP_PREFIX = "otp:";
+const OTP_TTL_MS = 10 * 60 * 1000;
+
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const googleLoginService = async (accessToken) => {
   // try {
@@ -65,13 +75,9 @@ export const googleLoginService = async (accessToken) => {
   };
   // } catch (error) {
   //   throw error;
+
   // }
 };
-
-const MAX_RETRIES = 3;
-const RETRY_BASE_DELAY_MS = 300;
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const createOtp = async (email, phone, resendFlag) => {
   console.log(email, phone, resendFlag);
@@ -247,12 +253,12 @@ export const loginService = async (userData, isAdmin) => {
   };
 };
 
-export const sendForgotPasswordEmail = (email, otp) => {
+export const sendForgotPasswordEmail = async (email, otp) => {
   let lastError;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = fetch("https://api.brevo.com/v3/smtp/email", {
+      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -271,7 +277,7 @@ export const sendForgotPasswordEmail = (email, otp) => {
       });
 
       if (!response.ok) {
-        const errorData = response.json();
+        const errorData = await response.json();
         console.error("Brevo API Error:", errorData);
         throw new Error(
           `Brevo API rejected the request: ${errorData?.message ?? response.status}`,
@@ -300,7 +306,7 @@ export const sendForgotPasswordEmail = (email, otp) => {
       console.warn(
         `sendForgotPasswordEmail: transient error on attempt ${attempt}, retrying in ${delay}ms...`,
       );
-      sleep(delay);
+      await sleep(delay);
     }
   }
 
@@ -334,22 +340,31 @@ export const forgotPasswordOtpService = async (email, role) => {
   const otp = crypto.randomInt(100000, 999999).toString();
   console.log("Forgot Password OTP", otp);
 
-  const existingOtp = await Otp.findOne({ email });
-  if (existingOtp) {
-    await Otp.deleteOne({ email });
-  }
+  // const existingOtp = await Otp.findOne({ email });
+  // if (existingOtp) {
+  //   await Otp.deleteOne({ email });
+  // }
+  const key = `${OTP_PREFIX}:${email}`;
 
+  const existingOtp = await redisClient.get(key);
+  if (existingOtp) {
+    await redisClient.del(key);
+  }
   const hashedOtp = await hashData(otp);
-  await Otp.create({
-    email,
-    otp: hashedOtp,
-    createdAt: new Date(),
-    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-  });
+  console.log(" Forgot hashedOtp", otp, hashedOtp);
+
+  await redisClient.set(key, hashedOtp, { EX: OTP_TTL_MS });
+  // await Otp.create({
+  //   email,
+  //   otp: hashedOtp,
+  //   createdAt: new Date(),
+  //   expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+  // });
 
   const otpSend = await sendForgotPasswordEmail(email, otp);
   if (!otpSend) {
-    await Otp.deleteOne({ email });
+    await redisClient.del(key);
+    // await Otp.deleteOne({ email });
     return { success: false, message: messages.FAILED_TO_SEND_OTP };
   }
 

@@ -4,6 +4,7 @@ import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePas
 import { generateAccessToken } from '../utils/generateTokens.js';
 import STATUS_CODES from '../constants/statusCodes.js';
 import MESSAGES from '../constants/messages.js';
+import { setOtp, verifyRedisOtp } from '../services/otpService.js';
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -36,7 +37,8 @@ export const refreshAccessToken = async (req, res) => {
 
 export const getOtpForSignUp = async (req, res) => {
     try {
-        const response = await createOtp(req.body.email, req.body.phone, req.body.resendFlag);
+        // const response = await createOtp(req.body.email, req.body.phone, req.body.resendFlag);
+        const response = await setOtp(req.body.email);
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.OTP_SENT });
         } else {
@@ -51,7 +53,8 @@ export const getOtpForSignUp = async (req, res) => {
 
 export const verifySignUpOtp = async (req, res) => {
     try {
-        const response = await verifyOtp(req.body.email, req.body.otp);
+        // const response = await verifyOtp(req.body.email, req.body.otp);
+        const response = await verifyRedisOtp(req.body.email, req.body.otp);
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.OTP_VERIFIED });
         } else {
@@ -180,7 +183,7 @@ export const googleLogin = async (req, res) => {
     }
 };
 
-export const updateUserPassword =  async (req, res) => {
+export const updateUserPassword = async (req, res) => {
     const response = await updateUserPasswordService(req.body, req.user._id);
     if (response.success) {
         return res.status(STATUS_CODES.OK).json({ success: true, message: response.message });
@@ -191,9 +194,9 @@ export const updateUserPassword =  async (req, res) => {
 
 export const deleteUserProfile = async (req, res) => {
     const response = await deleteUserProfileService(req.user);
-    if(response.success){
-        res.status(STATUS_CODES.OK).json({success: true, message: response.message});
+    if (response.success) {
+        res.status(STATUS_CODES.OK).json({ success: true, message: response.message });
     } else {
-        res.status(STATUS_CODES.BAD_REQUEST).json({success: false, message: response.message});
+        res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
     }
 }
