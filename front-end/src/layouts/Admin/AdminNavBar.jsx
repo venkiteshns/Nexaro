@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -8,6 +9,7 @@ import {
   LogOut,
   Menu,
   X,
+  ChevronDown,
 } from "lucide-react";
 import logo from '../../assets/Nex_Logo.png'
 import Logo from '../../components/Logo/Logo'
@@ -54,7 +56,16 @@ const AdminNavBar = () => {
     {
       label: "Financials",
       icon: <Wallet size={20} />,
-      redirect: '/admin/finance'
+      children: [
+        {
+          label: "Payments & Revenue",
+          redirect: '/admin/finance/payments'
+        },
+        {
+          label: "Financial Reports",
+          redirect: '/admin/finance/reports'
+        },
+      ]
     },
     {
       label: "Notifications",
@@ -62,6 +73,22 @@ const AdminNavBar = () => {
       redirect: '/admin/notifications'
     },
   ];
+
+  // Keep a group expanded when one of its children is the active page
+  const [openMenu, setOpenMenu] = useState(
+    () => adminNav.find((item) => item.children?.some((child) => child.label === active))?.label || null
+  );
+
+  const toggleMenu = (label) => {
+    // The labels are hidden while collapsed, so open the sidebar first
+    if (!sidebarOpen) dispatch(setSideBar(true));
+    setOpenMenu((prev) => (prev === label ? null : label));
+  };
+
+  const goTo = (item) => {
+    dispatch(setActivePage(item.label));
+    navigate(item.redirect);
+  };
 
   return (
     <div
@@ -97,26 +124,58 @@ const AdminNavBar = () => {
 
         {/* NAVIGATION */}
         <div className="p-4 space-y-2">
-          {adminNav.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                dispatch(setActivePage(item.label))
-                navigate(item.redirect)
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                item.label === active
-                  ? "bg-[#0A6E5C] text-white"
-                  : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
-              }`}
-            >
-              {item.icon}
+          {adminNav.map((item) => {
+            const childActive = item.children?.some((child) => child.label === active);
+            const isActive = item.label === active || childActive;
 
-              {sidebarOpen && (
-                <span className="font-medium text-sm">{item.label}</span>
-              )}
-            </button>
-          ))}
+            return (
+              <div key={item.label} className="space-y-1">
+                <button
+                  onClick={() => (item.children ? toggleMenu(item.label) : goTo(item))}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    isActive
+                      ? item.children
+                        ? "bg-emerald-50 text-[#0A6E5C]"
+                        : "bg-[#0A6E5C] text-white"
+                      : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
+                  }`}
+                >
+                  {item.icon}
+
+                  {sidebarOpen && (
+                    <span className="font-medium text-sm">{item.label}</span>
+                  )}
+
+                  {sidebarOpen && item.children && (
+                    <ChevronDown
+                      size={16}
+                      className={`ml-auto transition-transform ${
+                        openMenu === item.label ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </button>
+
+                {sidebarOpen && item.children && openMenu === item.label && (
+                  <div className="ml-5 pl-3 border-l border-gray-200 space-y-1">
+                    {item.children.map((child) => (
+                      <button
+                        key={child.label}
+                        onClick={() => goTo(child)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                          child.label === active
+                            ? "bg-[#0A6E5C] text-white font-medium"
+                            : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
+                        }`}
+                      >
+                        {child.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

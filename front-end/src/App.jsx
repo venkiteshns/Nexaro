@@ -36,6 +36,7 @@ import UserManagement from "./pages/admin/UserMangement.jsx";
 import UserVerificationPanel from './pages/admin/UserVerificationPanel.jsx'
 import AdminTaskManagement from './pages/admin/AdminTaskManagement.jsx'
 import AdminTaskDetails from './pages/admin/AdminTaskDetails.jsx'
+import AdminPayments from './pages/admin/AdminPayments.jsx'
 
 function App() {
   useSocketNotification();
@@ -94,6 +95,7 @@ function App() {
               <Route path="users/verification" element={<UserVerificationPanel />} />
               <Route path="tasks" element={<AdminTaskManagement />} />
               <Route path="tasks/:taskId" element={<AdminTaskDetails />} />
+              <Route path="finance/payments" element={<AdminPayments />} />
             </Route>
           </Route>
 

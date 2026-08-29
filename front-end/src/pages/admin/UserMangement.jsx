@@ -172,7 +172,7 @@ const UserManagement = () => {
 
   const { data, isLoading, isError } = useAdminGetUsersQuery({
     page: currentPage,
-    limit: 10,
+    limit: 5,
   });
 
   const navigate = useNavigate();
@@ -360,7 +360,7 @@ const UserManagement = () => {
                           </td>
                           <td className="px-6 py-5">
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-[#0A6E5C] capitalize">
-                              { user.taskCount}
+                              {user.taskCount}
                             </span>
                           </td>
                           <td className="px-6 py-5">
