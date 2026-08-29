@@ -9,7 +9,7 @@ function PrivateRoute({ allowedRoles }) {
     if (!(adminAuth?.accessToken && adminAuth?.admin)) {
       return <Navigate to="/admin/login" replace />;
     }
-      return <Outlet />;
+    return <Outlet />;
 
   } else {
     // 1. Check if user is logged in
@@ -18,7 +18,6 @@ function PrivateRoute({ allowedRoles }) {
     }
 
     if (allowedRoles == userAuth.user.role) {
-      console.log("allo state role", allowedRoles, userAuth.user.role);
       return <Outlet />;
     } else {
       if (userAuth.user.role === "worker") {
