@@ -39,6 +39,7 @@ const MESSAGES = {
     USER_UNSUSPENDED: "User unsuspended successfully",
 
     USER_NOT_EXIST_WITH_EMAIL: "User does not exist with this email",
+    USER_ALREADY_EXIST_WITH_EMAIL: "User already exists with this email",
     USER_NOT_EXIST_WITH_EMAIL_MOBILE: "User does not exist with this email or mobile number",
 
     USER_ALREADY_VERIFIED: "User is already verified",

@@ -11,7 +11,7 @@ import {
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {showWarning} from '../../utils/toast.js'
+import { showWarning } from '../../utils/toast.js'
 
 const WorkerSignup = () => {
   const methods = useForm();
@@ -30,7 +30,7 @@ const WorkerSignup = () => {
 
   const [workerSignUp] = useWorkerSignUpMutation();
 
-  const sendDataToBackend = useCallback( async () => {
+  const sendDataToBackend = useCallback(async () => {
     if (!isVerified) return;
     const fd = new FormData();
     console.log("called");
@@ -85,8 +85,9 @@ const WorkerSignup = () => {
     } catch (err) {
       showWarning(err.data?.message)
       console.log("Sign up error", err);
+      setIsVerified(false);
     }
-  },[formData, workerSignUp, navigate, isVerified, dispatch])
+  }, [formData, workerSignUp, navigate, isVerified, dispatch])
 
   useEffect(() => {
     if (isVerified && formData) {

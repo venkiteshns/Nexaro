@@ -5,7 +5,7 @@ import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getW
 
 
 export const workerSignup = async (req, res) => {
-    console.log(req.body, "body", req.files, "files");
+    // console.log(req.body, "body", req.files, "files");
 
     try {
 
@@ -252,48 +252,48 @@ export const getWorkerCurrentActiveJob = async (req, res) => {
 
 export const getWorkerProfile = async (req, res) => {
     const response = await getWorkerProfileService(req.user)
-    if(response.error){
-        return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error || MESSAGES.UNEXPECTED_ERROR})
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error || MESSAGES.UNEXPECTED_ERROR })
     }
-    return res.status(STATUS_CODES.OK).json({success: true, message: MESSAGES.PROFILE_FETCH_SUCCESS, profileData: response.profileData})
+    return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.PROFILE_FETCH_SUCCESS, profileData: response.profileData })
 }
 
 export const updateWorkerProfile = async (req, res) => {
-    const response = await updateWorkerProfileService({user:req.user, data: req.body, avatar: req.files})
+    const response = await updateWorkerProfileService({ user: req.user, data: req.body, avatar: req.files })
     console.log(response);
-    if(response.unauthorized){
-        return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.unauthorized})
+    if (response.unauthorized) {
+        return res.status(STATUS_CODES.FORBIDDEN).json({ success: false, message: response.unauthorized })
     }
-    if(response.error){
-        return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error})
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error })
     }
 
-    return res.status(STATUS_CODES.OK).json({success: true, message: response.message})
-    
+    return res.status(STATUS_CODES.OK).json({ success: true, message: response.message })
+
 }
 
 export const switchRoleToPoster = async (req, res) => {
-    const response = await switchRoleToPosterService ({user: req.user});
-    if(response.forbidden){
-        return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
-    }
-    
-    if(response.error){
-      return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error});
+    const response = await switchRoleToPosterService({ user: req.user });
+    if (response.forbidden) {
+        return res.status(STATUS_CODES.FORBIDDEN).json({ success: false, message: response.forbidden });
     }
 
-    return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error });
+    }
+
+    return res.status(STATUS_CODES.OK).json({ success: true, message: response.message })
 }
 
 export const getAllReviews = async (req, res) => {
-    const response = await getAllReviewService ({user: req.user, query: req.query})
-    if(response.forbidden){
-        return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
-    }
-    
-    if(response.error){
-      return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error});
+    const response = await getAllReviewService({ user: req.user, query: req.query })
+    if (response.forbidden) {
+        return res.status(STATUS_CODES.FORBIDDEN).json({ success: false, message: response.forbidden });
     }
 
-    return res.status(STATUS_CODES.OK).json({success:true, data: response.reviews, message: response.message})
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error });
+    }
+
+    return res.status(STATUS_CODES.OK).json({ success: true, data: response.reviews, message: response.message })
 }
