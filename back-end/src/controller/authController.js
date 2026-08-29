@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
-import { createOtp, loginService, verifyOtp, forgotPasswordOtpService, updatePasswordService, googleLoginService, updateUserPasswordService, deleteUserProfileService } from '../services/authServices.js';
+import { loginService, forgotPasswordOtpService, updatePasswordService, googleLoginService, updateUserPasswordService, deleteUserProfileService } from '../services/authServices.js';
 import { generateAccessToken } from '../utils/generateTokens.js';
 import STATUS_CODES from '../constants/statusCodes.js';
 import MESSAGES from '../constants/messages.js';

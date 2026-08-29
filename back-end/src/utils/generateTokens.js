@@ -8,7 +8,7 @@ export const generateAccessToken = (user) => {
             activeRole: user.activeRole
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
     );
 };
 
@@ -18,6 +18,6 @@ export const generateRefreshToken = (user) => {
             _id: user._id
         },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "10d" }
+        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
     );
 };

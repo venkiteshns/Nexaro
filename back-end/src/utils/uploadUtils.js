@@ -13,6 +13,7 @@ export const uploadManyFiles = async (files, folder) => {
         const uploadPromises = Object.entries(files).map(
             async ([filedName, fileArray]) => {
                 const file = fileArray[0];
+                console.log("file", file, "_________");
 
                 const extension = path.extname(file.originalname);
 
