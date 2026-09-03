@@ -42,7 +42,8 @@ export const WORKER = {
     UPDATE_PROFILE: "/worker/profile/update",
     SWITCH_ROLE: '/worker/switch/role',
     GET_REVIEWS: "/worker/reviews",
-    COMPLETED_TASK: "/worker/task/:taskId/completed"
+    COMPLETED_TASK: "/worker/task/:taskId/completed",
+    GET_EARNING_HERO_DATA: "/worker/earnings/hero"
 }
 
 export const PAYMENT = {

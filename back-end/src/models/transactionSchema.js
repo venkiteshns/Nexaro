@@ -22,7 +22,7 @@ const transactionSchema = new mongoose.Schema(
     },
     transactionType: {
       type: String,
-      enum: ["to_escrow", "to_worker"],
+      enum: ["to_escrow", "to_worker", "to_worker_wallet"],
       required: true,
     },
     status: {

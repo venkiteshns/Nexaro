@@ -391,6 +391,16 @@ export const orderPayoutService = async ({ bidId, user }) => {
       }
     );
 
+    await Transaction.create({
+      orderId: order._id,
+      senderId: user._id,
+      receiverId: bid.workerId,
+      amount: creditedAmount,
+      transactionType: "to_worker_wallet",
+      status: "completed",
+      processedAt: new Date(),
+    });
+
     task.update = 'payment';
     task.status = 'completed';
     if (!task.completedOn) {

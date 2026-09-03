@@ -145,6 +145,14 @@ export const workerApi = api.injectEndpoints({
       providesTags: ["Worker_Completed_Task"],
     }),
 
+    getEarningHeroData: builder.query({
+      query: () => ({
+        url: WORKER.GET_EARNING_HERO_DATA,
+        method: "GET",
+      }),
+      providesTags: ["Earning_Hero_Data"],
+    })
+
   }),
 });
 
@@ -162,6 +170,7 @@ export const {
   useUpdateWorkerProfileMutation,
   useSwitchRoleToPosterMutation,
   useGetReviewsWorkerQuery,
-  useGetCompletedTaskWorkerSideQuery
+  useGetCompletedTaskWorkerSideQuery,
+  useGetEarningHeroDataQuery
 } = workerApi;
 

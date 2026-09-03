@@ -13,7 +13,8 @@ import {
   updateWorkerProfile,
   switchRoleToPoster,
   getAllReviews,
-  getCompletedTaskWorkerSide
+  getCompletedTaskWorkerSide,
+  getEarningHeroData
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -30,13 +31,14 @@ router.get("/task/:taskId/active-job", verifyToken, getWorkerActiveJob);
 router.get('/profile', verifyToken, getWorkerProfile);
 router.get('/reviews', verifyToken, getAllReviews);
 router.get('/task/:taskId/completed', verifyToken, getCompletedTaskWorkerSide);
+router.get('/earnings/hero', verifyToken, getEarningHeroData);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 
 router.delete("/bid/withdraw/:bidId", verifyToken, withdrawBid);
 
 router.patch("/task/:taskId/progress", verifyToken, updateJobProgress);
-router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar',  maxCount: 1}]), updateWorkerProfile);
+router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar', maxCount: 1 }]), updateWorkerProfile);
 router.patch('/switch/role', verifyToken, switchRoleToPoster)
 
 export default router;

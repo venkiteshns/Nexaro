@@ -119,7 +119,8 @@ export const api = createApi({
     "Worker_Reviews",
     "Admin_Tasks",
     "Admin_Task_Details",
-    "Task_for_bid"
+    "Task_for_bid",
+    "Earning_Hero_Data"
   ],
   endpoints: () => ({}),
 });

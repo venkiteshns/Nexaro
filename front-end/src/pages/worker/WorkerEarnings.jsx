@@ -7,14 +7,13 @@ import EarningsOverviewChart from "../../components/Worker/Earnings/EarningsOver
 import TransactionHistoryCard from "../../components/Worker/Earnings/TransactionHistoryCard";
 import WithdrawModal from "../../components/Worker/Earnings/WithdrawModal";
 import { showSuccess } from "../../utils/toast.js";
+import { useGetEarningHeroDataQuery } from "../../store/services/workerApi.js";
 
 export default function WorkerEarnings() {
   // State for balances and data (can be linked to RTK query / backend wallet)
-  const [availableBalance, setAvailableBalance] = useState(1200);
-  const [thisMonthEarnings] = useState(8400);
-  const [completedJobsMonth] = useState(6);
-  const [totalEarned, setTotalEarned] = useState(28000);
-  const [totalJobs] = useState(34);
+  // const [availableBalance, setAvailableBalance] = useState(1200);
+  // const [totalEarned, setTotalEarned] = useState(28000);
+  // const [totalJobs] = useState(34);
 
   // Payout methods state
   const [payoutMethods, setPayoutMethods] = useState([
@@ -27,6 +26,20 @@ export default function WorkerEarnings() {
       isPrimary: true,
     },
   ]);
+
+  const { data, isLoading, isError, isSuccess } = useGetEarningHeroDataQuery();
+
+  console.log("is Loading", isLoading);
+  console.log("Data : ", data);
+  const availableBalance = data?.earningsData?.walletAmount;
+  const totalEarned = data?.earningsData?.totalEarned;
+  const totalJobs = data?.earningsData?.completedTasks;
+  const highestPaidAmount = data?.earningsData?.highestPaidAmount;
+  const earnedLast7Days = data?.earningsData?.earnedLast7Days;
+  const averageAmount = data?.earningsData?.averageAmount;
+  const sinceDate = data?.earningsData?.sinceDate;
+  console.log("is Success", isSuccess);
+  console.log("is Error", isError);
 
   // Transactions state
   const [transactions, setTransactions] = useState([
@@ -147,11 +160,9 @@ export default function WorkerEarnings() {
           <section aria-label="Available Balance and Summary">
             <EarningsHeroCard
               availableBalance={availableBalance}
-              thisMonthEarnings={thisMonthEarnings}
-              completedJobsMonth={completedJobsMonth}
               totalEarned={totalEarned}
               totalJobs={totalJobs}
-              sinceDate="Nov 2024"
+              sinceDate={sinceDate}
               onWithdrawClick={() => setIsWithdrawOpen(true)}
             />
           </section>
@@ -159,9 +170,9 @@ export default function WorkerEarnings() {
           {/* 2. THREE QUICK STATS CARDS */}
           <section aria-label="Quick Performance Stats">
             <EarningsStatCards
-              avgPerJob={824}
-              highestPaidJob={3500}
-              earnedThisWeek={2100}
+              avgPerJob={averageAmount}
+              highestPaidJob={highestPaidAmount}
+              earnedThisWeek={earnedLast7Days}
             />
           </section>
 

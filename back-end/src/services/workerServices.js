@@ -1,4 +1,5 @@
 import User from "../models/userSchema.js";
+import Wallet from "../models/walletSchema.js"
 import Review from "../models/reviewSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
@@ -449,6 +450,130 @@ export const getAllReviewService = async ({ user, query }) => {
         responseReviews.overallRating = isUser.worker.rating.toFixed(1);
         console.log(responseReviews);
         return { success: true, reviews: responseReviews, message: 'fetched reviews Successfully' }
+
+    } catch (error) {
+        console.log(error);
+        return { error: MESSAGES.UNEXPECTED_ERROR }
+    }
+}
+
+export const getEarningHeroDataService = async ({ userId }) => {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    try {
+        const isUser = await User.findOne({ _id: userId })
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND }
+        }
+        const earningsData = await Wallet.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(userId),
+                }
+            },
+            {
+                $lookup: {
+                    from: "transactions",
+                    let: { workerId: "$userId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$receiverId", "$$workerId"] },
+                                        { $eq: ["$transactionType", "to_worker_wallet"] },
+                                        { $eq: ["$status", "completed"] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "successTransactions"
+                }
+            },
+
+            {
+                $addFields: {
+                    highestPaidAmount: {
+                        $ifNull: [{ $max: "$successTransactions.amount" }, 0]
+                    },
+
+                    last7DayEarning: {
+                        $filter: {
+                            input: "$successTransactions",
+                            as: "tran",
+                            cond: {
+                                $gte: ["$$tran.createdAt", sevenDaysAgo]
+                            }
+                        }
+                    }
+                }
+            },
+
+            {
+                $addFields: {
+                    earnedLast7Days: {
+                        $ifNull: [{ $sum: "$last7DayEarning.amount" }, 0]
+                    }
+                }
+            },
+
+            {
+                $lookup: {
+                    from: "tasks",
+                    localField: "userId",
+                    foreignField: "workerId",
+                    as: "tasks",
+                    pipeline: [
+                        {
+                            $match: {
+                                status: "completed",
+                                update: "payment"
+                            }
+                        }
+                    ]
+                }
+            },
+
+            {
+                $addFields: {
+                    completedTasks: {
+                        $ifNull: [{ $size: "$tasks" }, 0]
+                    },
+
+                }
+            },
+
+            {
+                $project: {
+                    walletAmount: 1,
+                    withDrawn: 1,
+                    highestPaidAmount: 1,
+                    earnedLast7Days: 1,
+                    completedTasks: 1,
+                    totalEarned: 1,
+                }
+            }
+
+        ]);
+
+        const heroData = earningsData[0] || {
+            walletAmount: 0,
+            withDrawn: 0,
+            highestPaidAmount: 0,
+            earnedLast7Days: 0,
+            completedTasks: 0,
+            totalEarned: 0,
+        };
+
+        heroData.averageAmount = heroData.completedTasks > 0
+            ? Math.round(heroData.totalEarned / heroData.completedTasks)
+            : 0;
+
+        heroData.sinceDate = isUser.createdAt
+            ? new Date(isUser.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+            : "";
+
+        return { success: true, message: "Earnings data fetched successfully", earningsData: heroData };
 
     } catch (error) {
         console.log(error);
