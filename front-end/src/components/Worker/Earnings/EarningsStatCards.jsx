@@ -30,30 +30,30 @@ export default function EarningsStatCards({
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
       {stats.map((stat, idx) => (
         <div
           key={idx}
-          className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-xs hover:border-emerald-200 transition-all flex flex-col justify-between"
+          className="bg-white border border-gray-200/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-4 shadow-xs hover:border-emerald-200 transition-all flex flex-col justify-between"
         >
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider">
               {stat.label}
             </span>
-            <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center">
               {stat.icon}
             </div>
           </div>
 
-          <div className="mt-1">
+          <div className="mt-0.5">
             <h3
-              className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+              className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
                 stat.highlight ? "text-[#0A6E5C]" : "text-[#111827]"
               }`}
             >
               {stat.value}
             </h3>
-            <p className="text-xs text-gray-400 font-medium mt-1">{stat.subtext}</p>
+            <p className="text-[11px] sm:text-xs text-gray-400 font-medium mt-0.5">{stat.subtext}</p>
           </div>
         </div>
       ))}
