@@ -108,11 +108,18 @@ export const api = createApi({
     "Tasks",
     "Worker_Tasks",
     "Worker_Bids",
+    "Worker_Bid_Details",
     "Active_Job",
     "Poster_Profile",
     "Worker_Profile",
     "Poster_Tasks",
-    "Worker_Reviews"
+    "Poster_Bids",
+    "Poster_Task_Progress",
+    "Poster_Completed_Task",
+    "Worker_Reviews",
+    "Admin_Tasks",
+    "Admin_Task_Details",
+    "Task_for_bid"
   ],
   endpoints: () => ({}),
 });

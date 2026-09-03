@@ -12,7 +12,8 @@ import {
   getWorkerProfile,
   updateWorkerProfile,
   switchRoleToPoster,
-  getAllReviews
+  getAllReviews,
+  getCompletedTaskWorkerSide
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -28,6 +29,7 @@ router.get("/active-job", verifyToken, getWorkerCurrentActiveJob); // param coll
 router.get("/task/:taskId/active-job", verifyToken, getWorkerActiveJob);
 router.get('/profile', verifyToken, getWorkerProfile);
 router.get('/reviews', verifyToken, getAllReviews);
+router.get('/task/:taskId/completed', verifyToken, getCompletedTaskWorkerSide);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 

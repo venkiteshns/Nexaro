@@ -1,7 +1,7 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService } from "../../services/workerServices.js";
-import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
+import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
 
 export const workerSignup = async (req, res) => {
@@ -297,3 +297,16 @@ export const getAllReviews = async (req, res) => {
 
     return res.status(STATUS_CODES.OK).json({ success: true, data: response.reviews, message: response.message })
 }
+
+export const getCompletedTaskWorkerSide = async (req, res) => {
+    const { taskId } = req.params;
+    const workerId = req.user._id || req.user.id;
+
+    const response = await getCompletedTaskWorkerSideService(taskId, workerId);
+
+    if (response.error) {
+        return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: response.error });
+    }
+
+    return res.status(STATUS_CODES.OK).json({ success: true, data: response.data });
+};

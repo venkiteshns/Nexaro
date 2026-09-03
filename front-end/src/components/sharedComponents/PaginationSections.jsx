@@ -1,8 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const PaginationSections = ({totalPages, onPageChange, page}) => {
+const PaginationSections = ({ totalPages, onPageChange, page, className = "mt-6 pb-2" }) => {
 
-    
       if (totalPages <= 1) return null;
     
       const getPages = () => {
@@ -21,7 +20,7 @@ const PaginationSections = ({totalPages, onPageChange, page}) => {
       };
     
       return (
-        <div className="flex items-center justify-center gap-2 mt-6 pb-2">
+        <div className={`flex items-center justify-center gap-2 ${className}`}>
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page === 1}

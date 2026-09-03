@@ -24,6 +24,7 @@ export const workerApi = api.injectEndpoints({
         url: WORKER.GET_TASK_FOR_BID.replace(":taskId", taskId),
         method: "GET",
       }),
+      providesTags: ["Task_for_bid"]
     }),
 
     addNewBid: builder.mutation({
@@ -136,6 +137,14 @@ export const workerApi = api.injectEndpoints({
       providesTags: ["Worker_Reviews"],
     }),
 
+    getCompletedTaskWorkerSide: builder.query({
+      query: (taskId) => ({
+        url: WORKER.COMPLETED_TASK.replace(':taskId', taskId),
+        method: "GET",
+      }),
+      providesTags: ["Worker_Completed_Task"],
+    }),
+
   }),
 });
 
@@ -152,6 +161,7 @@ export const {
   useGetWorkerProfileQuery,
   useUpdateWorkerProfileMutation,
   useSwitchRoleToPosterMutation,
-  useGetReviewsWorkerQuery
+  useGetReviewsWorkerQuery,
+  useGetCompletedTaskWorkerSideQuery
 } = workerApi;
 

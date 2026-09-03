@@ -5,10 +5,7 @@ import EarningsHeroCard from "../../components/Worker/Earnings/EarningsHeroCard"
 import EarningsStatCards from "../../components/Worker/Earnings/EarningsStatCards";
 import EarningsOverviewChart from "../../components/Worker/Earnings/EarningsOverviewChart";
 import TransactionHistoryCard from "../../components/Worker/Earnings/TransactionHistoryCard";
-import CategoryBreakdownCard from "../../components/Worker/Earnings/CategoryBreakdownCard";
-import PayoutMethodsCard from "../../components/Worker/Earnings/PayoutMethodsCard";
 import WithdrawModal from "../../components/Worker/Earnings/WithdrawModal";
-import AddPayoutMethodModal from "../../components/Worker/Earnings/AddPayoutMethodModal";
 import { showSuccess } from "../../utils/toast.js";
 
 export default function WorkerEarnings() {
@@ -78,11 +75,37 @@ export default function WorkerEarnings() {
       type: "withdrawn",
       status: "WITHDRAWN",
     },
+    {
+      id: "tx-6",
+      title: "AC Filter Cleaning & Gas Refill",
+      date: "Dec 01, 2024",
+      category: "Appliances",
+      amount: 1200.0,
+      type: "received",
+      status: "RECEIVED",
+    },
+    {
+      id: "tx-7",
+      title: "Garden Landscaping & Clean up",
+      date: "Nov 28, 2024",
+      category: "Gardening",
+      amount: 3500.0,
+      type: "received",
+      status: "RECEIVED",
+    },
+    {
+      id: "tx-8",
+      title: "Bank Payout",
+      date: "Nov 20, 2024",
+      category: "Withdrawal",
+      amount: 4000.0,
+      type: "withdrawn",
+      status: "WITHDRAWN",
+    },
   ]);
 
   // Modals state
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
-  const [isAddPayoutOpen, setIsAddPayoutOpen] = useState(false);
 
   // Handle successful withdrawal
   const handleWithdrawSuccess = (amount) => {
@@ -98,20 +121,6 @@ export default function WorkerEarnings() {
     };
     setTransactions((prev) => [newTx, ...prev]);
     showSuccess(`Withdrawal of ₹${amount.toLocaleString("en-IN")} initiated successfully!`);
-  };
-
-  // Handle successful payout method added
-  const handleAddPayoutSuccess = (newMethod) => {
-    setPayoutMethods((prev) => {
-      if (newMethod.isPrimary) {
-        return [
-          newMethod,
-          ...prev.map((m) => ({ ...m, isPrimary: false })),
-        ];
-      }
-      return [...prev, newMethod];
-    });
-    showSuccess("Payout method added successfully!");
   };
 
   return (
@@ -161,22 +170,10 @@ export default function WorkerEarnings() {
             <EarningsOverviewChart />
           </section>
 
-          {/* 4. BOTTOM TWO-COLUMN SECTION */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left: Transaction History (8 cols) */}
-            <div className="lg:col-span-8 h-full">
-              <TransactionHistoryCard transactions={transactions} />
-            </div>
-
-            {/* Right: Breakdown by Category & Payout Methods (4 cols) */}
-            <div className="lg:col-span-4 space-y-6">
-              <CategoryBreakdownCard />
-              <PayoutMethodsCard
-                payoutMethods={payoutMethods}
-                onAddMethodClick={() => setIsAddPayoutOpen(true)}
-              />
-            </div>
-          </div>
+          {/* 4. TRANSACTION HISTORY SECTION */}
+          <section aria-label="Transaction History">
+            <TransactionHistoryCard transactions={transactions} />
+          </section>
         </main>
       </div>
 
@@ -187,12 +184,6 @@ export default function WorkerEarnings() {
         availableBalance={availableBalance}
         payoutMethods={payoutMethods}
         onWithdrawSuccess={handleWithdrawSuccess}
-      />
-
-      <AddPayoutMethodModal
-        isOpen={isAddPayoutOpen}
-        onClose={() => setIsAddPayoutOpen(false)}
-        onAddSuccess={handleAddPayoutSuccess}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { showError, showInfo, showSuccess, showWarning } from '../utils/toast';
 import { connectSocket, disconnectSocket, getSocket } from '../services/socketService';
@@ -7,6 +7,7 @@ import { api } from '../store/services/api';
 
 const useSocketNotification = () => {
     const dispatch = useDispatch();
+    const [paymentModalData, setPaymentModalData] = useState(null);
 
     const { user, accessToken } = useSelector((state) => state.auth);
     const { admin, accessToken: adminToken } = useSelector((state) => state.adminAuth);
@@ -39,11 +40,8 @@ const useSocketNotification = () => {
 
 
         socket.on('new-bid-added', (data) => {
-
             showInfo(`New bid added for : ${data.taskTitle}  for ${data.bidAmount} rupees`, { autoClose: 6000 });
-
-            dispatch(api.util.invalidateTags(['Poster_Tasks']));
-
+            dispatch(api.util.invalidateTags(['Poster_Tasks', 'Poster_Bids']));
         });
 
         socket.on("bid-accepted", (data) => {
@@ -56,8 +54,8 @@ const useSocketNotification = () => {
             dispatch(api.util.invalidateTags(['Worker_Bids', 'Active_Job', 'Worker_Tasks']));
         })
 
-        socket.on('task_updated',() => {
-            dispatch(api.util.invalidateTags(['Worker_Tasks']));
+        socket.on('task_updated', () => {
+            dispatch(api.util.invalidateTags(['Worker_Tasks', "Task_for_bid"]));
         })
 
         socket.on("task-update", (data) => {
@@ -70,9 +68,9 @@ const useSocketNotification = () => {
             dispatch(api.util.invalidateTags(["Poster_Task_Progress"]));
         })
 
-        socket.on ('payment-received', (data) => {
-            showSuccess(`Payment of ${data.amount} recieved for ${data.taskTitle}!!`);
-            dispatch(api.util.invalidateTags(['Active_Job']))
+        socket.on('payment-received', (data) => {
+            setPaymentModalData(data);
+            dispatch(api.util.invalidateTags(['Active_Job', 'Worker_Earnings', 'Worker_Wallet', "Worker_Bids"]));
         })
 
         return () => {
@@ -80,6 +78,11 @@ const useSocketNotification = () => {
         };
 
     }, [activeUser, activeToken, dispatch]);
+
+    return {
+        paymentModalData,
+        closePaymentModal: () => setPaymentModalData(null),
+    };
 };
 
 export default useSocketNotification;

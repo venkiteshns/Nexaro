@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import otpTemplate from "../utils/otpTemplate.js";
 import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
-import Otp from "../models/otpSchems.js";
 import User from "../models/userSchema.js";
 import { hashData, compareHash } from "../utils/hasing.js";
 import messages from "../constants/messages.js";
@@ -16,7 +15,7 @@ import redisClient from "../config/redisClient.js";
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 300;
 const OTP_PREFIX = "otp:";
-const OTP_TTL_MS = 10 * 60 * 1000;
+const OTP_TTL_SECONDS = 10 * 60;
 
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -95,28 +94,26 @@ export const createOtp = async (email, phone, resendFlag) => {
   const otp = crypto.randomInt(100000, 999999).toString();
   console.log("OTP", otp);
 
-  const existingOtp = await Otp.findOne({ email });
+  const key = `${OTP_PREFIX}:${email}`;
+
+  const existingOtp = await redisClient.get(key);
   if (existingOtp) {
-    await Otp.deleteOne({ email });
+    await redisClient.del(key);
   }
 
   const hashedOtp = await hashData(otp);
-  // console.log(email);
-  const otpRecord = await Otp.create({
-    email,
-    otp: hashedOtp,
-    createdAt: new Date(),
-    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-  });
+  console.log("Hashed OTP", otp, hashedOtp);
+
+  await redisClient.set(key, hashedOtp, { EX: OTP_TTL_SECONDS });
+
   const otpSend = await sendOtp(email, otp);
   if (!otpSend) {
-    await Otp.deleteOne({ email });
-    return { success: false, response: messages.FAILED_TO_SEND_OTP };
+    await redisClient.del(key);
+    return { success: false, message: messages.FAILED_TO_SEND_OTP };
   }
   return {
     success: true,
     message: messages.OTP_SENT,
-    response: otpRecord,
   };
 };
 
@@ -182,21 +179,17 @@ export const sendOtp = async (email, otp) => {
 };
 
 export const verifyOtp = async (email, otp) => {
-  // console.log(email, otp);
-  const otpRecord = await Otp.findOne({
-    email,
-    expiresAt: { $gt: new Date() },
-  });
-  if (!otpRecord) {
+  const key = `${OTP_PREFIX}:${email}`;
+  const storedOtp = await redisClient.get(key);
+  if (!storedOtp) {
     return { success: false, message: messages.INVALID_OTP };
   }
-  const isOtpValid = await compareHash(otp, otpRecord.otp);
+  const isOtpValid = await compareHash(otp, storedOtp);
   if (!isOtpValid) {
     return { success: false, message: messages.INVALID_OTP };
   }
-  await Otp.deleteOne({ email });
+  await redisClient.del(key);
   return { success: true, message: messages.OTP_VERIFIED };
-
 };
 
 export const loginService = async (userData, isAdmin) => {
@@ -353,7 +346,7 @@ export const forgotPasswordOtpService = async (email, role) => {
   const hashedOtp = await hashData(otp);
   console.log(" Forgot hashedOtp", otp, hashedOtp);
 
-  await redisClient.set(key, hashedOtp, { EX: OTP_TTL_MS });
+  await redisClient.set(key, hashedOtp, { EX: OTP_TTL_SECONDS });
   // await Otp.create({
   //   email,
   //   otp: hashedOtp,

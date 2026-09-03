@@ -156,6 +156,8 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
                     "taskDetails.urgencyLevel": 1,
                     "taskDetails.bidCount": 1,
                     "taskDetails.amount": 1,
+                    "taskDetails.status": 1,
+                    "taskDetails.update": 1,
                 }
             },
             { $sort: { createdAt: -1 } },
@@ -235,25 +237,44 @@ export const handleNewBid = async (task, user) => {
             return { error: "You have already bid on this task" }
         }
 
+        const availabilityDate = new Date(task.availableDate + "T" + task.availableTime);
+        if (isNaN(availabilityDate.getTime())) {
+            return { error: "Invalid availability date or time" };
+        }
+
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        if (task.availableDate < todayStr) {
+            return { error: "Availability date cannot be in the past" };
+        }
+
+        if (isTask.deadline) {
+            const deadlineStr = new Date(isTask.deadline).toLocaleDateString('en-CA');
+            if (task.availableDate > deadlineStr) {
+                return { error: "Availability date must be on or before the task deadline" };
+            }
+        }
+
         const payload = {
             taskId,
             workerId: user._id,
             amount: bidAmount,
             eta: estimatedTime,
             pitch,
-            availability: new Date(task.availableDate + "T" + task.availableTime),
+            availability: availabilityDate,
             status: "pending"
         }
        
-        const io = getIo()
+        await Bid.create(payload);
+
+        const io = getIo();
 
         io.to(`user:${posterId}`).emit('new-bid-added', {
             taskTitle: isTask.title,
             bidAmount,
-        })
+            taskId,
+        });
 
-        await Bid.create(payload)
-        return "bid created successfully"
+        return "bid created successfully";
     } catch (error) {
         console.log(error);
         if (error.message) {
@@ -760,6 +781,91 @@ export const getWorkerCurrentActiveJobService = async (workerId) => {
         };
     } catch (error) {
         console.error("getWorkerCurrentActiveJobService error:", error.message);
+        return { error: error.message };
+    }
+};
+
+// ── Worker: Completed Task Details ───────────────────────────────────────────
+export const getCompletedTaskWorkerSideService = async (taskId, workerId) => {
+    try {
+        const result = await Task.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(taskId),
+                    workerId: new mongoose.Types.ObjectId(workerId),
+                    $or: [
+                        { status: 'completed' },
+                        { update: 'payment' }
+                    ]
+                },
+            },
+            // Join poster
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'posterId',
+                    foreignField: '_id',
+                    as: 'poster',
+                },
+            },
+            { $unwind: { path: '$poster', preserveNullAndEmptyArrays: true } },
+            // Join accepted bid
+            {
+                $lookup: {
+                    from: 'bids',
+                    localField: 'acceptedBid',
+                    foreignField: '_id',
+                    as: 'bid',
+                },
+            },
+            { $unwind: { path: '$bid', preserveNullAndEmptyArrays: true } },
+            // Join review for this task
+            {
+                $lookup: {
+                    from: 'reviews',
+                    localField: '_id',
+                    foreignField: 'taskId',
+                    as: 'review',
+                },
+            },
+            { $unwind: { path: '$review', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    category: 1,
+                    description: 1,
+                    address: 1,
+                    amount: 1,
+                    platformFee: 1,
+                    completedOn: 1,
+                    createdAt: 1,
+                    photos: { $ifNull: ["$images", []] },
+                    status: 1,
+                    update: 1,
+                    'poster._id': 1,
+                    'poster.name': 1,
+                    'poster.email': 1,
+                    'poster.phone': 1,
+                    'poster.avatar': { $ifNull: ["$poster.avatar", "$poster.verificationDocuments.selfie.url"] },
+                    'bid.amount': 1,
+                    'bid.eta': 1,
+                    'bid.description': 1,
+                    'review._id': 1,
+                    'review.rating': 1,
+                    'review.review': 1,
+                    'review.createdAt': 1,
+                },
+            },
+        ]);
+
+        if (!result || result.length === 0) {
+            return { error: 'Task not found' };
+        }
+
+        return { data: result[0] };
+    } catch (error) {
+        console.error('getCompletedTaskWorkerSideService error:', error.message);
         return { error: error.message };
     }
 };

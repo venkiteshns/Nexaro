@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import { useInitiatePaymentMutation } from '../../../store/services/paymentApi';
+import { formatInrToUsd } from '../../../utils/currency';
 
 /**
  * ReleaseModal — confirms and initiates payment payout.
@@ -55,7 +56,7 @@ export default function ReleaseModal({ amount, workerName, onCancel, bidId, task
                     <h2 className="text-xl font-extrabold text-gray-900 mb-2">Release Payment?</h2>
                     <p className="text-sm text-gray-500 leading-relaxed mb-6 px-2">
                         By confirming,{' '}
-                        <span className="font-semibold text-gray-700">₹{amount}.00</span> will be
+                        <span className="font-semibold text-gray-700">₹{amount}.00 ({formatInrToUsd(amount)})</span> will be
                         released immediately to{' '}
                         <span className="font-semibold text-gray-700">{workerName}</span>. This
                         action cannot be undone.
@@ -84,7 +85,7 @@ export default function ReleaseModal({ amount, workerName, onCancel, bidId, task
                                 Releasing…
                             </>
                         ) : (
-                            `Confirm & Release ₹${amount}.00`
+                            `Confirm & Release ₹${amount}.00 (${formatInrToUsd(amount)})`
                         )}
                     </button>
 

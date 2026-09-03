@@ -285,7 +285,16 @@ function TaskCard({ task }) {
                                 >
                                     View Progress
                                 </button>
-                                <button onClick={() => { handleOpenPaymentReleaseModal(task._id) }} className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors">
+                                <button
+                                    disabled={task.status !== 'completed'}
+                                    onClick={() => { handleOpenPaymentReleaseModal(task._id) }}
+                                    className={`flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
+                                        task.status === 'completed'
+                                            ? 'bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e]'
+                                            : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                                    }`}
+                                    title={task.status !== 'completed' ? 'Available once task is marked completed' : ''}
+                                >
                                     Release Payment
                                 </button>
                             </>

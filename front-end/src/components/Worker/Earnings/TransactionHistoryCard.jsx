@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Clock, Building2, ChevronRight, CheckCircle2 } from "lucide-react";
+import PaginationSections from "../../sharedComponents/PaginationSections";
 
 const INITIAL_TRANSACTIONS = [
   {
@@ -58,16 +59,26 @@ const INITIAL_TRANSACTIONS = [
   },
 ];
 
+const ITEMS_PER_PAGE = 5;
+
 export default function TransactionHistoryCard({ transactions = INITIAL_TRANSACTIONS }) {
   const [filter, setFilter] = useState("all"); // "all" | "received" | "withdrawn" | "pending"
-  const [showAll, setShowAll] = useState(false);
+  const [page, setPage] = useState(1);
+
+  const handleFilterChange = (tabKey) => {
+    setFilter(tabKey);
+    setPage(1);
+  };
 
   const filteredTransactions = transactions.filter((tx) => {
     if (filter === "all") return true;
     return tx.type === filter;
   });
 
-  const displayedList = showAll ? filteredTransactions : filteredTransactions.slice(0, 5);
+  const totalItems = filteredTransactions.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const displayedList = filteredTransactions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const getStatusBadge = (tx) => {
     switch (tx.type) {
@@ -126,7 +137,7 @@ export default function TransactionHistoryCard({ transactions = INITIAL_TRANSACT
               <button
                 key={tab.key}
                 type="button"
-                onClick={() => setFilter(tab.key)}
+                onClick={() => handleFilterChange(tab.key)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   filter === tab.key
                     ? "bg-[#0A6E5C] text-white shadow-xs"
@@ -186,16 +197,21 @@ export default function TransactionHistoryCard({ transactions = INITIAL_TRANSACT
         </div>
       </div>
 
-      {/* Footer view toggle button */}
-      {filteredTransactions.length > 5 && (
-        <div className="pt-4 border-t border-gray-100 mt-2 text-center">
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0A6E5C] hover:text-[#085a4b] hover:underline transition-colors cursor-pointer py-1"
-          >
-            <span>{showAll ? "Show Less" : "View All Transactions"}</span>
-            <ChevronRight size={14} className={showAll ? "rotate-90 transition-transform" : ""} />
-          </button>
+      {/* Pagination Footer */}
+      {totalItems > 0 && (
+        <div className="pt-4 border-t border-gray-100 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-gray-400">
+            Showing <span className="font-semibold text-gray-700">{startIndex + 1}</span>–
+            <span className="font-semibold text-gray-700">{Math.min(startIndex + ITEMS_PER_PAGE, totalItems)}</span> of{" "}
+            <span className="font-semibold text-gray-700">{totalItems}</span> transactions
+          </p>
+
+          <PaginationSections
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            className="mt-0 pb-0"
+          />
         </div>
       )}
     </div>
