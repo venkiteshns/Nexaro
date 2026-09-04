@@ -151,6 +151,19 @@ export const workerApi = api.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["Earning_Hero_Data"],
+    }),
+
+    getTransactionHistory: builder.query({
+      query: ({ page, limit }) => {
+        let queryParams = new URLSearchParams();
+        queryParams.append('page', page);
+        queryParams.append('limit', limit);
+        return {
+          url: `${WORKER.GET_TRANSACTION_HISTORY}?${queryParams.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Transaction_History"],
     })
 
   }),
@@ -171,6 +184,7 @@ export const {
   useSwitchRoleToPosterMutation,
   useGetReviewsWorkerQuery,
   useGetCompletedTaskWorkerSideQuery,
-  useGetEarningHeroDataQuery
+  useGetEarningHeroDataQuery,
+  useGetTransactionHistoryQuery
 } = workerApi;
 

@@ -14,7 +14,8 @@ import {
   switchRoleToPoster,
   getAllReviews,
   getCompletedTaskWorkerSide,
-  getEarningHeroData
+  getEarningHeroData,
+  getTransactionHistory
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -32,6 +33,7 @@ router.get('/profile', verifyToken, getWorkerProfile);
 router.get('/reviews', verifyToken, getAllReviews);
 router.get('/task/:taskId/completed', verifyToken, getCompletedTaskWorkerSide);
 router.get('/earnings/hero', verifyToken, getEarningHeroData);
+router.get('/earnings/transactions', verifyToken, getTransactionHistory);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 

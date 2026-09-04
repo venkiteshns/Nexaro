@@ -1,6 +1,6 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService } from "../../services/workerServices.js";
+import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService } from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
 
@@ -333,3 +333,19 @@ export const getEarningHeroData = async (req, res) => {
         });
     }
 };
+
+export const getTransactionHistory = async (req, res) => {
+    const response = await getTransactionHistoryService({ userId: req.user._id, page: req.query.page, limit: req.query.limit });
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: response.error,
+        });
+    }
+    return res.status(STATUS_CODES.OK).json({
+        success: true,
+        message: response.message,
+        transactionsData: response.transactionsData,
+        pagination: response.pagination,
+    });
+}

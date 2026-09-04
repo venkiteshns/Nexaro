@@ -6,6 +6,7 @@ import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 import MESSAGES from "../constants/messages.js";
 import mongoose from "mongoose";
+import Transaction from "../models/transactionSchema.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -575,6 +576,51 @@ export const getEarningHeroDataService = async ({ userId }) => {
 
         return { success: true, message: "Earnings data fetched successfully", earningsData: heroData };
 
+    } catch (error) {
+        console.log(error);
+        return { error: MESSAGES.UNEXPECTED_ERROR }
+    }
+}
+
+export const getTransactionHistoryService = async ({ userId, page, limit }) => {
+    const skip = (page - 1) * limit;
+    console.log("userId", userId);
+    try {
+        const isUser = await User.findOne({ _id: userId })
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND }
+        }
+
+        const transactions = await Transaction.find({ receiverId: new mongoose.Types.ObjectId(userId) })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+
+        const totalTransactions = await Transaction.countDocuments({ receiverId: new mongoose.Types.ObjectId(userId) })
+        const totalPages = Math.ceil(totalTransactions / limit)
+        const transactionsData = transactions.map((transaction) => {
+            return {
+                _id: transaction._id,
+                amount: transaction.amount,
+                transactionType: transaction.transactionType,
+                status: transaction.status,
+                processedAt: transaction.processedAt,
+                createdAt: transaction.createdAt,
+                updatedAt: transaction.updatedAt,
+
+            }
+        })
+        return {
+            success: true,
+            message: "Transactions fetched successfully",
+            transactionsData,
+            pagination: {
+                page,
+                limit,
+                totalPages,
+                totalTransactions,
+            }
+        };
     } catch (error) {
         console.log(error);
         return { error: MESSAGES.UNEXPECTED_ERROR }
