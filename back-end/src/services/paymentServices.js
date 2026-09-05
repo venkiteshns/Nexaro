@@ -424,6 +424,19 @@ export const orderPayoutService = async ({ bidId, user }) => {
       processedAt: new Date(),
     });
 
+    const adminUserId = process.env.ADMIN_USER_ID ? process.env.ADMIN_USER_ID.trim() : null;
+    if (adminUserId && platformFee > 0) {
+      await Transaction.create({
+        orderId: order._id,
+        senderId: new mongoose.Types.ObjectId(adminUserId),
+        receiverId: new mongoose.Types.ObjectId(adminUserId),
+        amount: platformFee,
+        transactionType: "platform_fee",
+        status: "completed",
+        processedAt: new Date(),
+      });
+    }
+
     task.update = 'payment';
     task.status = 'completed';
     if (!task.completedOn) {
