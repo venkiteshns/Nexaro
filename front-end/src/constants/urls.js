@@ -41,7 +41,12 @@ export const WORKER = {
     UPDATE_JOB_PROGRESS: "/worker/task/:taskId/progress",
     UPDATE_PROFILE: "/worker/profile/update",
     SWITCH_ROLE: '/worker/switch/role',
-    GET_REVIEWS: "/worker/reviews"
+    GET_REVIEWS: "/worker/reviews",
+    COMPLETED_TASK: "/worker/task/:taskId/completed",
+    GET_EARNING_HERO_DATA: "/worker/earnings/hero",
+    GET_TRANSACTION_HISTORY: "/worker/earnings/transactions",
+    GET_EARNING_CHART: "/worker/earnings/chart",
+    WITHDRAW_EARNINGS: "/worker/earnings/withdraw",
 }
 
 export const PAYMENT = {

@@ -18,6 +18,7 @@ import {
 import PosterNavBar from '../../layouts/Poster/PosterNavBar';
 import PosterHeader from '../../layouts/Poster/PosterHeader';
 import ReleaseModal from '../../components/sharedComponents/poster/ReleasePaymentModal';
+import { formatInrToUsd } from '../../utils/currency';
 
 const STEPS = [
     { key: 'posted', label: 'TASK POSTED', icon: CheckCircle, done: false, active: false },
@@ -120,6 +121,8 @@ const WorkProgress = () => {
 
     const mainData = data?.data;
     const { bid, worker: workerData } = mainData ?? {};
+
+    const isCompleted = mainData?.status === 'completed';
 
     const update = mainData?.update;
     const updateCount = {
@@ -382,18 +385,36 @@ const WorkProgress = () => {
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                                             Amount Held
                                         </p>
-                                        <p className="text-xl sm:text-2xl font-extrabold text-gray-900">₹{bid?.amount}.00</p>
+                                        <div className="flex items-baseline sm:justify-end gap-1.5">
+                                            <span className="text-xl sm:text-2xl font-extrabold text-gray-900">₹{bid?.amount}.00</span>
+                                            {bid?.amount && (
+                                                <span className="text-xs sm:text-sm font-semibold text-gray-500">
+                                                    ({formatInrToUsd(bid.amount)})
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    <button
-                                        onClick={() => setShowReleaseModal(true)}
-                                        className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-[#0A6E5C] text-white
-                                                   text-sm font-bold hover:bg-[#085e4e] active:scale-[0.98]
-                                                   transition-all duration-150 shadow-md whitespace-nowrap"
-                                    >
-                                        Release Payment
-                                        <ChevronRight size={16} />
-                                    </button>
+                                    <div className="flex flex-col items-center sm:items-end gap-1">
+                                        <button
+                                            disabled={!isCompleted}
+                                            onClick={() => setShowReleaseModal(true)}
+                                            className={`flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-sm font-bold whitespace-nowrap transition-all duration-150 ${
+                                                isCompleted
+                                                    ? 'bg-[#0A6E5C] text-white hover:bg-[#085e4e] active:scale-[0.98] shadow-md cursor-pointer'
+                                                    : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed shadow-none'
+                                            }`}
+                                            title={!isCompleted ? 'Payment can be released once the job is marked completed' : ''}
+                                        >
+                                            Release Payment
+                                            <ChevronRight size={16} />
+                                        </button>
+                                        {!isCompleted && (
+                                            <p className="text-[11px] text-gray-400 text-center sm:text-right">
+                                                Available once task is completed
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}

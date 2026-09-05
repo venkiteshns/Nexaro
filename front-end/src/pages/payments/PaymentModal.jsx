@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import PaymentButton from "../../components/Payment/PaymentButton";
+import { formatInrToUsd, convertInrToUsd } from "../../utils/currency";
 
 export default function PaymentModal({ amount, bidId, onClose, onSuccess }) {
     return (
@@ -31,16 +32,16 @@ export default function PaymentModal({ amount, bidId, onClose, onSuccess }) {
                 <div className="px-6 pt-2 pb-6">
                     <p className="text-sm text-gray-500 mb-5">
                         Amount to be held:{' '}
-                        <span className="font-semibold text-[#0A6E5C]">₹{amount}</span>
+                        <span className="font-semibold text-[#0A6E5C]">₹{amount} ({formatInrToUsd(amount)})</span>
                     </p>
 
                     <PayPalScriptProvider
                         options={{
-                            "client-id": "BAAqZizMfvZturYdpFssYGObvERUu_E3VGGlmQbspL1e_5idPdVQSzgzsbAICoGF-jxaVkSlC48tGBy4DA",
+                            "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID,
                             currency: "USD",
                         }}
                     >
-                        <PaymentButton bidId={bidId} amount={amount} onSuccess={onSuccess} />
+                        <PaymentButton bidId={bidId} amount={convertInrToUsd(amount)} onSuccess={onSuccess} />
                     </PayPalScriptProvider>
 
                     <button

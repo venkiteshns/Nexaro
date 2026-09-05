@@ -12,7 +12,12 @@ import {
   getWorkerProfile,
   updateWorkerProfile,
   switchRoleToPoster,
-  getAllReviews
+  getAllReviews,
+  getCompletedTaskWorkerSide,
+  getEarningHeroData,
+  getTransactionHistory,
+  getWorkerEarningsChart,
+  withdrawWorkerEarnings
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -28,13 +33,18 @@ router.get("/active-job", verifyToken, getWorkerCurrentActiveJob); // param coll
 router.get("/task/:taskId/active-job", verifyToken, getWorkerActiveJob);
 router.get('/profile', verifyToken, getWorkerProfile);
 router.get('/reviews', verifyToken, getAllReviews);
+router.get('/task/:taskId/completed', verifyToken, getCompletedTaskWorkerSide);
+router.get('/earnings/hero', verifyToken, getEarningHeroData);
+router.get('/earnings/transactions', verifyToken, getTransactionHistory);
+router.get('/earnings/chart', verifyToken, getWorkerEarningsChart);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
+router.post('/earnings/withdraw', verifyToken, withdrawWorkerEarnings);
 
 router.delete("/bid/withdraw/:bidId", verifyToken, withdrawBid);
 
 router.patch("/task/:taskId/progress", verifyToken, updateJobProgress);
-router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar',  maxCount: 1}]), updateWorkerProfile);
+router.patch("/profile/update", verifyToken, upload.fields([{ name: 'avatar', maxCount: 1 }]), updateWorkerProfile);
 router.patch('/switch/role', verifyToken, switchRoleToPoster)
 
 export default router;

@@ -24,6 +24,7 @@ export const workerApi = api.injectEndpoints({
         url: WORKER.GET_TASK_FOR_BID.replace(":taskId", taskId),
         method: "GET",
       }),
+      providesTags: ["Task_for_bid"]
     }),
 
     addNewBid: builder.mutation({
@@ -136,6 +137,56 @@ export const workerApi = api.injectEndpoints({
       providesTags: ["Worker_Reviews"],
     }),
 
+    getCompletedTaskWorkerSide: builder.query({
+      query: (taskId) => ({
+        url: WORKER.COMPLETED_TASK.replace(':taskId', taskId),
+        method: "GET",
+      }),
+      providesTags: ["Worker_Completed_Task"],
+    }),
+
+    getEarningHeroData: builder.query({
+      query: () => ({
+        url: WORKER.GET_EARNING_HERO_DATA,
+        method: "GET",
+      }),
+      providesTags: ["Earning_Hero_Data"],
+    }),
+
+    getTransactionHistory: builder.query({
+      query: ({ page, limit }) => {
+        let queryParams = new URLSearchParams();
+        queryParams.append('page', page);
+        queryParams.append('limit', limit);
+        return {
+          url: `${WORKER.GET_TRANSACTION_HISTORY}?${queryParams.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Transaction_History"],
+    }),
+
+    getWorkerEarningsChart: builder.query({
+      query: (timeframe = "7D") => ({
+        url: `${WORKER.GET_EARNING_CHART}?timeframe=${timeframe}`,
+        method: "GET",
+      }),
+      providesTags: ["Worker_Earnings_Chart"],
+    }),
+
+    withdrawEarnings: builder.mutation({
+      query: (payload) => ({
+        url: WORKER.WITHDRAW_EARNINGS,
+        method: "POST",
+        body: payload || {},
+      }),
+      invalidatesTags: [
+        "Earning_Hero_Data",
+        "Transaction_History",
+        "Worker_Earnings_Chart",
+      ],
+    }),
+
   }),
 });
 
@@ -152,6 +203,11 @@ export const {
   useGetWorkerProfileQuery,
   useUpdateWorkerProfileMutation,
   useSwitchRoleToPosterMutation,
-  useGetReviewsWorkerQuery
+  useGetReviewsWorkerQuery,
+  useGetCompletedTaskWorkerSideQuery,
+  useGetEarningHeroDataQuery,
+  useGetTransactionHistoryQuery,
+  useGetWorkerEarningsChartQuery,
+  useWithdrawEarningsMutation,
 } = workerApi;
 

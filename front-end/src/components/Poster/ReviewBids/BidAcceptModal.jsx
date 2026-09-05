@@ -1,6 +1,7 @@
 import { CheckCircle } from "lucide-react";
 import { useState } from "react";
 import PaymentModal from "../../../pages/payments/PaymentModal";
+import { formatInrToUsd } from "../../../utils/currency";
 
 export default function AcceptModal({ bid, onConfirm, onCancel }) {
     const [showPayment, setShowPayment] = useState(false);
@@ -32,7 +33,7 @@ export default function AcceptModal({ bid, onConfirm, onCancel }) {
                             Accepting this bid will notify{' '}
                             <span className="font-semibold text-gray-700">{bid.name}</span> to proceed.
                             Secure payment of{' '}
-                            <span className="font-semibold text-[#0A6E5C]">₹{bid.amount}</span> will be
+                            <span className="font-semibold text-[#0A6E5C]">₹{bid.amount} ({formatInrToUsd(bid.amount)})</span> will be
                             held.
                         </p>
 

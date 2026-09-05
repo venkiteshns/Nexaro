@@ -1,7 +1,7 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService } from "../../services/workerServices.js";
-import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService } from "../../services/taskServices.js";
+import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService, getWorkerEarningsChartService, withdrawWorkerEarningsService } from "../../services/workerServices.js";
+import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
 
 export const workerSignup = async (req, res) => {
@@ -297,3 +297,114 @@ export const getAllReviews = async (req, res) => {
 
     return res.status(STATUS_CODES.OK).json({ success: true, data: response.reviews, message: response.message })
 }
+
+export const getCompletedTaskWorkerSide = async (req, res) => {
+    const { taskId } = req.params;
+    const workerId = req.user._id || req.user.id;
+
+    const response = await getCompletedTaskWorkerSideService(taskId, workerId);
+
+    if (response.error) {
+        return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: response.error });
+    }
+
+    return res.status(STATUS_CODES.OK).json({ success: true, data: response.data });
+};
+
+export const getEarningHeroData = async (req, res) => {
+    try {
+        const result = await getEarningHeroDataService({ userId: req.user._id });
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: result.message,
+            earningsData: result.earningsData,
+        });
+    } catch (error) {
+        console.error("getEarningHeroData controller error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const getTransactionHistory = async (req, res) => {
+    const response = await getTransactionHistoryService({ userId: req.user._id, page: req.query.page, limit: req.query.limit });
+    if (response.error) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: response.error,
+        });
+    }
+    return res.status(STATUS_CODES.OK).json({
+        success: true,
+        message: response.message,
+        transactionsData: response.transactionsData,
+        pagination: response.pagination,
+    });
+}
+
+export const getWorkerEarningsChart = async (req, res) => {
+    try {
+        const response = await getWorkerEarningsChartService({
+            userId: req.user._id,
+            timeframe: req.query.timeframe,
+        });
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            timeframe: response.timeframe,
+            totalEarnings: response.totalEarnings,
+            chartData: response.chartData,
+        });
+    } catch (error) {
+        console.error("getWorkerEarningsChart error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const withdrawWorkerEarnings = async (req, res) => {
+    try {
+        const response = await withdrawWorkerEarningsService({
+            userId: req.user._id,
+            amount: req.body?.amount,
+        });
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: response.message,
+            withdrawnAmount: response.withdrawnAmount,
+            wallet: response.wallet,
+            transaction: response.transaction,
+        });
+    } catch (error) {
+        console.error("withdrawWorkerEarnings error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};

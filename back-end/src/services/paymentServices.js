@@ -7,185 +7,245 @@ import MESSAGES from "../constants/messages.js";
 import { getIo } from "../socket.js";
 import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
+import { convertInrToUsd, convertUsdToInr } from "../utils/currency.js";
+import Transaction from "../models/transactionSchema.js";
 
-// async function getPayoutStatus(payoutBatchId, accessToken) {
-//   const response = await fetch(
-//     `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
-//     {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     }
-//   );
+export async function getPayoutStatus(payoutBatchId, accessToken) {
+  if (!accessToken) {
+    accessToken = await generateAccessToken();
+  }
 
-//   const data = await response.json();
-//   return data;
-// }
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const response = await fetch(
+        `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+            Connection: 'close',
+          },
+        }
+      );
 
-// async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts = 6, delayMs = 2000) {
-//   const TERMINAL_STATUSES = [
-//     'SUCCESS', 'FAILED', 'RETURNED', 'ONHOLD',
-//     'BLOCKED', 'REFUNDED', 'REVERSED', 'UNCLAIMED', 'DENIED'
-//   ];
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      if (attempt === 2) throw err;
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+}
 
-//   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-//     const res = await fetch(
-//       `${process.env.PAYPAL_API_URL}/v1/payments/payouts/${payoutBatchId}?fields=all`,
-//       {
-//         method: 'GET',
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Authorization: `Bearer ${accessToken}`,
-//         },
-//       }
-//     );
+export async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts = 3, delayMs = 1500) {
+  const TERMINAL_STATUSES = [
+    'SUCCESS', 'FAILED', 'RETURNED', 'ONHOLD',
+    'BLOCKED', 'REFUNDED', 'REVERSED', 'UNCLAIMED', 'DENIED'
+  ];
 
-//     const data = await res.json();
-//     const item = data.items?.[0]; // single-item batch, so index 0 is safe
-//     const itemStatus = item?.transaction_status;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const data = await getPayoutStatus(payoutBatchId, accessToken);
+    const item = data.items?.[0]; // single-item batch, so index 0 is safe
+    const itemStatus = item?.transaction_status;
 
-//     console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
+    console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
 
-//     if (itemStatus && TERMINAL_STATUSES.includes(itemStatus)) {
-//       return {
-//         success: itemStatus === 'SUCCESS',
-//         stage: 'final',
-//         batchStatus: data.batch_header?.batch_status,
-//         itemStatus,
-//         payoutItemId: item.payout_item_id,
-//         transactionId: item.transaction_id,
-//         errors: item.errors || null,
-//         raw: data
-//       };
-//     }
+    if (itemStatus && TERMINAL_STATUSES.includes(itemStatus)) {
+      return {
+        success: itemStatus === 'SUCCESS',
+        stage: 'final',
+        batchStatus: data.batch_header?.batch_status,
+        itemStatus,
+        payoutItemId: item.payout_item_id,
+        transactionId: item.transaction_id,
+        errors: item.errors || null,
+        raw: data
+      };
+    }
 
-//     if (attempt < maxAttempts) {
-//       await new Promise(r => setTimeout(r, delayMs));
-//     }
-//   }
+    if (attempt < maxAttempts) {
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
 
-//   // Still not resolved after polling — don't block the caller forever
-//   return {
-//     success: null, // unknown yet
-//     stage: 'still_pending',
-//     message: 'Payout is still processing after polling window. Rely on webhook for final confirmation.',
-//     payoutBatchId
-//   };
-// }
+  // Still not resolved after polling — don't block the caller forever
+  return {
+    success: null, // unknown yet
+    stage: 'still_pending',
+    message: 'Payout is still processing after polling window. Status will update asynchronously.',
+    payoutBatchId
+  };
+}
 
-// async function payoutTransferService (receiverEmail, amount, currency) {
-  
-//   try {
-//     coonst accessToken = await generateAccessToken();
-//     const senderBatchId = `batch_${Date.now()}`; // Unique batch ID for this payout
+export async function payoutTransferService(receiverEmail, amount, currency = "USD") {
+  try {
+    const accessToken = await generateAccessToken();
+    const senderBatchId = `batch_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-//     const payoutPayload = {
-//       sender_batch_header:{
-//         sender_batch_id: senderBatchId,
-//         email_subject: "You have a payout!",
-//         email_message: "You have received a payout! Thanks for using our service!",
-//         recipient_type: "EMAIL"
-//       },
-//       items:[
-//         {
-//           recipient_type: "EMAIL",
-//           amount: {
-//             value:parseFloat(amount).toFixed(2), // Ensure exactly 2 decimal places
-//             currency: currency || "USD"
-//           },
-//           receiver: receiverEmail,
-//           note: "Thank you for your business.",
-//           sender_item_id: `item_${Date.now()}` // Unique item ID for this payout
-//         }
-//       ]
-//     }
+    const payoutPayload = {
+      sender_batch_header: {
+        sender_batch_id: senderBatchId,
+        email_subject: "Nexaro Worker Payout",
+        email_message: "Your earnings payout from Nexaro has been initiated!",
+        recipient_type: "EMAIL"
+      },
+      items: [
+        {
+          recipient_type: "EMAIL",
+          amount: {
+            value: parseFloat(amount).toFixed(2), // Ensure exactly 2 decimal places
+            currency: currency || "USD"
+          },
+          receiver: receiverEmail,
+          note: "Worker earnings withdrawal from Nexaro.",
+          sender_item_id: `item_${Date.now()}` // Unique item ID for this payout
+        }
+      ]
+    };
 
-//     const response = await fetch(`${process.env.PAYPAL_API_URL}/v1/payments/payouts`,{
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//       body: JSON.stringify(payoutPayload)
-//     });
+    let response;
+    let data;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        response = await fetch(`${process.env.PAYPAL_API_URL}/v1/payments/payouts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+            Connection: 'close',
+          },
+          body: JSON.stringify(payoutPayload)
+        });
 
-    
-    
-//     const data = await response.json();
-//     console.log("Payout Response:", data);
+        data = await response.json();
+        break;
+      } catch (fetchErr) {
+        if (attempt === 2) throw fetchErr;
+        console.warn(`payoutTransferService attempt ${attempt} failed (${fetchErr.message}). Retrying...`);
+        await new Promise(r => setTimeout(r, 600));
+      }
+    }
 
-//     if (!response.ok) {
-//       return {
-//         success: false,
-//         stage: 'create',
-//         error: data
-//       };
-//     }
+    console.log("Payout Initiation Response:", data);
 
-//     const payoutBatchId = data.batch_header.payout_batch_id;
+    if (!response.ok) {
+      let errorMsg = data.message || data.name || "Failed to initiate PayPal payout";
+      if (data.name === "INSUFFICIENT_FUNDS") {
+        errorMsg = "PayPal business account has insufficient funds. Please add test balance to your Sandbox Business account in PayPal Developer Dashboard.";
+      }
+      return {
+        success: false,
+        stage: 'create',
+        error: errorMsg,
+        details: data
+      };
+    }
 
-//     const finalStatus = await pollPayoutStatus( payoutBatchId, accessToken )
+    const payoutBatchId = data.batch_header?.payout_batch_id;
+    const initialBatchStatus = data.batch_header?.batch_status;
 
-//     console.log("finalStatus", finalStatus);
-    
-    
-//   } catch (error) {
-//     console.log("error", error);
-//     return { success: false, stage: 'exception', error: error.message };
-//   }
-// }
+    // Brief poll to see if it immediately resolved in sandbox
+    const finalStatus = await pollPayoutStatus(payoutBatchId, accessToken, 3, 1500);
+
+    return {
+      success: true,
+      stage: finalStatus.stage || 'created',
+      payoutBatchId,
+      initialBatchStatus,
+      finalStatus,
+    };
+
+  } catch (error) {
+    console.error("payoutTransferService error:", error);
+    return { success: false, stage: 'exception', error: error.message };
+  }
+}
 
 export const createOrderService = async (orderDetails) => {
 
   console.log(orderDetails);
-  
-    try {
-        const { items, totalAmount, bidId } = orderDetails;
-          
-        // 1. Save the initial pending order to MongoDB
-        const dbOrder = new Order({ items, totalAmount, status: 'Pending', bidId });
-        await dbOrder.save();
 
-        // 2. Request order creation from PayPal
-        const accessToken = await generateAccessToken();
-        const response = await fetch(`${process.env.PAYPAL_API_URL}/v2/checkout/orders`, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
+  try {
+    const { items, totalAmount, bidId } = orderDetails;
+
+    // 1. Save the initial pending order to MongoDB
+    const dbOrder = new Order({ items, totalAmount, status: 'Pending', bidId });
+    await dbOrder.save();
+
+    // 2. Request order creation from PayPal
+    const accessToken = await generateAccessToken();
+    const response = await fetch(`${process.env.PAYPAL_API_URL}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [
+          {
+            amount: {
+              currency_code: 'USD',
+              value: Number(totalAmount).toFixed(2),
+            },
+            custom_id: dbOrder._id.toString(),
           },
-          body: JSON.stringify({
-              intent: 'CAPTURE',
-              purchase_units: [
-              {
-                  amount: {
-                  currency_code: 'USD',
-                  value: Number(totalAmount).toFixed(2), 
-                  },
-                  custom_id: dbOrder._id.toString(), 
-              },
-              ],
-          }),
-        });
+        ],
+      }),
+    });
 
-        const paypalOrder = await response.json();
+    const paypalOrder = await response.json();
 
-        // 3. Link the PayPal Order ID back to your database record
-        dbOrder.paypalOrderId = paypalOrder.id;
-        await dbOrder.save();
-        console.log(paypalOrder);
+    // 3. Link the PayPal Order ID back to your database record
+    dbOrder.paypalOrderId = paypalOrder.id;
+    await dbOrder.save();
+    console.log(paypalOrder);
 
-        // Return the PayPal details back to the React frontend
-        return {success : true, order: paypalOrder};
+    // Return the PayPal details back to the React frontend
+    return { success: true, order: paypalOrder };
   } catch (error) {
     console.error('Error creating order:', error);
-    return {success : false, error: 'Failed to create order'};
+    return { success: false, error: 'Failed to create order' };
   }
 }
 
-export const captureOrderService = async ( orderId, user ) => {
+const recordEscrowTransaction = async ({ dbOrder, user, status }) => {
+  try {
+    const adminUserId = process.env.ADMIN_USER_ID;
+    if (!adminUserId) {
+      console.warn("ADMIN_USER_ID is not configured in environment variables.");
+    }
+
+    const bid = await Bid.findById(dbOrder.bidId);
+    const amount = bid?.amount ?? convertUsdToInr(dbOrder.totalAmount);
+
+    const existingTransaction = await Transaction.findOne({
+      orderId: dbOrder._id,
+      transactionType: "to_escrow",
+    });
+
+    if (!existingTransaction) {
+      await Transaction.create({
+        orderId: dbOrder._id,
+        senderId: user._id,
+        receiverId: adminUserId,
+        amount,
+        transactionType: "to_escrow",
+        status,
+        processedAt: new Date(),
+      });
+    } else {
+      existingTransaction.status = status;
+      existingTransaction.processedAt = new Date();
+      await existingTransaction.save();
+    }
+  } catch (err) {
+    console.error("Error recording escrow transaction:", err);
+  }
+};
+
+export const captureOrderService = async (orderId, user) => {
   try {
     const accessToken = await generateAccessToken();
     // 1. Instruct PayPal to capture the funds
@@ -218,11 +278,12 @@ export const captureOrderService = async ( orderId, user ) => {
         data: captureData,
       };
     }
-    
+
     if (!response.ok) {
       console.error('PayPal capture failed:', captureData);
       dbOrder.status = 'Failed';
       await dbOrder.save();
+      await recordEscrowTransaction({ dbOrder, user, status: "failed" });
       return {
         success: false,
         status: 'Failed',
@@ -231,20 +292,21 @@ export const captureOrderService = async ( orderId, user ) => {
       };
     }
     // console.log("captureData", captureData.purchase_units?.[0]?.payments?.captures?.[0]);
-    
+
     // 2. Find the corresponding local order in MongoDB
-   
+
     // 3. SECURE VERIFICATION: Check if PayPal successfully completed the capture
     const captureStatus = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status;
     const statusReason = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status_details?.reason;
     const capturedAmount = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value;
     const captureId = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id;
     const capturedCurrency = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code;
-    
-     if (captureStatus === "PENDING") {
+
+    if (captureStatus === "PENDING") {
       dbOrder.status = "Pending";
       dbOrder.paypalCaptureId = captureId;
       await dbOrder.save();
+      await recordEscrowTransaction({ dbOrder, user, status: "pending" });
       return {
         success: true,
         status: "Pending",
@@ -253,26 +315,35 @@ export const captureOrderService = async ( orderId, user ) => {
         order: dbOrder,
       };
     }
- 
+
     if (
       captureStatus === "COMPLETED" &&
       Number(capturedAmount) === Number(dbOrder.totalAmount) &&
-      capturedCurrency === "USD" 
+      capturedCurrency === "USD"
     ) {
       dbOrder.status = "Paid";
       dbOrder.paypalCaptureId = captureId;
       await dbOrder.save();
+
+      const bid = await Bid.findById(dbOrder.bidId);
+      const bidAmount = Number(bid?.amount ?? convertUsdToInr(dbOrder.totalAmount));
+
       await User.findOneAndUpdate(
-        {_id: user._id},
-        {$inc : {
-          'poster.spent': Number(dbOrder.totalAmount),
-          'poster.inEscrow': Number(dbOrder.totalAmount)
-        }},
-        {returnDocument: 'after'},
-      )
+        { _id: user._id },
+        {
+          $inc: {
+            'poster.spent': bidAmount,
+            'poster.inEscrow': bidAmount
+          }
+        },
+        { returnDocument: 'after' },
+      );
+
+      await recordEscrowTransaction({ dbOrder, user, status: "completed" });
+
       return { success: true, status: "Success", order: dbOrder };
     }
- 
+
     if (captureStatus === "COMPLETED") {
       console.error("Amount/currency mismatch on completed capture", {
         capturedAmount,
@@ -280,13 +351,15 @@ export const captureOrderService = async ( orderId, user ) => {
         expectedAmount: dbOrder.totalAmount,
       });
       dbOrder.status = "Failed";
-      dbOrder.paypalCaptureId = captureId; 
+      dbOrder.paypalCaptureId = captureId;
       await dbOrder.save();
+      await recordEscrowTransaction({ dbOrder, user, status: "failed" });
       return { success: false, status: "Failed", reason: "AMOUNT_MISMATCH" };
     }
- 
+
     dbOrder.status = "Failed";
     await dbOrder.save();
+    await recordEscrowTransaction({ dbOrder, user, status: "failed" });
     return {
       success: false,
       status: "Failed",
@@ -299,58 +372,83 @@ export const captureOrderService = async ( orderId, user ) => {
   }
 }
 
-export const orderPayoutService = async ({bidId, user}) => {
+export const orderPayoutService = async ({ bidId, user }) => {
   console.log(bidId, user);
   try {
-    const order = await Order.findOne({bidId}) 
+    const order = await Order.findOne({ bidId })
     // console.log("order",order)
-    const bid = await Bid.findById(bidId) 
+    const bid = await Bid.findById(bidId)
     // console.log("bid",bid)
     // const worker = await User.findOne({_id:bid.workerId}) 
     // console.log("worker",worker)
-    const poster = await User.findOne({_id: user._id}) 
+    const poster = await User.findOne({ _id: user._id })
     // console.log("poster")
-    const task = await Task.findOne({acceptedBid:bid._id})
-    console.log("task ", task);
-    
-    
-    if(order.totalAmount !== bid.amount){
-      return {success: false, message: MESSAGES.AMOUNT_MISMATCH};
+    const task = await Task.findOne({ acceptedBid: bid._id })
+    if (!task) {
+      return { success: false, message: "Task not found" };
+    }
+
+    if (task.status !== 'completed') {
+      return { success: false, message: "Payment cannot be released until the task is marked as completed by the worker." };
+    }
+
+    if (order.totalAmount !== convertInrToUsd(bid.amount)) {
+      return { success: false, message: MESSAGES.AMOUNT_MISMATCH };
     }
     // console.log("amount okay");
-    
+
+    const platformFee = Number(bid.amount) * 0.05;
+    const creditedAmount = Number(bid.amount) - platformFee;
+
     await Wallet.findOneAndUpdate(
-      {userId: new mongoose.Types.ObjectId(bid.workerId) },
+      { userId: new mongoose.Types.ObjectId(bid.workerId) },
       {
         $inc: {
-          walletAmount: Number(bid.amount),
-          totalEarned: Number(bid.amount)
+          walletAmount: creditedAmount,
+          totalEarned: creditedAmount
         },
       },
       {
-        returnDocument: 'after', 
+        returnDocument: 'after',
         upsert: true
       }
     );
 
+    await Transaction.create({
+      orderId: order._id,
+      senderId: user._id,
+      receiverId: bid.workerId,
+      amount: creditedAmount,
+      transactionType: "to_worker_wallet",
+      status: "completed",
+      processedAt: new Date(),
+    });
+
     task.update = 'payment';
+    task.status = 'completed';
+    if (!task.completedOn) {
+      task.completedOn = new Date();
+    }
     await task.save();
 
     const io = getIo()
 
-     io.to(`user:${bid.workerId}`).emit("payment-received", {
+    io.to(`user:${bid.workerId}`).emit("payment-received", {
+      taskId: task._id.toString(),
       taskTitle: task.title,
       amount: bid.amount,
+      platformFee: platformFee,
+      creditedAmount: creditedAmount,
     });
 
 
     poster.poster.inEscrow -= bid.amount;
     await poster.save();
 
-    return {success: true, message: "Payment has been released to Worker"}
-    
+    return { success: true, message: "Payment has been released to Worker" }
+
   } catch (error) {
     console.error(error)
-    return {success: false, message: "Unexpected error occoured"}
+    return { success: false, message: "Unexpected error occoured" }
   }
 }

@@ -1,4 +1,6 @@
-export function PhotoStrip({ photos }) {
+import { Image } from "lucide-react";
+
+export function PhotoStrip({ photos = [] }) {
   return (
     <div className="overflow-x-auto mt-4 pb-1">
       <div className="flex gap-3 w-max">

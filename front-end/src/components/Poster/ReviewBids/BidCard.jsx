@@ -1,4 +1,5 @@
 import { CheckCircle, Star } from "lucide-react";
+import { formatInrToUsd } from "../../../utils/currency";
 
 export default function BidCard({ bid, onAccept }) {
     const { worker } = bid;
@@ -54,9 +55,14 @@ export default function BidCard({ bid, onAccept }) {
                 <div className="flex flex-col sm:flex-row items-center justify-between pt-3 border-t border-gray-100">
                     <div className='flex flex-col '>
                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Bid Amount</p>
-                        <p className="text-2xl font-extrabold text-gray-900">
-                            ₹{bid.amount}
-                        </p>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-extrabold text-gray-900">
+                                ₹{bid.amount}
+                            </span>
+                            <span className="text-sm font-semibold text-gray-500">
+                                ({formatInrToUsd(bid.amount)})
+                            </span>
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
 

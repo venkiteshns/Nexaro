@@ -1,10 +1,15 @@
 import User from "../models/userSchema.js";
+import Wallet from "../models/walletSchema.js"
 import Review from "../models/reviewSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 import MESSAGES from "../constants/messages.js";
 import mongoose from "mongoose";
+import Transaction from "../models/transactionSchema.js";
+import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
+import { convertInrToUsd } from "../utils/currency.js";
+import { getIo } from "../socket.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -455,3 +460,540 @@ export const getAllReviewService = async ({ user, query }) => {
         return { error: MESSAGES.UNEXPECTED_ERROR }
     }
 }
+
+export const getEarningHeroDataService = async ({ userId }) => {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    try {
+        const isUser = await User.findOne({ _id: userId })
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND }
+        }
+        const earningsData = await Wallet.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(userId),
+                }
+            },
+            {
+                $lookup: {
+                    from: "transactions",
+                    let: { workerId: "$userId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$receiverId", "$$workerId"] },
+                                        { $eq: ["$transactionType", "to_worker_wallet"] },
+                                        { $eq: ["$status", "completed"] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "successTransactions"
+                }
+            },
+
+            {
+                $addFields: {
+                    highestPaidAmount: {
+                        $ifNull: [{ $max: "$successTransactions.amount" }, 0]
+                    },
+
+                    last7DayEarning: {
+                        $filter: {
+                            input: "$successTransactions",
+                            as: "tran",
+                            cond: {
+                                $gte: ["$$tran.createdAt", sevenDaysAgo]
+                            }
+                        }
+                    }
+                }
+            },
+
+            {
+                $addFields: {
+                    earnedLast7Days: {
+                        $ifNull: [{ $sum: "$last7DayEarning.amount" }, 0]
+                    }
+                }
+            },
+
+            {
+                $lookup: {
+                    from: "tasks",
+                    localField: "userId",
+                    foreignField: "workerId",
+                    as: "tasks",
+                    pipeline: [
+                        {
+                            $match: {
+                                status: "completed",
+                                update: "payment"
+                            }
+                        }
+                    ]
+                }
+            },
+
+            {
+                $addFields: {
+                    completedTasks: {
+                        $ifNull: [{ $size: "$tasks" }, 0]
+                    },
+
+                }
+            },
+
+            {
+                $project: {
+                    walletAmount: 1,
+                    withDrawn: 1,
+                    highestPaidAmount: 1,
+                    earnedLast7Days: 1,
+                    completedTasks: 1,
+                    totalEarned: 1,
+                }
+            }
+
+        ]);
+
+        const heroData = earningsData[0] || {
+            walletAmount: 0,
+            withDrawn: 0,
+            highestPaidAmount: 0,
+            earnedLast7Days: 0,
+            completedTasks: 0,
+            totalEarned: 0,
+        };
+
+        heroData.averageAmount = heroData.completedTasks > 0
+            ? Math.round(heroData.totalEarned / heroData.completedTasks)
+            : 0;
+
+        heroData.sinceDate = isUser.createdAt
+            ? new Date(isUser.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+            : "";
+
+        return { success: true, message: "Earnings data fetched successfully", earningsData: heroData };
+
+    } catch (error) {
+        console.log(error);
+        return { error: MESSAGES.UNEXPECTED_ERROR }
+    }
+}
+
+export const getTransactionHistoryService = async ({ userId, page, limit }) => {
+    const skip = (page - 1) * limit;
+    console.log("userId", userId);
+    try {
+        const isUser = await User.findOne({ _id: userId })
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND }
+        }
+
+        // Automatic PayPal status sync for any pending withdrawal transactions
+        try {
+            const pendingWithdrawals = await Transaction.find({
+                receiverId: new mongoose.Types.ObjectId(userId),
+                transactionType: "to_worker",
+                status: "pending",
+                payoutBatchId: { $exists: true, $ne: null },
+            });
+
+            for (const tx of pendingWithdrawals) {
+                const payoutData = await getPayoutStatus(tx.payoutBatchId);
+                const item = payoutData.items?.[0];
+                const itemStatus = item?.transaction_status;
+
+                if (itemStatus === "SUCCESS") {
+                    tx.status = "completed";
+                    tx.processedAt = new Date();
+                    if (item.payout_item_id) tx.payoutItemId = item.payout_item_id;
+                    await tx.save();
+                } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED"].includes(itemStatus)) {
+                    tx.status = "failed";
+                    tx.processedAt = new Date();
+                    await tx.save();
+
+                    // Restore wallet amount
+                    await Wallet.findOneAndUpdate(
+                        { userId: new mongoose.Types.ObjectId(userId) },
+                        {
+                            $inc: { walletAmount: tx.amount, withDrawn: -tx.amount },
+                        }
+                    );
+                }
+            }
+        } catch (syncErr) {
+            console.warn("Background PayPal status sync error:", syncErr.message);
+        }
+
+        const filter = { receiverId: new mongoose.Types.ObjectId(userId) };
+
+        const transactions = await Transaction.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalTransactions = await Transaction.countDocuments(filter);
+        const totalPages = Math.ceil(totalTransactions / limit);
+        const transactionsData = transactions.map((transaction) => {
+            return {
+                _id: transaction._id,
+                amount: transaction.amount,
+                transactionType: transaction.transactionType,
+                status: transaction.status,
+                processedAt: transaction.processedAt,
+                createdAt: transaction.createdAt,
+                updatedAt: transaction.updatedAt,
+                payoutBatchId: transaction.payoutBatchId,
+                payoutItemId: transaction.payoutItemId,
+                payoutEmail: transaction.payoutEmail,
+            };
+        });
+        return {
+            success: true,
+            message: "Transactions fetched successfully",
+            transactionsData,
+            pagination: {
+                page,
+                limit,
+                totalPages,
+                totalTransactions,
+            }
+        };
+    } catch (error) {
+        console.log(error);
+        return { error: MESSAGES.UNEXPECTED_ERROR }
+    }
+}
+
+export const getWorkerEarningsChartService = async ({ userId, timeframe = "7D" }) => {
+    try {
+        const isUser = await User.findById(userId);
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        const normalizedTimeframe = (timeframe || "7D").toUpperCase();
+        const now = new Date();
+        let startDate;
+        let chartData = [];
+
+        if (normalizedTimeframe === "7D") {
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 6);
+            startDate.setHours(0, 0, 0, 0);
+
+            // Pre-fill last 7 days
+            const dayMap = new Map();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                const key = d.toISOString().slice(0, 10);
+                const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+                const dateLabel = d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+                dayMap.set(key, { name: dayName, date: dateLabel, earnings: 0 });
+            }
+
+            const rawEarnings = await Transaction.aggregate([
+                {
+                    $match: {
+                        receiverId: new mongoose.Types.ObjectId(userId),
+                        transactionType: "to_worker_wallet",
+                        status: "completed",
+                        createdAt: { $gte: startDate },
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+
+            rawEarnings.forEach((item) => {
+                if (dayMap.has(item._id)) {
+                    dayMap.get(item._id).earnings = item.total;
+                }
+            });
+
+            chartData = Array.from(dayMap.values());
+        } else if (normalizedTimeframe === "1M") {
+            // 4 weekly buckets over the last 28 days
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 27);
+            startDate.setHours(0, 0, 0, 0);
+
+            const weeks = [
+                { name: "Week 1", startDaysAgo: 27, endDaysAgo: 21 },
+                { name: "Week 2", startDaysAgo: 20, endDaysAgo: 14 },
+                { name: "Week 3", startDaysAgo: 13, endDaysAgo: 7 },
+                { name: "Week 4", startDaysAgo: 6, endDaysAgo: 0 },
+            ];
+
+            const weekBuckets = weeks.map((w) => {
+                const s = new Date(now);
+                s.setDate(now.getDate() - w.startDaysAgo);
+                s.setHours(0, 0, 0, 0);
+
+                const e = new Date(now);
+                e.setDate(now.getDate() - w.endDaysAgo);
+                e.setHours(23, 59, 59, 999);
+
+                const dateLabel = `${s.toLocaleDateString("en-US", { day: "numeric", month: "short" })} - ${e.toLocaleDateString("en-US", { day: "numeric", month: "short" })}`;
+
+                return {
+                    name: w.name,
+                    date: dateLabel,
+                    start: s,
+                    end: e,
+                    earnings: 0,
+                };
+            });
+
+            const transactions = await Transaction.find({
+                receiverId: new mongoose.Types.ObjectId(userId),
+                transactionType: "to_worker_wallet",
+                status: "completed",
+                createdAt: { $gte: startDate },
+            });
+
+            transactions.forEach((tx) => {
+                const txTime = new Date(tx.createdAt).getTime();
+                const bucket = weekBuckets.find(
+                    (b) => txTime >= b.start.getTime() && txTime <= b.end.getTime()
+                );
+
+                if (bucket) {
+                    bucket.earnings += tx.amount;
+                }
+            });
+
+            chartData = weekBuckets.map(({ name, date, earnings }) => ({
+                name,
+                date,
+                earnings,
+            }));
+        } else if (normalizedTimeframe === "6M") {
+            startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
+            const monthMap = new Map();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                const name = d.toLocaleDateString("en-US", { month: "short" });
+                const dateLabel = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                monthMap.set(key, { name, date: dateLabel, earnings: 0 });
+            }
+
+            const rawEarnings = await Transaction.aggregate([
+                {
+                    $match: {
+                        receiverId: new mongoose.Types.ObjectId(userId),
+                        transactionType: "to_worker_wallet",
+                        status: "completed",
+                        createdAt: { $gte: startDate },
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+
+            rawEarnings.forEach((item) => {
+                if (monthMap.has(item._id)) {
+                    monthMap.get(item._id).earnings = item.total;
+                }
+            });
+
+            chartData = Array.from(monthMap.values());
+        } else if (normalizedTimeframe === "1Y") {
+            startDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+
+            const monthMap = new Map();
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                const name = d.toLocaleDateString("en-US", { month: "short" });
+                const dateLabel = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                monthMap.set(key, { name, date: dateLabel, earnings: 0 });
+            }
+
+            const rawEarnings = await Transaction.aggregate([
+                {
+                    $match: {
+                        receiverId: new mongoose.Types.ObjectId(userId),
+                        transactionType: "to_worker_wallet",
+                        status: "completed",
+                        createdAt: { $gte: startDate },
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+
+            rawEarnings.forEach((item) => {
+                if (monthMap.has(item._id)) {
+                    monthMap.get(item._id).earnings = item.total;
+                }
+            });
+
+            chartData = Array.from(monthMap.values());
+        } else {
+            return { error: "Invalid timeframe specified" };
+        }
+
+        const totalEarnings = chartData.reduce((acc, curr) => acc + curr.earnings, 0);
+
+        return {
+            success: true,
+            timeframe: normalizedTimeframe,
+            totalEarnings,
+            chartData,
+        };
+    } catch (error) {
+        console.error("getWorkerEarningsChartService error:", error);
+        return { error: MESSAGES.UNEXPECTED_ERROR };
+    }
+};
+
+const activeWithdrawals = new Set();
+
+export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
+    const userLockKey = userId.toString();
+    if (activeWithdrawals.has(userLockKey)) {
+        return { error: "A withdrawal request is already in progress. Please wait a moment." };
+    }
+
+    activeWithdrawals.add(userLockKey);
+
+    try {
+        const isUser = await User.findById(userId);
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        if (!isUser.email) {
+            return { error: "Worker account does not have a registered email address for PayPal payout." };
+        }
+
+        const wallet = await Wallet.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+        if (!wallet || wallet.walletAmount <= 0) {
+            return { error: "Insufficient wallet balance. You have ₹0 available to withdraw." };
+        }
+
+        // Amount to withdraw: defaults to full wallet balance
+        const withdrawAmount = amount && Number(amount) > 0
+            ? Math.min(Number(amount), wallet.walletAmount)
+            : wallet.walletAmount;
+
+        if (withdrawAmount <= 0) {
+            return { error: "Invalid withdrawal amount." };
+        }
+
+        // Convert INR amount to USD for PayPal Payouts API
+        const usdAmount = convertInrToUsd(withdrawAmount);
+        if (usdAmount < 0.01) {
+            return { error: "Withdrawal amount is too small to process via PayPal." };
+        }
+
+        console.log(`[PayPal Payout] Converted ₹${withdrawAmount} INR -> $${usdAmount} USD. Initiating payout to ${isUser.email}`);
+
+        // 1. Initiate PayPal Transfer
+        const payoutResponse = await payoutTransferService(isUser.email, usdAmount, "USD");
+
+        if (!payoutResponse.success) {
+            console.error("PayPal withdrawal initiation failed:", payoutResponse);
+            return {
+                error: payoutResponse.error || "Failed to initiate PayPal transfer. Your wallet balance was not changed.",
+            };
+        }
+
+        // 2. Update Wallet (Atomic update: set wallet amount to 0, increment withDrawn)
+        const updatedWallet = await Wallet.findOneAndUpdate(
+            { userId: new mongoose.Types.ObjectId(userId) },
+            {
+                $set: { walletAmount: 0 },
+                $inc: { withDrawn: withdrawAmount },
+            },
+            { new: true }
+        );
+
+        // Determine initial status based on PayPal response
+        const itemStatus = payoutResponse.finalStatus?.itemStatus;
+        let txStatus = "pending";
+        if (itemStatus === "SUCCESS") {
+            txStatus = "completed";
+        } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED", "REFUNDED"].includes(itemStatus)) {
+            txStatus = "failed";
+        }
+
+        // 3. Create Transaction record in collection
+        const adminUserId = process.env.ADMIN_USER_ID;
+        const transaction = await Transaction.create({
+            senderId: adminUserId ? new mongoose.Types.ObjectId(adminUserId) : new mongoose.Types.ObjectId(userId),
+            receiverId: new mongoose.Types.ObjectId(userId),
+            amount: withdrawAmount,
+            transactionType: "to_worker",
+            status: txStatus,
+            processedAt: new Date(),
+            payoutBatchId: payoutResponse.payoutBatchId,
+            payoutItemId: payoutResponse.finalStatus?.payoutItemId || null,
+            payoutEmail: isUser.email,
+        });
+
+        // If PayPal immediately reported failure during poll:
+        if (txStatus === "failed") {
+            // Restore wallet balance
+            await Wallet.findOneAndUpdate(
+                { userId: new mongoose.Types.ObjectId(userId) },
+                {
+                    $set: { walletAmount: wallet.walletAmount },
+                    $inc: { withDrawn: -withdrawAmount },
+                }
+            );
+            return {
+                error: `PayPal payout failed: ${payoutResponse.finalStatus?.errors?.[0]?.message || "Transaction was rejected by PayPal."}`,
+            };
+        }
+
+        // 6. Realtime Notification via Socket
+        try {
+            const io = getIo();
+            io.to(`user:${userId}`).emit("withdrawal-initiated", {
+                message: "Your payment has been initiated and will reflect in your account within 48 hours.",
+                amount: withdrawAmount,
+                status: txStatus,
+                transactionId: transaction._id,
+                payoutBatchId: payoutResponse.payoutBatchId,
+            });
+        } catch (socketError) {
+            console.warn("Could not emit withdrawal realtime notification:", socketError.message);
+        }
+
+        return {
+            success: true,
+            message: "Withdrawal initiated successfully",
+            withdrawnAmount: withdrawAmount,
+            wallet: updatedWallet,
+            transaction,
+        };
+    } catch (error) {
+        console.error("withdrawWorkerEarningsService error:", error);
+        return { error: MESSAGES.UNEXPECTED_ERROR };
+    } finally {
+        activeWithdrawals.delete(userLockKey);
+    }
+};

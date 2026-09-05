@@ -19,10 +19,18 @@ const TIME_OPTIONS = [
 
 const BidForm = ({ task, bidLoading, deadline }) => {
 
-    const minDate = deadline.split('T')[0];
+    const minDate = new Date().toLocaleDateString('en-CA');
+    const maxDate = deadline ? new Date(deadline).toLocaleDateString('en-CA') : '';
+    const formattedDeadline = deadline
+        ? new Date(deadline).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        })
+        : '';
 
     // console.log(Math.floor(new Date - new Date(deadline)) / (24 * 60 * 60 * 1000));
-    
+
     const navigate = useNavigate();
 
     const { register, formState: { errors }, watch, setValue } = useFormContext();
@@ -93,25 +101,43 @@ const BidForm = ({ task, bidLoading, deadline }) => {
 
                 {/* YOUR AVAILABILITY */}
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                        Your Availability
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            Your Availability
+                        </label>
+                        {formattedDeadline && (
+                            <span className="text-xs text-gray-400">
+                                Deadline: <span className="font-semibold text-gray-700">{formattedDeadline}</span>
+                            </span>
+                        )}
+                    </div>
+                    {formattedDeadline && (
+                        <p className="text-xs text-gray-400 mb-2.5">
+                            Task deadline:{" "}
+                            <span className="font-semibold text-gray-600">{formattedDeadline}</span>
+                        </p>
+                    )}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             {/* Date picker */}
                             <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3 focus-within:border-[#0A6E5C] focus-within:ring-2 focus-within:ring-emerald-100 transition-all bg-white">
                                 <Calendar size={15} className="text-[#0A6E5C] shrink-0" />
                                 <input
-                                    {...register("availableDate", { 
+                                    {...register("availableDate", {
                                         required: "Please select your availability date",
-                                        validate:(value) => {
-                                            return (
-                                                value >= minDate || "Availability date must be on or after the deadline"
-                                            )
-                                            
+                                        validate: (value) => {
+                                            if (value < minDate) {
+                                                return "Availability date cannot be in the past";
+                                            }
+                                            if (maxDate && value > maxDate) {
+                                                return "Availability date must be on or before the deadline";
+                                            }
+                                            return true;
                                         }
-                                     })}
+                                    })}
                                     type="date"
+                                    min={minDate}
+                                    max={maxDate}
                                     className="flex-1 outline-none text-sm text-gray-800 font-semibold bg-transparent"
                                 />
                             </div>
@@ -144,6 +170,7 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                             {errors.availableTime && <FormError error={errors.availableTime} />}
                         </div>
                     </div>
+
                 </div>
 
                 {/* ── Summary strip ── */}
