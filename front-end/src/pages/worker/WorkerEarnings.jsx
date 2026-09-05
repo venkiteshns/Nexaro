@@ -124,20 +124,10 @@ export default function WorkerEarnings() {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
   // Handle successful withdrawal
-  const handleWithdrawSuccess = (amount) => {
-    setAvailableBalance((prev) => Math.max(0, prev - amount));
-    const newTx = {
-      id: `tx-${Date.now()}`,
-      title: "Bank Payout Request",
-      date: "Just now",
-      category: "Withdrawal",
-      amount: amount,
-      type: "withdrawn",
-      status: "WITHDRAWN",
-    };
-    setTransactions((prev) => [newTx, ...prev]);
-    showSuccess(`Withdrawal of ₹${amount.toLocaleString("en-IN")} initiated successfully!`);
+  const handleWithdrawSuccess = () => {
+    setIsWithdrawOpen(false);
   };
+
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">

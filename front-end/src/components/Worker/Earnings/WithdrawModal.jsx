@@ -23,7 +23,7 @@ export default function WithdrawModal({
       setError("");
       setSuccess(false);
     }
-  }, [isOpen, availableBalance]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -63,15 +63,12 @@ export default function WithdrawModal({
     setError("");
 
     try {
-      const response = await withdrawEarnings({ amount: numAmount }).unwrap();
+      await withdrawEarnings({ amount: numAmount }).unwrap();
       setSuccess(true);
-      if (onWithdrawSuccess) {
-        onWithdrawSuccess(numAmount, response);
-      }
       setTimeout(() => {
         setSuccess(false);
         onClose();
-      }, 2000);
+      }, 2500);
     } catch (err) {
       console.error("Withdrawal error:", err);
       setError(
@@ -103,14 +100,21 @@ export default function WithdrawModal({
         </button>
 
         {success ? (
-          <div className="py-8 flex flex-col items-center justify-center text-center">
+          <div className="py-6 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-200">
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-[#0A6E5C] flex items-center justify-center mb-4">
               <CheckCircle2 size={36} />
             </div>
             <h3 className="text-xl font-bold text-[#111827]">Withdrawal Initiated!</h3>
-            <p className="text-sm text-gray-500 mt-2 max-w-xs">
+            <p className="text-sm text-gray-500 mt-2 max-w-xs leading-relaxed">
               ₹{numAmount.toLocaleString("en-IN")} has been sent to your PayPal account (<span className="font-semibold text-gray-700">{workerEmail}</span>). It will reflect within 48 hours.
             </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-6 w-full py-3 rounded-2xl bg-[#0A6E5C] text-white text-sm font-bold hover:bg-[#085a4b] transition-all shadow-md shadow-[#0A6E5C]/20 cursor-pointer"
+            >
+              Done
+            </button>
           </div>
         ) : (
           <div>
