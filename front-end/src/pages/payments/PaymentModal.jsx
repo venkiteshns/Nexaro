@@ -37,7 +37,7 @@ export default function PaymentModal({ amount, bidId, onClose, onSuccess }) {
 
                     <PayPalScriptProvider
                         options={{
-                            "client-id": "BAAqZizMfvZturYdpFssYGObvERUu_E3VGGlmQbspL1e_5idPdVQSzgzsbAICoGF-jxaVkSlC48tGBy4DA",
+                            "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID,
                             currency: "USD",
                         }}
                     >
