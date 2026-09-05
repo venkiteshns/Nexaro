@@ -33,6 +33,15 @@ const transactionSchema = new mongoose.Schema(
     processedAt: {
       type: Date,
     },
+    payoutBatchId: {
+      type: String,
+    },
+    payoutItemId: {
+      type: String,
+    },
+    payoutEmail: {
+      type: String,
+    },
   },
   {
     timestamps: true,

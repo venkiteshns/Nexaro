@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import EarningsHeroCard from "../../components/Worker/Earnings/EarningsHeroCard";
@@ -11,6 +12,7 @@ import { useGetEarningHeroDataQuery } from "../../store/services/workerApi.js";
 import { EarningsChart } from "../../components/Worker/Earnings/EarningsChart.jsx";
 
 export default function WorkerEarnings() {
+  const { user } = useSelector((state) => state.auth);
   // State for balances and data (can be linked to RTK query / backend wallet)
   // const [availableBalance, setAvailableBalance] = useState(1200);
   // const [totalEarned, setTotalEarned] = useState(28000);
@@ -198,8 +200,8 @@ export default function WorkerEarnings() {
       <WithdrawModal
         isOpen={isWithdrawOpen}
         onClose={() => setIsWithdrawOpen(false)}
-        availableBalance={availableBalance}
-        payoutMethods={payoutMethods}
+        availableBalance={availableBalance || 0}
+        workerEmail={user?.email || ""}
         onWithdrawSuccess={handleWithdrawSuccess}
       />
     </div>

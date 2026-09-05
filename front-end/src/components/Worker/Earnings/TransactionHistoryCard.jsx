@@ -32,7 +32,7 @@ export default function TransactionHistoryCard() {
       case "to_worker_wallet":
         return "Transferred to Wallet";
       case "to_worker":
-        return "Task Earnings Credited";
+        return "PayPal Wallet Withdrawal";
       case "withdrawal":
       case "withdrawn":
         return "Bank Payout Withdrawal";
@@ -49,7 +49,7 @@ export default function TransactionHistoryCard() {
       case "to_worker_wallet":
         return "Wallet Credit";
       case "to_worker":
-        return "Task Payment";
+        return "Withdrawal";
       case "withdrawal":
       case "withdrawn":
         return "Withdrawal";
@@ -102,7 +102,7 @@ export default function TransactionHistoryCard() {
       };
     }
 
-    if (type === "withdrawn" || type === "withdrawal") {
+    if (type === "withdrawn" || type === "withdrawal" || type === "to_worker") {
       return {
         icon: <Building2 size={16} className="text-gray-600" />,
         iconBg: "bg-gray-100 text-gray-600",

@@ -7,6 +7,9 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 import MESSAGES from "../constants/messages.js";
 import mongoose from "mongoose";
 import Transaction from "../models/transactionSchema.js";
+import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
+import { convertInrToUsd } from "../utils/currency.js";
+import { getIo } from "../socket.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -591,13 +594,52 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
 
-        const transactions = await Transaction.find({ receiverId: new mongoose.Types.ObjectId(userId) })
+        // Automatic PayPal status sync for any pending withdrawal transactions
+        try {
+            const pendingWithdrawals = await Transaction.find({
+                receiverId: new mongoose.Types.ObjectId(userId),
+                transactionType: "to_worker",
+                status: "pending",
+                payoutBatchId: { $exists: true, $ne: null },
+            });
+
+            for (const tx of pendingWithdrawals) {
+                const payoutData = await getPayoutStatus(tx.payoutBatchId);
+                const item = payoutData.items?.[0];
+                const itemStatus = item?.transaction_status;
+
+                if (itemStatus === "SUCCESS") {
+                    tx.status = "completed";
+                    tx.processedAt = new Date();
+                    if (item.payout_item_id) tx.payoutItemId = item.payout_item_id;
+                    await tx.save();
+                } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED"].includes(itemStatus)) {
+                    tx.status = "failed";
+                    tx.processedAt = new Date();
+                    await tx.save();
+
+                    // Restore wallet amount
+                    await Wallet.findOneAndUpdate(
+                        { userId: new mongoose.Types.ObjectId(userId) },
+                        {
+                            $inc: { walletAmount: tx.amount, withDrawn: -tx.amount },
+                        }
+                    );
+                }
+            }
+        } catch (syncErr) {
+            console.warn("Background PayPal status sync error:", syncErr.message);
+        }
+
+        const filter = { receiverId: new mongoose.Types.ObjectId(userId) };
+
+        const transactions = await Transaction.find(filter)
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit)
+            .limit(limit);
 
-        const totalTransactions = await Transaction.countDocuments({ receiverId: new mongoose.Types.ObjectId(userId) })
-        const totalPages = Math.ceil(totalTransactions / limit)
+        const totalTransactions = await Transaction.countDocuments(filter);
+        const totalPages = Math.ceil(totalTransactions / limit);
         const transactionsData = transactions.map((transaction) => {
             return {
                 _id: transaction._id,
@@ -607,9 +649,11 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
                 processedAt: transaction.processedAt,
                 createdAt: transaction.createdAt,
                 updatedAt: transaction.updatedAt,
-
-            }
-        })
+                payoutBatchId: transaction.payoutBatchId,
+                payoutItemId: transaction.payoutItemId,
+                payoutEmail: transaction.payoutEmail,
+            };
+        });
         return {
             success: true,
             message: "Transactions fetched successfully",
@@ -822,5 +866,134 @@ export const getWorkerEarningsChartService = async ({ userId, timeframe = "7D" }
     } catch (error) {
         console.error("getWorkerEarningsChartService error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR };
+    }
+};
+
+const activeWithdrawals = new Set();
+
+export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
+    const userLockKey = userId.toString();
+    if (activeWithdrawals.has(userLockKey)) {
+        return { error: "A withdrawal request is already in progress. Please wait a moment." };
+    }
+
+    activeWithdrawals.add(userLockKey);
+
+    try {
+        const isUser = await User.findById(userId);
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        if (!isUser.email) {
+            return { error: "Worker account does not have a registered email address for PayPal payout." };
+        }
+
+        const wallet = await Wallet.findOne({ userId: new mongoose.Types.ObjectId(userId) });
+        if (!wallet || wallet.walletAmount <= 0) {
+            return { error: "Insufficient wallet balance. You have ₹0 available to withdraw." };
+        }
+
+        // Amount to withdraw: defaults to full wallet balance
+        const withdrawAmount = amount && Number(amount) > 0
+            ? Math.min(Number(amount), wallet.walletAmount)
+            : wallet.walletAmount;
+
+        if (withdrawAmount <= 0) {
+            return { error: "Invalid withdrawal amount." };
+        }
+
+        // Convert INR amount to USD for PayPal Payouts API
+        const usdAmount = convertInrToUsd(withdrawAmount);
+        if (usdAmount < 0.01) {
+            return { error: "Withdrawal amount is too small to process via PayPal." };
+        }
+
+        console.log(`[PayPal Payout] Converted ₹${withdrawAmount} INR -> $${usdAmount} USD. Initiating payout to ${isUser.email}`);
+
+        // 1. Initiate PayPal Transfer
+        const payoutResponse = await payoutTransferService(isUser.email, usdAmount, "USD");
+
+        if (!payoutResponse.success) {
+            console.error("PayPal withdrawal initiation failed:", payoutResponse);
+            return {
+                error: payoutResponse.error || "Failed to initiate PayPal transfer. Your wallet balance was not changed.",
+            };
+        }
+
+        // 2. Update Wallet (Atomic update: set wallet amount to 0, increment withDrawn)
+        const updatedWallet = await Wallet.findOneAndUpdate(
+            { userId: new mongoose.Types.ObjectId(userId) },
+            {
+                $set: { walletAmount: 0 },
+                $inc: { withDrawn: withdrawAmount },
+            },
+            { new: true }
+        );
+
+        // Determine initial status based on PayPal response
+        const itemStatus = payoutResponse.finalStatus?.itemStatus;
+        let txStatus = "pending";
+        if (itemStatus === "SUCCESS") {
+            txStatus = "completed";
+        } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED", "REFUNDED"].includes(itemStatus)) {
+            txStatus = "failed";
+        }
+
+        // 3. Create Transaction record in collection
+        const adminUserId = process.env.ADMIN_USER_ID;
+        const transaction = await Transaction.create({
+            senderId: adminUserId ? new mongoose.Types.ObjectId(adminUserId) : new mongoose.Types.ObjectId(userId),
+            receiverId: new mongoose.Types.ObjectId(userId),
+            amount: withdrawAmount,
+            transactionType: "to_worker",
+            status: txStatus,
+            processedAt: new Date(),
+            payoutBatchId: payoutResponse.payoutBatchId,
+            payoutItemId: payoutResponse.finalStatus?.payoutItemId || null,
+            payoutEmail: isUser.email,
+        });
+
+        // If PayPal immediately reported failure during poll:
+        if (txStatus === "failed") {
+            // Restore wallet balance
+            await Wallet.findOneAndUpdate(
+                { userId: new mongoose.Types.ObjectId(userId) },
+                {
+                    $set: { walletAmount: wallet.walletAmount },
+                    $inc: { withDrawn: -withdrawAmount },
+                }
+            );
+            return {
+                error: `PayPal payout failed: ${payoutResponse.finalStatus?.errors?.[0]?.message || "Transaction was rejected by PayPal."}`,
+            };
+        }
+
+        // 6. Realtime Notification via Socket
+        try {
+            const io = getIo();
+            io.to(`user:${userId}`).emit("withdrawal-initiated", {
+                message: "Your payment has been initiated and will reflect in your account within 48 hours.",
+                amount: withdrawAmount,
+                status: txStatus,
+                transactionId: transaction._id,
+                payoutBatchId: payoutResponse.payoutBatchId,
+            });
+        } catch (socketError) {
+            console.warn("Could not emit withdrawal realtime notification:", socketError.message);
+        }
+
+        return {
+            success: true,
+            message: "Withdrawal initiated successfully",
+            withdrawnAmount: withdrawAmount,
+            wallet: updatedWallet,
+            transaction,
+        };
+    } catch (error) {
+        console.error("withdrawWorkerEarningsService error:", error);
+        return { error: MESSAGES.UNEXPECTED_ERROR };
+    } finally {
+        activeWithdrawals.delete(userLockKey);
     }
 };

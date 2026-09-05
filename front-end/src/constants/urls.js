@@ -46,6 +46,7 @@ export const WORKER = {
     GET_EARNING_HERO_DATA: "/worker/earnings/hero",
     GET_TRANSACTION_HISTORY: "/worker/earnings/transactions",
     GET_EARNING_CHART: "/worker/earnings/chart",
+    WITHDRAW_EARNINGS: "/worker/earnings/withdraw",
 }
 
 export const PAYMENT = {

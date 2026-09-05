@@ -1,6 +1,6 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService, getWorkerEarningsChartService } from "../../services/workerServices.js";
+import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService, getWorkerEarningsChartService, withdrawWorkerEarningsService } from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
 
@@ -372,6 +372,36 @@ export const getWorkerEarningsChart = async (req, res) => {
         });
     } catch (error) {
         console.error("getWorkerEarningsChart error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const withdrawWorkerEarnings = async (req, res) => {
+    try {
+        const response = await withdrawWorkerEarningsService({
+            userId: req.user._id,
+            amount: req.body?.amount,
+        });
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: response.message,
+            withdrawnAmount: response.withdrawnAmount,
+            wallet: response.wallet,
+            transaction: response.transaction,
+        });
+    } catch (error) {
+        console.error("withdrawWorkerEarnings error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

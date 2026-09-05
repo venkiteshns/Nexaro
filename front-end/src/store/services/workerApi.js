@@ -174,6 +174,19 @@ export const workerApi = api.injectEndpoints({
       providesTags: ["Worker_Earnings_Chart"],
     }),
 
+    withdrawEarnings: builder.mutation({
+      query: (payload) => ({
+        url: WORKER.WITHDRAW_EARNINGS,
+        method: "POST",
+        body: payload || {},
+      }),
+      invalidatesTags: [
+        "Earning_Hero_Data",
+        "Transaction_History",
+        "Worker_Earnings_Chart",
+      ],
+    }),
+
   }),
 });
 
@@ -195,5 +208,6 @@ export const {
   useGetEarningHeroDataQuery,
   useGetTransactionHistoryQuery,
   useGetWorkerEarningsChartQuery,
+  useWithdrawEarningsMutation,
 } = workerApi;
 

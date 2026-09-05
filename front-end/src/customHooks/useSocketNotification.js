@@ -71,7 +71,21 @@ const useSocketNotification = () => {
         socket.on('payment-received', (data) => {
             setPaymentModalData(data);
             dispatch(api.util.invalidateTags(['Active_Job', 'Worker_Earnings', 'Worker_Wallet', "Worker_Bids"]));
-        })
+        });
+
+        socket.on('withdrawal-initiated', (data) => {
+            showSuccess(data.message || "Your payment has been initiated and will reflect in your account within 48 hours.", { autoClose: 7000 });
+            dispatch(api.util.invalidateTags(['Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart']));
+        });
+
+        socket.on('withdrawal-status-updated', (data) => {
+            if (data.status === 'completed') {
+                showSuccess(data.message || "Your withdrawal has been completed by PayPal!");
+            } else if (data.status === 'failed') {
+                showError(data.message || "Your withdrawal failed and the balance was refunded.");
+            }
+            dispatch(api.util.invalidateTags(['Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart']));
+        });
 
         return () => {
             disconnectSocket();

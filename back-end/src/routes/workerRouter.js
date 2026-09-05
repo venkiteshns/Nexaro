@@ -16,7 +16,8 @@ import {
   getCompletedTaskWorkerSide,
   getEarningHeroData,
   getTransactionHistory,
-  getWorkerEarningsChart
+  getWorkerEarningsChart,
+  withdrawWorkerEarnings
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -38,6 +39,7 @@ router.get('/earnings/transactions', verifyToken, getTransactionHistory);
 router.get('/earnings/chart', verifyToken, getWorkerEarningsChart);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
+router.post('/earnings/withdraw', verifyToken, withdrawWorkerEarnings);
 
 router.delete("/bid/withdraw/:bidId", verifyToken, withdrawBid);
 
