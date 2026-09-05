@@ -45,6 +45,7 @@ export const WORKER = {
     COMPLETED_TASK: "/worker/task/:taskId/completed",
     GET_EARNING_HERO_DATA: "/worker/earnings/hero",
     GET_TRANSACTION_HISTORY: "/worker/earnings/transactions",
+    GET_EARNING_CHART: "/worker/earnings/chart",
 }
 
 export const PAYMENT = {

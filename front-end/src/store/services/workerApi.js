@@ -164,7 +164,15 @@ export const workerApi = api.injectEndpoints({
         };
       },
       providesTags: ["Transaction_History"],
-    })
+    }),
+
+    getWorkerEarningsChart: builder.query({
+      query: (timeframe = "7D") => ({
+        url: `${WORKER.GET_EARNING_CHART}?timeframe=${timeframe}`,
+        method: "GET",
+      }),
+      providesTags: ["Worker_Earnings_Chart"],
+    }),
 
   }),
 });
@@ -185,6 +193,7 @@ export const {
   useGetReviewsWorkerQuery,
   useGetCompletedTaskWorkerSideQuery,
   useGetEarningHeroDataQuery,
-  useGetTransactionHistoryQuery
+  useGetTransactionHistoryQuery,
+  useGetWorkerEarningsChartQuery,
 } = workerApi;
 

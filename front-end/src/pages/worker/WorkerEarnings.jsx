@@ -8,6 +8,7 @@ import TransactionHistoryCard from "../../components/Worker/Earnings/Transaction
 import WithdrawModal from "../../components/Worker/Earnings/WithdrawModal";
 import { showSuccess } from "../../utils/toast.js";
 import { useGetEarningHeroDataQuery } from "../../store/services/workerApi.js";
+import { EarningsChart } from "../../components/Worker/Earnings/EarningsChart.jsx";
 
 export default function WorkerEarnings() {
   // State for balances and data (can be linked to RTK query / backend wallet)
@@ -137,54 +138,59 @@ export default function WorkerEarnings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6FAF8] flex">
+    <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
       {/* Worker Navigation Sidebar */}
       <WorkerNavBar />
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <WorkerHeader />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
-          {/* Top Page Title & Subtitle */}
-          <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
-              Earnings
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Your complete earnings overview and payout history
-            </p>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl w-full mx-auto space-y-6">
+            {/* Top Page Title & Subtitle */}
+            <div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
+                Earnings
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                Your complete earnings overview and payout history
+              </p>
+            </div>
+
+            {/* 1. AVAILABLE BALANCE HERO CARD */}
+            <section aria-label="Available Balance and Summary">
+              <EarningsHeroCard
+                availableBalance={availableBalance}
+                totalEarned={totalEarned}
+                totalJobs={totalJobs}
+                sinceDate={sinceDate}
+                onWithdrawClick={() => setIsWithdrawOpen(true)}
+              />
+            </section>
+
+            {/* 2. THREE QUICK STATS CARDS */}
+            <section aria-label="Quick Performance Stats">
+              <EarningsStatCards
+                avgPerJob={averageAmount}
+                highestPaidJob={highestPaidAmount}
+                earnedThisWeek={earnedLast7Days}
+              />
+            </section>
+
+            {/* 3. EARNINGS OVERVIEW BAR CHART */}
+            {/* <section aria-label="Earnings Overview Chart">
+              <EarningsOverviewChart />
+            </section> */}
+            <section aria-label="Earnings  Chart">
+              <EarningsChart />
+            </section>
+
+            {/* 4. TRANSACTION HISTORY SECTION */}
+            <section aria-label="Transaction History">
+              <TransactionHistoryCard transactions={transactions} />
+            </section>
           </div>
-
-          {/* 1. AVAILABLE BALANCE HERO CARD */}
-          <section aria-label="Available Balance and Summary">
-            <EarningsHeroCard
-              availableBalance={availableBalance}
-              totalEarned={totalEarned}
-              totalJobs={totalJobs}
-              sinceDate={sinceDate}
-              onWithdrawClick={() => setIsWithdrawOpen(true)}
-            />
-          </section>
-
-          {/* 2. THREE QUICK STATS CARDS */}
-          <section aria-label="Quick Performance Stats">
-            <EarningsStatCards
-              avgPerJob={averageAmount}
-              highestPaidJob={highestPaidAmount}
-              earnedThisWeek={earnedLast7Days}
-            />
-          </section>
-
-          {/* 3. EARNINGS OVERVIEW BAR CHART */}
-          <section aria-label="Earnings Overview Chart">
-            <EarningsOverviewChart />
-          </section>
-
-          {/* 4. TRANSACTION HISTORY SECTION */}
-          <section aria-label="Transaction History">
-            <TransactionHistoryCard transactions={transactions} />
-          </section>
         </main>
       </div>
 

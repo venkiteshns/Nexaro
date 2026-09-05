@@ -1,6 +1,6 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService } from "../../services/workerServices.js";
+import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService, getWorkerEarningsChartService } from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
 
@@ -349,3 +349,32 @@ export const getTransactionHistory = async (req, res) => {
         pagination: response.pagination,
     });
 }
+
+export const getWorkerEarningsChart = async (req, res) => {
+    try {
+        const response = await getWorkerEarningsChartService({
+            userId: req.user._id,
+            timeframe: req.query.timeframe,
+        });
+
+        if (response.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: response.error,
+            });
+        }
+
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            timeframe: response.timeframe,
+            totalEarnings: response.totalEarnings,
+            chartData: response.chartData,
+        });
+    } catch (error) {
+        console.error("getWorkerEarningsChart error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};

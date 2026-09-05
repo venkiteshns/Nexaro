@@ -626,3 +626,201 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
         return { error: MESSAGES.UNEXPECTED_ERROR }
     }
 }
+
+export const getWorkerEarningsChartService = async ({ userId, timeframe = "7D" }) => {
+    try {
+        const isUser = await User.findById(userId);
+        if (!isUser) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        const normalizedTimeframe = (timeframe || "7D").toUpperCase();
+        const now = new Date();
+        let startDate;
+        let chartData = [];
+
+        if (normalizedTimeframe === "7D") {
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 6);
+            startDate.setHours(0, 0, 0, 0);
+
+            // Pre-fill last 7 days
+            const dayMap = new Map();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                const key = d.toISOString().slice(0, 10);
+                const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+                const dateLabel = d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+                dayMap.set(key, { name: dayName, date: dateLabel, earnings: 0 });
+            }
+
+            const rawEarnings = await Transaction.aggregate([
+                {
+                    $match: {
+                        receiverId: new mongoose.Types.ObjectId(userId),
+                        transactionType: "to_worker_wallet",
+                        status: "completed",
+                        createdAt: { $gte: startDate },
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+
+            rawEarnings.forEach((item) => {
+                if (dayMap.has(item._id)) {
+                    dayMap.get(item._id).earnings = item.total;
+                }
+            });
+
+            chartData = Array.from(dayMap.values());
+        } else if (normalizedTimeframe === "1M") {
+            // 4 weekly buckets over the last 28 days
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 27);
+            startDate.setHours(0, 0, 0, 0);
+
+            const weeks = [
+                { name: "Week 1", startDaysAgo: 27, endDaysAgo: 21 },
+                { name: "Week 2", startDaysAgo: 20, endDaysAgo: 14 },
+                { name: "Week 3", startDaysAgo: 13, endDaysAgo: 7 },
+                { name: "Week 4", startDaysAgo: 6, endDaysAgo: 0 },
+            ];
+
+            const weekBuckets = weeks.map((w) => {
+                const s = new Date(now);
+                s.setDate(now.getDate() - w.startDaysAgo);
+                s.setHours(0, 0, 0, 0);
+
+                const e = new Date(now);
+                e.setDate(now.getDate() - w.endDaysAgo);
+                e.setHours(23, 59, 59, 999);
+
+                const dateLabel = `${s.toLocaleDateString("en-US", { day: "numeric", month: "short" })} - ${e.toLocaleDateString("en-US", { day: "numeric", month: "short" })}`;
+
+                return {
+                    name: w.name,
+                    date: dateLabel,
+                    start: s,
+                    end: e,
+                    earnings: 0,
+                };
+            });
+
+            const transactions = await Transaction.find({
+                receiverId: new mongoose.Types.ObjectId(userId),
+                transactionType: "to_worker_wallet",
+                status: "completed",
+                createdAt: { $gte: startDate },
+            });
+
+            transactions.forEach((tx) => {
+                const txTime = new Date(tx.createdAt).getTime();
+                const bucket = weekBuckets.find(
+                    (b) => txTime >= b.start.getTime() && txTime <= b.end.getTime()
+                );
+
+                if (bucket) {
+                    bucket.earnings += tx.amount;
+                }
+            });
+
+            chartData = weekBuckets.map(({ name, date, earnings }) => ({
+                name,
+                date,
+                earnings,
+            }));
+        } else if (normalizedTimeframe === "6M") {
+            startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
+            const monthMap = new Map();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                const name = d.toLocaleDateString("en-US", { month: "short" });
+                const dateLabel = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                monthMap.set(key, { name, date: dateLabel, earnings: 0 });
+            }
+
+            const rawEarnings = await Transaction.aggregate([
+                {
+                    $match: {
+                        receiverId: new mongoose.Types.ObjectId(userId),
+                        transactionType: "to_worker_wallet",
+                        status: "completed",
+                        createdAt: { $gte: startDate },
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+
+            rawEarnings.forEach((item) => {
+                if (monthMap.has(item._id)) {
+                    monthMap.get(item._id).earnings = item.total;
+                }
+            });
+
+            chartData = Array.from(monthMap.values());
+        } else if (normalizedTimeframe === "1Y") {
+            startDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+
+            const monthMap = new Map();
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                const name = d.toLocaleDateString("en-US", { month: "short" });
+                const dateLabel = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                monthMap.set(key, { name, date: dateLabel, earnings: 0 });
+            }
+
+            const rawEarnings = await Transaction.aggregate([
+                {
+                    $match: {
+                        receiverId: new mongoose.Types.ObjectId(userId),
+                        transactionType: "to_worker_wallet",
+                        status: "completed",
+                        createdAt: { $gte: startDate },
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                        total: { $sum: "$amount" },
+                    },
+                },
+            ]);
+
+            rawEarnings.forEach((item) => {
+                if (monthMap.has(item._id)) {
+                    monthMap.get(item._id).earnings = item.total;
+                }
+            });
+
+            chartData = Array.from(monthMap.values());
+        } else {
+            return { error: "Invalid timeframe specified" };
+        }
+
+        const totalEarnings = chartData.reduce((acc, curr) => acc + curr.earnings, 0);
+
+        return {
+            success: true,
+            timeframe: normalizedTimeframe,
+            totalEarnings,
+            chartData,
+        };
+    } catch (error) {
+        console.error("getWorkerEarningsChartService error:", error);
+        return { error: MESSAGES.UNEXPECTED_ERROR };
+    }
+};

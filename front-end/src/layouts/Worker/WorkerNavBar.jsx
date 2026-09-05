@@ -206,7 +206,7 @@ const WorkerNavBar = () => {
       </div>
 
       <div
-        className={`hidden md:flex h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex-col justify-between shrink-0 ${
+        className={`hidden md:flex sticky top-0 h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex-col justify-between shrink-0 ${
           desktopOpen ? "w-[220px]" : "w-[72px]"
         }`}
       >

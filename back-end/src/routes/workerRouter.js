@@ -15,7 +15,8 @@ import {
   getAllReviews,
   getCompletedTaskWorkerSide,
   getEarningHeroData,
-  getTransactionHistory
+  getTransactionHistory,
+  getWorkerEarningsChart
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -34,6 +35,7 @@ router.get('/reviews', verifyToken, getAllReviews);
 router.get('/task/:taskId/completed', verifyToken, getCompletedTaskWorkerSide);
 router.get('/earnings/hero', verifyToken, getEarningHeroData);
 router.get('/earnings/transactions', verifyToken, getTransactionHistory);
+router.get('/earnings/chart', verifyToken, getWorkerEarningsChart);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 
