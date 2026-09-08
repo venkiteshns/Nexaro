@@ -3,6 +3,7 @@ import Review from "../models/reviewSchema.js";
 import mongoose from "mongoose";
 import MESSAGES from "../constants/messages.js";
 import User from "../models/userSchema.js";
+import { recordAdminAlert } from "./adminNotificationHelper.js";
 
 export const createReviewService = async ({ taskId, reviewee, rating, review }, reviewerId) => {
   try {
@@ -64,6 +65,18 @@ export const createReviewService = async ({ taskId, reviewee, rating, review }, 
       rating: ratingNum,
       review: trimmedReview,
       isDeleted: false,
+    });
+
+    const reviewerUser = await User.findById(reviewerId).select("name").lean();
+    const revieweeUser = await User.findById(reviewee).select("name").lean();
+    await recordAdminAlert({
+      uniqueKey: `review_${newReview._id}`,
+      type: "review",
+      title: "New Review Added",
+      description: `New Review: ${ratingNum} stars for ${revieweeUser?.name || "Worker"} from ${reviewerUser?.name || "Poster"} for "${task.title}": "${trimmedReview}".`,
+      priority: "normal",
+      dotColor: "yellow",
+      metadata: { reviewId: newReview._id, taskId, rating: ratingNum },
     });
 
     const averageReview = await Review.aggregate([

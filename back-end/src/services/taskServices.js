@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import user from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
+import { recordAdminAlert } from "./adminNotificationHelper.js";
 
 const deleteImagesFromCloudinary = async (publicIds) => {
     if (!publicIds || publicIds.length === 0) return;
@@ -88,6 +89,21 @@ export const createTaskService = async (body, files, posterId) => {
                 city: createdTask.address.landmark,
             })
         })
+
+        // Real Admin Notification: New Task Posted
+        const poster = await user.findById(posterId).select("name").lean();
+        const posterName = poster?.name || "Poster";
+        const locationName = createdTask.address?.landmark?.split(",")[0]?.trim() || createdTask.address?.district || "Kerala";
+        await recordAdminAlert({
+            uniqueKey: `task_posted_${createdTask._id}`,
+            type: "new_task",
+            title: "New Task Posted",
+            description: `${posterName} posted "${createdTask.title}" at ${locationName} for ₹${Number(createdTask.amount).toLocaleString("en-IN")}.`,
+            priority: createdTask.urgencyLevel === "urgent" ? "high" : "normal",
+            dotColor: "emerald",
+            metadata: { taskId: createdTask._id, amount: createdTask.amount },
+            createdAt: createdTask.createdAt,
+        });
 
         return { task: createdTask };
 
@@ -569,6 +585,18 @@ export const cancelTaskByPosterService = async (taskId) => {
         }
         taskData.status = "cancelled"
         await taskData.save()
+
+        const locationName = taskData.address?.landmark?.split(",")[0]?.trim() || taskData.address?.district || "Kerala";
+        await recordAdminAlert({
+            uniqueKey: `task_cancelled_${taskData._id}`,
+            type: "task_cancelled",
+            title: "Task Cancelled",
+            description: `Task "${taskData.title}" at ${locationName} was cancelled by poster.`,
+            priority: "normal",
+            dotColor: "rose",
+            metadata: { taskId: taskData._id },
+        });
+
         return { message: "Task cancelled successfully" }
     } catch (error) {
         console.error("cancelTaskByPosterService error:", error.message);

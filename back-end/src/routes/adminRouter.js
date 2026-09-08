@@ -9,6 +9,17 @@ import {
     getAllTasks,
     cancelTaskByAdmin,
     getAdminTaskDetails,
+    getAdminFinanceStats,
+    getAdminFinanceChart,
+    getAdminFinanceTransactions,
+    getAdminDailyRevenueReport,
+    getAdminMonthlyPlReport,
+    getAdminPlatformFeeSummary,
+    getAdminNotifications,
+    markAllAdminNotificationsRead,
+    markAdminNotificationRead,
+    sendAdminAnnouncement,
+    getAdminRecentAnnouncements,
 } from "../controller/AdminControllers/adminController.js";
 import verifyToken from "../middlewares/verifyToken.js";
 
@@ -28,6 +39,18 @@ adminRouter.patch("/users/:userId/reject", rejectUser);
 adminRouter.patch('/task/cancel/:taskId', cancelTaskByAdmin);
 adminRouter.get('/task/:taskId', getAdminTaskDetails);
 
+adminRouter.get("/finance/stats", getAdminFinanceStats);
+adminRouter.get("/finance/chart", getAdminFinanceChart);
+adminRouter.get("/finance/transactions", getAdminFinanceTransactions);
+adminRouter.get("/finance/reports/daily", getAdminDailyRevenueReport);
+adminRouter.get("/finance/reports/monthly", getAdminMonthlyPlReport);
+adminRouter.get("/finance/reports/platform-fee", getAdminPlatformFeeSummary);
+
+adminRouter.get("/notifications", getAdminNotifications);
+adminRouter.patch("/notifications/mark-all-read", markAllAdminNotificationsRead);
+adminRouter.patch("/notifications/:id/read", markAdminNotificationRead);
+adminRouter.post("/announcements", sendAdminAnnouncement);
+adminRouter.get("/announcements/recent", getAdminRecentAnnouncements);
 
 export default adminRouter;
 

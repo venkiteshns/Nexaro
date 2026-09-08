@@ -10,6 +10,7 @@ import Transaction from "../models/transactionSchema.js";
 import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
 import { convertInrToUsd } from "../utils/currency.js";
 import { getIo } from "../socket.js";
+import { recordAdminAlert } from "./adminNotificationHelper.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -110,10 +111,28 @@ export const workerSignupService = async ({ files, data }) => {
         await createdUser.save({ validateBeforeSave: false });
         const { _id, name, email, verificationDocuments, activeRole } = createdUser;
         const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role: activeRole };
-        // console.log(responseUser);
+
+        await recordAdminAlert({
+            uniqueKey: `user_signup_${_id}`,
+            type: "signup",
+            title: "New User Sign Up",
+            description: `${name} joined as a Worker.`,
+            priority: "normal",
+            dotColor: "blue",
+            metadata: { userId: _id, role: activeRole },
+        });
+
+        await recordAdminAlert({
+            uniqueKey: `user_verify_${_id}`,
+            type: "verification",
+            title: "Verification Pending",
+            description: `Identity documents submitted by ${name} for verification review.`,
+            priority: "high",
+            dotColor: "amber",
+            metadata: { userId: _id },
+        });
+
         return { responseUser, accessToken, refreshToken };
-
-
     } catch (error) {
         console.log(error)
         return { error: error.message || MESSAGES.UNEXPECTED_ERROR };
@@ -964,10 +983,31 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
                     $inc: { withDrawn: -withdrawAmount },
                 }
             );
+
+            await recordAdminAlert({
+                uniqueKey: `tx_payout_failed_${transaction._id}`,
+                type: "payout_failed",
+                title: "Payout Failed",
+                description: `Payout of ₹${Number(withdrawAmount).toLocaleString("en-IN")} for ${isUser.name} failed via PayPal.`,
+                priority: "urgent",
+                dotColor: "rose",
+                metadata: { transactionId: transaction._id, amount: withdrawAmount },
+            });
+
             return {
                 error: `PayPal payout failed: ${payoutResponse.finalStatus?.errors?.[0]?.message || "Transaction was rejected by PayPal."}`,
             };
         }
+
+        await recordAdminAlert({
+            uniqueKey: `tx_payout_${transaction._id}`,
+            type: "payout_initiated",
+            title: "Worker Payout Initiated",
+            description: `${isUser.name} initiated a payout of ₹${Number(withdrawAmount).toLocaleString("en-IN")} via PayPal.`,
+            priority: "normal",
+            dotColor: "emerald",
+            metadata: { transactionId: transaction._id, amount: withdrawAmount },
+        });
 
         // 6. Realtime Notification via Socket
         try {

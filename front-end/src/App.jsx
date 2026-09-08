@@ -39,6 +39,8 @@ import UserVerificationPanel from './pages/admin/UserVerificationPanel.jsx'
 import AdminTaskManagement from './pages/admin/AdminTaskManagement.jsx'
 import AdminTaskDetails from './pages/admin/AdminTaskDetails.jsx'
 import AdminPayments from './pages/admin/AdminPayments.jsx'
+import AdminFinancialReports from './pages/admin/AdminFinancialReports.jsx'
+import AdminNotifications from './pages/admin/AdminNotifications.jsx'
 import PaymentReceivedModal from './components/Worker/PaymentReceivedModal.jsx';
 
 
@@ -119,6 +121,8 @@ function AppInner() {
               <Route path="tasks" element={<AdminTaskManagement />} />
               <Route path="tasks/:taskId" element={<AdminTaskDetails />} />
               <Route path="finance/payments" element={<AdminPayments />} />
+              <Route path="finance/reports" element={<AdminFinancialReports />} />
+              <Route path="notifications" element={<AdminNotifications />} />
             </Route>
           </Route>
 

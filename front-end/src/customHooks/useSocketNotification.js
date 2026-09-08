@@ -87,6 +87,17 @@ const useSocketNotification = () => {
             dispatch(api.util.invalidateTags(['Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart']));
         });
 
+        socket.on('admin-notification', (data) => {
+            if (admin) {
+                showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
+                dispatch(api.util.invalidateTags(['Admin_Notifications']));
+            }
+        });
+
+        socket.on('admin-announcement', (data) => {
+            showInfo(`📢 ${data.title}: ${data.message}`, { autoClose: 9000 });
+        });
+
         return () => {
             disconnectSocket();
         };

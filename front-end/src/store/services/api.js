@@ -122,7 +122,12 @@ export const api = createApi({
     "Task_for_bid",
     "Earning_Hero_Data",
     "Transaction_History",
-    "Worker_Earnings_Chart"
+    "Worker_Earnings_Chart",
+    "Admin_Finance_Stats",
+    "Admin_Finance_Chart",
+    "Admin_Finance_Transactions",
+    "Admin_Notifications",
+    "Admin_Announcements",
   ],
   endpoints: () => ({}),
 });

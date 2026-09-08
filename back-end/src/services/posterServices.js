@@ -10,6 +10,7 @@ import Bid from "../models/bidsSchema.js";
 import Review from "../models/reviewSchema.js";
 import { getIo } from "../socket.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
+import { recordAdminAlert } from "./adminNotificationHelper.js";
 import MESSAGES from "../constants/messages.js";
 
 export const posterSignupService = async (data) => {
@@ -65,6 +66,16 @@ export const posterSignupService = async (data) => {
 
     const { _id, name, email, activeRole } = createdUser;
     const responseUser = { id: _id, name, email, role: activeRole };
+
+    await recordAdminAlert({
+      uniqueKey: `user_signup_${_id}`,
+      type: "signup",
+      title: "New User Sign Up",
+      description: `${name} joined as a Poster.`,
+      priority: "normal",
+      dotColor: "blue",
+      metadata: { userId: _id, role: activeRole },
+    });
 
     return { responseUser, accessToken, refreshToken };
   } catch (error) {
@@ -330,6 +341,17 @@ export const acceptBidService = async (bidId) => {
     io.to(`user:${workerId}`).emit("bid-accepted", {
       taskTitle: updatedTask.title,
       bidAmount: acceptedBid.amount,
+    });
+
+    const poster = await User.findById(updatedTask.posterId).select("name").lean();
+    await recordAdminAlert({
+      uniqueKey: `bid_accepted_${updatedTask._id}`,
+      type: "bid_accepted",
+      title: "Bid Accepted",
+      description: `Bid of ₹${Number(acceptedBid.amount).toLocaleString("en-IN")} accepted for "${updatedTask.title}" by ${poster?.name || "Poster"}.`,
+      priority: "normal",
+      dotColor: "emerald",
+      metadata: { taskId: updatedTask._id, bidAmount: acceptedBid.amount },
     });
 
     return {
