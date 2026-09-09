@@ -11,6 +11,8 @@ import Review from "../models/reviewSchema.js";
 import { getIo } from "../socket.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { recordAdminAlert } from "./adminNotificationHelper.js";
+import PosterNotification from "../models/posterNotificationSchema.js";
+import { syncPosterNotifications } from "./posterNotificationHelper.js";
 import MESSAGES from "../constants/messages.js";
 
 export const posterSignupService = async (data) => {
@@ -503,7 +505,7 @@ export const getPosterProfileService = async (posterId) => {
       totalSpent: posterUser?.poster?.spent || 0,
     };
 
-    const recentTasks = await Task.find({ posterId: posterObjectId, activeRole: "poster" })
+    const recentTasks = await Task.find({ posterId: posterObjectId })
       .sort({ createdAt: -1 })
       .limit(3)
       .select("_id title status amount category createdAt address");
@@ -676,9 +678,9 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
 
     const isPasswordValid = await compareHash(data.password, userData.password);
     console.log(isPasswordValid);
-    
+
     if (!isPasswordValid) {
-      return { error : MESSAGES.CURRENT_PASSWORD_INVALID };
+      return { error: MESSAGES.CURRENT_PASSWORD_INVALID };
     }
 
     if (userData.isSuspended) {
@@ -732,3 +734,98 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
     return { error: MESSAGES.UNEXPECTED_ERROR }
   }
 }
+
+export const getPosterNotificationsService = async (posterId, { page = 1, limit = 6, filter = "all" } = {}) => {
+  const posterObjectId = new mongoose.Types.ObjectId(posterId);
+
+  // Sync latest real database records into poster notifications
+  await syncPosterNotifications(posterId);
+
+  const query = { posterId: posterObjectId };
+  if (filter === "unread") {
+    query.isRead = false;
+  } else if (filter && filter !== "all") {
+    query.category = filter;
+  }
+
+  const pageNum = Math.max(1, parseInt(page) || 1);
+  const limitNum = Math.max(1, parseInt(limit) || 6);
+  const skip = (pageNum - 1) * limitNum;
+
+  const [
+    notifications,
+    totalItems,
+    allCount,
+    unreadCount,
+    bidsCount,
+    paymentsCount,
+    tasksCount,
+    systemCount,
+  ] = await Promise.all([
+    PosterNotification.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limitNum).lean(),
+    PosterNotification.countDocuments(query),
+    PosterNotification.countDocuments({ posterId: posterObjectId }),
+    PosterNotification.countDocuments({ posterId: posterObjectId, isRead: false }),
+    PosterNotification.countDocuments({ posterId: posterObjectId, category: "bids" }),
+    PosterNotification.countDocuments({ posterId: posterObjectId, category: "payments" }),
+    PosterNotification.countDocuments({ posterId: posterObjectId, category: "tasks" }),
+    PosterNotification.countDocuments({ posterId: posterObjectId, category: "system" }),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / limitNum) || 1;
+
+  return {
+    success: true,
+    notifications,
+    currentPage: pageNum,
+    totalPages,
+    totalItems,
+    counts: {
+      all: allCount,
+      unread: unreadCount,
+      bids: bidsCount,
+      payments: paymentsCount,
+      tasks: tasksCount,
+      system: systemCount,
+    },
+  };
+};
+
+export const markAllPosterNotificationsReadService = async (posterId) => {
+  const posterObjectId = new mongoose.Types.ObjectId(posterId);
+  await PosterNotification.updateMany({ posterId: posterObjectId, isRead: false }, { $set: { isRead: true } });
+  return {
+    success: true,
+    message: "All notifications marked as read",
+  };
+};
+
+export const markPosterNotificationReadService = async (posterId, notificationId) => {
+  const posterObjectId = new mongoose.Types.ObjectId(posterId);
+  const notifObjectId = new mongoose.Types.ObjectId(notificationId);
+  const notification = await PosterNotification.findOneAndUpdate(
+    { _id: notifObjectId, posterId: posterObjectId },
+    { $set: { isRead: true } },
+    { new: true }
+  );
+  if (!notification) {
+    return { error: "Notification not found" };
+  }
+  return {
+    success: true,
+    notification,
+  };
+};
+
+export const getPosterUnreadCountService = async (posterId) => {
+  const posterObjectId = new mongoose.Types.ObjectId(posterId);
+  await syncPosterNotifications(posterId);
+  const unreadCount = await PosterNotification.countDocuments({
+    posterId: posterObjectId,
+    isRead: false,
+  });
+  return {
+    success: true,
+    unreadCount,
+  };
+};

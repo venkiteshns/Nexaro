@@ -19,6 +19,7 @@ import WorkProgress from "./pages/poster/WorkProgress.jsx";
 import CompletedTaskDetails from "./pages/poster/CompletedTaskDetails.jsx";
 import PosterProfile from "./pages/poster/PosterProfile.jsx";
 import ReviewPage from "./pages/poster/ReviewPage.jsx";
+import PosterNotifications from "./pages/poster/PosterNotifications.jsx";
 
 import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
@@ -31,6 +32,7 @@ import WorkerProfile from './pages/worker/WorkerProfile.jsx'
 import WorkerAllReviews from './pages/worker/WorkerAllReviews.jsx'
 import WorkerEarnings from './pages/worker/WorkerEarnings.jsx'
 import WorkerCompletedTaskDetails from './pages/worker/CompletedTaskDetails.jsx'
+import WorkerNotifications from './pages/worker/WorkerNotifications.jsx'
 
 import AdminLogin from "./pages/auth/AdminLogin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -92,6 +94,7 @@ function AppInner() {
               <Route path="completed-task/:taskId" element={<CompletedTaskDetails />} />
               <Route path="profile" element={<PosterProfile />} />
               <Route path="review/:taskId" element={<ReviewPage />} />
+              <Route path="notifications" element={<PosterNotifications />} />
             </Route>
           </Route>
 
@@ -101,6 +104,8 @@ function AppInner() {
               <Route path="dashboard" element={<WorkerDashboard />} />
               <Route path="nearby-tasks" element={<NearbyTasks />} />
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
+              <Route path="task-details/:taskId" element={<PlaceBid />} />
+              <Route path="task/:taskId" element={<PlaceBid />} />
               <Route path="my-bids" element={<MyBids />} />
               <Route path='task-bid-details/:bidId' element={<TaskBidDetails />} />
               <Route path='active-job' element={<ActiveJobEntry />} />
@@ -109,6 +114,7 @@ function AppInner() {
               <Route path='profile' element={<WorkerProfile />} />
               <Route path='all-reviews' element={<WorkerAllReviews />} />
               <Route path='earnings' element={<WorkerEarnings />} />
+              <Route path='notifications' element={<WorkerNotifications />} />
 
             </Route>
           </Route>

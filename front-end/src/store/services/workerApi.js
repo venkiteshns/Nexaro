@@ -184,7 +184,60 @@ export const workerApi = api.injectEndpoints({
         "Earning_Hero_Data",
         "Transaction_History",
         "Worker_Earnings_Chart",
+        "Worker_Header_Status",
       ],
+    }),
+
+    getWorkerNotifications: builder.query({
+      query: ({ page = 1, limit = 6, filter = "all" } = {}) => {
+        const params = new URLSearchParams({ page, limit, filter });
+        return {
+          url: `${WORKER.GET_NOTIFICATIONS}?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Worker_Notifications"],
+    }),
+
+    getWorkerUnreadCount: builder.query({
+      query: () => ({
+        url: WORKER.GET_UNREAD_COUNT,
+        method: "GET",
+      }),
+      providesTags: ["Worker_Notifications"],
+    }),
+
+    markAllWorkerNotificationsRead: builder.mutation({
+      query: () => ({
+        url: WORKER.MARK_ALL_NOTIFICATIONS_READ,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Worker_Notifications"],
+    }),
+
+    markWorkerNotificationRead: builder.mutation({
+      query: (id) => ({
+        url: WORKER.MARK_NOTIFICATION_READ.replace(":id", id),
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Worker_Notifications"],
+    }),
+
+    getWorkerHeaderStatus: builder.query({
+      query: () => ({
+        url: WORKER.GET_HEADER_STATUS,
+        method: "GET",
+      }),
+      providesTags: ["Worker_Header_Status"],
+    }),
+
+    toggleWorkerLiveStatus: builder.mutation({
+      query: (payload) => ({
+        url: WORKER.TOGGLE_LIVE_STATUS,
+        method: "PATCH",
+        body: payload,
+      }),
+      invalidatesTags: ["Worker_Header_Status"],
     }),
 
   }),
@@ -209,5 +262,11 @@ export const {
   useGetTransactionHistoryQuery,
   useGetWorkerEarningsChartQuery,
   useWithdrawEarningsMutation,
+  useGetWorkerNotificationsQuery,
+  useGetWorkerUnreadCountQuery,
+  useMarkAllWorkerNotificationsReadMutation,
+  useMarkWorkerNotificationReadMutation,
+  useGetWorkerHeaderStatusQuery,
+  useToggleWorkerLiveStatusMutation,
 } = workerApi;
 

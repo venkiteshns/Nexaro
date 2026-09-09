@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
+import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
 
 
   const posterNav = [
@@ -54,7 +55,7 @@ import { useUserLogoutMutation } from "../../store/services/authApi";
     "/poster/completed-task",
   ];
 
- const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user }) =>{
+ const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user, unreadCount = 0 }) =>{
   const location = useLocation();
 
   return (
@@ -109,17 +110,40 @@ import { useUserLogoutMutation } from "../../store/services/authApi";
                 myTasksGroup.some((prefix) =>
                   location.pathname.startsWith(prefix),
                 ));
+            const isNotifications = item.redirect === "/poster/notifications";
+
             return (
               <button
                 key={index}
                 onClick={() => onNavClick(item.redirect)}
                 title={!isExpanded ? item.label : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium
+                className={`relative w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium
                   ${isActive ? "bg-[#0A6E5C] text-white" : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"}
                   ${!isExpanded ? "justify-center" : ""}`}
               >
-                {item.icon}
-                {isExpanded && <span>{item.label}</span>}
+                <div className="relative shrink-0">
+                  {item.icon}
+                  {!isExpanded && isNotifications && unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#0A6E5C] rounded-full ring-2 ring-white animate-pulse" />
+                  )}
+                </div>
+
+                {isExpanded && (
+                  <div className="flex-1 flex items-center justify-between min-w-0">
+                    <span className="truncate">{item.label}</span>
+                    {isNotifications && unreadCount > 0 && (
+                      <span
+                        className={`px-1.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          isActive
+                            ? "bg-white/20 text-white"
+                            : "bg-emerald-100 text-[#0A6E5C]"
+                        }`}
+                      >
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                )}
               </button>
             );
           })}
@@ -145,6 +169,10 @@ const PosterNavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+
+  // Unread notifications count for poster
+  const { data: unreadData } = useGetPosterUnreadCountQuery();
+  const unreadCount = unreadData?.unreadCount || 0;
 
   // md+ desktop: collapsed (icon-only) ↔ expanded
   const [desktopOpen, setDesktopOpen] = useState(false);
@@ -200,6 +228,7 @@ const PosterNavBar = () => {
       >
         <NavContent
           user={user}
+          unreadCount={unreadCount}
           isExpanded={true}
           onToggle={() => setMobileOpen(false)}
           onNavClick={handleNav}
@@ -215,6 +244,7 @@ const PosterNavBar = () => {
       >
         <NavContent
           user={user}
+          unreadCount={unreadCount}
           isExpanded={desktopOpen}
           onToggle={() => setDesktopOpen(!desktopOpen)}
           onNavClick={handleNav}

@@ -6,6 +6,7 @@ import user from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
 import { recordAdminAlert } from "./adminNotificationHelper.js";
+import { recordPosterAlert } from "./posterNotificationHelper.js";
 
 const deleteImagesFromCloudinary = async (publicIds) => {
     if (!publicIds || publicIds.length === 0) return;
@@ -113,19 +114,49 @@ export const createTaskService = async (body, files, posterId) => {
     }
 };
 
-export const getTaskForBidService = async (taskId) => {
+export const getTaskForBidService = async (taskId, workerId = null) => {
     try {
-        const task = await Task.find({ _id: new mongoose.Types.ObjectId(taskId) });
+        const task = await Task.findById(taskId)
+            .populate("posterId", "name email phone city district state isVerified createdAt avatar picture")
+            .populate("workerId", "name phone email avatar picture")
+            .lean();
+
         if (!task) {
-            return "No task found"
+            return [];
         }
-        return task;
+
+        let existingBid = null;
+        if (workerId) {
+            existingBid = await Bid.findOne({
+                taskId: new mongoose.Types.ObjectId(taskId),
+                workerId: new mongoose.Types.ObjectId(workerId)
+            }).lean();
+        }
+
+        const isAssignedToMe = Boolean(
+            (task.status === "assigned" || task.status === "in_progress" || task.status === "completed") &&
+            task.workerId &&
+            workerId &&
+            String(task.workerId?._id || task.workerId) === String(workerId)
+        );
+
+        const isAssignedToOther = Boolean(
+            (task.status === "assigned" || task.status === "in_progress" || task.status === "completed") &&
+            !isAssignedToMe
+        );
+
+        return [{
+            ...task,
+            existingBid,
+            isAssignedToOther,
+            isAssignedToMe,
+        }];
 
     } catch (error) {
-        console.error("getTaskByIdService error:", error.message);
+        console.error("getTaskForBidService error:", error.message);
         return { error: error.message };
     }
-}
+};
 
 export const getWorkerBidsService = async (workerId, { status, page, limit }) => {
     try {
@@ -280,7 +311,27 @@ export const handleNewBid = async (task, user) => {
             status: "pending"
         }
        
-        await Bid.create(payload);
+        const createdBid = await Bid.create(payload);
+
+        // Record real-time notification for poster
+        const bidder = await user.findById(user._id).select("name avatar picture profilePicture").lean();
+        await recordPosterAlert({
+            posterId,
+            type: "new_bid",
+            category: "bids",
+            title: `New Bid Received — ₹${bidAmount}`,
+            description: `${bidder?.name || "A professional"} has submitted a new bid on your task "${isTask.title}".`,
+            amount: bidAmount,
+            taskId: isTask._id,
+            taskTitle: isTask.title,
+            workerId: user._id,
+            workerName: bidder?.name || "A professional",
+            workerAvatar: bidder?.avatar || bidder?.picture || bidder?.profilePicture || null,
+            bidId: createdBid._id,
+            dotColor: "blue",
+            uniqueKey: `p_${posterId}_bid_${createdBid._id}`,
+            metadata: { taskId: isTask._id, bidId: createdBid._id },
+        });
 
         const io = getIo();
 

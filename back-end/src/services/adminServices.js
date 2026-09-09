@@ -5,6 +5,7 @@ import Transaction from "../models/transactionSchema.js";
 import Order from "../models/orderSchema.js";
 import AdminNotification from "../models/adminNotificationSchema.js";
 import Announcement from "../models/announcementSchema.js";
+import WorkerNotification from "../models/workerNotificationSchema.js";
 import { getIo } from "../socket.js";
 import { syncRealPlatformNotifications, recordAdminAlert } from "./adminNotificationHelper.js";
 import MESSAGES from "../constants/messages.js";
@@ -1074,6 +1075,44 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         isRead: true,
     });
 
+    // If target audience includes workers, persist to WorkerNotification immediately
+    if (targetAudience === "WORKERS" || targetAudience === "ALL USERS") {
+        try {
+            const workers = await User.find({
+                $or: [{ role: "worker" }, { activeRole: "worker" }],
+                isDeleted: { $ne: true },
+            }).select("_id").lean();
+
+            if (workers.length > 0) {
+                const bulkOps = workers.map((w) => ({
+                    updateOne: {
+                        filter: { uniqueKey: `w_${w._id}_ann_${announcement._id}` },
+                        update: {
+                            $setOnInsert: {
+                                workerId: w._id,
+                                uniqueKey: `w_${w._id}_ann_${announcement._id}`,
+                                type: "announcement",
+                                category: "system",
+                                title: announcement.title,
+                                description: announcement.message,
+                                actionLink: null,
+                                actionLabel: null,
+                                dotColor: "emerald",
+                                createdAt: announcement.createdAt,
+                                metadata: { announcementId: announcement._id },
+                                isRead: false,
+                            },
+                        },
+                        upsert: true,
+                    },
+                }));
+                await WorkerNotification.bulkWrite(bulkOps, { ordered: false });
+            }
+        } catch (workerNotifErr) {
+            console.error("Error creating worker notifications for announcement:", workerNotifErr.message);
+        }
+    }
+
     // Broadcast via socket to targeted audience
     try {
         const io = getIo();
@@ -1088,11 +1127,27 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
 
             if (targetAudience === "WORKERS") {
                 io.to("role:worker").emit("admin-announcement", payload);
+                io.to("role:worker").emit("worker-notification", {
+                    notification: {
+                        type: "announcement",
+                        title: announcement.title,
+                        description: announcement.message,
+                    },
+                    message: `📢 ${announcement.title}: ${announcement.message}`,
+                });
             } else if (targetAudience === "POSTERS") {
                 io.to("role:poster").emit("admin-announcement", payload);
             } else {
                 // ALL USERS
                 io.emit("admin-announcement", payload);
+                io.to("role:worker").emit("worker-notification", {
+                    notification: {
+                        type: "announcement",
+                        title: announcement.title,
+                        description: announcement.message,
+                    },
+                    message: `📢 ${announcement.title}: ${announcement.message}`,
+                });
             }
         }
     } catch (socketErr) {

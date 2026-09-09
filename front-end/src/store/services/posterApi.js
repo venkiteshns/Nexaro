@@ -194,6 +194,41 @@ export const posterApi = api.injectEndpoints({
       })
     }),
 
+    getPosterNotifications: builder.query({
+      query: ({ page = 1, limit = 6, filter = "all" } = {}) => {
+        const params = new URLSearchParams({ page, limit, filter });
+        return {
+          url: `${POSTER.GET_NOTIFICATIONS}?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Poster_Notifications"],
+    }),
+
+    getPosterUnreadCount: builder.query({
+      query: () => ({
+        url: POSTER.GET_UNREAD_COUNT,
+        method: "GET",
+      }),
+      providesTags: ["Poster_Unread_Count"],
+    }),
+
+    markAllPosterNotificationsRead: builder.mutation({
+      query: () => ({
+        url: POSTER.MARK_ALL_NOTIFICATIONS_READ,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Poster_Notifications", "Poster_Unread_Count"],
+    }),
+
+    markPosterNotificationRead: builder.mutation({
+      query: (id) => ({
+        url: POSTER.MARK_NOTIFICATION_READ.replace(":id", id),
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Poster_Notifications", "Poster_Unread_Count"],
+    }),
+
   }),
 
 });
@@ -213,6 +248,10 @@ export const {
   useUpdatePosterProfileMutation,
   useSubmitReviewMutation,
   useSwitchtoworkerMutation,
-  useSwitchRoleActiveWorkerMutation
+  useSwitchRoleActiveWorkerMutation,
+  useGetPosterNotificationsQuery,
+  useGetPosterUnreadCountQuery,
+  useMarkAllPosterNotificationsReadMutation,
+  useMarkPosterNotificationReadMutation,
 } = posterApi;
 

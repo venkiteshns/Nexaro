@@ -1,6 +1,22 @@
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
-import { workerSignupService, getWorkerProfileService, updateWorkerProfileService, switchRoleToPosterService, getAllReviewService, getEarningHeroDataService, getTransactionHistoryService, getWorkerEarningsChartService, withdrawWorkerEarningsService } from "../../services/workerServices.js";
+import {
+  workerSignupService,
+  getWorkerProfileService,
+  updateWorkerProfileService,
+  switchRoleToPosterService,
+  getAllReviewService,
+  getEarningHeroDataService,
+  getTransactionHistoryService,
+  getWorkerEarningsChartService,
+  withdrawWorkerEarningsService,
+  getWorkerNotificationsService,
+  markAllWorkerNotificationsReadService,
+  markWorkerNotificationReadService,
+  getWorkerUnreadCountService,
+  getWorkerHeaderStatusService,
+  toggleWorkerLiveStatusService
+} from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
 
@@ -75,7 +91,8 @@ export const getTaskForBid = async (req, res) => {
     // console.log(req.params, "params");
     try {
         const taskId = req.params.taskId;
-        const result = await getTaskForBidService(taskId);
+        const workerId = req.user?._id;
+        const result = await getTaskForBidService(taskId, workerId);
         if (result.error) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
@@ -408,3 +425,115 @@ export const withdrawWorkerEarnings = async (req, res) => {
         });
     }
 };
+
+export const getWorkerNotifications = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit) || 6);
+        const filter = req.query.filter || "all";
+
+        const result = await getWorkerNotificationsService(workerId, { page, limit, filter });
+        return res.status(STATUS_CODES.OK).json(result);
+    } catch (error) {
+        console.error("getWorkerNotifications error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const markAllWorkerNotificationsRead = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const result = await markAllWorkerNotificationsReadService(workerId);
+        return res.status(STATUS_CODES.OK).json(result);
+    } catch (error) {
+        console.error("markAllWorkerNotificationsRead error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const markWorkerNotificationRead = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const { id } = req.params;
+        const result = await markWorkerNotificationReadService(workerId, id);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.error });
+        }
+        return res.status(STATUS_CODES.OK).json(result);
+    } catch (error) {
+        console.error("markWorkerNotificationRead error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const getWorkerUnreadCount = async (req, res) => {
+    try {
+        const workerId = req.user._id;
+        const result = await getWorkerUnreadCountService(workerId);
+        return res.status(STATUS_CODES.OK).json(result);
+    } catch (error) {
+        console.error("getWorkerUnreadCount error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const getWorkerHeaderStatus = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const result = await getWorkerHeaderStatusService(userId);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            ...result,
+        });
+    } catch (error) {
+        console.error("getWorkerHeaderStatus error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const toggleWorkerLiveStatus = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { isLive } = req.body;
+        const result = await toggleWorkerLiveStatusService(userId, isLive);
+        if (result.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            ...result,
+        });
+    } catch (error) {
+        console.error("toggleWorkerLiveStatus error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+

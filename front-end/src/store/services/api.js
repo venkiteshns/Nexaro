@@ -128,6 +128,10 @@ export const api = createApi({
     "Admin_Finance_Transactions",
     "Admin_Notifications",
     "Admin_Announcements",
+    "Worker_Notifications",
+    "Worker_Header_Status",
+    "Poster_Notifications",
+    "Poster_Unread_Count",
   ],
   endpoints: () => ({}),
 });

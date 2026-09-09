@@ -11,6 +11,8 @@ import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
 import { convertInrToUsd } from "../utils/currency.js";
 import { getIo } from "../socket.js";
 import { recordAdminAlert } from "./adminNotificationHelper.js";
+import WorkerNotification from "../models/workerNotificationSchema.js";
+import { syncWorkerNotifications } from "./workerNotificationHelper.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -1037,3 +1039,154 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
         activeWithdrawals.delete(userLockKey);
     }
 };
+
+export const getWorkerNotificationsService = async (workerId, { page = 1, limit = 6, filter = "all" } = {}) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+
+    // Sync latest real database records into worker notifications
+    await syncWorkerNotifications(workerId);
+
+    const query = { workerId: workerObjectId };
+    if (filter === "urgent") {
+        query.type = "urgent_task";
+    } else if (filter === "unread") {
+        query.isRead = false;
+    } else if (filter && filter !== "all") {
+        query.category = filter;
+    }
+
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.max(1, parseInt(limit) || 6);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [
+        notifications,
+        totalItems,
+        allCount,
+        unreadCount,
+        nearbyCount,
+        bidsCount,
+        paymentsCount,
+        urgentCount,
+        systemCount,
+    ] = await Promise.all([
+        WorkerNotification.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limitNum).lean(),
+        WorkerNotification.countDocuments(query),
+        WorkerNotification.countDocuments({ workerId: workerObjectId }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, isRead: false }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "nearby_tasks" }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "bid_results" }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "payments" }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, type: "urgent_task" }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "system" }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limitNum) || 1;
+
+    return {
+        success: true,
+        notifications,
+        currentPage: pageNum,
+        totalPages,
+        totalItems,
+        counts: {
+            all: allCount,
+            unread: unreadCount,
+            nearby: nearbyCount,
+            bids: bidsCount,
+            payments: paymentsCount,
+            urgent: urgentCount,
+            system: systemCount,
+        },
+    };
+};
+
+export const markAllWorkerNotificationsReadService = async (workerId) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    await WorkerNotification.updateMany({ workerId: workerObjectId, isRead: false }, { $set: { isRead: true } });
+    return {
+        success: true,
+        message: "All notifications marked as read",
+    };
+};
+
+export const markWorkerNotificationReadService = async (workerId, notificationId) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    const notifObjectId = new mongoose.Types.ObjectId(notificationId);
+    const notification = await WorkerNotification.findOneAndUpdate(
+        { _id: notifObjectId, workerId: workerObjectId },
+        { $set: { isRead: true } },
+        { new: true }
+    );
+    if (!notification) {
+        return { error: "Notification not found" };
+    }
+    return {
+        success: true,
+        notification,
+    };
+};
+
+export const getWorkerUnreadCountService = async (workerId) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    await syncWorkerNotifications(workerId);
+    const unreadCount = await WorkerNotification.countDocuments({
+        workerId: workerObjectId,
+        isRead: false,
+    });
+    return {
+        success: true,
+        unreadCount,
+    };
+};
+
+export const getWorkerHeaderStatusService = async (userId) => {
+    try {
+        const user = await User.findById(userId).select("worker.isLive name").lean();
+        if (!user) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        const wallet = await Wallet.findOne({ userId: new mongoose.Types.ObjectId(userId) })
+            .select("walletAmount")
+            .lean();
+
+        return {
+            isLive: user?.worker?.isLive ?? true,
+            walletAmount: wallet?.walletAmount ?? 0,
+        };
+    } catch (error) {
+        console.error("getWorkerHeaderStatusService error:", error.message);
+        return { error: error.message };
+    }
+};
+
+export const toggleWorkerLiveStatusService = async (userId, isLive = null) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        const newLiveState = isLive !== null ? Boolean(isLive) : !(user.worker?.isLive ?? true);
+
+        if (!user.worker) {
+            user.worker = { isLive: newLiveState, rating: 0 };
+        } else {
+            user.worker.isLive = newLiveState;
+        }
+
+        await user.save();
+
+        return {
+            success: true,
+            isLive: newLiveState,
+            message: newLiveState
+                ? "You are now Live! Visible to nearby task posters."
+                : "You are now Offline. You won't appear active to posters.",
+        };
+    } catch (error) {
+        console.error("toggleWorkerLiveStatusService error:", error.message);
+        return { error: error.message };
+    }
+};

@@ -15,7 +15,11 @@ import {
   getCompletedTaskPosterSide,
   getPosterProfile,
   switchRoleToWorker,
-  posterRoleSwitchAlreadyDataUploaded
+  posterRoleSwitchAlreadyDataUploaded,
+  getPosterNotifications,
+  getPosterUnreadCount,
+  markAllPosterNotificationsRead,
+  markPosterNotificationRead,
 } from "../controller/PosterControllers/posterController.js";
 import { createReview } from "../controller/PosterControllers/reviewController.js";
 
@@ -37,6 +41,10 @@ router.get("/task/:taskId/progress", verifyToken, getPosterTaskProgress);
 router.get("/task/completed/:taskId", verifyToken, getCompletedTaskPosterSide);
 
 router.get("/profile", verifyToken, getPosterProfile);
+router.get("/notifications", verifyToken, getPosterNotifications);
+router.get("/notifications/unread-count", verifyToken, getPosterUnreadCount);
+router.patch("/notifications/mark-all-read", verifyToken, markAllPosterNotificationsRead);
+router.patch("/notifications/:id/read", verifyToken, markPosterNotificationRead);
 
 router.patch("/bid/accept/:bidId", verifyToken, acceptBid);
 router.patch("/task/cancel/:taskId", verifyToken, cancelTaskByPoster);
