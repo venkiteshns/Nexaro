@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { generateAccessToken } from "../utils/paypalAccessToken.js";
 import Order from "../models/orderSchema.js"; // Import the Order model
 import Bid from '../models/bidsSchema.js'
@@ -9,6 +10,7 @@ import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
 import { convertInrToUsd, convertUsdToInr } from "../utils/currency.js";
 import Transaction from "../models/transactionSchema.js";
+import { recordAdminAlert } from "./adminNotificationHelper.js";
 
 export async function getPayoutStatus(payoutBatchId, accessToken) {
   if (!accessToken) {
@@ -424,12 +426,51 @@ export const orderPayoutService = async ({ bidId, user }) => {
       processedAt: new Date(),
     });
 
+    let adminUserId = process.env.ADMIN_USER_ID ? process.env.ADMIN_USER_ID.trim() : null;
+    if (!adminUserId) {
+      const adminUser = await User.findOne({ $or: [{ role: "admin" }, { activeRole: "admin" }] }).lean();
+      if (adminUser) adminUserId = adminUser._id.toString();
+    }
+
+    if (adminUserId && platformFee > 0) {
+      await Transaction.create({
+        orderId: order._id,
+        senderId: new mongoose.Types.ObjectId(adminUserId),
+        receiverId: new mongoose.Types.ObjectId(adminUserId),
+        amount: platformFee,
+        transactionType: "platform_fee",
+        status: "completed",
+        processedAt: new Date(),
+      });
+
+      await recordAdminAlert({
+        uniqueKey: `tx_fee_${order._id}`,
+        type: "platform_fee",
+        title: "Platform Fee Credited",
+        description: `Platform commission fee of ₹${Number(platformFee).toLocaleString("en-IN")} credited from task "${task.title}".`,
+        priority: "normal",
+        dotColor: "emerald",
+        metadata: { orderId: order._id, amount: platformFee },
+      });
+    }
+
     task.update = 'payment';
     task.status = 'completed';
+    task.platformFee = platformFee;
     if (!task.completedOn) {
       task.completedOn = new Date();
     }
     await task.save();
+
+    await recordAdminAlert({
+      uniqueKey: `task_completed_${task._id}`,
+      type: "task_completed",
+      title: "Task Completed",
+      description: `Task "${task.title}" has been completed and ₹${Number(creditedAmount).toLocaleString("en-IN")} released to worker.`,
+      priority: "normal",
+      dotColor: "emerald",
+      metadata: { taskId: task._id },
+    });
 
     const io = getIo()
 
@@ -437,8 +478,8 @@ export const orderPayoutService = async ({ bidId, user }) => {
       taskId: task._id.toString(),
       taskTitle: task.title,
       amount: bid.amount,
-      platformFee: platformFee,
-      creditedAmount: creditedAmount,
+      platformFee,
+      creditedAmount,
     });
 
 

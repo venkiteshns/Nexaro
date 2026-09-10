@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import HeaderWorkerSignup from "../../components/Worker/HeaderWorkerSignup";
 import Header from "../../components/Landing/Header";
@@ -21,7 +21,7 @@ const WorkerSignup = () => {
   const [showOtp, setShowOtp] = useState(false);
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
-  const [isVerified, setIsVerified] = useState(false);
+  const [, setIsVerified] = useState(false);
 
   const [
     sendOtp,
@@ -30,8 +30,9 @@ const WorkerSignup = () => {
 
   const [workerSignUp] = useWorkerSignUpMutation();
 
-  const sendDataToBackend = useCallback(async () => {
-    if (!isVerified) return;
+  const sendDataToBackend = useCallback(async (dataToSubmit) => {
+    const data = dataToSubmit || formData;
+    if (!data) return;
     const fd = new FormData();
     console.log("called");
 
@@ -54,18 +55,18 @@ const WorkerSignup = () => {
     ];
 
     textFields.forEach((key) => {
-      if (formData[key] !== undefined && formData[key] !== null) {
-        fd.append(key, formData[key]);
+      if (data[key] !== undefined && data[key] !== null) {
+        fd.append(key, data[key]);
       }
     });
 
-    if (formData.skill) fd.append("skill", JSON.stringify(formData.skill));
-    if (formData.language)
-      fd.append("language", JSON.stringify(formData.language));
+    if (data.skill) fd.append("skill", JSON.stringify(data.skill));
+    if (data.language)
+      fd.append("language", JSON.stringify(data.language));
 
     const fileFields = ["id_front", "id_back", "selfie"];
     fileFields.forEach((key) => {
-      const fileList = formData[key];
+      const fileList = data[key];
       if (fileList && fileList[0] instanceof File) {
         fd.append(key, fileList[0]);
       }
@@ -81,19 +82,18 @@ const WorkerSignup = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      navigate("/worker/dashboard");
+      navigate("/worker/nearby-tasks");
     } catch (err) {
-      showWarning(err.data?.message)
+      showWarning(err.data?.message);
       console.log("Sign up error", err);
       setIsVerified(false);
     }
-  }, [formData, workerSignUp, navigate, isVerified, dispatch])
+  }, [formData, workerSignUp, navigate, dispatch]);
 
-  useEffect(() => {
-    if (isVerified && formData) {
-      sendDataToBackend();
-    }
-  }, [isVerified, formData, sendDataToBackend]);
+  const handleOtpVerified = () => {
+    setIsVerified(true);
+    sendDataToBackend();
+  };
 
   const resendOtp = async () => {
     const response = await sendOtp({
@@ -135,7 +135,7 @@ const WorkerSignup = () => {
         <OtpModal
           show={setShowOtp}
           email={email}
-          isVerified={setIsVerified}
+          isVerified={handleOtpVerified}
           reSendOtp={resendOtp}
         />
       )}

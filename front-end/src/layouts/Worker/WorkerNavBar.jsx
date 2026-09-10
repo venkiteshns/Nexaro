@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  LayoutDashboard,
   ListChecks,
   Briefcase,
   Wallet,
@@ -17,13 +16,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
+import { useGetWorkerUnreadCountQuery } from "../../store/services/workerApi";
 
 const workerNav = [
-  {
-    label: "Dashboard",
-    icon: <LayoutDashboard size={20} />,
-    redirect: "/worker/dashboard",
-  },
   {
     label: "Nearby Tasks",
     icon: <ListChecks size={20} />,
@@ -62,7 +57,7 @@ const routeGroups = {
   "/worker/active-job": ["/worker/active-job"],
 };
 
-const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user }) => {
+const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user, unreadCount = 0 }) => {
   const location = useLocation();
 
   const isActive = (redirect) => {
@@ -114,21 +109,45 @@ const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user }) => {
         )}
 
         <div className="p-3 space-y-1 mt-1">
-          {workerNav.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => onNavClick(item.redirect)}
-              title={!isExpanded ? item.label : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium ${
-                isActive(item.redirect)
-                  ? "bg-[#0A6E5C] text-white"
-                  : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
-              } ${!isExpanded ? "justify-center" : ""}`}
-            >
-              {item.icon}
-              {isExpanded && <span>{item.label}</span>}
-            </button>
-          ))}
+          {workerNav.map((item, index) => {
+            const isNotif = item.redirect === "/worker/notifications";
+            return (
+              <button
+                key={index}
+                onClick={() => onNavClick(item.redirect)}
+                title={!isExpanded ? item.label : undefined}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all text-sm font-medium ${
+                  isActive(item.redirect)
+                    ? "bg-[#0A6E5C] text-white shadow-sm"
+                    : "text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
+                } ${!isExpanded ? "justify-center" : "justify-between"}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative flex items-center justify-center">
+                    {item.icon}
+                    {!isExpanded && isNotif && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center shadow">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  {isExpanded && <span>{item.label}</span>}
+                </div>
+
+                {isExpanded && isNotif && unreadCount > 0 && (
+                  <span
+                    className={`ml-auto px-2 py-0.5 text-xs font-bold rounded-full transition-colors ${
+                      isActive(item.redirect)
+                        ? "bg-white text-[#0A6E5C]"
+                        : "bg-emerald-600 text-white"
+                    }`}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -155,6 +174,9 @@ const WorkerNavBar = () => {
 
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const { data: unreadData } = useGetWorkerUnreadCountQuery();
+  const unreadCount = unreadData?.unreadCount || 0;
 
   const [userLogout] = useUserLogoutMutation();
 
@@ -199,6 +221,7 @@ const WorkerNavBar = () => {
         <NavContent
           user={user}
           isExpanded={true}
+          unreadCount={unreadCount}
           onToggle={() => setMobileOpen(false)}
           onNavClick={handleNav}
           onLogout={handleLogout}
@@ -213,6 +236,7 @@ const WorkerNavBar = () => {
         <NavContent
           user={user}
           isExpanded={desktopOpen}
+          unreadCount={unreadCount}
           onToggle={() => setDesktopOpen(!desktopOpen)}
           onNavClick={handleNav}
           onLogout={handleLogout}

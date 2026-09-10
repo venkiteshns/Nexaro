@@ -7,7 +7,11 @@ import {
   getCompletedTaskPosterSideService,
   getPosterProfileService,
   switchRoleToWorkerService,
-  posterRoleSwitchAlreadyDataUploadedService
+  posterRoleSwitchAlreadyDataUploadedService,
+  getPosterNotificationsService,
+  markAllPosterNotificationsReadService,
+  markPosterNotificationReadService,
+  getPosterUnreadCountService
 } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
@@ -209,3 +213,67 @@ export const posterRoleSwitchAlreadyDataUploaded = async (req, res) => {
 
   return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
 }
+
+export const getPosterNotifications = async (req, res) => {
+  try {
+    const posterId = req.user._id;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 6);
+    const filter = req.query.filter || "all";
+
+    const result = await getPosterNotificationsService(posterId, { page, limit, filter });
+    return res.status(STATUS_CODES.OK).json(result);
+  } catch (error) {
+    console.error("getPosterNotifications error:", error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: MESSAGES.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+export const markAllPosterNotificationsRead = async (req, res) => {
+  try {
+    const posterId = req.user._id;
+    const result = await markAllPosterNotificationsReadService(posterId);
+    return res.status(STATUS_CODES.OK).json(result);
+  } catch (error) {
+    console.error("markAllPosterNotificationsRead error:", error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: MESSAGES.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+export const markPosterNotificationRead = async (req, res) => {
+  try {
+    const posterId = req.user._id;
+    const { id } = req.params;
+    const result = await markPosterNotificationReadService(posterId, id);
+    if (result.error) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: result.error });
+    }
+    return res.status(STATUS_CODES.OK).json(result);
+  } catch (error) {
+    console.error("markPosterNotificationRead error:", error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: MESSAGES.INTERNAL_SERVER_ERROR,
+    });
+  }
+};
+
+export const getPosterUnreadCount = async (req, res) => {
+  try {
+    const posterId = req.user._id;
+    const result = await getPosterUnreadCountService(posterId);
+    return res.status(STATUS_CODES.OK).json(result);
+  } catch (error) {
+    console.error("getPosterUnreadCount error:", error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: MESSAGES.INTERNAL_SERVER_ERROR,
+    });
+  }
+};

@@ -57,14 +57,14 @@ const WorkerProfile = () => {
                 ...user,
                 role:'poster'
             }
-             showSuccess("Switching to Poster Dashboard");
+             showSuccess("Switching to Poster Mode");
                   setTimeout(() => {
                     dispatch(setCredentials({
                       user: updatedUser,
                       refreshToken,
                       accessToken
                     }))
-                    navigate('/poster/dashboard', { replace: true });
+                    navigate('/poster/my-tasks', { replace: true });
                   }, 2600);
         } catch (error) {
             showError(error.data.message || "Unable to switch role, try again later !")

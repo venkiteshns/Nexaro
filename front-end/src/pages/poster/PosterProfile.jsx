@@ -55,14 +55,14 @@ const PosterProfile = () => {
       let response = await switchRole(data).unwrap();
       console.log(response);
       const updatedUser = { ...user, role: 'worker' };
-      showSuccess("Switching to Worker Dashboard");
+      showSuccess("Switching to Worker Mode");
       setTimeout(() => {
         dispatch(setCredentials({
           user: updatedUser,
           refreshToken,
           accessToken
         }))
-        navigate('/worker/dashboard', { replace: true });
+        navigate('/worker/nearby-tasks', { replace: true });
       }, 2600);
     } catch (error) {
       console.log(error);
@@ -77,14 +77,14 @@ const PosterProfile = () => {
         await roleSwitch().unwrap();
         console.log("redirect to worker profile");
         const updatedUser = { ...user, role: 'worker' };
-        showSuccess("Switching to Worker Dashboard");
+        showSuccess("Switching to Worker Mode");
         setTimeout(() => {
           dispatch(setCredentials({
             user: updatedUser,
             refreshToken,
             accessToken
           }))
-          navigate('/worker/dashboard', { replace: true });
+          navigate('/worker/nearby-tasks', { replace: true });
         }, 2600);
         return;
       } catch (error) {

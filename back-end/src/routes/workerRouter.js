@@ -17,7 +17,13 @@ import {
   getEarningHeroData,
   getTransactionHistory,
   getWorkerEarningsChart,
-  withdrawWorkerEarnings
+  withdrawWorkerEarnings,
+  getWorkerNotifications,
+  markAllWorkerNotificationsRead,
+  markWorkerNotificationRead,
+  getWorkerUnreadCount,
+  getWorkerHeaderStatus,
+  toggleWorkerLiveStatus
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -37,6 +43,12 @@ router.get('/task/:taskId/completed', verifyToken, getCompletedTaskWorkerSide);
 router.get('/earnings/hero', verifyToken, getEarningHeroData);
 router.get('/earnings/transactions', verifyToken, getTransactionHistory);
 router.get('/earnings/chart', verifyToken, getWorkerEarningsChart);
+router.get('/notifications', verifyToken, getWorkerNotifications);
+router.get('/notifications/unread-count', verifyToken, getWorkerUnreadCount);
+router.get('/status/header', verifyToken, getWorkerHeaderStatus);
+router.patch('/status/live', verifyToken, toggleWorkerLiveStatus);
+router.patch('/notifications/mark-all-read', verifyToken, markAllWorkerNotificationsRead);
+router.patch('/notifications/:id/read', verifyToken, markWorkerNotificationRead);
 
 router.post("/tasks/add_bid", verifyToken, addNewBid);
 router.post('/earnings/withdraw', verifyToken, withdrawWorkerEarnings);

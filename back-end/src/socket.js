@@ -24,14 +24,19 @@ const initSocket = (socketIo) => {
             const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
             if (decoded) {
-                const userId = decoded._id
+                const userId = decoded._id;
                 socket.join(`user:${userId}`);
-                console.log(`User ${userId} joined room`);
+                const role = decoded.activeRole || decoded.role;
+                if (role && role !== 'admin') {
+                    socket.join("all-users");
+                }
+                if (role) {
+                    socket.join(`role:${role}`);
+                }
+                console.log(`User ${userId} (${role}) joined rooms`);
             }
 
-
             if (decoded.activeRole !== 'worker') {
-                console.log(`${decoded.activeRole} ${socket.id} connected (no room)`);
                 return;
             }
 

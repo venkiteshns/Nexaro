@@ -10,6 +10,9 @@ import Transaction from "../models/transactionSchema.js";
 import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
 import { convertInrToUsd } from "../utils/currency.js";
 import { getIo } from "../socket.js";
+import { recordAdminAlert } from "./adminNotificationHelper.js";
+import WorkerNotification from "../models/workerNotificationSchema.js";
+import { syncWorkerNotifications } from "./workerNotificationHelper.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -17,10 +20,10 @@ export const workerSignupService = async ({ files, data }) => {
         const user = await User.findOne({ $or: [{ email: data.email }, { phone: data.phone }] })
 
         if (user) {
-            if (user.email == data.email) {
+            if (user.email === data.email) {
                 throw new Error(MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL);
             }
-            if (user.phone == data.phone) {
+            if (user.phone === data.phone) {
                 throw new Error(MESSAGES.PHONE_ALREADY_IN_USE);
             }
             // This line should technically never be reached if the above conditions are exhaustive
@@ -64,7 +67,7 @@ export const workerSignupService = async ({ files, data }) => {
             role: "worker",
             activeRole: "worker",
             worker: {
-                isLive: false,
+                isLive: true,
                 rating: "0"
             }
         };
@@ -110,10 +113,28 @@ export const workerSignupService = async ({ files, data }) => {
         await createdUser.save({ validateBeforeSave: false });
         const { _id, name, email, verificationDocuments, activeRole } = createdUser;
         const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role: activeRole };
-        // console.log(responseUser);
+
+        await recordAdminAlert({
+            uniqueKey: `user_signup_${_id}`,
+            type: "signup",
+            title: "New User Sign Up",
+            description: `${name} joined as a Worker.`,
+            priority: "normal",
+            dotColor: "blue",
+            metadata: { userId: _id, role: activeRole },
+        });
+
+        await recordAdminAlert({
+            uniqueKey: `user_verify_${_id}`,
+            type: "verification",
+            title: "Verification Pending",
+            description: `Identity documents submitted by ${name} for verification review.`,
+            priority: "high",
+            dotColor: "amber",
+            metadata: { userId: _id },
+        });
+
         return { responseUser, accessToken, refreshToken };
-
-
     } catch (error) {
         console.log(error)
         return { error: error.message || MESSAGES.UNEXPECTED_ERROR };
@@ -603,30 +624,32 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
                 payoutBatchId: { $exists: true, $ne: null },
             });
 
-            for (const tx of pendingWithdrawals) {
-                const payoutData = await getPayoutStatus(tx.payoutBatchId);
-                const item = payoutData.items?.[0];
-                const itemStatus = item?.transaction_status;
+            await Promise.all(
+                pendingWithdrawals.map(async (tx) => {
+                    const payoutData = await getPayoutStatus(tx.payoutBatchId);
+                    const item = payoutData.items?.[0];
+                    const itemStatus = item?.transaction_status;
 
-                if (itemStatus === "SUCCESS") {
-                    tx.status = "completed";
-                    tx.processedAt = new Date();
-                    if (item.payout_item_id) tx.payoutItemId = item.payout_item_id;
-                    await tx.save();
-                } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED"].includes(itemStatus)) {
-                    tx.status = "failed";
-                    tx.processedAt = new Date();
-                    await tx.save();
+                    if (itemStatus === "SUCCESS") {
+                        tx.status = "completed";
+                        tx.processedAt = new Date();
+                        if (item.payout_item_id) tx.payoutItemId = item.payout_item_id;
+                        await tx.save();
+                    } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED"].includes(itemStatus)) {
+                        tx.status = "failed";
+                        tx.processedAt = new Date();
+                        await tx.save();
 
-                    // Restore wallet amount
-                    await Wallet.findOneAndUpdate(
-                        { userId: new mongoose.Types.ObjectId(userId) },
-                        {
-                            $inc: { walletAmount: tx.amount, withDrawn: -tx.amount },
-                        }
-                    );
-                }
-            }
+                        // Restore wallet amount
+                        await Wallet.findOneAndUpdate(
+                            { userId: new mongoose.Types.ObjectId(userId) },
+                            {
+                                $inc: { walletAmount: tx.amount, withDrawn: -tx.amount },
+                            }
+                        );
+                    }
+                })
+            );
         } catch (syncErr) {
             console.warn("Background PayPal status sync error:", syncErr.message);
         }
@@ -964,10 +987,31 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
                     $inc: { withDrawn: -withdrawAmount },
                 }
             );
+
+            await recordAdminAlert({
+                uniqueKey: `tx_payout_failed_${transaction._id}`,
+                type: "payout_failed",
+                title: "Payout Failed",
+                description: `Payout of ₹${Number(withdrawAmount).toLocaleString("en-IN")} for ${isUser.name} failed via PayPal.`,
+                priority: "urgent",
+                dotColor: "rose",
+                metadata: { transactionId: transaction._id, amount: withdrawAmount },
+            });
+
             return {
                 error: `PayPal payout failed: ${payoutResponse.finalStatus?.errors?.[0]?.message || "Transaction was rejected by PayPal."}`,
             };
         }
+
+        await recordAdminAlert({
+            uniqueKey: `tx_payout_${transaction._id}`,
+            type: "payout_initiated",
+            title: "Worker Payout Initiated",
+            description: `${isUser.name} initiated a payout of ₹${Number(withdrawAmount).toLocaleString("en-IN")} via PayPal.`,
+            priority: "normal",
+            dotColor: "emerald",
+            metadata: { transactionId: transaction._id, amount: withdrawAmount },
+        });
 
         // 6. Realtime Notification via Socket
         try {
@@ -995,5 +1039,145 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
         return { error: MESSAGES.UNEXPECTED_ERROR };
     } finally {
         activeWithdrawals.delete(userLockKey);
+    }
+};
+
+export const getWorkerNotificationsService = async (workerId, { page = 1, limit = 6, filter = "all" } = {}) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+
+    // Sync latest real database records into worker notifications
+    await syncWorkerNotifications(workerId);
+
+    const query = { workerId: workerObjectId };
+    if (filter === "unread") {
+        query.isRead = false;
+    } else if (filter && filter !== "all") {
+        query.category = filter;
+    }
+
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.max(1, parseInt(limit) || 6);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [
+        notifications,
+        totalItems,
+        allCount,
+        unreadCount,
+        paymentsCount,
+        systemCount,
+    ] = await Promise.all([
+        WorkerNotification.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limitNum).lean(),
+        WorkerNotification.countDocuments(query),
+        WorkerNotification.countDocuments({ workerId: workerObjectId }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, isRead: false }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "payments" }),
+        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "system" }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limitNum) || 1;
+
+    return {
+        success: true,
+        notifications,
+        currentPage: pageNum,
+        totalPages,
+        totalItems,
+        counts: {
+            all: allCount,
+            unread: unreadCount,
+            payments: paymentsCount,
+            system: systemCount,
+        },
+    };
+};
+
+export const markAllWorkerNotificationsReadService = async (workerId) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    await WorkerNotification.updateMany({ workerId: workerObjectId, isRead: false }, { $set: { isRead: true } });
+    return {
+        success: true,
+        message: "All notifications marked as read",
+    };
+};
+
+export const markWorkerNotificationReadService = async (workerId, notificationId) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    const notifObjectId = new mongoose.Types.ObjectId(notificationId);
+    const notification = await WorkerNotification.findOneAndUpdate(
+        { _id: notifObjectId, workerId: workerObjectId },
+        { $set: { isRead: true } },
+        { new: true }
+    );
+    if (!notification) {
+        return { error: "Notification not found" };
+    }
+    return {
+        success: true,
+        notification,
+    };
+};
+
+export const getWorkerUnreadCountService = async (workerId) => {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    await syncWorkerNotifications(workerId);
+    const unreadCount = await WorkerNotification.countDocuments({
+        workerId: workerObjectId,
+        isRead: false,
+    });
+    return {
+        success: true,
+        unreadCount,
+    };
+};
+
+export const getWorkerHeaderStatusService = async (userId) => {
+    try {
+        const user = await User.findById(userId).select("worker.isLive name").lean();
+        if (!user) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        const wallet = await Wallet.findOne({ userId: new mongoose.Types.ObjectId(userId) })
+            .select("walletAmount")
+            .lean();
+
+        return {
+            isLive: user?.worker?.isLive ?? true,
+            walletAmount: wallet?.walletAmount ?? 0,
+        };
+    } catch (error) {
+        console.error("getWorkerHeaderStatusService error:", error.message);
+        return { error: error.message };
+    }
+};
+
+export const toggleWorkerLiveStatusService = async (userId, isLive = null) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        const newLiveState = isLive !== null ? Boolean(isLive) : !(user.worker?.isLive ?? true);
+
+        if (!user.worker) {
+            user.worker = { isLive: newLiveState, rating: 0 };
+        } else {
+            user.worker.isLive = newLiveState;
+        }
+
+        await user.save();
+
+        return {
+            success: true,
+            isLive: newLiveState,
+            message: newLiveState
+                ? "You are now Live! Visible to nearby task posters."
+                : "You are now Offline. You won't appear active to posters.",
+        };
+    } catch (error) {
+        console.error("toggleWorkerLiveStatusService error:", error.message);
+        return { error: error.message };
     }
 };

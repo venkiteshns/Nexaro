@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import ErrorBoundary from "./components/routes/ErrorBoundary.jsx";
@@ -11,7 +11,6 @@ import Map from "./components/Maps/Map.jsx";
 import PosterSignup from "./pages/auth/PosterSignup.jsx";
 import WorkerSignup from "./pages/auth/WorkerSignup.jsx";
 import UserLogin from "./pages/auth/UserLogin.jsx";
-import PosterDasboard from "./pages/poster/PosterDasboard.jsx";
 import PostTask from "./pages/poster/PostTask.jsx";
 import MyTasks from "./pages/poster/MyTasks.jsx";
 import ReviewBids from "./pages/poster/ReviewBids.jsx";
@@ -19,8 +18,8 @@ import WorkProgress from "./pages/poster/WorkProgress.jsx";
 import CompletedTaskDetails from "./pages/poster/CompletedTaskDetails.jsx";
 import PosterProfile from "./pages/poster/PosterProfile.jsx";
 import ReviewPage from "./pages/poster/ReviewPage.jsx";
+import PosterNotifications from "./pages/poster/PosterNotifications.jsx";
 
-import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
 import MyBids from "./pages/worker/MyBids.jsx";
@@ -31,6 +30,7 @@ import WorkerProfile from './pages/worker/WorkerProfile.jsx'
 import WorkerAllReviews from './pages/worker/WorkerAllReviews.jsx'
 import WorkerEarnings from './pages/worker/WorkerEarnings.jsx'
 import WorkerCompletedTaskDetails from './pages/worker/CompletedTaskDetails.jsx'
+import WorkerNotifications from './pages/worker/WorkerNotifications.jsx'
 
 import AdminLogin from "./pages/auth/AdminLogin.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -39,6 +39,8 @@ import UserVerificationPanel from './pages/admin/UserVerificationPanel.jsx'
 import AdminTaskManagement from './pages/admin/AdminTaskManagement.jsx'
 import AdminTaskDetails from './pages/admin/AdminTaskDetails.jsx'
 import AdminPayments from './pages/admin/AdminPayments.jsx'
+import AdminFinancialReports from './pages/admin/AdminFinancialReports.jsx'
+import AdminNotifications from './pages/admin/AdminNotifications.jsx'
 import PaymentReceivedModal from './components/Worker/PaymentReceivedModal.jsx';
 
 
@@ -82,7 +84,8 @@ function AppInner() {
 
           <Route element={<PrivateRoute allowedRoles="poster" />}>
             <Route path="/poster">
-              <Route path="dashboard" element={<PosterDasboard />} />
+              <Route index element={<Navigate to="/poster/my-tasks" replace />} />
+              <Route path="dashboard" element={<Navigate to="/poster/my-tasks" replace />} />
               <Route path="post-task" element={<PostTask />} />
               <Route path="my-tasks" element={<MyTasks />} />
               <Route path="review-bids/:taskId" element={<ReviewBids />} />
@@ -90,15 +93,19 @@ function AppInner() {
               <Route path="completed-task/:taskId" element={<CompletedTaskDetails />} />
               <Route path="profile" element={<PosterProfile />} />
               <Route path="review/:taskId" element={<ReviewPage />} />
+              <Route path="notifications" element={<PosterNotifications />} />
             </Route>
           </Route>
 
 
           <Route element={<PrivateRoute allowedRoles="worker" />}>
             <Route path="/worker">
-              <Route path="dashboard" element={<WorkerDashboard />} />
+              <Route index element={<Navigate to="/worker/nearby-tasks" replace />} />
+              <Route path="dashboard" element={<Navigate to="/worker/nearby-tasks" replace />} />
               <Route path="nearby-tasks" element={<NearbyTasks />} />
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
+              <Route path="task-details/:taskId" element={<PlaceBid />} />
+              <Route path="task/:taskId" element={<PlaceBid />} />
               <Route path="my-bids" element={<MyBids />} />
               <Route path='task-bid-details/:bidId' element={<TaskBidDetails />} />
               <Route path='active-job' element={<ActiveJobEntry />} />
@@ -107,7 +114,7 @@ function AppInner() {
               <Route path='profile' element={<WorkerProfile />} />
               <Route path='all-reviews' element={<WorkerAllReviews />} />
               <Route path='earnings' element={<WorkerEarnings />} />
-
+              <Route path='notifications' element={<WorkerNotifications />} />
             </Route>
           </Route>
 
@@ -119,6 +126,8 @@ function AppInner() {
               <Route path="tasks" element={<AdminTaskManagement />} />
               <Route path="tasks/:taskId" element={<AdminTaskDetails />} />
               <Route path="finance/payments" element={<AdminPayments />} />
+              <Route path="finance/reports" element={<AdminFinancialReports />} />
+              <Route path="notifications" element={<AdminNotifications />} />
             </Route>
           </Route>
 

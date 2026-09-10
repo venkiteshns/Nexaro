@@ -1,4 +1,4 @@
-import React from "react";
+
 
 const DEFAULT_OPTIONS = [
   { label: "7 Days", shortLabel: "7D", value: "7D" },

@@ -107,6 +107,9 @@ const taskSchema = new mongoose.Schema(
 
 taskSchema.index({ location: "2dsphere" }, { sparse: true });
 
-const Task = mongoose.model("Task", taskSchema);
+const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
+if (!mongoose.models.Tasks) {
+    mongoose.model("Tasks", taskSchema);
+}
 
 export default Task;

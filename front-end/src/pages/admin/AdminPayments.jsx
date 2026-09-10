@@ -8,6 +8,7 @@ import RevenueTrendsChart from "../../components/Admin/Finance/RevenueTrendsChar
 import PaymentsTable from "../../components/Admin/Finance/PaymentsTable";
 import SelectDropdown from "../../components/sharedComponents/SelectDropdown";
 import { Calendar } from "lucide-react";
+import { useAdminGetFinanceStatsQuery } from "../../store/services/adminApi";
 
 /**
  * AdminPayments Page
@@ -26,12 +27,17 @@ export default function AdminPayments() {
     "Last 30 Days",
     "Last 90 Days",
     "This Year",
+    "All Time",
   ];
 
   // Set active navigation page on mount
   useEffect(() => {
     dispatch(setActivePage("Payments & Revenue"));
   }, [dispatch]);
+
+  // Live Stats Query
+  const { data: statsData, isLoading: statsLoading } =
+    useAdminGetFinanceStatsQuery(selectedRange);
 
   return (
     <div className="min-h-screen bg-[#F6FAF8] flex">
@@ -42,15 +48,15 @@ export default function AdminPayments() {
       <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
         <AdminHeader />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
           {/* Top Page Header: Helper text + Date Filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
                 Payments & Revenue
               </h1>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                Monitor platform revenue and transaction trends across all service categories.
+                Monitor platform revenue, GMV, and live transactions across all service categories.
               </p>
             </div>
 
@@ -68,17 +74,20 @@ export default function AdminPayments() {
 
           {/* 1. TOP STATS CARDS COMPONENT */}
           <section aria-label="Financial Overview">
-            <PaymentStatsCards />
+            <PaymentStatsCards
+              stats={statsData?.stats}
+              isLoading={statsLoading}
+            />
           </section>
 
-          {/* 2. REVENUE TRENDS CHART COMPONENT (Empty container ready for chart) */}
+          {/* 2. REVENUE TRENDS CHART COMPONENT */}
           <section aria-label="Revenue Trends Chart">
             <RevenueTrendsChart />
           </section>
 
           {/* 3. PAYMENTS & TRANSACTIONS TABLE COMPONENT */}
           <section aria-label="Transactions Table">
-            <PaymentsTable />
+            <PaymentsTable dateRange={selectedRange} />
           </section>
         </main>
       </div>

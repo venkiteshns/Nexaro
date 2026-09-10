@@ -4,7 +4,7 @@ const bidSchema = new mongoose.Schema({
     taskId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: "Tasks"
+        ref: "Task"
     },
     workerId: {
         type: mongoose.Schema.Types.ObjectId,

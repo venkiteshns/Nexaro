@@ -3,13 +3,10 @@ import {
   Search,
   CheckCircle,
   XCircle,
-  AlertTriangle,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import AdminNavBar from "../../layouts/Admin/AdminNavBar";
 import AdminHeader from "../../layouts/Admin/AdminHeader";
+import PaginationSections from "../../components/sharedComponents/PaginationSections";
 import {
   useAdminApproveUserMutation,
   useAdminGetPendingVerificationUsersQuery,
@@ -28,7 +25,7 @@ const UserVerificationPanel = () => {
   const { data, isLoading, isError } = useAdminGetPendingVerificationUsersQuery(
     {
       page: currentPage,
-      limit: 10,
+      limit: 2,
     },
   );
 
@@ -40,13 +37,9 @@ const UserVerificationPanel = () => {
     user.name.toLowerCase().includes(searchName.toLowerCase())
   );
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
+  if (totalPages > 0 && currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
 
   const handleRejectUser = async (id) => {
     await rejectUser(id)
@@ -94,7 +87,10 @@ const UserVerificationPanel = () => {
               <input
                 type="text"
                 value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
+                onChange={(e) => {
+                  setSearchName(e.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Search users..."
                 className="w-full bg-[#f7f7f7] border border-gray-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-[#0A6E5C]"
               />
@@ -165,9 +161,6 @@ const UserVerificationPanel = () => {
                         </div>
                       </div>
 
-                      <button className="self-start lg:self-auto p-2 rounded-xl hover:bg-gray-100">
-                        <MoreHorizontal className="w-5 h-5 text-gray-500" />
-                      </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8">
@@ -244,48 +237,30 @@ const UserVerificationPanel = () => {
                           Reject
                         </button>
 
-                        <button className="px-3 py-2 rounded-xl border border-yellow-300 text-yellow-700 text-sm font-medium hover:bg-yellow-50 transition-all flex items-center gap-2">
-                          <AlertTriangle className="w-3 h-3" />
-                          Request Re-upload
-                        </button>
+
                       </div>
 
-                      <button className="px-3 py-2 text-sm rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium">
-                        Request More Info
-                      </button>
                     </div>
                   </div>
                 </div>
               ))}
           </div>
 
-          {!isLoading && !isError && totalPages > 1 && (
-            <div className="flex items-center justify-between mt-8">
+          {!isLoading && !isError && users.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 bg-white border border-gray-200 rounded-3xl p-4 md:p-6 shadow-sm">
               <p className="text-sm text-gray-500">
-                Page {currentPage} of {totalPages} · {totalUsers} total users
+                Page <span className="font-semibold text-gray-800">{currentPage}</span> of{" "}
+                <span className="font-semibold text-gray-800">{totalPages}</span> ·{" "}
+                <span className="font-semibold text-gray-800">{totalUsers}</span> total users
               </p>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                <span className="text-sm font-medium text-gray-700 px-2">
-                  {currentPage}
-                </span>
-
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
+              <PaginationSections
+                totalPages={totalPages}
+                page={currentPage}
+                onPageChange={(newPage) => setCurrentPage(newPage)}
+                alwaysShow={true}
+                className="mt-0 pb-0"
+              />
             </div>
           )}
         </div>

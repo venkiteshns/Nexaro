@@ -4,10 +4,8 @@ import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import EarningsHeroCard from "../../components/Worker/Earnings/EarningsHeroCard";
 import EarningsStatCards from "../../components/Worker/Earnings/EarningsStatCards";
-import EarningsOverviewChart from "../../components/Worker/Earnings/EarningsOverviewChart";
 import TransactionHistoryCard from "../../components/Worker/Earnings/TransactionHistoryCard";
 import WithdrawModal from "../../components/Worker/Earnings/WithdrawModal";
-import { showSuccess } from "../../utils/toast.js";
 import { useGetEarningHeroDataQuery } from "../../store/services/workerApi.js";
 import { EarningsChart } from "../../components/Worker/Earnings/EarningsChart.jsx";
 
@@ -18,17 +16,7 @@ export default function WorkerEarnings() {
   // const [totalEarned, setTotalEarned] = useState(28000);
   // const [totalJobs] = useState(34);
 
-  // Payout methods state
-  const [payoutMethods, setPayoutMethods] = useState([
-    {
-      id: "pm-1",
-      type: "bank",
-      bankName: "State Bank of India",
-      accountNumber: "4492",
-      holderName: "Alex Carter",
-      isPrimary: true,
-    },
-  ]);
+
 
   const { data, isLoading, isError, isSuccess } = useGetEarningHeroDataQuery();
 
@@ -45,7 +33,7 @@ export default function WorkerEarnings() {
   console.log("is Error", isError);
 
   // Transactions state
-  const [transactions, setTransactions] = useState([
+  const [transactions] = useState([
     {
       id: "tx-1",
       title: "Kitchen Tap Repair",

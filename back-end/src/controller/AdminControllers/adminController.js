@@ -1,4 +1,26 @@
-import { getAllUsersService, suspendUserService, unsuspendUserService, getPendingVerificationUsersService, approveUserService, rejectUserService, getAllTasksService, cancelTaskByAdminService, getAdminTaskDetailsService } from "../../services/adminServices.js";
+import {
+    getAllUsersService,
+    suspendUserService,
+    unsuspendUserService,
+    getPendingVerificationUsersService,
+    approveUserService,
+    rejectUserService,
+    getAllTasksService,
+    cancelTaskByAdminService,
+    getAdminTaskDetailsService,
+    getAdminFinanceStatsService,
+    getAdminFinanceChartService,
+    getAdminFinanceTransactionsService,
+    getAdminDailyRevenueReportService,
+    getAdminMonthlyPlReportService,
+    getAdminPlatformFeeSummaryService,
+    getAdminNotificationsService,
+    markAllNotificationsReadService,
+    markNotificationReadService,
+    sendAnnouncementService,
+    getRecentAnnouncementsService,
+    getAdminDashboardService,
+} from "../../services/adminServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 
@@ -205,5 +227,184 @@ export const getAdminTaskDetails = async (req, res) => {
     } catch (error) {
         console.error('Get admin task details error:', error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminFinanceStats = async (req, res) => {
+    try {
+        const range = req.query.range || "Last 30 Days";
+        const response = await getAdminFinanceStatsService(range);
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin finance stats error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminFinanceChart = async (req, res) => {
+    try {
+        const timeframe = req.query.timeframe || "7D";
+        const metric = req.query.metric || "revenue";
+        const response = await getAdminFinanceChartService(timeframe, metric);
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin finance chart error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminFinanceTransactions = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search?.trim() || "";
+        const status = req.query.status || "ALL";
+        const range = req.query.range || "All Time";
+
+        const response = await getAdminFinanceTransactionsService({
+            page,
+            limit,
+            search,
+            status,
+            range,
+        });
+
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin finance transactions error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminDailyRevenueReport = async (req, res) => {
+    try {
+        const response = await getAdminDailyRevenueReportService();
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin daily revenue report error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminMonthlyPlReport = async (req, res) => {
+    try {
+        const { year, month } = req.query;
+        const response = await getAdminMonthlyPlReportService(year, month);
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin monthly P&L report error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminPlatformFeeSummary = async (req, res) => {
+    try {
+        const response = await getAdminPlatformFeeSummaryService();
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin platform fee summary error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
+    }
+};
+
+export const getAdminNotifications = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 6;
+        const filter = req.query.filter || "all";
+
+        const response = await getAdminNotificationsService(page, limit, filter);
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin notifications error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const markAllAdminNotificationsRead = async (req, res) => {
+    try {
+        const response = await markAllNotificationsReadService();
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Mark all notifications read error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const markAdminNotificationRead = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const response = await markNotificationReadService(id);
+        if (!response.success) {
+            return res.status(STATUS_CODES.NOT_FOUND).json(response);
+        }
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Mark notification read error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const sendAdminAnnouncement = async (req, res) => {
+    try {
+        const { targetAudience, title, message } = req.body;
+        if (!title || !message) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: "Title and message are required",
+            });
+        }
+
+        const adminId = req.user?._id;
+        const response = await sendAnnouncementService({
+            targetAudience,
+            title,
+            message,
+            adminId,
+        });
+
+        return res.status(STATUS_CODES.CREATED).json(response);
+    } catch (error) {
+        console.error("Send admin announcement error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const getAdminRecentAnnouncements = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+        const response = await getRecentAnnouncementsService(limit);
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get recent announcements error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const getAdminDashboard = async (req, res) => {
+    try {
+        const response = await getAdminDashboardService();
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin dashboard error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
     }
 };

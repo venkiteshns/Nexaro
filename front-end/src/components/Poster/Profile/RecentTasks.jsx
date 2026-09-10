@@ -1,4 +1,4 @@
-import { ChevronRight, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import { categoryIcon, statusColor } from "./profileUtils.jsx";
 
 const RecentTasks = ({ recentTasks, isLoading }) => (
@@ -29,7 +29,7 @@ const RecentTasks = ({ recentTasks, isLoading }) => (
       recentTasks.map((task) => (
         <div
           key={task._id}
-          className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 group hover:bg-gray-50 rounded-xl px-2 -mx-2 transition-colors cursor-pointer"
+          className="flex items-center py-3 border-b border-gray-50 last:border-0 group hover:bg-gray-50/60 rounded-xl px-2 -mx-2 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-[#0A6E5C] shrink-0">
@@ -49,10 +49,6 @@ const RecentTasks = ({ recentTasks, isLoading }) => (
               </span>
             </div>
           </div>
-          <ChevronRight
-            size={16}
-            className="text-gray-300 group-hover:text-[#0A6E5C] transition-colors"
-          />
         </div>
       ))}
   </div>

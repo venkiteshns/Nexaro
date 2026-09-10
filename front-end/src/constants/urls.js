@@ -25,7 +25,11 @@ export const POSTER = {
     PROFILE: "/poster/profile",
     UPDATE_PROFILE: "/poster/profile/update",
     ROLE_SWITCH: "/poster/switch/role",
-    ROLE_SWITCH_ACTIVE_WORKER: '/poster/switch/to_worker'
+    ROLE_SWITCH_ACTIVE_WORKER: '/poster/switch/to_worker',
+    GET_NOTIFICATIONS: "/poster/notifications",
+    GET_UNREAD_COUNT: "/poster/notifications/unread-count",
+    MARK_ALL_NOTIFICATIONS_READ: "/poster/notifications/mark-all-read",
+    MARK_NOTIFICATION_READ: "/poster/notifications/:id/read",
 }
 
 export const WORKER = {
@@ -47,6 +51,12 @@ export const WORKER = {
     GET_TRANSACTION_HISTORY: "/worker/earnings/transactions",
     GET_EARNING_CHART: "/worker/earnings/chart",
     WITHDRAW_EARNINGS: "/worker/earnings/withdraw",
+    GET_NOTIFICATIONS: "/worker/notifications",
+    GET_UNREAD_COUNT: "/worker/notifications/unread-count",
+    MARK_ALL_NOTIFICATIONS_READ: "/worker/notifications/mark-all-read",
+    MARK_NOTIFICATION_READ: "/worker/notifications/:id/read",
+    GET_HEADER_STATUS: "/worker/status/header",
+    TOGGLE_LIVE_STATUS: "/worker/status/live",
 }
 
 export const PAYMENT = {

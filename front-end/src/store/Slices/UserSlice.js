@@ -51,9 +51,19 @@ const userSlice = createSlice({
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");
         },
+
+        updateUserLiveStatus: (state, action) => {
+            if (state.user) {
+                if (!state.user.worker) {
+                    state.user.worker = {};
+                }
+                state.user.worker.isLive = action.payload;
+                localStorage.setItem("user", JSON.stringify(state.user));
+            }
+        },
     },
 });
 
-export const { setCredentials, logOut } = userSlice.actions;
+export const { setCredentials, logOut, updateUserLiveStatus } = userSlice.actions;
 
 export default userSlice.reducer;
