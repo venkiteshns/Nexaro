@@ -5,7 +5,6 @@ import "./Landing.css";
 const GetStarted = () => {
   return (
     <div className="get-start grid grid-cols-1 md:grid-cols-2">
-      {/* ── Poster / Requester side ── */}
       <div
         className="p-8 py-16 flex flex-col items-center justify-center relative overflow-hidden"
         style={{
@@ -13,7 +12,6 @@ const GetStarted = () => {
             "linear-gradient(160deg, #f0fdf8 0%, #ffffff 60%, #ecfdf5 100%)",
         }}
       >
-        {/* faint decorative circle */}
         <div
           className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none"
           style={{ background: "rgba(16,185,129,0.07)" }}
@@ -46,7 +44,6 @@ const GetStarted = () => {
         </Link>
       </div>
 
-      {/* ── Worker / Professional side ── */}
       <div
         className="p-8 py-16 flex flex-col items-center justify-center relative overflow-hidden"
         style={{
@@ -54,7 +51,6 @@ const GetStarted = () => {
             "linear-gradient(160deg, #0a6e5c 0%, #065f46 50%, #064e3b 100%)",
         }}
       >
-        {/* faint decorative circle */}
         <div
           className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full pointer-events-none"
           style={{ background: "rgba(255,255,255,0.05)" }}

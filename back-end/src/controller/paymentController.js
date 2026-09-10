@@ -23,12 +23,11 @@ export const captureOrder = async (req, res) => {
 export const orderPayout = async (req, res) => {
 
     const response = await orderPayoutService({bidId: req.params.bidId, user:req.user})
-    // console.log(req.user, req.params.bidId);
     console.log(response);
     if(response.success){
         return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
     }
 
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({success:false, message:response.message})
-    
+
 }

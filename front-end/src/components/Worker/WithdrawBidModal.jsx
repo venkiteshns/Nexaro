@@ -50,7 +50,6 @@ const WithdrawBidModal = ({
       role="dialog"
       aria-labelledby="withdraw-title"
     >
-      {/* ── Card ────────────────────────────────────────────────────────────── */}
       <div
         className="relative w-full max-w-sm sm:max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden
                    animate-[scaleIn_0.2s_ease-out]"
@@ -67,7 +66,6 @@ const WithdrawBidModal = ({
             </div>
           </div>
 
-          {/* ── Heading ──────────────────────────────────────────────────────── */}
           <h2
             id="withdraw-title"
             className="text-center text-xl sm:text-2xl font-extrabold text-gray-900 mb-2"
@@ -75,7 +73,6 @@ const WithdrawBidModal = ({
             Withdraw Your Bid?
           </h2>
 
-          {/* ── Sub-copy ─────────────────────────────────────────────────────── */}
           <p className="text-center text-sm text-gray-500 leading-relaxed mb-6 px-2">
             Are you sure you want to withdraw your bid of{" "}
             <span className="font-semibold text-gray-700">
@@ -86,9 +83,7 @@ const WithdrawBidModal = ({
             This action cannot be undone.
           </p>
 
-          {/* ── Task Summary Card ─────────────────────────────────────────────── */}
           <div className="bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 mb-6">
-            {/* Task title row */}
             <div className="flex items-center gap-2 mb-3">
               <Wrench size={15} className="text-[#0A6E5C] shrink-0" />
               <span className="text-sm font-semibold text-gray-800 truncate">
@@ -96,7 +91,6 @@ const WithdrawBidModal = ({
               </span>
             </div>
 
-            {/* Bid amount row */}
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                 Your Bid
@@ -107,9 +101,7 @@ const WithdrawBidModal = ({
             </div>
           </div>
 
-          {/* ── Actions ──────────────────────────────────────────────────────── */}
           <div className="flex flex-col gap-3">
-            {/* Confirm – destructive */}
             <button
               id="confirm-withdraw-btn"
               onClick={onConfirm}
@@ -143,7 +135,6 @@ const WithdrawBidModal = ({
               )}
             </button>
 
-            {/* Cancel */}
             <button
               id="cancel-withdraw-btn"
               onClick={onClose}
@@ -159,7 +150,6 @@ const WithdrawBidModal = ({
         </div>
       </div>
 
-      {/* Keyframe for scale-in entrance */}
       <style>{`
         @keyframes scaleIn {
           from { opacity: 0; transform: scale(0.92); }

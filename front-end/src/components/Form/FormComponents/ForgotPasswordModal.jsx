@@ -61,7 +61,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="relative w-full max-w-[540px] rounded-[32px] border border-[#DDE7E2] bg-white shadow-2xl p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-300">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-[#F4F7F5] text-gray-500 transition hover:bg-[#E8F3EE] hover:text-[#0A6E5C]"
@@ -69,7 +68,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
           <X size={20} />
         </button>
 
-        {/* Heading */}
         <div className="text-center">
           <h2 className="text-2xl leading-none font-black tracking-tight text-[#111827]">
             Reset Password
@@ -81,7 +79,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
           </p>
         </div>
 
-        {/* Form */}
         <form
           className="mt-10 space-y-7"
           onSubmit={methods.handleSubmit(
@@ -110,7 +107,6 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
             </div>
           )}
 
-          {/* Button */}
           <div className="text-center">
             <button
               type="submit"

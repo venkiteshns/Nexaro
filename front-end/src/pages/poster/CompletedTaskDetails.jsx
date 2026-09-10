@@ -14,10 +14,8 @@ const CompletedTaskDetails = () => {
 
     const { data, isLoading, isError } = useGetCompletedTaskPosterSideQuery(taskId);
 
-    // The service returns an array; pick the first element
     const raw = data?.data?.[0];
 
-    // ── Derived data objects passed to sub-components ──────────────────────────
     const task = raw ? {
         title: raw.title,
         category: raw.category,
@@ -37,7 +35,6 @@ const CompletedTaskDetails = () => {
         isVerified: raw.worker.isVerified,
     } : null;
 
-    // review is null when no review document exists in the DB
     const review = raw?.review?._id ? {
         rating: raw.review.rating,
         text: raw.review.review,
@@ -45,18 +42,14 @@ const CompletedTaskDetails = () => {
             ? new Date(raw.review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
             : null,
     } : null;
-    // ──────────────────────────────────────────────────────────────────────────
 
     return (
         <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
-            {/* ── Sidebar ── */}
             <PosterNavBar />
 
-            {/* ── Main Content ── */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 <PosterHeader />
 
-                {/* ── Scrollable Body ── */}
                 <div className="flex-1 overflow-y-auto">
                     {isLoading && <PageLoader />}
                     {isError && <PageError onBack={() => navigate('/poster/my-tasks')} />}

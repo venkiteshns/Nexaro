@@ -33,7 +33,6 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
     }
   };
 
-  // Render left icon based on notification type
   const renderLeftMedia = () => {
     if (type === "payment_escrow") {
       return (
@@ -91,12 +90,9 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
       }`}
     >
       <div className="flex items-start gap-3 sm:gap-3.5">
-        {/* Media / Icon */}
         {renderLeftMedia()}
 
-        {/* Body Content */}
         <div className="flex-1 min-w-0">
-          {/* Header Row: Title & Timestamp */}
           <div className="flex items-center justify-between gap-2 mb-0.5">
             <h3
               className={`text-sm sm:text-base font-bold truncate ${
@@ -120,7 +116,6 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
                 />
               )}
 
-              {/* Mark as read quick action on hover */}
               {!isRead && (
                 <button
                   type="button"
@@ -134,7 +129,6 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
             </div>
           </div>
 
-          {/* Description */}
           <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">
             {description}
           </p>

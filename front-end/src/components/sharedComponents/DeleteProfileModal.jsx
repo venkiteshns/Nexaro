@@ -16,8 +16,8 @@ const DeleteProfileModal = ({ onClose, userId }) => {
         await userLogout().unwrap();
         onClose();
         showWarning("Your profile has been deleted. You will be logged out.");
-      } catch {
-        // log out locally even if API fails
+      } catch (error) {
+        console.error("Logout failed during account deletion:", error);
       } finally {
         setTimeout(() => {
           dispatch(logOut());

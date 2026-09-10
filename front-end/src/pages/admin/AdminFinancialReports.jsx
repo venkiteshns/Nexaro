@@ -7,30 +7,21 @@ import DailyRevenueReportCard from "../../components/Admin/Finance/Reports/Daily
 import MonthlyPlReportCard from "../../components/Admin/Finance/Reports/MonthlyPlReportCard";
 import PlatformFeeSummaryCard from "../../components/Admin/Finance/Reports/PlatformFeeSummaryCard";
 
-/**
- * AdminFinancialReports Page
- * Route: /admin/finance/reports
- * Theme: White & Green aesthetic for Nexaro Admin Portal
- */
 export default function AdminFinancialReports() {
   const dispatch = useDispatch();
 
-  // Set active navigation page in Redux state on mount
   useEffect(() => {
     dispatch(setActivePage("Financial Reports"));
   }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-[#F6FAF8] flex">
-      {/* SIDEBAR NAVIGATION */}
       <AdminNavBar />
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
         <AdminHeader />
 
         <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
-          {/* Top Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight">
@@ -42,13 +33,11 @@ export default function AdminFinancialReports() {
             </div>
           </div>
 
-          {/* 1. TOP SECTION: 2-COLUMN GRID (Daily Revenue + Monthly P&L) */}
           <section aria-label="Core Financial Reports" className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
             <DailyRevenueReportCard />
             <MonthlyPlReportCard />
           </section>
 
-          {/* 2. BOTTOM SECTION: FULL WIDTH (Platform Fee Summary) */}
           <section aria-label="Platform Fee Summary">
             <PlatformFeeSummaryCard />
           </section>

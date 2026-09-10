@@ -1,4 +1,3 @@
-// Auth
 export const AUTH = {
     SEND_OTP: "/auth/get-otp",
     VERIFY_OTP: "/auth/verify-otp",
@@ -68,3 +67,33 @@ export const PAYMENT = {
 export const REVIEWS = {
     CREATE_REVIEW: "/poster/review",
 };
+
+export const ADMIN = {
+    GET_USERS: "/admin/users",
+    GET_PENDING_VERIFICATION_USERS: "/admin/users/pending-verification",
+    SUSPEND_USER: "/admin/users/:userId/suspend",
+    UNSUSPEND_USER: "/admin/users/:userId/unsuspend",
+    APPROVE_USER: "/admin/users/:userId/approve",
+    REJECT_USER: "/admin/users/:userId/reject",
+    GET_TASKS: "/admin/tasks",
+    DELETE_TASK: "/admin/task/cancel/:taskId",
+    GET_TASK_DETAILS: "/admin/task/:taskId",
+    GET_FINANCE_STATS: "/admin/finance/stats",
+    GET_FINANCE_CHART: "/admin/finance/chart",
+    GET_FINANCE_TRANSACTIONS: "/admin/finance/transactions",
+    GET_DAILY_REPORT: "/admin/finance/reports/daily",
+    GET_MONTHLY_PL_REPORT: "/admin/finance/reports/monthly",
+    GET_PLATFORM_FEE_SUMMARY: "/admin/finance/reports/platform-fee",
+    GET_NOTIFICATIONS: "/admin/notifications",
+    MARK_ALL_NOTIFICATIONS_READ: "/admin/notifications/mark-all-read",
+    MARK_NOTIFICATION_READ: "/admin/notifications/:id/read",
+    SEND_ANNOUNCEMENT: "/admin/announcements",
+    GET_RECENT_ANNOUNCEMENTS: "/admin/announcements/recent",
+    GET_DASHBOARD: "/admin/dashboard",
+};
+
+export const SHARED = {
+    UPDATE_PROFILE_PASSWORD: "/auth/profile/update-password",
+    DELETE_PROFILE: "/auth/profile/delete",
+};
+

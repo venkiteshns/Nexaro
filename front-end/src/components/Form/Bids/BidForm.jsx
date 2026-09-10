@@ -29,7 +29,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
         })
         : '';
 
-    // console.log(Math.floor(new Date - new Date(deadline)) / (24 * 60 * 60 * 1000));
 
     const navigate = useNavigate();
 
@@ -44,7 +43,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
     return (
         <div>
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-5">
-                {/* Section header */}
                 <div className="flex items-center gap-2">
                     <span className="w-1 h-5 rounded-full bg-[#0A6E5C] block" />
                     <h2 className="text-base font-extrabold text-gray-900">
@@ -52,7 +50,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                     </h2>
                 </div>
 
-                {/* YOUR PRICE */}
                 <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
                         Your Price
@@ -73,7 +70,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                         <span className="font-semibold text-gray-600">₹{task.amount}</span>
                     </p>
 
-                    {/* Tip banner */}
                     <div className="mt-3 flex items-center gap-2 bg-[#F0FAF7] border border-emerald-100 rounded-xl px-4 py-3">
                         <Lightbulb size={15} className="text-[#0A6E5C] shrink-0" />
                         <p className="text-xs text-[#0A6E5C] font-medium">
@@ -82,10 +78,8 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                     </div>
                 </div>
 
-                {/* ESTIMATED TIME */}
                 <Dropdown name="estimatedTime" field="Estimated Time" options={TIME_OPTIONS} />
 
-                {/* YOUR PITCH */}
                 <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
                         Your Pitch
@@ -99,7 +93,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                     {errors.pitch && <FormError error={errors.pitch} />}
                 </div>
 
-                {/* YOUR AVAILABILITY */}
                 <div>
                     <div className="flex items-center justify-between mb-2">
                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">
@@ -119,7 +112,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                     )}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            {/* Date picker */}
                             <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3 focus-within:border-[#0A6E5C] focus-within:ring-2 focus-within:ring-emerald-100 transition-all bg-white">
                                 <Calendar size={15} className="text-[#0A6E5C] shrink-0" />
                                 <input
@@ -144,7 +136,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                             {errors.availableDate && <FormError error={errors.availableDate} />}
 
                         </div>
-                        {/* Time picker */}
                         <div>
                             <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3 focus-within:border-[#0A6E5C] focus-within:ring-2 focus-within:ring-emerald-100 transition-all bg-white">
                                 <Clock
@@ -173,7 +164,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
 
                 </div>
 
-                {/* ── Summary strip ── */}
                 <div className="flex items-center justify-around py-3 border-t border-gray-100">
                     <div className="text-center">
                         <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">
@@ -194,7 +184,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                     </div>
                 </div>
 
-                {/* Submit */}
                 <button
                     type="submit"
                     disabled={bidLoading}
@@ -206,7 +195,6 @@ const BidForm = ({ task, bidLoading, deadline }) => {
                     </span> : "Submit Bid"}
                 </button>
 
-                {/* Cancel */}
                 <button
                     type="button"
                     onClick={() => navigate(-1)}

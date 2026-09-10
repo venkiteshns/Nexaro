@@ -6,7 +6,6 @@ import ReviewForm from '../../components/Poster/Review/ReviewForm';
 import WorkerReviewCard from '../../components/Poster/Review/WorkerReviewCard';
 import { useGetCompletedTaskPosterSideQuery } from '../../store/services/posterApi';
 
-// ── Loader ────────────────────────────────────────────────────────────────────
 function PageLoader() {
     return (
         <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20">
@@ -34,7 +33,6 @@ function PageLoader() {
     );
 }
 
-// ── Error ─────────────────────────────────────────────────────────────────────
 function PageError({ onBack }) {
     return (
         <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20 text-center px-6">
@@ -59,7 +57,6 @@ function PageError({ onBack }) {
     );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
 const ReviewPage = () => {
     const navigate = useNavigate();
     const { taskId } = useParams();
@@ -67,7 +64,6 @@ const ReviewPage = () => {
     const { data, isLoading, isError } = useGetCompletedTaskPosterSideQuery(taskId);
     const raw = data?.data?.[0];
 
-    // ── Derived data ──
     const workerProps = raw?.worker
         ? {
             name: raw.worker.name,
@@ -97,7 +93,6 @@ const ReviewPage = () => {
     const revieweeId = raw?.workerId?.toString() ?? null;
     const alreadyReviewed = Boolean(raw?.review?._id);
 
-    // ── Redirect on success ───────────────────────────────────────────────────
     const handleReviewSuccess = (tid) => {
         setTimeout(() => {
             navigate(`/poster/completed-task/${tid}`, { replace: true });
@@ -106,14 +101,11 @@ const ReviewPage = () => {
 
     return (
         <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
-            {/* ── Sidebar ── */}
             <PosterNavBar />
 
-            {/* ── Main content ── */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 <PosterHeader />
 
-                {/* ── Scrollable body ── */}
                 <div className="flex-1 overflow-y-auto">
 
                     {isLoading && <PageLoader />}
@@ -124,7 +116,6 @@ const ReviewPage = () => {
                     {!isLoading && !isError && raw && (
                         <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full">
 
-                            {/* ── Back button + heading ── */}
                             <div className="mb-5">
                                 <button
                                     onClick={() => navigate(-1)}
@@ -142,7 +133,6 @@ const ReviewPage = () => {
                                 <p className="text-sm text-gray-500 mt-1">{raw.title}</p>
                             </div>
 
-                            {/* ── Payment success banner ── */}
                             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4 flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-full bg-[#0A6E5C] flex items-center justify-center shrink-0">
                                     <CheckCircle2 size={20} className="text-white" />
@@ -155,7 +145,6 @@ const ReviewPage = () => {
                                 </div>
                             </div>
 
-                            {/* ── Already reviewed state ── */}
                             {alreadyReviewed ? (
                                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 text-center">
                                     <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center mx-auto mb-4">

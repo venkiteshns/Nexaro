@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
-import { recordAdminAlert } from "./adminNotificationHelper.js";
+import { recordAdminAlert } from "./adminNotificationService.js";
 
 const deleteImagesFromCloudinary = async (publicIds) => {
     if (!publicIds || publicIds.length === 0) return;
@@ -66,15 +66,12 @@ export const createTaskService = async (body, files, posterId) => {
 
         const createdTask = await Task.create(taskData);
 
-        // notify nearby workers
 
         const [task_lng, task_lat] = taskData.location.coordinates;
 
         const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
-        // console.log(taskGeoHash, "taskGeoHash");
 
         const neighbors = ngeohash.neighbors(taskGeoHash);
-        // console.log(neighbors, "neighbours");
 
         const zonesToNotiffy = [taskGeoHash, ...neighbors];
 
@@ -90,7 +87,6 @@ export const createTaskService = async (body, files, posterId) => {
             })
         })
 
-        // Real Admin Notification: New Task Posted
         const poster = await User.findById(posterId).select("name").lean();
         const posterName = poster?.name || "Poster";
         const locationName = createdTask.address?.landmark?.split(",")[0]?.trim() || createdTask.address?.district || "Kerala";
@@ -239,7 +235,6 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
             rejected: result[0]?.rejectedCount[0]?.count || 0,
         };
 
-        // console.log(total, page, limit, totalPages, counts);
         return { bids, total, page, limit, totalPages, counts };
 
     } catch (error) {
@@ -259,11 +254,11 @@ export const handleNewBid = async (task, user) => {
     if(!task.availableDate ||  !task.availableTime || !task.estimatedTime){
         return {error: "Please fill your available dates or ETA"}
     }
-    
+
     try {
         const { taskId, bidAmount, estimatedTime, pitch } = task;
         console.log("taskId",taskId);
-        
+
         const isTask = await Task.findOne({ _id: taskId });
         if (!isTask) {
             return { error: "No task found" }
@@ -276,8 +271,6 @@ export const handleNewBid = async (task, user) => {
             workerId: user._id
         })
         const posterId = isTask.posterId;
-        // console.log("posterId", posterId,"____________");
-        // console.log("already bid", isAlreadyBid);
 
         if (isAlreadyBid) {
             return { error: "You have already bid on this task" }
@@ -309,7 +302,7 @@ export const handleNewBid = async (task, user) => {
             availability: availabilityDate,
             status: "pending"
         }
-       
+
         await Bid.create(payload);
 
         const io = getIo();
@@ -331,7 +324,6 @@ export const handleNewBid = async (task, user) => {
 }
 
 export const getNearbyTasksService = async (workerId, { search, category, page = 1, limit = 9 }) => {
-    // console.log(search, category, page, limit);
 
     try {
         const worker = await User.findById(workerId);
@@ -480,7 +472,6 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
             },
             { $unwind: { path: '$posterDetails', preserveNullAndEmptyArrays: true } },
 
-            // ── All bids on the same task (for competition insight) ──────────────
             {
                 $lookup: {
                     from: 'bids',
@@ -501,7 +492,6 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
                 }
             },
 
-            // ── final values ──
             {
                 $project: {
                     _id: 1,
@@ -511,7 +501,6 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
                     pitch: 1,
                     status: 1,
                     availability: 1,
-                    // Task fields
                     title: '$taskDetails.title',
                     description: '$taskDetails.description',
                     category: '$taskDetails.category',
@@ -522,7 +511,6 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
                     postedAt: '$taskDetails.createdAt',
                     urgencyLevel: '$taskDetails.urgencyLevel',
                     images: '$taskDetails.images',
-                    // Poster info
                     posterName: '$posterDetails.name',
                     posterPicture: {
                         $ifNull: [
@@ -530,7 +518,6 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
                             process.env.USER_ICON
                         ]
                     },
-                    // Competition
                     otherBidCount: { $size: '$otherBids' },
                     averageBid: {
                         $cond: {
@@ -548,7 +535,6 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
         }
 
         const bid = bidDetails[0];
-        // console.log(bidDetails[0]);
 
 
         return {
@@ -590,12 +576,9 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
 }
 
 export const withdrawBidService = async (bidId) => {
-    // console.log(bidId);
 
     try {
         const bid = await Bid.findByIdAndDelete({ _id: bidId })
-        // console.log(bid);
-        // const bid = await Bid.findByIdAndDelete(bidId)
 
         if (!bid) {
             return { error: "Bid not found" }
@@ -679,11 +662,11 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
 
         let address = task.address;
         if (body.address) {
-            try { address = JSON.parse(body.address); } catch { /* keep existing */ }
+            try { address = JSON.parse(body.address); } catch (err) { address = body.address; }
         }
         let location = task.location;
         if (body.location) {
-            try { location = JSON.parse(body.location); } catch { /* keep existing */ }
+            try { location = JSON.parse(body.location); } catch (err) { location = body.location; }
         }
 
         const updatedTask = await Task.findByIdAndUpdate(
@@ -707,7 +690,6 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
          const [task_lng, task_lat] = task.location.coordinates;
 
         const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
-        // console.log(taskGeoHash, "taskGeoHash");
 
         const neighbors = ngeohash.neighbors(taskGeoHash);
         console.log(neighbors, "neighbours");
@@ -843,7 +825,6 @@ export const getWorkerCurrentActiveJobService = async (workerId) => {
     }
 };
 
-// ── Worker: Completed Task Details ───────────────────────────────────────────
 export const getCompletedTaskWorkerSideService = async (taskId, workerId) => {
     try {
         const result = await Task.aggregate([
@@ -857,7 +838,6 @@ export const getCompletedTaskWorkerSideService = async (taskId, workerId) => {
                     ]
                 },
             },
-            // Join poster
             {
                 $lookup: {
                     from: 'users',
@@ -867,7 +847,6 @@ export const getCompletedTaskWorkerSideService = async (taskId, workerId) => {
                 },
             },
             { $unwind: { path: '$poster', preserveNullAndEmptyArrays: true } },
-            // Join accepted bid
             {
                 $lookup: {
                     from: 'bids',
@@ -877,7 +856,6 @@ export const getCompletedTaskWorkerSideService = async (taskId, workerId) => {
                 },
             },
             { $unwind: { path: '$bid', preserveNullAndEmptyArrays: true } },
-            // Join review for this task
             {
                 $lookup: {
                     from: 'reviews',

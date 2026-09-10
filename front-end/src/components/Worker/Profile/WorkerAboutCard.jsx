@@ -1,9 +1,5 @@
 import { User, Globe } from 'lucide-react';
 
-/**
- * WorkerAboutCard
- * Props: bio: string, languages: string[]
- */
 const WorkerAboutCard = ({ bio, languages }) => {
     const bioText = bio || "No Bio added !";
 
@@ -18,7 +14,6 @@ const WorkerAboutCard = ({ bio, languages }) => {
 
             <p className="text-xs md:text-sm text-gray-600 leading-relaxed flex-1">{bioText}</p>
 
-            {/* Languages */}
             <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex items-center gap-1.5 mb-2">
                     <Globe size={11} className="text-[#0A6E5C] md:w-[13px] md:h-[13px]" />

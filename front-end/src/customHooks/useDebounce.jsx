@@ -12,7 +12,6 @@ const useDebounce = ({ searchText = "", delay = 500 }) => {
 
     }, [searchText, delay])
 
-    // console.log("debounce : ", debounceText)
     return debounceText
 }
 

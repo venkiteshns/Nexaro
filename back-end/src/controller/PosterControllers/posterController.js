@@ -142,13 +142,10 @@ export const updateUserProfile = async (req, res) => {
 };
 
 export const getCompletedTaskPosterSide = async (req, res) => {
-  // console.log("task id : ", req.params.taskId);
-  // console.log("user id", req.user._id);
   const response = await getCompletedTaskPosterSideService(
     req.params.taskId,
     req.user._id,
   );
-  // console.log('resssssssssssssss', response);
 
   if (response.error) {
     return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -206,7 +203,7 @@ export const posterRoleSwitchAlreadyDataUploaded = async (req, res) => {
   if(response.forbidden){
     return res.status(STATUS_CODES.FORBIDDEN).json({success:false, message: response.forbidden});
   }
-  
+
   if(response.error){
     return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error});
   }

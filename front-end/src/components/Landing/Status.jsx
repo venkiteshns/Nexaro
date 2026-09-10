@@ -26,7 +26,6 @@ const Status = () => {
                   : "none",
             }}
           >
-            {/* subtle top accent line */}
             <div
               className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full"
               style={{

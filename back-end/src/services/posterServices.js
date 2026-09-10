@@ -10,29 +10,24 @@ import Bid from "../models/bidsSchema.js";
 import Review from "../models/reviewSchema.js";
 import { getIo } from "../socket.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
-import { recordAdminAlert } from "./adminNotificationHelper.js";
+import { recordAdminAlert } from "./adminNotificationService.js";
 import PosterNotification from "../models/posterNotificationSchema.js";
-import { syncPosterNotifications } from "./posterNotificationHelper.js";
+import { syncPosterNotifications } from "./posterNotificationService.js";
 import MESSAGES from "../constants/messages.js";
 
 export const posterSignupService = async (data) => {
-  // console.log("signUp data", data);
   try {
-    // 1. Duplicate check
     const existing = await User.findOne({ email: data.email });
     if (existing) {
       throw new Error("User Already Exists");
     }
 
-    // 2. Parse coordinates — must be finite numbers for 2dsphere index
     const locationLat = parseFloat(data.locationLat);
     const locationLng = parseFloat(data.locationLng);
     const hasValidLocation = isFinite(locationLat) && isFinite(locationLng);
 
-    // 3. Hash password
     const hashedPassword = await hashData(data.password);
 
-    // 4. Build clean payload (no frontend-only fields)
     const payload = {
       name: data.name,
       email: data.email,
@@ -48,18 +43,15 @@ export const posterSignupService = async (data) => {
       activeRole: "poster",
     };
 
-    // 5. Attach GeoJSON location only when coordinates are valid
     if (hasValidLocation) {
       payload.location = {
         type: "Point",
-        coordinates: [locationLng, locationLat], // GeoJSON: [lng, lat]
+        coordinates: [locationLng, locationLat],
       };
     }
 
-    // 6. Create user
     const createdUser = await User.create(payload);
 
-    // 7. Generate tokens
     const accessToken = generateAccessToken(createdUser);
     const refreshToken = generateRefreshToken(createdUser);
 
@@ -419,7 +411,6 @@ export const getPosterTaskProgressService = async (taskId) => {
     if (!task[0]) {
       return { error: "Task not found" };
     }
-    // console.log("task", task[0]);
 
     const result = task[0];
     const completedWork = await Task.find({
@@ -489,9 +480,6 @@ export const getPosterProfileService = async (posterId) => {
       },
     ]);
 
-    // const posterUser = await User.findOne({ _id: posterObjectId }).select(
-    //   "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea",
-    // );
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
       "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea",
     );
@@ -671,7 +659,6 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
 
   try {
     const userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" })
-    // let userData = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id) })
     if (!userData) {
       return { error: MESSAGES.USER_NOT_FOUND }
     }
@@ -738,7 +725,6 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
 export const getPosterNotificationsService = async (posterId, { page = 1, limit = 6, filter = "all" } = {}) => {
   const posterObjectId = new mongoose.Types.ObjectId(posterId);
 
-  // Sync latest real database records into poster notifications
   await syncPosterNotifications(posterId);
 
   const query = { posterId: posterObjectId };

@@ -8,11 +8,6 @@ import {
 } from "lucide-react";
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
 
-/**
- * LiveActivityCard Component
- * Real-time activity timeline feed of recent platform actions
- * White and Green Nexaro theme
- */
 const LiveActivityCard = ({ activities = [], isLoading = false }) => {
   const getIcon = (type) => {
     switch (type) {
@@ -84,14 +79,12 @@ const LiveActivityCard = ({ activities = [], isLoading = false }) => {
                 key={activity.id}
                 className="flex items-start gap-3 p-1.5 rounded-xl hover:bg-gray-50/70 transition-colors"
               >
-                {/* Status circular icon container */}
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-2xs mt-0.5 ${bg}`}
                 >
                   {icon}
                 </div>
 
-                {/* Details */}
                 <div className="min-w-0 flex-1">
                   <p className="text-xs sm:text-[13px] font-semibold text-gray-900 leading-snug truncate">
                     {activity.title}

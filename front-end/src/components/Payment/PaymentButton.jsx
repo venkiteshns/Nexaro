@@ -8,7 +8,6 @@ export default function PaymentButton({ amount, bidId, onSuccess }) {
     const [createOrder] = useCreateOrderMutation();
 
     const decAmount = amount.toFixed(2);
-    // console.log(bidId);
 
     return (
         <>
@@ -36,27 +35,26 @@ export default function PaymentButton({ amount, bidId, onSuccess }) {
                     onApprove={async (data, actions) => {
                         try {
                             const captureResult = await capturePayment(data.orderID).unwrap();
-                            // const result = captureResult.data;
 
                             console.log(captureResult);
-                            
-    
+
+
                             switch (captureResult?.status) {
                                 case "Success":
                                 case "AlreadyCaptured":
                                     showSuccess("Payment successful!",{autoClose:4000});
                                     onSuccess?.();
                                     break;
-    
+
                                 case "Pending":
                                     showWarning("Payment is under review. We'll confirm once it clears.");
-                                    onSuccess?.(); // or a distinct "pending" handler if your flow treats this differently
+                                    onSuccess?.();
                                     break;
-    
+
                                 case "InstrumentDeclined":
                                     showWarning("That payment method was declined. Please try another.");
                                     return actions.restart();
-                                    
+
                                 default:
                                     showWarning("Payment could not be completed. Please try again.");
                             }

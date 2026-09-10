@@ -21,7 +21,6 @@ import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getW
 
 
 export const workerSignup = async (req, res) => {
-    // console.log(req.body, "body", req.files, "files");
 
     try {
 
@@ -88,7 +87,6 @@ export const getNearbyTasks = async (req, res) => {
 };
 
 export const getTaskForBid = async (req, res) => {
-    // console.log(req.params, "params");
     try {
         const taskId = req.params.taskId;
         const workerId = req.user?._id;
@@ -119,7 +117,7 @@ export const getWorkerBids = async (req, res) => {
     try {
         const workerId = req.user._id;
 
-        const status = req.query.status || "all";       // "all" | "pending" | "accepted" | "rejected"
+        const status = req.query.status || "all";
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = Math.max(1, parseInt(req.query.limit) || 5);
 
@@ -186,7 +184,6 @@ export const getWorkerBidDetails = async (req, res) => {
 }
 
 export const withdrawBid = async (req, res) => {
-    // console.log("bidId from controller ", req.params.bidId);
     try {
         const result = await withdrawBidService(req.params.bidId)
         if (result.error) {

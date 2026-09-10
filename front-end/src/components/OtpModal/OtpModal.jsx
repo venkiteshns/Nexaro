@@ -56,7 +56,6 @@ const OtpModal = (props) => {
     return () => clearInterval(interval);
   }, [time]);
 
-  // Functions
 
   const handleResendOtp = () => {
     if (!canResend || resendCount >= 3) return;
@@ -131,7 +130,6 @@ const OtpModal = (props) => {
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-md rounded-3xl border-2 border-dashed border-green-800/70 bg-white/90 backdrop-blur-md shadow-2xl px-5 sm:px-8 md:px-12 py-8 sm:py-10 flex flex-col items-center gap-6"
       >
-        {/* Close */}
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-red-600/80 hover:text-white transition"
@@ -139,7 +137,6 @@ const OtpModal = (props) => {
           <X size={20} />
         </button>
 
-        {/* Header */}
         <div className="flex flex-col items-center text-center">
           <Logo />
 
@@ -149,7 +146,6 @@ const OtpModal = (props) => {
           </p>
         </div>
 
-        {/* OTP Inputs */}
         <div
           onPaste={handlePaste}
           className="flex items-center justify-center gap-2 sm:gap-3"
@@ -182,7 +178,6 @@ const OtpModal = (props) => {
           ))}
         </div>
 
-        {/* Resend button */}
         {resendCount >= 3 ? (
           <p className="text-xs text-red-600/70 text-center font-medium">
             For security reasons, resend OTP is limited. <br /> Please try after
@@ -202,7 +197,6 @@ const OtpModal = (props) => {
             {canResend ? "Resend OTP" : `Resend OTP in ${time}s`}
           </button>
         )}
-        {/* Verify */}
         {isError && (
           <span className="text-sm italic text-red-600/60">
             {error?.data?.message}

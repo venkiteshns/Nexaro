@@ -16,7 +16,6 @@ const ReviewCard = ({
 
                 {review?.rating != null ? (
                     <div className="space-y-3">
-                        {/* Stars + Score */}
                         <div className="flex items-center gap-2.5">
                             <div className="flex items-center gap-1">
                                 {Array.from({ length: 5 }).map((_, i) => (
@@ -33,7 +32,6 @@ const ReviewCard = ({
                             </span>
                         </div>
 
-                        {/* Review text */}
                         {review.text ? (
                             <blockquote className="text-sm text-gray-700 leading-relaxed italic border-l-2 border-[#0A6E5C] pl-4 py-1 bg-gray-50/80 rounded-r-xl">
                                 "{review.text}"
@@ -47,7 +45,6 @@ const ReviewCard = ({
                         )}
                     </div>
                 ) : (
-                    /* ── No review state ── */
                     <div className="flex flex-col items-center justify-center py-6 gap-3 text-center">
                         <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-300">
                             <MessageSquareOff size={22} />

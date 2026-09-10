@@ -38,7 +38,6 @@ const WorkerNotificationFilters = ({
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2 md:p-2.5 rounded-2xl border border-gray-200 shadow-xs mb-6">
-      {/* Unified Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
         {FILTER_TABS.map((tab) => {
           const isActive = activeFilter === tab.id;
@@ -78,7 +77,6 @@ const WorkerNotificationFilters = ({
         })}
       </div>
 
-      {/* Mark All as Read Action */}
       <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
         <button
           onClick={onMarkAllRead}

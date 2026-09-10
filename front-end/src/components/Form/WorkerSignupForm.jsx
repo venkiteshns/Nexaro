@@ -19,8 +19,7 @@ const WorkerSignupForm = ({ onSubmitForm, isOtpError, otpError, isOtpSuccess}) =
           <IdentityVerification />
           <Password />
           <TermsAndConditions />
-          
-          {/* isOtpError otpError isOtpSuccess */}
+
            {isOtpError && (
               <div className="text-center my-4">
                 <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">

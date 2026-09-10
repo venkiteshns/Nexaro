@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom";
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
 
-/**
- * RecentSignupsCard Component
- * Displays latest 5 platform signups with user initials, role badges, and relative join time
- * White and Green Nexaro theme
- */
 const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
-  // Get 2-letter uppercase initials
   const getInitials = (name) => {
     if (!name) return "U";
     const parts = name.trim().split(" ");
@@ -17,7 +11,6 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
     return name.slice(0, 2).toUpperCase();
   };
 
-  // Curated harmonious avatar bubble colors
   const avatarColors = [
     "bg-emerald-100 text-[#0A6E5C] border-emerald-200",
     "bg-teal-100 text-teal-700 border-teal-200",
@@ -30,7 +23,6 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-2xs h-full flex flex-col justify-between">
-      {/* Header Row */}
       <div className="flex items-center justify-between gap-3 mb-3.5">
         <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">
           Recent Signups
@@ -43,14 +35,12 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
         </Link>
       </div>
 
-      {/* Table Headers */}
       <div className="grid grid-cols-12 text-[11px] font-bold uppercase tracking-wider text-gray-400 pb-2.5 border-b border-gray-100">
         <div className="col-span-6 sm:col-span-5">User</div>
         <div className="col-span-3 sm:col-span-4 text-center">Role</div>
         <div className="col-span-3 text-right">Join Time</div>
       </div>
 
-      {/* Rows */}
       {isLoading ? (
         <div className="divide-y divide-gray-50 animate-pulse">
           {[...Array(5)].map((_, i) => (
@@ -79,7 +69,6 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
                 key={user._id || index}
                 className="grid grid-cols-12 items-center py-3 sm:py-3.5 group hover:bg-gray-50/60 rounded-xl px-1 -mx-1 transition-colors"
               >
-                {/* User column: Initials bubble + Full name */}
                 <div className="col-span-6 sm:col-span-5 flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
                   <div
                     className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border shadow-2xs ${colorClass}`}
@@ -91,7 +80,6 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
                   </span>
                 </div>
 
-                {/* Role badge */}
                 <div className="col-span-3 sm:col-span-4 text-center">
                   <span
                     className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -104,7 +92,6 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
                   </span>
                 </div>
 
-                {/* Join Time */}
                 <div className="col-span-3 text-right text-xs font-medium text-gray-500 whitespace-nowrap">
                   {formatTimeAgo(user.createdAt)}
                 </div>

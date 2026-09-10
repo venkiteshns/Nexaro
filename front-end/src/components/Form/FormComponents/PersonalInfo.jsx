@@ -11,7 +11,6 @@ const PersonalInfo = (props) => {
 
   return (
     <div className={`${login ? "w-full" :"mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}>
-      {/* Name */}
       {!login && <div >
         <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
           Name <span className="text-red-400">*</span>
@@ -35,7 +34,6 @@ const PersonalInfo = (props) => {
       </div>
 }
       <div className="flex flex-col md:flex-row gap-3">
-        {/* Email */}
         <div className="w-full" >
           <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
             Email <span className="text-red-400">*</span>
@@ -62,7 +60,6 @@ const PersonalInfo = (props) => {
           )}
         </div>
 
-        {/* Phone */}
         {!login &&  <div>
           <label className="text-xs text-gray-700/80">
             Phone <span className="text-red-500">*</span>

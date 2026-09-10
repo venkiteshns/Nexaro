@@ -17,21 +17,14 @@ import { api } from "../../store/services/api";
 import { getSocket } from "../../services/socketService";
 import { showSuccess, showError, showInfo } from "../../utils/toast";
 
-/**
- * AdminNotifications Page
- * Route: /admin/notifications
- * Theme: Green and White aesthetic for Nexaro Admin Portal (#0A6E5C)
- */
 export default function AdminNotifications() {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Sync active sidebar state
   useEffect(() => {
     dispatch(setActivePage("Notifications"));
   }, [dispatch]);
 
-  // Real-time socket listener for incoming platform alerts
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
@@ -47,7 +40,6 @@ export default function AdminNotifications() {
     };
   }, [dispatch]);
 
-  // Queries and mutations
   const {
     data: notifResponse,
     isLoading: notifLoading,
@@ -104,15 +96,12 @@ export default function AdminNotifications() {
 
   return (
     <div className="min-h-screen bg-[#F6FAF8] flex">
-      {/* SIDEBAR NAVIGATION */}
       <AdminNavBar />
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
         <AdminHeader />
 
         <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-4 sm:space-y-5">
-          {/* Top Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight">
@@ -124,9 +113,7 @@ export default function AdminNotifications() {
             </div>
           </div>
 
-          {/* 2-Column Responsive Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
-            {/* Left Column: System Alerts (7 cols) */}
             <section
               aria-label="System Alerts"
               className="lg:col-span-7 xl:col-span-7"
@@ -144,7 +131,6 @@ export default function AdminNotifications() {
               />
             </section>
 
-            {/* Right Column: Send Announcement + Recently Sent (5 cols) */}
             <section
               aria-label="Broadcast Announcements"
               className="lg:col-span-5 xl:col-span-5 space-y-4"

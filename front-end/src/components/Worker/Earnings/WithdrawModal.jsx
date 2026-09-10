@@ -85,15 +85,12 @@ export default function WithdrawModal({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={!isLoading ? onClose : undefined}
       />
 
-      {/* Modal Container */}
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
@@ -133,7 +130,6 @@ export default function WithdrawModal({
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Available Balance Pill */}
               <div className="flex items-center justify-between px-4 py-3 bg-[#F6FAF8] border border-emerald-100 rounded-2xl">
                 <span className="text-xs font-semibold text-gray-500">Available Balance</span>
                 <span className="text-sm font-bold text-[#0A6E5C]">
@@ -141,7 +137,6 @@ export default function WithdrawModal({
                 </span>
               </div>
 
-              {/* Amount Input */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
                   Withdrawal Amount (₹)
@@ -167,7 +162,6 @@ export default function WithdrawModal({
                 </div>
               </div>
 
-              {/* PayPal Recipient Card */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
                   Transfer Destination
@@ -203,7 +197,6 @@ export default function WithdrawModal({
                 Payment is initiated immediately and reflects in your account within 48 hours.
               </p>
 
-              {/* Action Buttons */}
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"

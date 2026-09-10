@@ -8,10 +8,6 @@ const AUDIENCE_OPTIONS = [
   { id: "POSTERS", label: "POSTERS" },
 ];
 
-/**
- * Reusable SendAnnouncementCard component
- * Allows admin to compose and broadcast announcements to targeted user groups.
- */
 const SendAnnouncementCard = ({ onSend, isSending = false }) => {
   const [targetAudience, setTargetAudience] = useState("ALL USERS");
   const [title, setTitle] = useState("");
@@ -44,7 +40,6 @@ const SendAnnouncementCard = ({ onSend, isSending = false }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-4 sm:p-5 space-y-4">
-      {/* Header */}
       <div className="flex items-center gap-2.5 pb-2.5 border-b border-gray-100">
         <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#0A6E5C] flex items-center justify-center">
           <Megaphone size={18} />
@@ -55,7 +50,6 @@ const SendAnnouncementCard = ({ onSend, isSending = false }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* 1. Target Audience */}
         <div>
           <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
             Target Audience
@@ -81,7 +75,6 @@ const SendAnnouncementCard = ({ onSend, isSending = false }) => {
           </div>
         </div>
 
-        {/* 2. Announcement Title */}
         <div>
           <label
             htmlFor="announcement-title"
@@ -100,7 +93,6 @@ const SendAnnouncementCard = ({ onSend, isSending = false }) => {
           />
         </div>
 
-        {/* 3. Message Content */}
         <div>
           <label
             htmlFor="announcement-message"
@@ -119,7 +111,6 @@ const SendAnnouncementCard = ({ onSend, isSending = false }) => {
           />
         </div>
 
-        {/* 4. Action Button */}
         <button
           type="submit"
           disabled={isSending}

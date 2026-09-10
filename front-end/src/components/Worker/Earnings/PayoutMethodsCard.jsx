@@ -50,7 +50,6 @@ export default function PayoutMethodsCard({
           </div>
         ))}
 
-        {/* Add Payout Method Button */}
         <button
           type="button"
           onClick={onAddMethodClick}

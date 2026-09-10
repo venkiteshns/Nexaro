@@ -12,7 +12,6 @@ import { useGetCompletedTaskWorkerSideQuery } from '../../store/services/workerA
 import PageLoader from '../../components/sharedComponents/CompletedTask/PageLoader';
 import PageError from '../../components/sharedComponents/CompletedTask/PageError';
 
-// ─── Main Worker Completed Task Page ──────────────────────────────────────────
 const WorkerCompletedTaskDetails = () => {
     const navigate = useNavigate();
     const { taskId } = useParams();
@@ -21,7 +20,6 @@ const WorkerCompletedTaskDetails = () => {
 
     const raw = response?.data;
 
-    // Derived values
     const address = raw?.address;
     const fullAddress = typeof address === 'string'
         ? address

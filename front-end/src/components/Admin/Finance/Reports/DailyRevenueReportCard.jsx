@@ -6,10 +6,6 @@ import {
   exportDailyRevenueReportPDF,
 } from "../../../../utils/reportExportUtils";
 
-/**
- * DailyRevenueReportCard Component
- * Displays Daily Revenue Report card with "AUTO-GENERATED" badge and PDF export.
- */
 export default function DailyRevenueReportCard() {
   const { data, isLoading, refetch } = useAdminGetDailyReportQuery();
   const [isExporting, setIsExporting] = useState(false);
@@ -25,11 +21,9 @@ export default function DailyRevenueReportCard() {
   const handleDownload = async () => {
     try {
       setIsExporting(true);
-      // Ensure latest data
       const result = await refetch();
       const reportData = result?.data || data;
 
-      // Trigger branded PDF print/download
       exportDailyRevenueReportPDF(reportData);
 
       setDownloadSuccess(true);
@@ -72,7 +66,6 @@ export default function DailyRevenueReportCard() {
         </button>
       }
     >
-      {/* Real-time snapshot metrics */}
       <div className="grid grid-cols-2 gap-3 pt-2">
         <div className="bg-[#F8FBFA] p-3 rounded-xl border border-gray-100">
           <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">

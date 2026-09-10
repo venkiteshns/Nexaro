@@ -1,10 +1,5 @@
 import { Pencil, ArrowLeftRight, Star, ShieldCheck, Clock } from 'lucide-react';
 
-/**
- * WorkerProfileBanner
- * Props: worker { name, category, rating, isLive, avatar }
- *        onEditClick, onSwitchToPoster
- */
 const WorkerProfileBanner = ({ worker, onEditClick, onSwitchToPoster }) => {
 
     const initials = worker?.name
@@ -13,7 +8,6 @@ const WorkerProfileBanner = ({ worker, onEditClick, onSwitchToPoster }) => {
 
     return (
         <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm mb-5">
-            {/* Gradient banner */}
             <div
                 className="h-15 sm:h-18 w-full"
                 style={{
@@ -21,11 +15,9 @@ const WorkerProfileBanner = ({ worker, onEditClick, onSwitchToPoster }) => {
                 }}
             />
 
-            {/* Profile row */}
             <div className="bg-white px-5 sm:px-7 pb-5">
                 <div className="flex flex-col min-[420px]:flex-row min-[420px]:items-end min-[420px]:justify-between gap-4">
 
-                    {/* Avatar + name */}
                     <div className="flex items-end gap-4">
                         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-4 border-white shadow-md bg-[#0A6E5C] flex items-center justify-center shrink-0 relative z-10 -mt-10 min-[420px]:-mt-12">
                             {worker?.avatar ? (
@@ -36,7 +28,6 @@ const WorkerProfileBanner = ({ worker, onEditClick, onSwitchToPoster }) => {
                         </div>
 
                         <div className="mb-2">
-                            {/* Verification Badge */}
                             <div className="mb-1 sm:mb-1.5 flex items-center">
                                 {worker?.isVerified ? (
                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-emerald-100 text-[#0A6E5C] border border-emerald-200/60 shadow-sm">
@@ -59,7 +50,6 @@ const WorkerProfileBanner = ({ worker, onEditClick, onSwitchToPoster }) => {
                         </div>
                     </div>
 
-                    {/* Rating + actions */}
                     <div className="flex flex-col items-start min-[420px]:items-end gap-2 pb-1">
                         <div className="flex items-center gap-1.5">
                             <span className="text-lg sm:text-xl md:text-2xl font-extrabold text-gray-900">{Number(worker?.rating) > 0.01 ? Number(worker?.rating).toFixed(1) : '0'}</span>

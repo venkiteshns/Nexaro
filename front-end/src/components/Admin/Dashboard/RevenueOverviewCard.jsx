@@ -7,9 +7,6 @@ import {
   Tooltip,
 } from "recharts";
 
-/**
- * Custom Tooltip component for Recharts
- */
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -25,14 +22,8 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-/**
- * RevenueOverviewCard Component
- * Powered by Recharts chart library
- * Displays interactive revenue trajectory bar chart with Week/Month toggle
- * and bottom 3 metrics (THIS MONTH, TODAY, SUCCESS) in Nexaro's White & Green theme
- */
 const RevenueOverviewCard = ({ data = {}, isLoading = false }) => {
-  const [timeframe, setTimeframe] = useState("week"); // "week" | "month"
+  const [timeframe, setTimeframe] = useState("week");
 
   const {
     thisMonth = 0,
@@ -70,7 +61,6 @@ const RevenueOverviewCard = ({ data = {}, isLoading = false }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
-      {/* Top Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
         <div>
           <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">
@@ -83,7 +73,6 @@ const RevenueOverviewCard = ({ data = {}, isLoading = false }) => {
           </p>
         </div>
 
-        {/* Week / Month Toggle Pill */}
         <div className="inline-flex items-center self-start sm:self-auto p-1 bg-gray-100/90 rounded-xl border border-gray-200/70 text-xs font-semibold">
           <button
             type="button"
@@ -110,7 +99,6 @@ const RevenueOverviewCard = ({ data = {}, isLoading = false }) => {
         </div>
       </div>
 
-      {/* Recharts Bar Chart Canvas */}
       <div className="pt-1 pb-1 h-32 sm:h-36 w-full">
         {isLoading ? (
           <div className="h-full w-full bg-gray-50 rounded-xl animate-pulse flex items-center justify-center text-xs text-gray-400">
@@ -157,7 +145,6 @@ const RevenueOverviewCard = ({ data = {}, isLoading = false }) => {
         )}
       </div>
 
-      {/* Bottom 2 Summary Metrics */}
       <div className="grid grid-cols-2 gap-3 pt-3.5 mt-2 border-t border-gray-100">
         <div className="bg-gray-50/70 border border-gray-100 rounded-xl p-3 text-center">
           <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-0.5">

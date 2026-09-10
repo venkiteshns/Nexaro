@@ -27,7 +27,6 @@ export default function CategoryBreakdownCard({
               <span className="text-[#0A6E5C] font-extrabold">{cat.percentage}%</span>
             </div>
 
-            {/* Progress Track */}
             <div className="w-full h-2.5 bg-[#F6FAF8] border border-gray-100 rounded-full overflow-hidden p-0.5">
               <div
                 style={{ width: `${cat.percentage}%` }}

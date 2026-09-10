@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { generateAccessToken } from "../utils/paypalAccessToken.js";
-import Order from "../models/orderSchema.js"; // Import the Order model
+import Order from "../models/orderSchema.js";
 import Bid from '../models/bidsSchema.js'
 import User from '../models/userSchema.js'
 import Wallet from "../models/walletSchema.js";
@@ -10,7 +10,7 @@ import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
 import { convertInrToUsd, convertUsdToInr } from "../utils/currency.js";
 import Transaction from "../models/transactionSchema.js";
-import { recordAdminAlert } from "./adminNotificationHelper.js";
+import { recordAdminAlert } from "./adminNotificationService.js";
 
 export async function getPayoutStatus(payoutBatchId, accessToken) {
   if (!accessToken) {
@@ -48,7 +48,7 @@ export async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts =
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const data = await getPayoutStatus(payoutBatchId, accessToken);
-    const item = data.items?.[0]; // single-item batch, so index 0 is safe
+    const item = data.items?.[0];
     const itemStatus = item?.transaction_status;
 
     console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
@@ -71,9 +71,8 @@ export async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts =
     }
   }
 
-  // Still not resolved after polling — don't block the caller forever
   return {
-    success: null, // unknown yet
+    success: null,
     stage: 'still_pending',
     message: 'Payout is still processing after polling window. Status will update asynchronously.',
     payoutBatchId
@@ -96,12 +95,12 @@ export async function payoutTransferService(receiverEmail, amount, currency = "U
         {
           recipient_type: "EMAIL",
           amount: {
-            value: parseFloat(amount).toFixed(2), // Ensure exactly 2 decimal places
+            value: parseFloat(amount).toFixed(2),
             currency: currency || "USD"
           },
           receiver: receiverEmail,
           note: "Worker earnings withdrawal from Nexaro.",
-          sender_item_id: `item_${Date.now()}` // Unique item ID for this payout
+          sender_item_id: `item_${Date.now()}`
         }
       ]
     };
@@ -147,7 +146,6 @@ export async function payoutTransferService(receiverEmail, amount, currency = "U
     const payoutBatchId = data.batch_header?.payout_batch_id;
     const initialBatchStatus = data.batch_header?.batch_status;
 
-    // Brief poll to see if it immediately resolved in sandbox
     const finalStatus = await pollPayoutStatus(payoutBatchId, accessToken, 3, 1500);
 
     return {
@@ -171,11 +169,9 @@ export const createOrderService = async (orderDetails) => {
   try {
     const { items, totalAmount, bidId } = orderDetails;
 
-    // 1. Save the initial pending order to MongoDB
     const dbOrder = new Order({ items, totalAmount, status: 'Pending', bidId });
     await dbOrder.save();
 
-    // 2. Request order creation from PayPal
     const accessToken = await generateAccessToken();
     const response = await fetch(`${process.env.PAYPAL_API_URL}/v2/checkout/orders`, {
       method: 'POST',
@@ -199,12 +195,10 @@ export const createOrderService = async (orderDetails) => {
 
     const paypalOrder = await response.json();
 
-    // 3. Link the PayPal Order ID back to your database record
     dbOrder.paypalOrderId = paypalOrder.id;
     await dbOrder.save();
     console.log(paypalOrder);
 
-    // Return the PayPal details back to the React frontend
     return { success: true, order: paypalOrder };
   } catch (error) {
     console.error('Error creating order:', error);
@@ -250,7 +244,6 @@ const recordEscrowTransaction = async ({ dbOrder, user, status }) => {
 export const captureOrderService = async (orderId, user) => {
   try {
     const accessToken = await generateAccessToken();
-    // 1. Instruct PayPal to capture the funds
     const response = await fetch(`${process.env.PAYPAL_API_URL}/v2/checkout/orders/${orderId}/capture`, {
       method: 'POST',
       headers: {
@@ -293,11 +286,8 @@ export const captureOrderService = async (orderId, user) => {
         data: captureData,
       };
     }
-    // console.log("captureData", captureData.purchase_units?.[0]?.payments?.captures?.[0]);
 
-    // 2. Find the corresponding local order in MongoDB
 
-    // 3. SECURE VERIFICATION: Check if PayPal successfully completed the capture
     const captureStatus = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status;
     const statusReason = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status_details?.reason;
     const capturedAmount = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value;
@@ -378,13 +368,8 @@ export const orderPayoutService = async ({ bidId, user }) => {
   console.log(bidId, user);
   try {
     const order = await Order.findOne({ bidId })
-    // console.log("order",order)
     const bid = await Bid.findById(bidId)
-    // console.log("bid",bid)
-    // const worker = await User.findOne({_id:bid.workerId}) 
-    // console.log("worker",worker)
     const poster = await User.findOne({ _id: user._id })
-    // console.log("poster")
     const task = await Task.findOne({ acceptedBid: bid._id })
     if (!task) {
       return { success: false, message: "Task not found" };
@@ -397,7 +382,6 @@ export const orderPayoutService = async ({ bidId, user }) => {
     if (order.totalAmount !== convertInrToUsd(bid.amount)) {
       return { success: false, message: MESSAGES.AMOUNT_MISMATCH };
     }
-    // console.log("amount okay");
 
     const platformFee = Number(bid.amount) * 0.05;
     const creditedAmount = Number(bid.amount) - platformFee;

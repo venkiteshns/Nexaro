@@ -236,7 +236,6 @@ function TaskCard({ task }) {
                                     Task Cancelled
                                 </button>}
 
-                                {/* Edit button — only when no bids */}
                                 {!hasBids ? (
                                     <button
                                         onClick={() => setShowEditModal(true)}
@@ -319,11 +318,6 @@ function TaskCard({ task }) {
                             </>
                         )}
 
-                        {/* {task.status === 'cancelled' && (
-                            <button className="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors">
-                                Repost Task
-                            </button>
-                        )} */}
                     </div>
                 </div>
             </div>

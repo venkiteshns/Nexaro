@@ -10,9 +10,6 @@ import {
 } from "recharts";
 import { TrendingUp, Loader2 } from "lucide-react";
 
-/**
- * Custom Tooltip component for rich formatting
- */
 const CustomTooltip = ({ active, payload, label, isVolume = false, currencySymbol = "₹" }) => {
   if (active && payload && payload.length) {
     const item = payload[0].payload;
@@ -62,7 +59,6 @@ export default function FinanceBarChart({
 
   return (
     <div className="bg-white border border-gray-200/80 rounded-3xl p-5 sm:p-7 shadow-xs">
-      {/* Header with Title, Badge, Metric Tabs, and Timeframe Selector */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-100">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -82,7 +78,6 @@ export default function FinanceBarChart({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-          {/* Optional Metric Switcher Tabs (e.g. Net Revenue, GMV, Volume) */}
           {metricTabs && metricTabs.length > 0 && (
             <div className="flex items-center gap-1 p-1 bg-[#F6FAF8] border border-emerald-100/60 rounded-2xl text-xs font-semibold">
               {metricTabs.map((tab) => {
@@ -105,7 +100,6 @@ export default function FinanceBarChart({
             </div>
           )}
 
-          {/* Timeframe Selector Pill Component */}
           {timeframeOptions && timeframeOptions.length > 0 && (
             <div className="flex items-center gap-2">
               {isFetching && !isLoading && (
@@ -139,7 +133,6 @@ export default function FinanceBarChart({
         </div>
       </div>
 
-      {/* Chart Canvas Area */}
       <div className="pt-3 pb-1">
         {isLoading ? (
           <div className="w-full h-44 sm:h-52 flex flex-col items-center justify-center gap-2 text-gray-400">

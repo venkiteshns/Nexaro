@@ -19,7 +19,6 @@ function getStatusConfig(status) {
 
 const TaskHeaderBanner = ({ task }) => {
     const config = getStatusConfig(task.status);
-    // const { Icon } = config;
 
     const isActive = ['assigned', 'in_progress', 'completed'].includes(task.status);
 
@@ -37,7 +36,6 @@ const TaskHeaderBanner = ({ task }) => {
                 </h1>
                 <p className="text-sm text-white/60">{task.category}</p>
 
-                {/* Bids pill */}
                 <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
                     <ClipboardList size={13} className="text-white/70" />
                     <span className="text-xs font-semibold text-white/80">

@@ -38,16 +38,13 @@ const MOCK = {
     ],
 };
 
-// ─── Helper ────────────────────────────────────────────────────────────────
 function completedCount(list) {
     return list.filter((i) => i.done).length;
 }
 
-// ── Page Loader ───────────────────────────────────────────────────────────────
 function PageLoader() {
     return (
         <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20">
-            {/* Spinner ring */}
             <div className="relative w-20 h-20">
                 <div className="w-20 h-20 rounded-full border-4 border-emerald-100" />
                 <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#0A6E5C] animate-spin" />
@@ -61,7 +58,6 @@ function PageLoader() {
                 <p className="text-sm text-gray-400">Fetching progress data…</p>
             </div>
 
-            {/* Bouncing dots */}
             <div className="flex gap-1.5">
                 {[0, 1, 2].map((i) => (
                     <span
@@ -103,7 +99,6 @@ function PageError({ onBack }) {
 
 
 
-// ─── Main Page ─────────────────────────────────────────────────────────────
 const WorkProgress = () => {
     const navigate = useNavigate();
     const { taskId } = useParams();
@@ -142,14 +137,12 @@ const WorkProgress = () => {
         'cancelled': 5,
     }[mainData?.status];
 
-    // ── Derive display steps from backend data (never mutate module-level STEPS)
     const steps = STEPS.map((step, i) => ({
         ...step,
         done: statusUpdate ? i < statusUpdate : false,
         active: statusUpdate ? i === statusUpdate : false,
     }));
 
-    // ── Derive checklist from backend update count
     const displayChecklist = MOCK.checklist.map((item, i) => ({
         ...item,
         done: updateCount ? i < updateCount : false,
@@ -165,7 +158,6 @@ const WorkProgress = () => {
 
                 {(!isLoading && !isError) && <div className="flex-1 overflow-y-auto">
 
-                    {/* ── Top bar ── */}
                     <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200
                                     px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
                         <button
@@ -186,7 +178,6 @@ const WorkProgress = () => {
 
                     <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-5">
 
-                        {/* ── Title ── */}
                         <div>
                             <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-widest mb-1">
                                 Task Progress
@@ -196,7 +187,6 @@ const WorkProgress = () => {
                             </h1>
                         </div>
 
-                        {/* ── Progress Stepper ── */}
                         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4 sm:px-8 py-5 overflow-x-auto">
                             <div className="flex items-center min-w-[380px]">
                                 {steps.map((step, idx) => {
@@ -240,11 +230,9 @@ const WorkProgress = () => {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-                            {/* Worker card — row on mobile, column on md+ */}
                             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5
                                             sm:col-span-2 lg:col-span-1">
                                 <div className="flex items-center gap-4 sm:flex-col sm:items-center sm:text-center lg:flex-col lg:items-center lg:text-center">
-                                    {/* Avatar */}
                                     <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 border-2 border-emerald-100
                                                     flex items-center justify-center overflow-hidden shrink-0">
                                         {workerData?.selfie ? (
@@ -287,7 +275,6 @@ const WorkProgress = () => {
                                 </a>
                             </div>
 
-                            {/* Job Checklist */}
                             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
                                 <div className="flex items-center justify-between mb-3">
                                     <p className="font-bold text-gray-900 text-sm">Job Checklist</p>
@@ -319,7 +306,6 @@ const WorkProgress = () => {
                                 </ul>
                             </div>
 
-                            {/* Timeline */}
                             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
                                 <p className="font-bold text-gray-900 text-sm mb-4">Timeline</p>
 
@@ -343,7 +329,6 @@ const WorkProgress = () => {
                             </div>
                         </div>
 
-                        {/* ── Release Payment Banner ── */}
                         {(released || update === 'payment') ? (
                             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 sm:px-6 py-5
                                             flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -427,7 +412,6 @@ const WorkProgress = () => {
                 {isError && <PageError onBack={() => navigate('/poster/my-tasks', { replace: true })} />}
             </div>
 
-            {/* ── Release Modal ── */}
             {showReleaseModal && (
                 <ReleaseModal
                     bidId={bid._id}

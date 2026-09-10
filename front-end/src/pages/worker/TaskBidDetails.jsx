@@ -26,7 +26,6 @@ import { useGetWorkerBidDetailsQuery } from "../../store/services/workerApi";
 import WithdrawBidModal from "../../components/Worker/WithdrawBidModal.jsx";
 import Map from "../../components/Maps/Map";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getCategoryIcon(category) {
   const map = {
@@ -48,11 +47,6 @@ function formatDate(dateStr) {
   });
 }
 
-// function formatDistance(metres) {
-//   if (!metres && metres !== 0) return null;
-//   if (metres < 1000) return `${Math.round(metres)} m from your location`;
-//   return `${(metres / 1000).toFixed(1)} km from your location`;
-// }
 
 function getBidStatusConfig(status) {
   switch (status) {
@@ -77,7 +71,6 @@ function getBidStatusConfig(status) {
   }
 }
 
-// ─── Photo Gallery ─────────────────────────────────────────────────────────────
 function PhotoGallery({ photos }) {
   const [lightbox, setLightbox] = useState(null);
 
@@ -118,7 +111,6 @@ function PhotoGallery({ photos }) {
         ))}
       </div>
 
-      {/* Lightbox */}
       {lightbox !== null && (
         <div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
@@ -165,7 +157,6 @@ function PhotoGallery({ photos }) {
   );
 }
 
-// ─── Sidebar Cards ─────────────────────────────────────────────────────────────
 
 function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
   const { dot, badge, label } = getBidStatusConfig(bid?.status);
@@ -174,7 +165,6 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
   return (
     <>
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-        {/* Green top accent */}
         <div className="h-1 w-full bg-[#0A6E5C]" />
 
         <div className="p-5">
@@ -190,7 +180,6 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
             </span>
           </div>
 
-          {/* Bid amount + ETA */}
           <div className="flex items-end justify-between mb-4">
             <div>
               <p className="text-3xl font-extrabold text-gray-900">
@@ -203,7 +192,6 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
             </div>
           </div>
 
-          {/* Pitch */}
           {bid?.pitch && (
             <div className="mb-4">
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
@@ -215,7 +203,6 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
             </div>
           )}
 
-          {/* Available Date */}
           {bid?.availableDate && (
             <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
               <Calendar size={13} className="text-[#0A6E5C]" />
@@ -226,7 +213,6 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
             </div>
           )}
 
-          {/* Actions */}
           {bid?.status === "pending" && (
             <button onClick={() => {
               setShowWithdrawModal(true)
@@ -296,7 +282,6 @@ function CompetitionCard({ bidCount, averageBid }) {
 }
 
 function PostedByCard({ poster }) {
-  // console.log(poster);
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
@@ -368,7 +353,6 @@ function LocationCard({ address, location }) {
         )}
       </div>
 
-      {/* Full address */}
       {address?.landmark && (
         <div className="px-5 pb-5 text-xs text-gray-500 leading-relaxed">
           📍{" "}
@@ -381,7 +365,6 @@ function LocationCard({ address, location }) {
   );
 }
 
-// ─── Bid Withdrawn Success Screen ──────────────────────────────────────────────
 
 function BidWithdrawnSuccess({ navigate }) {
   const [count, setCount] = useState(3);
@@ -402,7 +385,6 @@ function BidWithdrawnSuccess({ navigate }) {
     <div className="flex-1 flex items-center justify-center bg-[#F6FAF8] px-4">
       <div className="flex flex-col items-center text-center max-w-xs w-full">
 
-        {/* Animated ring + checkmark */}
         <div className="relative mb-6">
           <div className="w-24 h-24 rounded-full bg-emerald-50 border-4 border-[#0A6E5C]/20 flex items-center justify-center">
             <div className="w-16 h-16 rounded-full bg-[#0A6E5C]/10 flex items-center justify-center">
@@ -419,7 +401,6 @@ function BidWithdrawnSuccess({ navigate }) {
               </svg>
             </div>
           </div>
-          {/* Pulse ring */}
           <span className="absolute inset-0 rounded-full border-2 border-[#0A6E5C]/30 animate-ping" />
         </div>
 
@@ -428,7 +409,6 @@ function BidWithdrawnSuccess({ navigate }) {
           Your bid has been successfully withdrawn. You won't be considered for this task anymore.
         </p>
 
-        {/* Countdown pill */}
         <p className="text-xs text-gray-400 mb-4">
           Redirecting to My Bids in{" "}
           <span className="font-bold text-[#0A6E5C]">{count}s</span>…
@@ -446,16 +426,13 @@ function BidWithdrawnSuccess({ navigate }) {
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 
 const TaskBidDetails = () => {
   const navigate = useNavigate();
   const { bidId } = useParams();
 
   const [isWithdrawSuccess, setIsWithdrawSuccess] = useState(false);
-  // console.log("withdraw", isWithdrawSuccess);
 
-  // if (isWithdrawSuccess) return <BidWithdrawnSuccess navigate={navigate} />
 
   const { data, isLoading, isError } = useGetWorkerBidDetailsQuery(bidId, {
     skip: !bidId || isWithdrawSuccess,
@@ -563,7 +540,6 @@ const TaskBidDetails = () => {
                     </div>
                   </div>
 
-                  {/* Full Description Card */}
                   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
                       Full Description
@@ -572,12 +548,10 @@ const TaskBidDetails = () => {
                       {task?.description || "No description provided."}
                     </p>
 
-                    {/* Photos */}
                     {task?.images && (
                       <PhotoGallery photos={task.images} />
                     )}
 
-                    {/* Deadline + Urgency row */}
                     <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
                       {task?.deadline && (
                         <div>
@@ -609,7 +583,6 @@ const TaskBidDetails = () => {
                     </div>
                   </div>
 
-                  {/* Task Location Card */}
                   <LocationCard
                     address={task?.address}
                     location={task?.location}
@@ -628,7 +601,6 @@ const TaskBidDetails = () => {
             </div>
           )}
 
-          {/* ── Empty / No data ── */}
           {!isLoading && !isError && !task && !bid && (
             <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500">
               <AlertCircle size={36} className="text-gray-300" />

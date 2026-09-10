@@ -6,10 +6,8 @@ const PosterNotificationSkeleton = ({ count = 4 }) => {
           key={idx}
           className="p-4 sm:p-5 rounded-2xl bg-white border border-gray-200 animate-pulse flex items-start gap-4 shadow-2xs"
         >
-          {/* Media Skeleton */}
           <div className="w-12 h-12 rounded-2xl bg-gray-200 shrink-0" />
 
-          {/* Content Skeleton */}
           <div className="flex-1 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="h-4 bg-gray-200 rounded-md w-1/3" />

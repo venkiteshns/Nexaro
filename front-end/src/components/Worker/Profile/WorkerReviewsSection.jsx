@@ -1,9 +1,5 @@
 import { Star } from 'lucide-react';
 
-/**
- * WorkerReviewItem — single review card
- * Props: review { reviewerName, location, timeAgo, rating, text }
- */
 export const WorkerReviewItem = ({ review }) => {
     const initials = review?.reviewerName
         ? review.reviewerName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
@@ -11,7 +7,6 @@ export const WorkerReviewItem = ({ review }) => {
 
     return (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-            {/* Reviewer header */}
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
@@ -22,7 +17,6 @@ export const WorkerReviewItem = ({ review }) => {
                     </div>
                 </div>
 
-                {/* Stars */}
                 <div className="flex items-center gap-0.5 shrink-0">
                     {[1, 2, 3, 4, 5].map((s) => (
                         <Star
@@ -43,10 +37,6 @@ export const WorkerReviewItem = ({ review }) => {
     );
 };
 
-/**
- * WorkerReviewsSection
- * Props: reviews: Review[], totalCount: number, onViewAll: fn
- */
 const WorkerReviewsSection = ({ reviews, totalCount, onViewAll }) => {
 
     return (

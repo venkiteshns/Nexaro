@@ -27,7 +27,6 @@ export default function BidCard({ bid, onAccept }) {
                         </div>
                     </div>
 
-                    {/* Rating */}
                     <div className="flex items-center gap-1">
                         <Star size={13} fill="#FBBF24" color="#FBBF24" />
                         <span className="text-sm font-bold text-gray-800">{worker.rating}</span>

@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { X, Building2, QrCode, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function AddPayoutMethodModal({ isOpen, onClose, onAddSuccess }) {
-  const [activeTab, setActiveTab] = useState("bank"); // "bank" | "upi"
+  const [activeTab, setActiveTab] = useState("bank");
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [confirmAccountNumber, setConfirmAccountNumber] = useState("");
@@ -93,15 +93,12 @@ export default function AddPayoutMethodModal({ isOpen, onClose, onAddSuccess }) 
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal Box */}
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 flex items-center justify-center transition-colors"
@@ -131,7 +128,6 @@ export default function AddPayoutMethodModal({ isOpen, onClose, onAddSuccess }) 
               </div>
             </div>
 
-            {/* Type Toggle Tabs */}
             <div className="flex items-center p-1 bg-[#F6FAF8] border border-emerald-100 rounded-2xl mb-4">
               <button
                 type="button"
@@ -246,7 +242,6 @@ export default function AddPayoutMethodModal({ isOpen, onClose, onAddSuccess }) 
                 </div>
               )}
 
-              {/* Primary checkbox */}
               <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -266,7 +261,6 @@ export default function AddPayoutMethodModal({ isOpen, onClose, onAddSuccess }) 
                 </div>
               )}
 
-              {/* Action Buttons */}
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"

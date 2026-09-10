@@ -12,15 +12,6 @@ import { SectionHeading } from "../../sharedComponents/SectionHeading";
 
 
 
-/**
- * EditWorkerProfileModal
- *
- * Props:
- *   isOpen    – boolean, controls visibility
- *   onClose   – fn to close the modal
- *   worker    – { name, email, phone, avatar } – current worker data (optional)
- *   onSave    – fn(data) called with form values on submit
- */
 
 const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) => {
 
@@ -30,8 +21,8 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
   const [isVerified, setIsVerified] = useState(false); 
 
   const [sendOtp] = useSendOtpMutation();
-  
-  
+
+
   const methods = useForm({
     defaultValues: {
       name: worker?.name || "",
@@ -52,7 +43,7 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
     })()
     console.log("isVerified status", isVerified)
   }, [isVerified, onSave, pendingData])
-  
+
   if (!isOpen) return null;
 
   const resendOtp = ({ email }) => {
@@ -216,7 +207,6 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
         </FormProvider>
       </div>
 
-      {/* ── Entry animation keyframe ── */}
       <style>{`
         @keyframes editModalIn {
           from { opacity: 0; transform: scale(0.94) translateY(8px); }

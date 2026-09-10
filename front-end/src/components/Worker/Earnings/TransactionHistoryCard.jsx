@@ -113,7 +113,6 @@ export default function TransactionHistoryCard() {
       };
     }
 
-    // Default: received / credited
     return {
       icon: <ArrowDownLeft size={16} className="text-[#0A6E5C]" />,
       iconBg: "bg-emerald-50 text-[#0A6E5C]",
@@ -127,7 +126,6 @@ export default function TransactionHistoryCard() {
   return (
     <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between h-full min-h-[360px]">
       <div>
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-bold text-[#111827]">Transaction History</h3>
@@ -135,7 +133,6 @@ export default function TransactionHistoryCard() {
           </div>
         </div>
 
-        {/* Transactions List */}
         <div className="divide-y divide-gray-50 mt-1">
           {isLoading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3 text-center">
@@ -211,7 +208,6 @@ export default function TransactionHistoryCard() {
         </div>
       </div>
 
-      {/* Pagination Footer */}
       {!isLoading && !isError && totalTransactions > 0 && (
         <div className="pt-4 border-t border-gray-100 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-400">

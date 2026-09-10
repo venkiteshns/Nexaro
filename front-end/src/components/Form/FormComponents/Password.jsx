@@ -21,7 +21,6 @@ const Password = (props) => {
     <div
       className={`${login ? "" : "mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}
     >
-      {/* Passwords */}
       <div
         className={` ${login ? "grid-cols-2 gap-5" : "grid grid-cols-1 md:grid-cols-2 gap-5 "} `}
       >

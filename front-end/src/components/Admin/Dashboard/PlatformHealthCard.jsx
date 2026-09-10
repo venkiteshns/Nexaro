@@ -1,10 +1,5 @@
 
 
-/**
- * PlatformHealthCard Component
- * Displays system health indicators (Online Workers, Tasks Today, Bids Today, Avg Bids / Task)
- * White and Green Nexaro theme
- */
 const PlatformHealthCard = ({ health = {}, isLoading = false }) => {
   const {
     onlineWorkers = 0,

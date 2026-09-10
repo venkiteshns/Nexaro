@@ -7,13 +7,6 @@ import { useSubmitReviewMutation } from '../../../store/services/posterApi';
 const MIN_CHARS = 10;
 const MAX_CHARS = 1000;
 
-/**
- * Props:
- *   taskId      {string}
- *   revieweeId  {string}  worker's user ID
- *   workerName  {string}
- *   onSuccess   {function} called with taskId after successful submission
- */
 
 const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
     const [submitReview, { isLoading }] = useSubmitReviewMutation();
@@ -43,7 +36,6 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
                 rating: data.rating,
                 review: data.review,
             }).unwrap();
-            // Redirect handled by parent after success
             if (onSuccess) onSuccess(taskId);
         } catch (err) {
             const message =
@@ -53,7 +45,6 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
         }
     };
 
-    // ── Success state ──────────────────────────────────────────────────────
     if (isSubmitSuccessful) {
         return (
             <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
@@ -74,7 +65,6 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
 
-            {/* ── Rate your experience ── */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
                 <h2 className="text-gray-900 font-extrabold text-lg mb-1">Rate Your Experience</h2>
                 <p className="text-gray-500 text-sm mb-5">
@@ -98,7 +88,6 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
             </div>
 
 
-            {/* ── Share your feedback ── */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
                 <h2 className="font-extrabold text-gray-900 text-lg mb-0.5">Share Your Feedback</h2>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
@@ -131,7 +120,6 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
                     />
                 </div>
 
-                {/* Char count + validation error row */}
                 <div className="flex items-center justify-between mt-2">
                     {errors.review ? (
                         <p className="text-xs text-red-500 font-medium">{errors.review.message}</p>
@@ -146,14 +134,12 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
                 </div>
             </div>
 
-            {/* ── API / root error ── */}
             {errors.root && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
                     <p className="text-sm text-red-600 font-medium">{errors.root.message}</p>
                 </div>
             )}
 
-            {/* ── Submit ── */}
             <button
                 id="submit-review-btn"
                 type="submit"

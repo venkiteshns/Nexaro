@@ -11,11 +11,6 @@ import RecentSignupsCard from "../../components/Admin/Dashboard/RecentSignupsCar
 import LiveActivityCard from "../../components/Admin/Dashboard/LiveActivityCard";
 import PlatformHealthCard from "../../components/Admin/Dashboard/PlatformHealthCard";
 
-/**
- * AdminDashboard Page
- * Complete Admin Overview Dashboard matching user layout
- * Styled in Nexaro's native White & Green brand theme
- */
 const AdminDashboard = () => {
   const dispatch = useDispatch();
 
@@ -33,23 +28,17 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#F6FAF8] flex">
-      {/* SIDEBAR NAVIGATION */}
       <AdminNavBar />
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <AdminHeader />
 
         <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
-          {/* Top Subtitle & Date Pill */}
           <DashboardHeader subtitle="Platform overview" />
 
-            {/* 4 Top Stats Cards */}
             <DashboardStatsGrid stats={stats} isLoading={isLoading} />
 
-            {/* Main 2-Row 2-Column Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-5">
-              {/* Row 1: Revenue Trajectory (7 cols) + Live Activity (5 cols) */}
               <div className="xl:col-span-7 flex flex-col">
                 <RevenueOverviewCard
                   data={revenueOverview}
@@ -63,7 +52,6 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              {/* Row 2: Recent Signups (7 cols) + Platform Health (5 cols) */}
               <div className="xl:col-span-7 flex flex-col">
                 <RecentSignupsCard
                   signups={recentSignups}

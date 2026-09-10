@@ -21,7 +21,6 @@ const OTP_TTL_SECONDS = 10 * 60;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const googleLoginService = async (accessToken) => {
-  // try {
   const googleResponse = await fetch(process.env.GOOGLE_USERINFO_URL, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -72,10 +71,7 @@ export const googleLoginService = async (accessToken) => {
     accessToken: accessTokenJwt,
     refreshToken,
   };
-  // } catch (error) {
-  //   throw error;
 
-  // }
 };
 
 export const createOtp = async (email, phone, resendFlag) => {
@@ -194,7 +190,6 @@ export const verifyOtp = async (email, otp) => {
 
 export const loginService = async (userData, isAdmin) => {
   const { email, password } = userData;
-  // 1. Find user by email
   if (isAdmin) {
     const existingUser = await User.findOne({ email, activeRole: "admin" });
     if (!existingUser) {
@@ -211,23 +206,18 @@ export const loginService = async (userData, isAdmin) => {
     return { success: false, message: "Access Restricted : Your account is suspended by admin" };
   }
 
-  // 2. Check if the password matches
   const isPasswordValid = await compareHash(password, existingUser.password);
   if (!isPasswordValid) {
     return { success: false, message: messages.INVALID_PASSWORD };
   }
 
-  // 3. Generate tokens
   const accessToken = generateAccessToken(existingUser);
   const refreshToken = generateRefreshToken(existingUser);
 
-  // 4. refresh token to database
   existingUser.refreshToken = refreshToken;
   await existingUser.save({ validateBeforeSave: false });
   const selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
-  // console.log("selfie ", selfie);
 
-  // 5. response user
   const { _id, name, email: userEmail, activeRole } = existingUser;
   const responseUser = {
     id: _id,
@@ -307,7 +297,6 @@ export const sendForgotPasswordEmail = async (email, otp) => {
 };
 
 export const forgotPasswordOtpService = async (email, role) => {
-  // console.log("role", role);
 
   if (role === "admin") {
     const userData = await User.findOne({ email, activeRole: role });
@@ -333,10 +322,6 @@ export const forgotPasswordOtpService = async (email, role) => {
   const otp = crypto.randomInt(100000, 999999).toString();
   console.log("Forgot Password OTP", otp);
 
-  // const existingOtp = await Otp.findOne({ email });
-  // if (existingOtp) {
-  //   await Otp.deleteOne({ email });
-  // }
   const key = `${OTP_PREFIX}:${email}`;
 
   const existingOtp = await redisClient.get(key);
@@ -347,17 +332,10 @@ export const forgotPasswordOtpService = async (email, role) => {
   console.log(" Forgot hashedOtp", otp, hashedOtp);
 
   await redisClient.set(key, hashedOtp, { EX: OTP_TTL_SECONDS });
-  // await Otp.create({
-  //   email,
-  //   otp: hashedOtp,
-  //   createdAt: new Date(),
-  //   expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-  // });
 
   const otpSend = await sendForgotPasswordEmail(email, otp);
   if (!otpSend) {
     await redisClient.del(key);
-    // await Otp.deleteOne({ email });
     return { success: false, message: messages.FAILED_TO_SEND_OTP };
   }
 

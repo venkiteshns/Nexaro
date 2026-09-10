@@ -1,18 +1,9 @@
 import { Star, MapPin, Calendar, ShieldCheck } from 'lucide-react';
 
-/**
- * WorkerReviewCard — sidebar card showing worker info and task context.
- *
- * Props:
- *   worker  { name, avatar, category, rating }
- *   task    { amount, status, completedOn, location }
- */
 const WorkerReviewCard = ({ worker, task }) => {
     return (
         <div className="flex flex-col gap-4">
-            {/* ── Worker profile card ── */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col items-center text-center">
-                {/* Avatar */}
                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-emerald-100 mb-4 shrink-0">
                     {worker?.avatar ? (
                         <img
@@ -29,10 +20,8 @@ const WorkerReviewCard = ({ worker, task }) => {
                     )}
                 </div>
 
-                {/* Name */}
                 <p className="text-gray-900 font-bold text-lg leading-tight">{worker?.name}</p>
 
-                {/* Category badge */}
                 {worker?.category && (
                     <span className="mt-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#0A6E5C] text-xs font-bold uppercase tracking-wider">
                         <ShieldCheck size={11} />
@@ -40,7 +29,6 @@ const WorkerReviewCard = ({ worker, task }) => {
                     </span>
                 )}
 
-                {/* Stats row */}
                 <div className="w-full mt-5 pt-4 border-t border-gray-100 flex items-center justify-around">
                     <div className="text-center">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
@@ -63,7 +51,6 @@ const WorkerReviewCard = ({ worker, task }) => {
                 </div>
             </div>
 
-            {/* ── Task details card ── */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
                     Task Details

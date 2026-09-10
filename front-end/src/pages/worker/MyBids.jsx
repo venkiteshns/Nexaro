@@ -46,7 +46,6 @@ const MyBids = () => {
                 <WorkerHeader />
 
                 <div className="flex-1 overflow-y-auto p-6">
-                    {/* ── Page heading ── */}
                     <div className="mb-5">
                         <h1 className="text-[22px] font-extrabold text-gray-900">My Bids</h1>
                         <p className="text-sm text-gray-500 mt-1">
@@ -54,17 +53,14 @@ const MyBids = () => {
                         </p>
                     </div>
 
-                    {/* ── Stat cards ── */}
                     <BidStatsSection counts={counts} winRate={winRate} />
 
-                    {/* ── Filter tabs ── */}
                     <BidFilterTabs
                         activeTab={activeTab}
                         onTabChange={handleTabChange}
                         total={total}
                     />
 
-                    {/* ── Loading ── */}
                     {(isLoading || isFetching) && (
                         <div className="flex items-center justify-center py-16 gap-2 text-gray-400">
                             <Loader2 size={20} className="animate-spin" />
@@ -72,7 +68,6 @@ const MyBids = () => {
                         </div>
                     )}
 
-                    {/* ── Error ── */}
                     {isError && !isFetching && (
                         <div className="flex items-center justify-center py-16 gap-2 text-red-500 text-sm">
                             <AlertCircle size={18} />
@@ -80,12 +75,10 @@ const MyBids = () => {
                         </div>
                     )}
 
-                    {/* ── Empty ── */}
                     {!isLoading && !isFetching && !isError && bids.length === 0 && (
                         <BidEmptyState activeTab={activeTab} />
                     )}
 
-                    {/* ── Bid list & Pagination ── */}
                     {!isLoading && !isFetching && !isError && bids.length > 0 && (
                         <>
                             <div className="space-y-3">

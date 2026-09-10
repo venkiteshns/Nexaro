@@ -1,10 +1,11 @@
+import { SHARED } from "../../constants/urls";
 import { api } from "./api";
 
 export const sharedApi = api.injectEndpoints({
     endpoints: (builder) => ({
         updateProfilePassword: builder.mutation({
              query: (formValues) => ({
-                url: "/auth/profile/update-password",
+                url: SHARED.UPDATE_PROFILE_PASSWORD,
                 method: "PATCH",
                 body: formValues
             })
@@ -12,7 +13,7 @@ export const sharedApi = api.injectEndpoints({
 
         deleteProfile: builder.mutation({
             query: () => ({
-                url: "/auth/profile/delete",
+                url: SHARED.DELETE_PROFILE,
                 method: "DELETE"
             })
         })

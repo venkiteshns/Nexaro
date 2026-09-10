@@ -5,9 +5,6 @@ import Review from "../models/reviewSchema.js";
 import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 
-/**
- * Record a real admin notification and emit in real-time via Socket.IO
- */
 export const recordAdminAlert = async ({
     type,
     title,
@@ -50,7 +47,6 @@ export const recordAdminAlert = async ({
         });
       }
 
-      // Emit live socket event ONLY to connected admin clients
       try {
         const io = getIo();
         if (io) {
@@ -59,8 +55,8 @@ export const recordAdminAlert = async ({
             message: `${title}: ${description}`,
           });
         }
-      } catch {
-        // Socket not ready or outside web context
+      } catch (err) {
+        console.error("Socket emit admin notification error:", err.message);
       }
 
       return alert;
@@ -70,9 +66,6 @@ export const recordAdminAlert = async ({
     }
   };
 
-/**
- * Extract clean readable location string from task address
- */
 const formatTaskLocation = (address) => {
   if (!address) return "Kerala";
   if (typeof address === "string") return address;
@@ -83,20 +76,8 @@ const formatTaskLocation = (address) => {
   return address.city || address.district || "Kerala";
 };
 
-/**
- * Sync and compile all real notifications directly from existing MongoDB records:
- * - Real tasks posted by users with location and amount
- * - Real bids accepted
- * - Real tasks completed
- * - Real tasks cancelled
- * - Real worker payouts initiated & completed
- * - Real platform fee commissions credited
- * - Real reviews added with rating and comments
- * - Real user sign ups & KYC verifications
- */
 export const syncRealPlatformNotifications = async () => {
   try {
-    // 1. Remove mock dummy alerts from previous placeholder seed (marked by dummy names or no uniqueKey)
     await AdminNotification.deleteMany({
       $or: [
         { description: { $regex: /Ravi Kumar|Julianne Smith|Suresh Babu|Arjun Sharma|Manoj K|Anita Verma/i } },
@@ -107,7 +88,6 @@ export const syncRealPlatformNotifications = async () => {
 
     const alertsToUpsert = [];
 
-    // 2. Process real Tasks
     const tasks = await Task.find()
       .populate("posterId", "name email")
       .populate("workerId", "name email")
@@ -120,7 +100,6 @@ export const syncRealPlatformNotifications = async () => {
       const workerName = t.workerId?.name || "Worker";
       const amountStr = `₹${Number(t.amount || 0).toLocaleString("en-IN")}`;
 
-      // A. Real Task Posted
       alertsToUpsert.push({
         uniqueKey: `task_posted_${t._id}`,
         type: "new_task",
@@ -132,7 +111,6 @@ export const syncRealPlatformNotifications = async () => {
         metadata: { taskId: t._id, amount: t.amount, category: t.category },
       });
 
-      // B. Real Bid Accepted (if task assigned or has acceptedBid)
       if (t.acceptedBid || t.status === "assigned" || t.status === "completed") {
         const bidAmount = t.acceptedBid?.amount || t.amount;
         const bidAmountStr = `₹${Number(bidAmount).toLocaleString("en-IN")}`;
@@ -143,12 +121,11 @@ export const syncRealPlatformNotifications = async () => {
           description: `Bid of ${bidAmountStr} accepted for "${t.title}" by ${posterName}.`,
           priority: "normal",
           dotColor: "emerald",
-          createdAt: new Date(new Date(t.createdAt).getTime() + 1000 * 60 * 2), // slightly after task creation
+          createdAt: new Date(new Date(t.createdAt).getTime() + 1000 * 60 * 2),
           metadata: { taskId: t._id, bidAmount },
         });
       }
 
-      // C. Real Task Completed
       if (t.status === "completed") {
         alertsToUpsert.push({
           uniqueKey: `task_completed_${t._id}`,
@@ -162,7 +139,6 @@ export const syncRealPlatformNotifications = async () => {
         });
       }
 
-      // D. Real Task Cancelled
       if (t.status === "cancelled") {
         alertsToUpsert.push({
           uniqueKey: `task_cancelled_${t._id}`,
@@ -177,7 +153,6 @@ export const syncRealPlatformNotifications = async () => {
       }
     }
 
-    // 3. Process real Transactions
     const transactions = await Transaction.find()
       .populate("senderId", "name email")
       .populate("receiverId", "name email")
@@ -236,7 +211,6 @@ export const syncRealPlatformNotifications = async () => {
       }
     }
 
-    // 4. Process real Reviews
     const reviews = await Review.find()
       .populate("reviewer", "name")
       .populate("reviewee", "name")
@@ -257,7 +231,6 @@ export const syncRealPlatformNotifications = async () => {
       });
     }
 
-    // 5. Process real Users
     const users = await User.find({ activeRole: { $ne: "admin" } }).lean();
     for (const u of users) {
       alertsToUpsert.push({
@@ -287,7 +260,6 @@ export const syncRealPlatformNotifications = async () => {
       }
     }
 
-    // 6. Execute bulk upserts preserving existing isRead state if already read
     const operations = alertsToUpsert.map((item) => ({
       updateOne: {
         filter: { uniqueKey: item.uniqueKey },

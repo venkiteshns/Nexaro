@@ -35,7 +35,6 @@ const FlyToLocation = ({ position }) => {
 }
 
 const Map = ({ position: externalPosition, setPosition: externalSetPosition, height = "500px", showButton = true }) => {
-    // handleMapPositionChange
     const [internalPosition, setInternalPosition] = useState({
         lat: 10.5276,
         lng: 76.2144

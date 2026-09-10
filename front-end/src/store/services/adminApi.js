@@ -1,10 +1,11 @@
+import { ADMIN } from "../../constants/urls";
 import { api } from "./api";
 
 export const adminApi = api.injectEndpoints({
   endpoints: (builder) => ({
     adminGetUsers: builder.query({
       query: ({ page = 1, limit = 10 } = {}) => ({
-        url: `/admin/users?page=${page}&limit=${limit}`,
+        url: `${ADMIN.GET_USERS}?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Users"],
@@ -12,7 +13,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetPendingVerificationUsers: builder.query({
       query: ({ page = 1, limit = 10 } = {}) => ({
-        url: `/admin/users/pending-verification?page=${page}&limit=${limit}`,
+        url: `${ADMIN.GET_PENDING_VERIFICATION_USERS}?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       extraOptions: { isAdmin: true },
@@ -21,7 +22,7 @@ export const adminApi = api.injectEndpoints({
 
     adminSuspendUser: builder.mutation({
       query: (userId) => ({
-        url: `/admin/users/${userId}/suspend`,
+        url: ADMIN.SUSPEND_USER.replace(":userId", userId),
         method: "PATCH",
       }),
       invalidatesTags: ["Users"],
@@ -29,7 +30,7 @@ export const adminApi = api.injectEndpoints({
 
     adminUnsuspendUser: builder.mutation({
       query: (userId) => ({
-        url: `/admin/users/${userId}/unsuspend`,
+        url: ADMIN.UNSUSPEND_USER.replace(":userId", userId),
         method: "PATCH",
       }),
       invalidatesTags: ["Users"],
@@ -37,7 +38,7 @@ export const adminApi = api.injectEndpoints({
 
     adminApproveUser: builder.mutation({
       query: (userId) => ({
-        url: `/admin/users/${userId}/approve`,
+        url: ADMIN.APPROVE_USER.replace(":userId", userId),
         method: "PATCH",
       }),
       invalidatesTags: ["Users"],
@@ -45,7 +46,7 @@ export const adminApi = api.injectEndpoints({
 
     adminRejectUser: builder.mutation({
       query: (userId) => ({
-        url: `/admin/users/${userId}/reject`,
+        url: ADMIN.REJECT_USER.replace(":userId", userId),
         method: "PATCH",
       }),
       invalidatesTags: ["Users"],
@@ -64,7 +65,7 @@ export const adminApi = api.injectEndpoints({
         if (status !== "all") params.append("status", status);
         if (category !== "all") params.append("category", category);
         return {
-          url: `/admin/tasks?${params.toString()}`,
+          url: `${ADMIN.GET_TASKS}?${params.toString()}`,
           method: "GET",
         };
       },
@@ -73,7 +74,7 @@ export const adminApi = api.injectEndpoints({
 
     adminTaskDelete: builder.mutation({
       query: (taskId) => ({
-        url: `/admin/task/cancel/${taskId}`,
+        url: ADMIN.DELETE_TASK.replace(":taskId", taskId),
         method: "PATCH",
       }),
       invalidatesTags: ["Admin_Tasks"],
@@ -81,7 +82,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetTaskDetails: builder.query({
       query: (taskId) => ({
-        url: `/admin/task/${taskId}`,
+        url: ADMIN.GET_TASK_DETAILS.replace(":taskId", taskId),
         method: "GET",
       }),
       providesTags: ["Admin_Task_Details"],
@@ -89,7 +90,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetFinanceStats: builder.query({
       query: (range = "Last 30 Days") => ({
-        url: `/admin/finance/stats?range=${encodeURIComponent(range)}`,
+        url: `${ADMIN.GET_FINANCE_STATS}?range=${encodeURIComponent(range)}`,
         method: "GET",
       }),
       providesTags: ["Admin_Finance_Stats"],
@@ -97,7 +98,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetFinanceChart: builder.query({
       query: ({ timeframe = "7D", metric = "revenue" } = {}) => ({
-        url: `/admin/finance/chart?timeframe=${timeframe}&metric=${metric}`,
+        url: `${ADMIN.GET_FINANCE_CHART}?timeframe=${timeframe}&metric=${metric}`,
         method: "GET",
       }),
       providesTags: ["Admin_Finance_Chart"],
@@ -116,7 +117,7 @@ export const adminApi = api.injectEndpoints({
         if (status && status !== "ALL") params.append("status", status);
         if (range && range !== "All Time") params.append("range", range);
         return {
-          url: `/admin/finance/transactions?${params.toString()}`,
+          url: `${ADMIN.GET_FINANCE_TRANSACTIONS}?${params.toString()}`,
           method: "GET",
         };
       },
@@ -125,7 +126,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetDailyReport: builder.query({
       query: () => ({
-        url: "/admin/finance/reports/daily",
+        url: ADMIN.GET_DAILY_REPORT,
         method: "GET",
       }),
       providesTags: ["Admin_Finance_Reports"],
@@ -137,7 +138,7 @@ export const adminApi = api.injectEndpoints({
         if (year !== undefined && year !== null) params.append("year", year);
         if (month !== undefined && month !== null) params.append("month", month);
         return {
-          url: `/admin/finance/reports/monthly?${params.toString()}`,
+          url: `${ADMIN.GET_MONTHLY_PL_REPORT}?${params.toString()}`,
           method: "GET",
         };
       },
@@ -146,7 +147,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetPlatformFeeSummary: builder.query({
       query: () => ({
-        url: "/admin/finance/reports/platform-fee",
+        url: ADMIN.GET_PLATFORM_FEE_SUMMARY,
         method: "GET",
       }),
       providesTags: ["Admin_Finance_Reports"],
@@ -154,7 +155,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetNotifications: builder.query({
       query: ({ page = 1, limit = 6, filter = "all" } = {}) => ({
-        url: `/admin/notifications?page=${page}&limit=${limit}&filter=${filter}`,
+        url: `${ADMIN.GET_NOTIFICATIONS}?page=${page}&limit=${limit}&filter=${filter}`,
         method: "GET",
       }),
       providesTags: ["Admin_Notifications"],
@@ -162,7 +163,7 @@ export const adminApi = api.injectEndpoints({
 
     adminMarkAllNotificationsRead: builder.mutation({
       query: () => ({
-        url: "/admin/notifications/mark-all-read",
+        url: ADMIN.MARK_ALL_NOTIFICATIONS_READ,
         method: "PATCH",
       }),
       invalidatesTags: ["Admin_Notifications"],
@@ -170,7 +171,7 @@ export const adminApi = api.injectEndpoints({
 
     adminMarkNotificationRead: builder.mutation({
       query: (id) => ({
-        url: `/admin/notifications/${id}/read`,
+        url: ADMIN.MARK_NOTIFICATION_READ.replace(":id", id),
         method: "PATCH",
       }),
       invalidatesTags: ["Admin_Notifications"],
@@ -178,7 +179,7 @@ export const adminApi = api.injectEndpoints({
 
     adminSendAnnouncement: builder.mutation({
       query: (body) => ({
-        url: "/admin/announcements",
+        url: ADMIN.SEND_ANNOUNCEMENT,
         method: "POST",
         body,
       }),
@@ -187,7 +188,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetRecentAnnouncements: builder.query({
       query: (limit = 5) => ({
-        url: `/admin/announcements/recent?limit=${limit}`,
+        url: `${ADMIN.GET_RECENT_ANNOUNCEMENTS}?limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Admin_Announcements"],
@@ -195,7 +196,7 @@ export const adminApi = api.injectEndpoints({
 
     adminGetDashboard: builder.query({
       query: () => ({
-        url: "/admin/dashboard",
+        url: ADMIN.GET_DASHBOARD,
         method: "GET",
       }),
       providesTags: ["Admin_Dashboard"],

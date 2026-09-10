@@ -3,10 +3,6 @@ import NotificationItem from "./NotificationItem";
 import PaginationSections from "../../sharedComponents/PaginationSections";
 import { Bell, CheckCheck, Loader2 } from "lucide-react";
 
-/**
- * Reusable SystemAlertsCard component
- * Displays list of alerts, unread counts, mark all as read action, and pagination.
- */
 const SystemAlertsCard = ({
   notifications = [],
   isLoading = false,
@@ -21,7 +17,6 @@ const SystemAlertsCard = ({
   return (
     <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-4 sm:p-5 flex flex-col">
       <div>
-        {/* Card Header: Title + Unread Count + MARK ALL AS READ */}
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
             <span className="w-1.5 h-5 bg-[#0A6E5C] rounded-full" aria-hidden="true" />
@@ -50,10 +45,8 @@ const SystemAlertsCard = ({
           </button>
         </div>
 
-        {/* Alerts List / Skeletons / Empty State */}
         <div className="mt-3 space-y-2">
           {isLoading ? (
-            // Skeletons
             Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={`alert-skeleton-${idx}`}
@@ -93,7 +86,6 @@ const SystemAlertsCard = ({
         </div>
       </div>
 
-      {/* Reusable Pagination Section */}
       {totalPages > 1 && (
         <div className="pt-4 mt-4 border-t border-gray-100">
           <PaginationSections

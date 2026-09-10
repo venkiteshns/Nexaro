@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
-/**
- * Helper to render an icon whether it's a Component (function / forwardRef) or JSX element
- */
 function renderIcon(iconProp, defaultClass = "text-[#0A6E5C] shrink-0", size = 16) {
   if (!iconProp) return null;
   if (React.isValidElement(iconProp)) {
@@ -13,16 +10,6 @@ function renderIcon(iconProp, defaultClass = "text-[#0A6E5C] shrink-0", size = 1
   return <IconComponent size={size} className={defaultClass} />;
 }
 
-/**
- * Reusable SelectDropdown Component
- * 
- * Supports:
- * - Simple array of strings (e.g. ["Today", "Last 30 Days"])
- * - Array of objects (e.g. [{ label: "Last 30 Days", value: "30d", icon: Calendar }])
- * - Left icon slot (Lucide icon component or JSX)
- * - Click outside detection
- * - Customizable alignment, styling, and checkmark indicators
- */
 export default function SelectDropdown({
   options = [],
   value,
@@ -39,7 +26,6 @@ export default function SelectDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -50,7 +36,6 @@ export default function SelectDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Format options to a standard shape: { label, value, icon }
   const normalizedOptions = options.map((opt) => {
     if (typeof opt === "object" && opt !== null) {
       return {
@@ -66,7 +51,6 @@ export default function SelectDropdown({
     };
   });
 
-  // Determine current display label and icon
   const currentOption = normalizedOptions.find((opt) => opt.value === value);
   const displayLabel = currentOption ? currentOption.label : value || placeholder;
 
@@ -79,7 +63,6 @@ export default function SelectDropdown({
 
   return (
     <div className={`relative inline-block ${className}`} ref={dropdownRef}>
-      {/* Trigger Button */}
       <button
         type="button"
         disabled={disabled}
@@ -88,10 +71,8 @@ export default function SelectDropdown({
           isOpen ? "border-emerald-400 ring-2 ring-emerald-500/10 text-[#0A6E5C]" : ""
         } ${buttonClassName}`}
       >
-        {/* Left Icon */}
         {renderIcon(icon, "text-[#0A6E5C] shrink-0", 16)}
 
-        {/* Current option icon if defined */}
         {currentOption?.icon && renderIcon(currentOption.icon, "text-[#0A6E5C] shrink-0", 16)}
 
         <span className="truncate">{displayLabel}</span>
@@ -104,7 +85,6 @@ export default function SelectDropdown({
         />
       </button>
 
-      {/* Dropdown Menu Popup */}
       {isOpen && (
         <div
           className={`absolute ${

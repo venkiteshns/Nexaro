@@ -36,7 +36,7 @@ const CHART_DATA = {
 };
 
 export default function EarningsOverviewChart() {
-  const [timeframe, setTimeframe] = useState("30D"); // "7D" | "30D" | "3M" | "1Y"
+  const [timeframe, setTimeframe] = useState("30D");
   const [hoveredBar, setHoveredBar] = useState(null);
 
   const currentDataset = CHART_DATA[timeframe];
@@ -44,7 +44,6 @@ export default function EarningsOverviewChart() {
 
   return (
     <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-7 shadow-xs">
-      {/* Header with Title and Timeframe Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100">
         <div>
           <div className="flex items-center gap-2">
@@ -59,7 +58,6 @@ export default function EarningsOverviewChart() {
           </p>
         </div>
 
-        {/* Timeframe selector pills */}
         <div className="flex items-center p-1 bg-[#F6FAF8] border border-emerald-100 rounded-2xl self-start sm:self-auto">
           {["7D", "30D", "3M", "1Y"].map((tf) => (
             <button
@@ -81,17 +79,14 @@ export default function EarningsOverviewChart() {
         </div>
       </div>
 
-      {/* Chart Canvas Area */}
       <div className="pt-8 pb-3">
         <div className="relative h-48 sm:h-56 w-full flex items-end justify-between gap-1.5 sm:gap-2.5 px-2">
-          {/* Subtle Grid baseline lines */}
           <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-40">
             <div className="border-b border-dashed border-gray-200 w-full" />
             <div className="border-b border-dashed border-gray-200 w-full" />
             <div className="border-b border-gray-200 w-full" />
           </div>
 
-          {/* Render Interactive Bars */}
           {currentDataset.values.map((val, idx) => {
             const heightPercent = Math.max((val / maxVal) * 100, 6);
             const isHovered = hoveredBar === idx;
@@ -103,7 +98,6 @@ export default function EarningsOverviewChart() {
                 onMouseLeave={() => setHoveredBar(null)}
                 className="relative flex-1 flex flex-col items-center justify-end h-full group cursor-pointer z-10"
               >
-                {/* Floating Tooltip */}
                 {isHovered && (
                   <div className="absolute -top-12 z-30 px-3 py-1.5 bg-[#111827] text-white text-xs rounded-xl shadow-lg whitespace-nowrap animate-in fade-in zoom-in-90 duration-150">
                     <p className="font-bold text-emerald-400">
@@ -116,7 +110,6 @@ export default function EarningsOverviewChart() {
                   </div>
                 )}
 
-                {/* The Bar */}
                 <div
                   style={{ height: `${heightPercent}%` }}
                   className={`w-full max-w-[28px] sm:max-w-[34px] rounded-t-lg transition-all duration-300 ${
@@ -130,7 +123,6 @@ export default function EarningsOverviewChart() {
           })}
         </div>
 
-        {/* X-Axis Date Labels */}
         <div className="flex items-center justify-between text-[11px] font-semibold text-gray-400 pt-3 px-3">
           {currentDataset.labels.map((label, idx) => (
             <span key={idx} className="uppercase tracking-wider">

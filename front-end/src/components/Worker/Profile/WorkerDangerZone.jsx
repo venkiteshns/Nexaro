@@ -1,9 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
 
-/**
- * WorkerDangerZone
- * Props: onDeleteProfile: fn
- */
 const WorkerDangerZone = ({ onDeleteProfile }) => (
     <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3">

@@ -12,7 +12,6 @@ const TaskHeaderBanner = ({
 
     return (
         <div className="mb-6">
-            {/* Back button */}
             <button
                 onClick={() => navigate(backUrl)}
                 className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-semibold mb-4"
@@ -21,7 +20,6 @@ const TaskHeaderBanner = ({
                 {backText}
             </button>
 
-            {/* Title row */}
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
                     <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-widest mb-1">

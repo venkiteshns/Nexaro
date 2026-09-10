@@ -41,7 +41,6 @@ const NearbyTasks = () => {
   const total = pagination.total ?? 0;
   const noServiceArea = isError && error?.data?.message?.includes("service area");
 
-  // Reset to page 1 whenever search or category changes
   const handleCategoryChange = (cat) => {
     setSelectedCategory(cat);
     setPage(1);
@@ -60,16 +59,14 @@ const NearbyTasks = () => {
 
         <div className="flex-1 overflow-y-auto p-6">
 
-          {/* ── Heading ── */}
           <div className="mb-5">
             <h1 className="text-[22px] font-extrabold text-gray-900">Nearby Tasks</h1>
             <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
               <MapPin size={13} />
-              Showing open tasks within 10 km of your service area
+              Showing open tasks within 50 km of your service area
             </p>
           </div>
 
-          {/* ── Search ── */}
           <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-5 shadow-sm">
             <Search size={16} className="text-gray-400 shrink-0" />
             <input
@@ -86,7 +83,6 @@ const NearbyTasks = () => {
             )}
           </div>
 
-          {/* ── Category pills ── */}
           <div className="flex flex-wrap gap-2 items-center mb-5">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wide mr-1">
               Category
@@ -116,14 +112,12 @@ const NearbyTasks = () => {
             ))}
           </div>
 
-          {/* ── Loading ── */}
           {(isLoading || isFetching) && (
             <div className="text-center py-16 text-gray-400 text-sm">
               Loading nearby tasks...
             </div>
           )}
 
-          {/* ── Service area error ── */}
           {noServiceArea && (
             <div className="flex flex-col items-center gap-3 py-16 bg-white rounded-2xl border border-orange-200">
               <AlertTriangle size={36} className="text-orange-400" />
@@ -140,14 +134,12 @@ const NearbyTasks = () => {
             </div>
           )}
 
-          {/* ── Generic error ── */}
           {isError && !noServiceArea && (
             <div className="text-center py-16 text-red-500 text-sm">
               Could not load tasks. Please try again later.
             </div>
           )}
 
-          {/* ── Empty ── */}
           {!isLoading && !isFetching && !isError && allTasks.length === 0 && (
             <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
               <p className="text-sm font-semibold text-gray-700 mb-1">
@@ -156,15 +148,13 @@ const NearbyTasks = () => {
               <p className="text-xs text-gray-400">
                 {searchText || selectedCategory
                   ? "Try clearing the category or search filters."
-                  : "There are no open tasks within 10 km of your service area right now."}
+                  : "There are no open tasks within 50 km of your service area right now."}
               </p>
             </div>
           )}
 
-          {/* ── Task List ── */}
           {!isLoading && !isFetching && !isError && allTasks.length > 0 && (
             <>
-              {/* Content Number Feedback */}
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs text-gray-500 font-medium">
                   Showing{" "}
@@ -191,7 +181,6 @@ const NearbyTasks = () => {
                 ))}
               </div>
 
-              {/* Pagination */}
               <PaginationSections
                 page={page}
                 totalPages={totalPages}

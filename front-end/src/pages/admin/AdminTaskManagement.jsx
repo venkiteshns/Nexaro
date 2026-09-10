@@ -134,7 +134,6 @@ function MobileTaskCard({ task }) {
                 />
             )}
 
-            {/* Title row */}
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-2.5 min-w-0">
                     <div className={`w-1 self-stretch rounded-full shrink-0 ${config.dot}`} />
@@ -148,7 +147,6 @@ function MobileTaskCard({ task }) {
                 </span>
             </div>
 
-            {/* Poster + Status row */}
             <div className="flex items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs shrink-0">
@@ -159,7 +157,6 @@ function MobileTaskCard({ task }) {
                 <StatusBadge status={task.status} />
             </div>
 
-            {/* Action buttons */}
             <div className="flex items-center gap-2">
                 {task.status !== 'cancelled' && (
                     <button
@@ -291,7 +288,6 @@ const AdminTaskManagement = () => {
         category: categoryFilter === 'all' ? undefined : categoryFilter,
     });
 
-    // console.log(data);
 
     const tasks = data?.tasks || [];
     const totalPages = data?.totalPages || 1;
@@ -481,7 +477,6 @@ const AdminTaskManagement = () => {
                             </table>
                         </div>
 
-                        {/* ── Pagination footer ── */}
                         <div className="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
                             <p className="text-sm text-gray-500 order-2 sm:order-1">
                                 Showing page {currentPage} of {totalPages} · {totalTasks} total tasks

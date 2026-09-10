@@ -80,7 +80,6 @@ function UserDetailPanel({ user, onClose, isMobile, navigate, onAction }) {
         </button>
       )}
 
-      {/* Avatar + name */}
       <div className="flex flex-col items-center text-center">
         <div className="relative">
           <img
@@ -101,7 +100,6 @@ function UserDetailPanel({ user, onClose, isMobile, navigate, onAction }) {
         </p>
       </div>
 
-      {/* Skills */}
       {user.skills?.length > 0 && (
         <div className="mt-6">
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
@@ -120,7 +118,6 @@ function UserDetailPanel({ user, onClose, isMobile, navigate, onAction }) {
         </div>
       )}
 
-      {/* Status card */}
       <div className="mt-6 bg-[#F6FAF8] rounded-2xl p-4">
         <div className="flex items-center justify-between">
           <h4 className="font-semibold text-[#111827] text-sm">Account Status</h4>
@@ -136,7 +133,6 @@ function UserDetailPanel({ user, onClose, isMobile, navigate, onAction }) {
         </p>
       </div>
 
-      {/* Actions */}
       <div className="space-y-3 mt-6">
         {!user.isVerified && (
           <button
@@ -192,11 +188,7 @@ const UserManagement = () => {
   const selectedUser = users.find((u) => u._id === selectedUserId) || null;
 
   const handleSuspensionStatus = (id, isSuspended) => {
-    // try {
     isSuspended ? unsuspendUser(id) : suspendUser(id);
-    // } catch {
-    // errors handled by RTK Query's isError state
-    // }
   };
 
   const handleSelectUser = (id) => {
@@ -220,7 +212,6 @@ const UserManagement = () => {
 
         <div className="p-4 sm:p-6 flex flex-col gap-4">
 
-          {/* Header row */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <h2 className="font-bold text-xl text-[#111827] flex-1">User Management</h2>
             <button
@@ -231,7 +222,6 @@ const UserManagement = () => {
             </button>
           </div>
 
-          {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3">
             <select
               value={roleFilter}
@@ -255,10 +245,8 @@ const UserManagement = () => {
             </div>
           </div>
 
-          {/* Main grid */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
-            {/* Sidebar: user detail (xl+) */}
             <div className="hidden xl:block xl:order-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <UserDetailPanel
                 user={selectedUser}
@@ -292,7 +280,6 @@ const UserManagement = () => {
                   ))}
               </div>
 
-              {/* Desktop table (lg+) */}
               <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b border-gray-100">
@@ -392,7 +379,6 @@ const UserManagement = () => {
                 </table>
               </div>
 
-              {/* Pagination */}
               <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
                 <p className="text-sm text-gray-500 order-2 sm:order-1">
                   Showing page {currentPage} of {totalPages} · {totalUsers} total users
@@ -420,17 +406,13 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* ── Mobile centered modal (< xl) ── */}
       {drawerOpen && (
         <div className="xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setDrawerOpen(false)}
           />
-          {/* Modal */}
           <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm max-h-[85vh] overflow-y-auto p-6">
-            {/* Drag/close indicator */}
             <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-5" />
             <UserDetailPanel
               user={selectedUser}

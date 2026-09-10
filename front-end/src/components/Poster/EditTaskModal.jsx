@@ -37,7 +37,6 @@ const toDateInputValue = (date) => {
 };
 
 const EditTaskModal = ({ task, onClose, onUpdated }) => {
-  // Form state seeded from task
   const [title, setTitle] = useState(task.title || "");
   const [description, setDescription] = useState(task.description || "");
   const [category, setCategory] = useState(task.category || "");
@@ -47,10 +46,7 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
   );
   const [amount, setAmount] = useState(task.amount ?? "");
 
-  // Image management
-  // retainedImages → existing task images the poster wants to KEEP
   const [retainedImages, setRetainedImages] = useState(task.images || []);
-  // newPhotos → newly selected local File objects
   const [newPhotos, setNewPhotos] = useState([]);
 
   const [errors, setErrors] = useState({});
@@ -59,7 +55,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
 
   const totalImageCount = retainedImages.length + newPhotos.length;
 
-  // ── Prevent body scroll ──────────────────────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -67,7 +62,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
     };
   }, []);
 
-  // ── Image handlers ───────────────────────────────────────────────────────
   const handleAddNewPhotos = (e) => {
     const files = Array.from(e.target.files);
     const remaining = 5 - totalImageCount;
@@ -86,7 +80,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
     setNewPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // ── Validation ───────────────────────────────────────────────────────────
   const validate = () => {
     const e = {};
     if (!title.trim()) e.title = "Task title is required";
@@ -99,7 +92,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
     return e;
   };
 
-  // ── Submit ───────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
@@ -133,7 +125,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
     }
   };
 
-  // ── UI ───────────────────────────────────────────────────────────────────
   return (
     <div
       className="fixed inset-0 z-60 flex items-center justify-center p-4"
@@ -147,7 +138,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
         className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="h-1.5 w-full bg-linear-to-r from-[#0A6E5C] to-emerald-400 shrink-0" />
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2">
@@ -162,10 +152,8 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
           </button>
         </div>
 
-        {/* Scrollable body */}
         <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
           <form id="edit-task-form" onSubmit={handleSubmit} noValidate>
-            {/* Title */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-600 mb-1.5">
                 Task Title
@@ -185,7 +173,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
               )}
             </div>
 
-            {/* Category + Budget */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1.5">
@@ -242,7 +229,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
               </div>
             </div>
 
-            {/* Description */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-600 mb-1.5">
                 Description
@@ -264,7 +250,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
               )}
             </div>
 
-            {/* Deadline + Urgency */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1.5">
@@ -303,7 +288,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
               </div>
             </div>
 
-            {/* Images */}
             <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
               <div className="flex items-center gap-2 mb-3">
                 <Camera size={16} className="text-[#0A6E5C]" />
@@ -316,7 +300,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
               </div>
 
               <div className="flex gap-3 flex-wrap">
-                {/* Upload button */}
                 {totalImageCount < 5 && (
                   <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#0A6E5C] hover:bg-emerald-50 transition-all group">
                     <Upload
@@ -336,7 +319,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
                   </label>
                 )}
 
-                {/* Existing retained images */}
                 {retainedImages.map((img) => (
                   <div
                     key={img.public_id}
@@ -360,7 +342,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
                   </div>
                 ))}
 
-                {/* New local images */}
                 {newPhotos.map((file, i) => (
                   <div
                     key={`new-${i}`}
@@ -384,7 +365,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
                   </div>
                 ))}
 
-                {/* Empty slots */}
                 {Array.from({
                   length: Math.max(
                     0,
@@ -414,7 +394,6 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
           </form>
         </div>
 
-        {/* Footer */}
         <div className="flex gap-3 px-6 py-4 border-t border-gray-100 bg-white shrink-0">
           <button
             type="button"

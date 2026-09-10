@@ -13,7 +13,6 @@ import {
 import { PhotoStrip } from '../PhotoStrip';
 import { formatInrToUsd } from '../../../utils/currency';
 
-/* ── Stat pill inside the summary card ── */
 function StatPill({ label, value, subValue, valueClass = 'text-gray-900' }) {
     return (
         <div className="flex flex-col gap-0.5">
@@ -34,9 +33,7 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-4">
-            {/* ── Left / Main details ── */}
             <div className="lg:col-span-2 bg-white border border-gray-200 rounded-3xl shadow-sm p-5 sm:p-6 space-y-4">
-                {/* Stats row */}
                 <div className="flex flex-wrap items-center gap-6 pb-5 border-b border-gray-100">
                     <div className="flex items-center gap-2.5">
                         <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
@@ -73,7 +70,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                     )}
                 </div>
 
-                {/* Description */}
                 {task?.description && (
                     <div className="space-y-1 pt-1">
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</p>
@@ -83,7 +79,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                     </div>
                 )}
 
-                {/* Location / Address */}
                 {task?.address && (
                     <div className="space-y-1 pt-1">
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Location</p>
@@ -94,7 +89,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                     </div>
                 )}
 
-                {/* Photos if any using PhotoStrip */}
                 {task?.photos && task.photos.length > 0 && (
                     <div className="space-y-1.5 pt-1">
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -105,7 +99,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                     </div>
                 )}
 
-                {/* Completed on */}
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 pt-2 border-t border-gray-100">
                     <CalendarCheck size={15} className="text-[#0A6E5C]" />
                     <span>
@@ -115,11 +108,9 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                 </div>
             </div>
 
-            {/* ── Right / Profile Card (Worker OR Poster) ── */}
             {worker && (
                 <div className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 flex flex-col items-center text-center justify-between gap-4">
                     <div className="flex flex-col items-center w-full">
-                        {/* Avatar */}
                         <div className="w-18 h-18 rounded-full bg-emerald-50 border-2 border-emerald-100 overflow-hidden flex items-center justify-center mb-3 shadow-inner">
                             {worker.avatar ? (
                                 <img src={worker.avatar} alt={worker.name} className="w-full h-full object-cover" />
@@ -130,7 +121,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                             )}
                         </div>
 
-                        {/* Name + verified */}
                         <div>
                             <div className="flex items-center justify-center gap-1.5 mb-0.5">
                                 <p className="font-extrabold text-gray-900 text-base">{worker.name}</p>
@@ -144,7 +134,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                             <p className="text-xs text-gray-400 font-medium">Worker Profile</p>
                         </div>
 
-                        {/* Rating stat */}
                         {worker.rating != null && (
                             <div className="flex items-center justify-center gap-4 w-full border-t border-gray-100 pt-3 mt-3">
                                 <div>
@@ -165,7 +154,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
             {poster && (
                 <div className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 flex flex-col items-center text-center justify-between gap-4">
                     <div className="flex flex-col items-center w-full">
-                        {/* Avatar */}
                         <div className="w-18 h-18 rounded-full bg-emerald-50 border-2 border-emerald-100 overflow-hidden flex items-center justify-center mb-3 shadow-inner">
                             {poster.avatar ? (
                                 <img src={poster.avatar} alt={poster.name} className="w-full h-full object-cover" />
@@ -176,7 +164,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                             )}
                         </div>
 
-                        {/* Name + role */}
                         <div>
                             <p className="font-extrabold text-gray-900 text-base">{poster.name}</p>
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-bold mt-1">
@@ -184,7 +171,6 @@ const TaskSummaryCard = ({ task, worker, poster }) => {
                             </span>
                         </div>
 
-                        {/* Contacts */}
                         <div className="w-full border-t border-gray-100 my-3 pt-3 space-y-2 text-left text-xs text-gray-600">
 
                             {poster.phone && (

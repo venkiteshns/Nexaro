@@ -5,12 +5,7 @@ import SelectDropdown from "../../../sharedComponents/SelectDropdown";
 import { useAdminGetMonthlyPlReportQuery } from "../../../../store/services/adminApi";
 import { exportMonthlyPlStatementPDF } from "../../../../utils/reportExportUtils";
 
-/**
- * MonthlyPlReportCard Component
- * Displays Monthly P&L Statement card with month selector and PDF export.
- */
 export default function MonthlyPlReportCard() {
-  // Generate dynamic list of past 12 months for selector
   const monthOptions = useMemo(() => {
     const list = [];
     const now = new Date();
@@ -33,7 +28,6 @@ export default function MonthlyPlReportCard() {
   const [isExporting, setIsExporting] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
-  // Parse current selected year and month
   const selectedOption = useMemo(
     () => monthOptions.find((opt) => opt.value === selectedMonthValue) || monthOptions[0],
     [monthOptions, selectedMonthValue]
@@ -99,7 +93,6 @@ export default function MonthlyPlReportCard() {
         </button>
       }
     >
-      {/* Month Selector using existing reusable SelectDropdown */}
       <div className="space-y-2 pt-1">
         <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">
           SELECT MONTH
@@ -118,7 +111,6 @@ export default function MonthlyPlReportCard() {
           />
         </div>
 
-        {/* Selected Month Preview Pills */}
         <div className="grid grid-cols-2 gap-3 pt-2">
           <div className="bg-[#F8FBFA] p-3 rounded-xl border border-gray-100">
             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">

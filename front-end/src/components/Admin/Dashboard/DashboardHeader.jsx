@@ -1,14 +1,8 @@
 import { Calendar } from "lucide-react";
 
-/**
- * DashboardHeader Component
- * Displays "Platform overview" with a formatted current date & time pill badge
- * White and Green Nexaro theme
- */
 const DashboardHeader = ({ subtitle = "Platform overview" }) => {
   const now = new Date();
 
-  // Format: "Sep 9 • 2026"
   const month = now.toLocaleDateString("en-US", { month: "short" });
   const day = now.getDate();
   const year = now.getFullYear();

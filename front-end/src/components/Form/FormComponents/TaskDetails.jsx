@@ -38,7 +38,6 @@ const TaskDetails = () => {
                     Task Details
                 </h2>
 
-                {/* Title */}
                 <div className="mb-4">
                     <label className="block text-sm text-gray-500 mb-2 font-medium">
                         Task Title
@@ -50,8 +49,6 @@ const TaskDetails = () => {
                             minLength: { value: 3, message: "Title must be at least 3 characters" },
                             maxLength: { value: 250, message: "Title cannot exceed 250 characters" }
                         })}
-                        // value={title}
-                        // onChange={(e) => setTitle(e.target.value)}
                         placeholder="e.g., Professional Home Deep Cleaning"
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] placeholder-gray-400 text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
                     />
@@ -68,8 +65,6 @@ const TaskDetails = () => {
                                 {...register('category', {
                                     required: "Please select a category"
                                 })}
-                                // value={category}
-                                // onChange={(e) => setCategory(e.target.value)}
                                 className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors cursor-pointer pr-10"
                             >
                                 <option value="" className='text-xs text-slate-600' >Select Category</option>
@@ -102,8 +97,6 @@ const TaskDetails = () => {
                                     min: { value: 1, message: "Budget must be above 0" },
                                     max: { value: 100000, message: "Budget cannot exceed 100000" }
                                 })}
-                                // value={budget}
-                                // onChange={(e) => setBudget(e.target.value)}
                                 placeholder="5,000"
                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-[#111827] placeholder-gray-400 text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
                             />
@@ -112,14 +105,12 @@ const TaskDetails = () => {
                     </div>
                 </div>
 
-                {/* Description */}
                 <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                         <label className="text-sm text-gray-500 font-medium">
                             Description
                         </label>
                         <span className="text-xs text-gray-400">
-                            {/* {description.length} / 1000 characters */}
                         </span>
                     </div>
                     <textarea
@@ -128,10 +119,6 @@ const TaskDetails = () => {
                             minLength: { value: 3, message: "Description must be at least 3 characters" },
                             maxLength: { value: 1000, message: "Description cannot exceed 1000 characters" }
                         })}
-                        // value={description}
-                        // onChange={(e) =>
-                        // setDescription(e.target.value.slice(0, 1000))
-                        // }
                         placeholder="Detail the work, required skills, and expectations..."
                         rows={5}
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] placeholder-gray-400 text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors resize-none"
@@ -139,7 +126,6 @@ const TaskDetails = () => {
                     <FormError error={errors?.description} />
                 </div>
 
-                {/* deadline and urgency */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm text-gray-500 mb-2 font-medium">

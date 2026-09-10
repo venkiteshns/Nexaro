@@ -132,7 +132,6 @@ const LoginForm = () => {
         </button>
       </form>
 
-      {/* divider */}
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px" style={{ background: "rgba(10,110,92,0.1)" }} />
         <span
@@ -144,7 +143,6 @@ const LoginForm = () => {
         <div className="flex-1 h-px" style={{ background: "rgba(10,110,92,0.1)" }} />
       </div>
 
-      {/* google login btn */}
       <button
         onClick={() => signInWithGoogle()}
         disabled={isGoogleLoading}
@@ -180,7 +178,6 @@ const LoginForm = () => {
         {isGoogleLoading ? "Signing in..." : "Continue with Google"}
       </button>
 
-      {/* google err */}
       {googleError && (
         <div className="text-center bg-red-500/10 rounded-xl py-2 px-4 mt-3">
           <p className="italic text-red-600/90 text-sm">{googleError}</p>

@@ -17,8 +17,6 @@ export const searchPlaces = async (query) => {
         country: place.address.country || "",
         state: place.address.state || "",
         district: place.address.state_district || place.address.county || place.address.district || "",
-        // city: place.address.city || place.address.town || place.address.village || place.address.suburb || "",
-        // area: place.address.suburb || place.address.neighbourhood || place.address.quarter || place.address.residential || "",
         lat: place.lat,
         lon: place.lon,
         address: place.address,

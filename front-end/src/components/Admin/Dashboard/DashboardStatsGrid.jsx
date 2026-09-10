@@ -1,10 +1,5 @@
 import { Users, CheckSquare, Wallet, ShieldCheck } from "lucide-react";
 
-/**
- * DashboardStatsGrid Component
- * 4 KPI stat cards displayed strictly in one row
- * White and Green Nexaro theme
- */
 const DashboardStatsGrid = ({ stats = {}, isLoading = false }) => {
   const {
     totalUsers = 0,
@@ -74,7 +69,6 @@ const DashboardStatsGrid = ({ stats = {}, isLoading = false }) => {
           key={card.id}
           className="group relative bg-white rounded-2xl border border-gray-200/90 p-3.5 sm:p-4 lg:p-4.5 shadow-2xs hover:shadow-xs hover:border-gray-300 transition-all duration-200 flex flex-col gap-2 sm:gap-2.5 min-w-0"
         >
-          {/* Top Row: Icon */}
           <div className="flex items-center">
             <div
               className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border shadow-2xs transition-transform group-hover:scale-105 ${card.iconBg}`}
@@ -83,7 +77,6 @@ const DashboardStatsGrid = ({ stats = {}, isLoading = false }) => {
             </div>
           </div>
 
-          {/* Bottom Content: Label + Value */}
           <div className="min-w-0">
             <p className="text-[11px] sm:text-xs font-semibold text-gray-500 truncate mb-0.5">
               {card.label}

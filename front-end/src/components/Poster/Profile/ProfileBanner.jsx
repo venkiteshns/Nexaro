@@ -2,7 +2,6 @@ import { MapPin, ClipboardList, Edit3, ArrowLeftRight, BadgeCheck } from "lucide
 
 const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
   <div className="relative bg-white rounded-2xl border border-gray-100 shadow-sm mb-5">
-    {/* Mobile layout */}
     <div className="block min-[668px]:hidden">
       <div className="h-auto bg-linear-to-br from-[#0A6E5C] via-emerald-500 to-teal-400 relative overflow-hidden rounded-t-2xl px-5 py-5">
         <div className="absolute inset-0 opacity-20">
@@ -68,7 +67,6 @@ const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
       </div>
     </div>
 
-    {/* Desktop layout */}
     <div className="hidden min-[668px]:block">
       <div className="h-28 bg-linear-to-br from-[#0A6E5C] via-emerald-500 to-teal-400 relative overflow-hidden rounded-t-2xl">
         <div className="absolute inset-0 opacity-20">
@@ -121,7 +119,6 @@ const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
               </div>
             </div>
           </div>
-          {/* Action Buttons */}
           <div className="flex gap-2 shrink-0 self-end pt-8">
             <button
               onClick={onEditClick}

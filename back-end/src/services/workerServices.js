@@ -10,9 +10,9 @@ import Transaction from "../models/transactionSchema.js";
 import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
 import { convertInrToUsd } from "../utils/currency.js";
 import { getIo } from "../socket.js";
-import { recordAdminAlert } from "./adminNotificationHelper.js";
+import { recordAdminAlert } from "./adminNotificationService.js";
 import WorkerNotification from "../models/workerNotificationSchema.js";
-import { syncWorkerNotifications } from "./workerNotificationHelper.js";
+import { syncWorkerNotifications } from "./workerNotificationService.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -26,7 +26,6 @@ export const workerSignupService = async ({ files, data }) => {
             if (user.phone === data.phone) {
                 throw new Error(MESSAGES.PHONE_ALREADY_IN_USE);
             }
-            // This line should technically never be reached if the above conditions are exhaustive
         }
 
         const locationLat = parseFloat(data.locationLat);
@@ -39,7 +38,9 @@ export const workerSignupService = async ({ files, data }) => {
 
         let parsedSkills = [];
         let parsedLanguages = [];
-        try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch { /* ignore parsing errors */ }
+        try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch (e) {
+            console.log("Parse skills error", e);
+        }
         try { parsedLanguages = typeof data.language === 'string' ? JSON.parse(data.language) : data.language; } catch (e) {
             console.log("Parse error", e);
         }
@@ -72,7 +73,6 @@ export const workerSignupService = async ({ files, data }) => {
             }
         };
 
-        // Only attach location when we have real coordinates
         if (hasValidLocation) {
             payLoad.location = {
                 type: "Point",
@@ -80,7 +80,6 @@ export const workerSignupService = async ({ files, data }) => {
             };
         }
 
-        // Only attach serviceArea when we have real coordinates
         if (hasValidServiceArea) {
             payLoad.serviceArea = {
                 area: data.workPlace,
@@ -143,21 +142,18 @@ export const workerSignupService = async ({ files, data }) => {
 
 export const getWorkerProfileService = async (user) => {
 
-    // 1 Check the user object
     if (!user) {
         return { error: MESSAGES.USER_NOT_FOUND }
     }
 
     try {
 
-        // 2 Check if user exists in database
 
         const isUserExist = await User.findById(user._id)
         if (!isUserExist) {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
 
-        // 3 Prepare response 
         const userData = await User.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(user._id) }
@@ -294,7 +290,6 @@ export const getWorkerProfileService = async (user) => {
 export const updateWorkerProfileService = async ({ user, data, avatar }) => {
     console.log(user);
 
-    // 1 Check Form Values
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!user) {
         return { unauthorized: MESSAGES.UNAUTHORIZED_USER }
@@ -333,7 +328,6 @@ export const updateWorkerProfileService = async ({ user, data, avatar }) => {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
         if (avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
-            // upload avatar
             const uploadStatus = await uploadManyFiles(avatar, `user/${data.email}/verification`);
             if (uploadStatus.error) {
                 return { error: "Unable to upload profile picture, Please try again." }
@@ -465,7 +459,6 @@ export const getAllReviewService = async ({ user, query }) => {
                 }
             }
         ])
-        // console.log(reviewDatas[0]);
         const responseReviews = {
             reviews: reviewDatas[0].reviews,
             totalReviews: reviewDatas[0].totalReviews[0].TotalReviews,
@@ -615,7 +608,6 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
 
-        // Automatic PayPal status sync for any pending withdrawal transactions
         try {
             const pendingWithdrawals = await Transaction.find({
                 receiverId: new mongoose.Types.ObjectId(userId),
@@ -640,7 +632,6 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
                         tx.processedAt = new Date();
                         await tx.save();
 
-                        // Restore wallet amount
                         await Wallet.findOneAndUpdate(
                             { userId: new mongoose.Types.ObjectId(userId) },
                             {
@@ -711,7 +702,6 @@ export const getWorkerEarningsChartService = async ({ userId, timeframe = "7D" }
             startDate.setDate(now.getDate() - 6);
             startDate.setHours(0, 0, 0, 0);
 
-            // Pre-fill last 7 days
             const dayMap = new Map();
             for (let i = 6; i >= 0; i--) {
                 const d = new Date(now);
@@ -747,7 +737,6 @@ export const getWorkerEarningsChartService = async ({ userId, timeframe = "7D" }
 
             chartData = Array.from(dayMap.values());
         } else if (normalizedTimeframe === "1M") {
-            // 4 weekly buckets over the last 28 days
             startDate = new Date(now);
             startDate.setDate(now.getDate() - 27);
             startDate.setHours(0, 0, 0, 0);
@@ -917,7 +906,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             return { error: "Insufficient wallet balance. You have ₹0 available to withdraw." };
         }
 
-        // Amount to withdraw: defaults to full wallet balance
         const withdrawAmount = amount && Number(amount) > 0
             ? Math.min(Number(amount), wallet.walletAmount)
             : wallet.walletAmount;
@@ -926,7 +914,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             return { error: "Invalid withdrawal amount." };
         }
 
-        // Convert INR amount to USD for PayPal Payouts API
         const usdAmount = convertInrToUsd(withdrawAmount);
         if (usdAmount < 0.01) {
             return { error: "Withdrawal amount is too small to process via PayPal." };
@@ -934,7 +921,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
 
         console.log(`[PayPal Payout] Converted ₹${withdrawAmount} INR -> $${usdAmount} USD. Initiating payout to ${isUser.email}`);
 
-        // 1. Initiate PayPal Transfer
         const payoutResponse = await payoutTransferService(isUser.email, usdAmount, "USD");
 
         if (!payoutResponse.success) {
@@ -944,7 +930,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             };
         }
 
-        // 2. Update Wallet (Atomic update: set wallet amount to 0, increment withDrawn)
         const updatedWallet = await Wallet.findOneAndUpdate(
             { userId: new mongoose.Types.ObjectId(userId) },
             {
@@ -954,7 +939,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             { new: true }
         );
 
-        // Determine initial status based on PayPal response
         const itemStatus = payoutResponse.finalStatus?.itemStatus;
         let txStatus = "pending";
         if (itemStatus === "SUCCESS") {
@@ -963,7 +947,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             txStatus = "failed";
         }
 
-        // 3. Create Transaction record in collection
         const adminUserId = process.env.ADMIN_USER_ID;
         const transaction = await Transaction.create({
             senderId: adminUserId ? new mongoose.Types.ObjectId(adminUserId) : new mongoose.Types.ObjectId(userId),
@@ -977,9 +960,7 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             payoutEmail: isUser.email,
         });
 
-        // If PayPal immediately reported failure during poll:
         if (txStatus === "failed") {
-            // Restore wallet balance
             await Wallet.findOneAndUpdate(
                 { userId: new mongoose.Types.ObjectId(userId) },
                 {
@@ -1013,7 +994,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             metadata: { transactionId: transaction._id, amount: withdrawAmount },
         });
 
-        // 6. Realtime Notification via Socket
         try {
             const io = getIo();
             io.to(`user:${userId}`).emit("withdrawal-initiated", {
@@ -1045,7 +1025,6 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
 export const getWorkerNotificationsService = async (workerId, { page = 1, limit = 6, filter = "all" } = {}) => {
     const workerObjectId = new mongoose.Types.ObjectId(workerId);
 
-    // Sync latest real database records into worker notifications
     await syncWorkerNotifications(workerId);
 
     const query = { workerId: workerObjectId };

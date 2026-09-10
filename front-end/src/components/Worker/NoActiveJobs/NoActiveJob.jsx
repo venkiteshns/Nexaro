@@ -3,7 +3,6 @@ import { AlertTriangle, MapPin, Wrench } from "lucide-react";
 export default function NoActiveJob({ onNavigate }) {
     return (
         <div className="flex-1 flex flex-col items-center justify-center gap-6 py-20 px-6 text-center">
-            {/* Illustration */}
             <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center">
                     <Wrench size={36} className="text-emerald-300" />
@@ -31,7 +30,6 @@ export default function NoActiveJob({ onNavigate }) {
                 </button>
             </div>
 
-            {/* Tips card */}
             <div className="mt-6 bg-emerald-50 border border-emerald-200 rounded-2xl p-5 max-w-sm text-left">
                 <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-wider mb-3">How it works</p>
                 <ol className="space-y-2 text-sm text-gray-600">
