@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowUpRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useWithdrawEarningsMutation } from "../../../store/services/workerApi";
@@ -13,17 +13,18 @@ export default function WithdrawModal({
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
-  const [withdrawEarnings, { isLoading }] = useWithdrawEarningsMutation();
-
-  // Reset and prefill amount whenever modal opens
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setAmount(availableBalance ? availableBalance.toString() : "");
       setError("");
       setSuccess(false);
     }
-  }, [isOpen]);
+  }
+
+  const [withdrawEarnings, { isLoading }] = useWithdrawEarningsMutation();
 
   if (!isOpen) return null;
 
@@ -65,6 +66,9 @@ export default function WithdrawModal({
     try {
       await withdrawEarnings({ amount: numAmount }).unwrap();
       setSuccess(true);
+      if (onWithdrawSuccess) {
+        onWithdrawSuccess();
+      }
       setTimeout(() => {
         setSuccess(false);
         onClose();

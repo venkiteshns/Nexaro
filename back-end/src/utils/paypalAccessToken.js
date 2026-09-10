@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 export async function generateAccessToken(retries = 2) {
   const auth = Buffer.from(
     `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`

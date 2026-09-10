@@ -80,7 +80,7 @@ export const recordPosterAlert = async ({
           message: `${title}: ${description}`,
         });
       }
-    } catch (socketErr) {
+    } catch {
       // Socket not ready or outside web context
     }
 

@@ -19,7 +19,7 @@ const WorkerHeader = () => {
   const unreadCount = unreadData?.unreadCount || 0;
 
   // Real-time worker header status (live state + wallet balance) from DB
-  const { data: headerStatus, isLoading: isStatusLoading } = useGetWorkerHeaderStatusQuery();
+  const { data: headerStatus } = useGetWorkerHeaderStatusQuery();
   const [toggleLive, { isLoading: isToggling }] = useToggleWorkerLiveStatusMutation();
 
   const isLive = headerStatus?.isLive ?? user?.worker?.isLive ?? true;

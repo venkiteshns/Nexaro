@@ -1,10 +1,8 @@
-import mongoose from "mongoose";
 import AdminNotification from "../models/adminNotificationSchema.js";
 import Task from "../models/taskSchema.js";
 import Transaction from "../models/transactionSchema.js";
 import Review from "../models/reviewSchema.js";
 import User from "../models/userSchema.js";
-import Bid from "../models/bidsSchema.js";
 import { getIo } from "../socket.js";
 
 /**
@@ -61,7 +59,7 @@ export const recordAdminAlert = async ({
             message: `${title}: ${description}`,
           });
         }
-      } catch (socketErr) {
+      } catch {
         // Socket not ready or outside web context
       }
 

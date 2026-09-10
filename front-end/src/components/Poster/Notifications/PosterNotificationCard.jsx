@@ -5,7 +5,6 @@ import {
   Megaphone,
   Check,
   Bell,
-  IndianRupee,
 } from "lucide-react";
 
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";

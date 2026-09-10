@@ -6,7 +6,6 @@ import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
 import { recordAdminAlert } from "./adminNotificationHelper.js";
-import { recordPosterAlert } from "./posterNotificationHelper.js";
 
 const deleteImagesFromCloudinary = async (publicIds) => {
     if (!publicIds || publicIds.length === 0) return;
@@ -311,17 +310,7 @@ export const handleNewBid = async (task, user) => {
             status: "pending"
         }
        
-        const createdBid = await Bid.create(payload);
-
-        // Record real-time notification for poster
-        const bidder = await User.findById(user._id)
-            .select("name verificationDocuments verificationDocument")
-            .lean();
-        const bidderAvatar =
-            bidder?.verificationDocuments?.selfie?.url ||
-            bidder?.verificationDocument?.selfie?.url ||
-            null;
-
+        await Bid.create(payload);
 
         const io = getIo();
 

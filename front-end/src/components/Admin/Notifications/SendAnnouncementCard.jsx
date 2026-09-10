@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Megaphone, Send, Loader2 } from "lucide-react";
 import { showWarning } from "../../../utils/toast";
 

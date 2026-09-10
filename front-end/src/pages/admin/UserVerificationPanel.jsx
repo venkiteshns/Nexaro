@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Search,
   CheckCircle,
@@ -37,11 +37,9 @@ const UserVerificationPanel = () => {
     user.name.toLowerCase().includes(searchName.toLowerCase())
   );
 
-  useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [totalPages, currentPage]);
+  if (totalPages > 0 && currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
 
   const handleRejectUser = async (id) => {
     await rejectUser(id)

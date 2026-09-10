@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import WithdrawBidModal from '../WithdrawBidModal';
 
-export function timeAgo(dateStr) {
+function timeAgo(dateStr) {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
 
@@ -21,7 +21,7 @@ export function timeAgo(dateStr) {
     return `${days} days ago`;
 }
 
-export function getBidStatusConfig(status, task) {
+function getBidStatusConfig(status, task) {
     if (status === "accepted") {
         if (task?.status === "completed" && task?.update === "payment") {
             return {

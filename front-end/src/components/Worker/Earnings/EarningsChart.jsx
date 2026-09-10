@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { useGetWorkerEarningsChartQuery } from "../../../store/services/workerApi";
 import FinanceBarChart from "../../sharedComponents/FinanceBarChart";

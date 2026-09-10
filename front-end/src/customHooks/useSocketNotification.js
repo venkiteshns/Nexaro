@@ -45,7 +45,7 @@ const useSocketNotification = () => {
         });
 
 
-        socket.on('new-bid-added', (data) => {
+        socket.on('new-bid-added', () => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'poster' && activeUser?.role !== 'poster')) return;
 
             // Silently invalidate data so task & bid lists refresh without showing duplicate toast

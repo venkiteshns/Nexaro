@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ChevronDown, Megaphone } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 /**
  * Format relative time for announcements

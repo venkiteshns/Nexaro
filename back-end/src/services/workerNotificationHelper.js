@@ -78,7 +78,7 @@ export const recordWorkerAlert = async ({
           message: `${title}: ${description}`,
         });
       }
-    } catch (socketErr) {
+    } catch {
       // Socket not ready or outside web context
     }
 
@@ -87,19 +87,6 @@ export const recordWorkerAlert = async ({
     console.error("Error recording worker alert:", err.message);
     return null;
   }
-};
-
-/**
- * Extract clean readable location string from task address
- */
-const formatTaskLocation = (address) => {
-  if (!address) return "Kerala";
-  if (typeof address === "string") return address;
-  if (address.landmark) {
-    const parts = address.landmark.split(",");
-    return parts[0]?.trim() || address.district || "Kerala";
-  }
-  return address.city || address.district || "Kerala";
 };
 
 /**

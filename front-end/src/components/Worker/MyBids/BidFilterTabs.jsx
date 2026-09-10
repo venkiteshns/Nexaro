@@ -1,4 +1,4 @@
-export const TABS = [
+const TABS = [
     { key: "all", label: "All" },
     { key: "pending", label: "Pending" },
     { key: "accepted", label: "Accepted" },

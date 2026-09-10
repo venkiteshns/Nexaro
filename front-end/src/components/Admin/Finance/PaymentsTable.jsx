@@ -1,9 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Download,
-  Copy,
-  Check,
   Loader2,
   Inbox,
 } from "lucide-react";
@@ -86,22 +84,22 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const [copiedTxnId, setCopiedTxnId] = useState(null);
   const pageSize = 10;
 
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setCurrentPage(1);
     }, 350);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Reset page when range or status changes
-  useEffect(() => {
+  const [prevFilterKey, setPrevFilterKey] = useState(`${dateRange}|${selectedStatus}|${debouncedSearch}`);
+  const currentFilterKey = `${dateRange}|${selectedStatus}|${debouncedSearch}`;
+  if (currentFilterKey !== prevFilterKey) {
+    setPrevFilterKey(currentFilterKey);
     setCurrentPage(1);
-  }, [dateRange, selectedStatus]);
+  }
 
   // Query live backend
   const { data, isLoading, isFetching } = useAdminGetFinanceTransactionsQuery({
@@ -118,8 +116,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
 
   const handleCopyId = (id) => {
     navigator.clipboard?.writeText(id);
-    setCopiedTxnId(id);
-    setTimeout(() => setCopiedTxnId(null), 1500);
   };
 
   const handleNextPage = () => {

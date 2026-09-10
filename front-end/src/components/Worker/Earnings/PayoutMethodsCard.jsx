@@ -1,4 +1,4 @@
-import { Building2, Plus, CheckCircle2, ShieldCheck, QrCode } from "lucide-react";
+import { Building2, Plus, ShieldCheck, QrCode } from "lucide-react";
 
 export default function PayoutMethodsCard({
   payoutMethods = [

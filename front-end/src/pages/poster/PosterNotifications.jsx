@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PosterNavBar from "../../layouts/Poster/PosterNavBar";
 import PosterHeader from "../../layouts/Poster/PosterHeader";
 import PosterNotificationHeader from "../../components/Poster/Notifications/PosterNotificationHeader";

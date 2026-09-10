@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Receipt, FileDown, Loader2, Calendar, CheckCircle2 } from "lucide-react";
 import ReportCardWrapper from "./ReportCardWrapper";
 import SelectDropdown from "../../../sharedComponents/SelectDropdown";
@@ -10,11 +10,10 @@ import { exportMonthlyPlStatementPDF } from "../../../../utils/reportExportUtils
  * Displays Monthly P&L Statement card with month selector and PDF export.
  */
 export default function MonthlyPlReportCard() {
-  const now = new Date();
-
   // Generate dynamic list of past 12 months for selector
   const monthOptions = useMemo(() => {
     const list = [];
+    const now = new Date();
     for (let i = 0; i < 12; i++) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -29,7 +28,7 @@ export default function MonthlyPlReportCard() {
   }, []);
 
   const [selectedMonthValue, setSelectedMonthValue] = useState(
-    monthOptions[0]?.value || `${now.getFullYear()}-${now.getMonth()}`
+    monthOptions[0]?.value || ""
   );
   const [isExporting, setIsExporting] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);

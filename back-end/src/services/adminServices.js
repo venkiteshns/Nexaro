@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Task from "../models/taskSchema.js";
 import Transaction from "../models/transactionSchema.js";
-import Order from "../models/orderSchema.js";
 import AdminNotification from "../models/adminNotificationSchema.js";
 import Announcement from "../models/announcementSchema.js";
 import WorkerNotification from "../models/workerNotificationSchema.js";
@@ -321,10 +320,10 @@ export const getAdminTaskDetailsService = async (taskId) => {
 
 const getRangeDates = (range) => {
     const now = new Date();
-    let currentStart = null;
+    let currentStart;
     let currentEnd = now;
-    let prevStart = null;
-    let prevEnd = null;
+    let prevStart;
+    let prevEnd;
 
     switch (range) {
         case "Today": {
@@ -459,7 +458,7 @@ export const getAdminFinanceChartService = async (timeframe = "7D", metric = "re
     const normalizedTimeframe = (timeframe || "7D").toUpperCase();
     const normalizedMetric = (metric || "revenue").toLowerCase();
     const now = new Date();
-    let chartData = [];
+    let chartData;
     let startDate;
 
     if (normalizedTimeframe === "7D") {
@@ -1202,8 +1201,8 @@ export const getAdminDashboardService = async () => {
         totalUsers,
         activeTasks,
         pendingVerifications,
-        pendingPayouts,
-        flaggedCount,
+        _pendingPayouts,
+        _flaggedCount,
         todayTransactions,
         monthTransactions,
         recent7DaysTransactions,

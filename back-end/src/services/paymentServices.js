@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { generateAccessToken } from "../utils/paypalAccessToken.js";
 import Order from "../models/orderSchema.js"; // Import the Order model
 import Bid from '../models/bidsSchema.js'
@@ -477,8 +478,8 @@ export const orderPayoutService = async ({ bidId, user }) => {
       taskId: task._id.toString(),
       taskTitle: task.title,
       amount: bid.amount,
-      platformFee: platformFee,
-      creditedAmount: creditedAmount,
+      platformFee,
+      creditedAmount,
     });
 
 

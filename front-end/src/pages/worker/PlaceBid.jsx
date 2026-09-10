@@ -25,7 +25,7 @@ import {
   FileText,
   Image as ImageIcon,
 } from "lucide-react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import WorkerNavBar from "../../layouts/Worker/WorkerNavBar";
 import WorkerHeader from "../../layouts/Worker/WorkerHeader";
 import { useAddNewBidMutation, useGetTaskForBidQuery } from "../../store/services/workerApi";

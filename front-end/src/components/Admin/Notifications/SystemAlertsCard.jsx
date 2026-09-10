@@ -1,4 +1,4 @@
-import React from "react";
+
 import NotificationItem from "./NotificationItem";
 import PaginationSections from "../../sharedComponents/PaginationSections";
 import { Bell, CheckCheck, Loader2 } from "lucide-react";

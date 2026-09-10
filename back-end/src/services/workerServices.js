@@ -20,10 +20,10 @@ export const workerSignupService = async ({ files, data }) => {
         const user = await User.findOne({ $or: [{ email: data.email }, { phone: data.phone }] })
 
         if (user) {
-            if (user.email == data.email) {
+            if (user.email === data.email) {
                 throw new Error(MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL);
             }
-            if (user.phone == data.phone) {
+            if (user.phone === data.phone) {
                 throw new Error(MESSAGES.PHONE_ALREADY_IN_USE);
             }
             // This line should technically never be reached if the above conditions are exhaustive
@@ -624,30 +624,32 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
                 payoutBatchId: { $exists: true, $ne: null },
             });
 
-            for (const tx of pendingWithdrawals) {
-                const payoutData = await getPayoutStatus(tx.payoutBatchId);
-                const item = payoutData.items?.[0];
-                const itemStatus = item?.transaction_status;
+            await Promise.all(
+                pendingWithdrawals.map(async (tx) => {
+                    const payoutData = await getPayoutStatus(tx.payoutBatchId);
+                    const item = payoutData.items?.[0];
+                    const itemStatus = item?.transaction_status;
 
-                if (itemStatus === "SUCCESS") {
-                    tx.status = "completed";
-                    tx.processedAt = new Date();
-                    if (item.payout_item_id) tx.payoutItemId = item.payout_item_id;
-                    await tx.save();
-                } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED"].includes(itemStatus)) {
-                    tx.status = "failed";
-                    tx.processedAt = new Date();
-                    await tx.save();
+                    if (itemStatus === "SUCCESS") {
+                        tx.status = "completed";
+                        tx.processedAt = new Date();
+                        if (item.payout_item_id) tx.payoutItemId = item.payout_item_id;
+                        await tx.save();
+                    } else if (["FAILED", "BLOCKED", "DENIED", "RETURNED"].includes(itemStatus)) {
+                        tx.status = "failed";
+                        tx.processedAt = new Date();
+                        await tx.save();
 
-                    // Restore wallet amount
-                    await Wallet.findOneAndUpdate(
-                        { userId: new mongoose.Types.ObjectId(userId) },
-                        {
-                            $inc: { walletAmount: tx.amount, withDrawn: -tx.amount },
-                        }
-                    );
-                }
-            }
+                        // Restore wallet amount
+                        await Wallet.findOneAndUpdate(
+                            { userId: new mongoose.Types.ObjectId(userId) },
+                            {
+                                $inc: { walletAmount: tx.amount, withDrawn: -tx.amount },
+                            }
+                        );
+                    }
+                })
+            );
         } catch (syncErr) {
             console.warn("Background PayPal status sync error:", syncErr.message);
         }

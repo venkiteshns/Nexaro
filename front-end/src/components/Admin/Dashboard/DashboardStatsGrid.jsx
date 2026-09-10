@@ -1,4 +1,3 @@
-import React from "react";
 import { Users, CheckSquare, Wallet, ShieldCheck } from "lucide-react";
 
 /**
