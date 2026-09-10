@@ -81,7 +81,7 @@ const WorkerSignup = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      navigate("/worker/dashboard");
+      navigate("/worker/nearby-tasks");
     } catch (err) {
       showWarning(err.data?.message)
       console.log("Sign up error", err);

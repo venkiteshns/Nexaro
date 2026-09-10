@@ -21,9 +21,9 @@ function PrivateRoute({ allowedRoles }) {
       return <Outlet />;
     } else {
       if (userAuth.user.role === "worker") {
-        return <Navigate to="/worker/dashboard" replace />;
+        return <Navigate to="/worker/nearby-tasks" replace />;
       } else if (userAuth.user.role === "poster") {
-        return <Navigate to="/poster/dashboard" replace />;
+        return <Navigate to="/poster/my-tasks" replace />;
       } else {
         return <Navigate to="/" replace />;
       }

@@ -48,9 +48,9 @@ export default function AdminPayments() {
       <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
         <AdminHeader />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
           {/* Top Page Header: Helper text + Date Filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
                 Payments & Revenue

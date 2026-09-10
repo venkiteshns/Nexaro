@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  LayoutDashboard,
   ListChecks,
   Briefcase,
   Wallet,
@@ -20,11 +19,6 @@ import { useUserLogoutMutation } from "../../store/services/authApi";
 import { useGetWorkerUnreadCountQuery } from "../../store/services/workerApi";
 
 const workerNav = [
-  {
-    label: "Dashboard",
-    icon: <LayoutDashboard size={20} />,
-    redirect: "/worker/dashboard",
-  },
   {
     label: "Nearby Tasks",
     icon: <ListChecks size={20} />,

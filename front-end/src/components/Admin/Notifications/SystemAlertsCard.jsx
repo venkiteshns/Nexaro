@@ -19,10 +19,10 @@ const SystemAlertsCard = ({
   isMarkingAll = false,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-5 sm:p-6 flex flex-col justify-between min-h-[580px]">
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-4 sm:p-5 flex flex-col">
       <div>
         {/* Card Header: Title + Unread Count + MARK ALL AS READ */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
             <span className="w-1.5 h-5 bg-[#0A6E5C] rounded-full" aria-hidden="true" />
             <h2 className="text-lg font-bold text-[#111827] tracking-tight">
@@ -51,7 +51,7 @@ const SystemAlertsCard = ({
         </div>
 
         {/* Alerts List / Skeletons / Empty State */}
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-3 space-y-2">
           {isLoading ? (
             // Skeletons
             Array.from({ length: 6 }).map((_, idx) => (
@@ -94,14 +94,16 @@ const SystemAlertsCard = ({
       </div>
 
       {/* Reusable Pagination Section */}
-      <div className="pt-4 mt-4 border-t border-gray-100">
-        <PaginationSections
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-          page={currentPage}
-          className="mt-0"
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="pt-4 mt-4 border-t border-gray-100">
+          <PaginationSections
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            page={currentPage}
+            className="mt-0"
+          />
+        </div>
+      )}
     </div>
   );
 };

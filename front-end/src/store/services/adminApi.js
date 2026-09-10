@@ -192,6 +192,14 @@ export const adminApi = api.injectEndpoints({
       }),
       providesTags: ["Admin_Announcements"],
     }),
+
+    adminGetDashboard: builder.query({
+      query: () => ({
+        url: "/admin/dashboard",
+        method: "GET",
+      }),
+      providesTags: ["Admin_Dashboard"],
+    }),
   }),
 });
 
@@ -216,4 +224,5 @@ export const {
   useAdminMarkNotificationReadMutation,
   useAdminSendAnnouncementMutation,
   useAdminGetRecentAnnouncementsQuery,
+  useAdminGetDashboardQuery,
 } = adminApi;

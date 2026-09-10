@@ -201,11 +201,10 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                 key={status}
                 type="button"
                 onClick={() => setSelectedStatus(status)}
-                className={`px-3 py-1.5 rounded-lg transition-all capitalize cursor-pointer ${
-                  selectedStatus === status
-                    ? "bg-[#0A6E5C] text-white shadow-xs font-bold"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
+                className={`px-3 py-1.5 rounded-lg transition-all capitalize cursor-pointer ${selectedStatus === status
+                  ? "bg-[#0A6E5C] text-white shadow-xs font-bold"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
               >
                 {status.toLowerCase()}
               </button>
@@ -239,7 +238,7 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#F8FBFA] border-b border-gray-100 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                <th className="py-4 px-6">TRANS ID</th>
+                {/* <th className="py-4 px-6">TRANS ID</th> */}
                 <th className="py-4 px-6">USER</th>
                 <th className="py-4 px-6">TASK / PURPOSE</th>
                 <th className="py-4 px-6">AMOUNT</th>
@@ -265,7 +264,7 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                     className="hover:bg-[#F6FAF8] transition-colors group"
                   >
                     {/* Transaction ID with Copy Button */}
-                    <td className="py-4 px-6">
+                    {/* <td className="py-4 px-6">
                       <button
                         type="button"
                         onClick={() => handleCopyId(item.rawId || item.id)}
@@ -282,7 +281,7 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                           />
                         )}
                       </button>
-                    </td>
+                    </td> */}
 
                     {/* User Info with Avatar */}
                     <td className="py-4 px-6">
@@ -460,11 +459,10 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
               type="button"
               onClick={handlePrevPage}
               disabled={currentPage === 1 || isLoading}
-              className={`text-xs font-bold tracking-wider uppercase px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                currentPage === 1 || isLoading
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-600 hover:text-[#0A6E5C] hover:bg-emerald-50"
-              }`}
+              className={`text-xs font-bold tracking-wider uppercase px-3 py-1.5 rounded-lg transition-all cursor-pointer ${currentPage === 1 || isLoading
+                ? "text-gray-300 cursor-not-allowed"
+                : "text-gray-600 hover:text-[#0A6E5C] hover:bg-emerald-50"
+                }`}
             >
               PREVIOUS
             </button>
@@ -477,11 +475,10 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                     key={pageNum}
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      currentPage === pageNum
-                        ? "bg-[#0A6E5C] text-white shadow-xs"
-                        : "text-gray-500 hover:bg-gray-100"
-                    }`}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPage === pageNum
+                      ? "bg-[#0A6E5C] text-white shadow-xs"
+                      : "text-gray-500 hover:bg-gray-100"
+                      }`}
                   >
                     {pageNum}
                   </button>
@@ -493,11 +490,10 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
               type="button"
               onClick={handleNextPage}
               disabled={currentPage === totalPages || isLoading}
-              className={`text-xs font-bold tracking-wider uppercase px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                currentPage === totalPages || isLoading
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-[#0A6E5C] hover:text-emerald-700 hover:bg-emerald-50"
-              }`}
+              className={`text-xs font-bold tracking-wider uppercase px-3 py-1.5 rounded-lg transition-all cursor-pointer ${currentPage === totalPages || isLoading
+                ? "text-gray-300 cursor-not-allowed"
+                : "text-[#0A6E5C] hover:text-emerald-700 hover:bg-emerald-50"
+                }`}
             >
               NEXT PAGE
             </button>

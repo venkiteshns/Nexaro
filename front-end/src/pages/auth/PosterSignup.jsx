@@ -72,7 +72,7 @@ const PosterSignup = () => {
         refreshToken: res.refreshToken,
       }),
     );
-    navigate("/poster/dashboard");
+    navigate("/poster/my-tasks");
   },[isVerified, navigate, dispatch, posterSignUp, formData]);
 
   useEffect(() => {

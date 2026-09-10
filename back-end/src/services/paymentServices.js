@@ -425,7 +425,12 @@ export const orderPayoutService = async ({ bidId, user }) => {
       processedAt: new Date(),
     });
 
-    const adminUserId = process.env.ADMIN_USER_ID ? process.env.ADMIN_USER_ID.trim() : null;
+    let adminUserId = process.env.ADMIN_USER_ID ? process.env.ADMIN_USER_ID.trim() : null;
+    if (!adminUserId) {
+      const adminUser = await User.findOne({ $or: [{ role: "admin" }, { activeRole: "admin" }] }).lean();
+      if (adminUser) adminUserId = adminUser._id.toString();
+    }
+
     if (adminUserId && platformFee > 0) {
       await Transaction.create({
         orderId: order._id,
@@ -450,6 +455,7 @@ export const orderPayoutService = async ({ bidId, user }) => {
 
     task.update = 'payment';
     task.status = 'completed';
+    task.platformFee = platformFee;
     if (!task.completedOn) {
       task.completedOn = new Date();
     }

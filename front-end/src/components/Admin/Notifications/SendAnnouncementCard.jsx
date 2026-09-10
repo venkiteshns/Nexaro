@@ -43,9 +43,9 @@ const SendAnnouncementCard = ({ onSend, isSending = false }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-5 sm:p-6 space-y-5">
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-4 sm:p-5 space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100">
+      <div className="flex items-center gap-2.5 pb-2.5 border-b border-gray-100">
         <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#0A6E5C] flex items-center justify-center">
           <Megaphone size={18} />
         </div>

@@ -132,6 +132,7 @@ export const api = createApi({
     "Worker_Header_Status",
     "Poster_Notifications",
     "Poster_Unread_Count",
+    "Admin_Dashboard",
   ],
   endpoints: () => ({}),
 });

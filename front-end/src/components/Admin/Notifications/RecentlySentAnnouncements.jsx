@@ -31,7 +31,7 @@ const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) =>
   };
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 px-1">
         Recently Sent
       </h3>
@@ -42,7 +42,7 @@ const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) =>
           <div className="h-3 bg-gray-200 rounded w-1/3" />
         </div>
       ) : announcements.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-200/80 p-6 text-center text-gray-400 text-xs shadow-xs">
+        <div className="bg-white rounded-2xl border border-gray-200/80 p-4 text-center text-gray-400 text-xs shadow-xs">
           No announcements sent recently
         </div>
       ) : (

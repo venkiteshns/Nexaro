@@ -757,18 +757,14 @@ export const getPosterNotificationsService = async (posterId, { page = 1, limit 
     totalItems,
     allCount,
     unreadCount,
-    bidsCount,
     paymentsCount,
-    tasksCount,
     systemCount,
   ] = await Promise.all([
     PosterNotification.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limitNum).lean(),
     PosterNotification.countDocuments(query),
     PosterNotification.countDocuments({ posterId: posterObjectId }),
     PosterNotification.countDocuments({ posterId: posterObjectId, isRead: false }),
-    PosterNotification.countDocuments({ posterId: posterObjectId, category: "bids" }),
     PosterNotification.countDocuments({ posterId: posterObjectId, category: "payments" }),
-    PosterNotification.countDocuments({ posterId: posterObjectId, category: "tasks" }),
     PosterNotification.countDocuments({ posterId: posterObjectId, category: "system" }),
   ]);
 
@@ -783,9 +779,7 @@ export const getPosterNotificationsService = async (posterId, { page = 1, limit 
     counts: {
       all: allCount,
       unread: unreadCount,
-      bids: bidsCount,
       payments: paymentsCount,
-      tasks: tasksCount,
       system: systemCount,
     },
   };

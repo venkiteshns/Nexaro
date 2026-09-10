@@ -5,16 +5,12 @@ const PosterNotificationEmptyState = ({ filter = "all", onResetFilter }) => {
     switch (filter) {
       case "unread":
         return "You're all caught up! There are no unread notifications right now.";
-      case "bids":
-        return "No bids received yet. Once professionals start submitting bids on your tasks, they will appear here.";
       case "payments":
-        return "No payment notifications yet. Escrow updates and milestone releases will be tracked here.";
-      case "tasks":
-        return "No task updates yet. Progress and status changes on your tasks will appear here.";
+        return "No payment notifications yet. Escrow funding and payment releases will appear here.";
       case "system":
         return "No system announcements at the moment.";
       default:
-        return "You're all caught up! When workers bid on your tasks, progress is logged, or payments are processed, updates will appear here in real time.";
+        return "You're all caught up! When payments are processed or system updates arrive, they will appear here in real time.";
     }
   };
 

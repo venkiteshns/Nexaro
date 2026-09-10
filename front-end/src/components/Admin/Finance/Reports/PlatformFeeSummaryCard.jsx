@@ -12,9 +12,8 @@ export default function PlatformFeeSummaryCard() {
   const [isExporting, setIsExporting] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
-  const formattedAmount = data?.formattedAmount || "₹1.42M";
+  const formattedAmount = data?.formattedAmount || "₹0";
   const commissionRate = data?.commissionRate || "5%";
-  const fiscalYearLabel = data?.fiscalYear ? `${data.fiscalYear} PTD` : "FISCAL YEAR PTD";
 
   const handleDownload = async () => {
     try {
@@ -34,11 +33,11 @@ export default function PlatformFeeSummaryCard() {
   };
 
   return (
-    <div className="group relative bg-white rounded-2xl p-6 sm:p-7 border border-gray-100 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden">
+    <div className="group relative bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden">
       {/* Top subtle emerald gradient accent */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-[#0A6E5C] to-teal-600 opacity-80 group-hover:opacity-100 transition-opacity" />
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         {/* Left Side: Icon + Title + Description */}
         <div className="flex items-start sm:items-center gap-4 min-w-0">
           <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#0A6E5C] border border-emerald-100/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200 shadow-xs">
@@ -59,9 +58,6 @@ export default function PlatformFeeSummaryCard() {
         <div className="flex flex-wrap items-center justify-between lg:justify-end gap-6 sm:gap-8 pt-4 lg:pt-0 border-t lg:border-t-0 border-gray-100">
           {/* Fiscal Metric Column */}
           <div className="text-left lg:text-right">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">
-              {fiscalYearLabel}
-            </span>
             <span className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight block">
               {isLoading ? "..." : formattedAmount}
             </span>

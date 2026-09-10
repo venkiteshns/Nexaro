@@ -52,11 +52,11 @@ export const recordAdminAlert = async ({
         });
       }
 
-      // Emit live socket event to all connected admin clients
+      // Emit live socket event ONLY to connected admin clients
       try {
         const io = getIo();
         if (io) {
-          io.emit("admin-notification", {
+          io.to("role:admin").emit("admin-notification", {
             notification: alert,
             message: `${title}: ${description}`,
           });

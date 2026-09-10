@@ -40,18 +40,9 @@ const PosterNotifications = () => {
   const counts = data?.counts || {
     all: 0,
     unread: 0,
-    bids: 0,
     payments: 0,
-    tasks: 0,
     system: 0,
   };
-
-  // Reset to "all" if current filter tab is hidden / 0 items
-  useEffect(() => {
-    if (filter === "payments" && counts.payments === 0) {
-      setFilter("all");
-    }
-  }, [filter, counts.payments]);
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);

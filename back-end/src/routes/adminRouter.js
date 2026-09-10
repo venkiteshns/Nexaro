@@ -20,6 +20,7 @@ import {
     markAdminNotificationRead,
     sendAdminAnnouncement,
     getAdminRecentAnnouncements,
+    getAdminDashboard,
 } from "../controller/AdminControllers/adminController.js";
 import verifyToken from "../middlewares/verifyToken.js";
 
@@ -27,6 +28,7 @@ const adminRouter = express.Router();
 
 adminRouter.use(verifyToken);
 
+adminRouter.get("/dashboard", getAdminDashboard);
 adminRouter.get("/users", getAllUsers);
 adminRouter.get("/tasks", getAllTasks);
 adminRouter.get("/users/pending-verification", getPendingVerificationUsers);

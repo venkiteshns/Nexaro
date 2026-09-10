@@ -33,7 +33,7 @@ const WorkerNotifications = () => {
 
   const notifications = data?.notifications || [];
   const totalPages = data?.totalPages || 1;
-  const counts = data?.counts || { unread: 0, nearby: 0, bids: 0, payments: 0, urgent: 0 };
+  const counts = data?.counts || { unread: 0, payments: 0, system: 0 };
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
@@ -82,7 +82,7 @@ const WorkerNotifications = () => {
                   </h1>
                 </div>
                 <p className="text-sm text-gray-500 pl-10">
-                  Real-time updates on nearby tasks, your bids, and payments
+                  Real-time updates on your payments and system notices
                 </p>
               </div>
 
@@ -139,7 +139,7 @@ const WorkerNotifications = () => {
                 <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto mb-4">
                   {filter !== "all"
                     ? `You don't have any notifications under "${filter.replace("_", " ")}".`
-                    : "You're all caught up! When clients post urgent tasks, accept your bids, or release payments, they'll appear here in real-time."}
+                    : "You're all caught up! When you receive payments or system updates, they'll appear here in real-time."}
                 </p>
                 {filter !== "all" && (
                   <button

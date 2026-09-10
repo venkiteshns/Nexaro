@@ -50,7 +50,8 @@ const LoginForm = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      navigate(`/${res.user.role}/dashboard`);
+      const targetRoute = res.user.role === "worker" ? "/worker/nearby-tasks" : "/poster/my-tasks";
+      navigate(targetRoute);
     } catch (err) {
       console.log(" error: ", err);
     }
@@ -73,7 +74,8 @@ const LoginForm = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      navigate(`/${res.user.role}/dashboard`);
+      const targetRoute = res.user.role === "worker" ? "/worker/nearby-tasks" : "/poster/my-tasks";
+      navigate(targetRoute);
     } catch (err) {
       setGoogleError(
         err?.data?.message || "Google login failed. Please try again.",

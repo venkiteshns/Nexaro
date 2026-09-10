@@ -1,12 +1,9 @@
-import { CheckCheck, Flame, Circle } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 
 const FILTER_TABS = [
   { id: "all", label: "All" },
   { id: "unread", label: "Unread", hasDot: true },
-  { id: "nearby_tasks", label: "Nearby Tasks" },
-  { id: "bid_results", label: "Bid Results" },
   { id: "payments", label: "Payments" },
-  { id: "urgent", label: "Urgent", hasFlame: true },
   { id: "system", label: "System" },
 ];
 
@@ -20,10 +17,7 @@ const WorkerNotificationFilters = ({
   const {
     all = 0,
     unread = 0,
-    nearby = 0,
-    bids = 0,
     payments = 0,
-    urgent = 0,
     system = 0,
   } = counts;
 
@@ -33,14 +27,8 @@ const WorkerNotificationFilters = ({
         return all;
       case "unread":
         return unread;
-      case "nearby_tasks":
-        return nearby;
-      case "bid_results":
-        return bids;
       case "payments":
         return payments;
-      case "urgent":
-        return urgent;
       case "system":
         return system;
       default:
@@ -53,9 +41,6 @@ const WorkerNotificationFilters = ({
       {/* Unified Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
         {FILTER_TABS.map((tab) => {
-          // Hide "Urgent" tab if there are no urgent tasks
-          if (tab.id === "urgent" && urgent === 0) return null;
-
           const isActive = activeFilter === tab.id;
           const count = getTabCount(tab.id);
 
@@ -75,9 +60,6 @@ const WorkerNotificationFilters = ({
                     unread > 0 ? "bg-emerald-400 animate-pulse" : "bg-gray-300"
                   }`}
                 />
-              )}
-              {tab.hasFlame && (
-                <Flame size={13} className={isActive ? "text-white fill-white" : "text-rose-500 fill-rose-500"} />
               )}
               <span>{tab.label}</span>
               {count > 0 && (

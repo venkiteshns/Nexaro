@@ -47,12 +47,6 @@ export default function DailyRevenueReportCard() {
       icon={TrendingUp}
       title="Daily Revenue Report"
       description="Aggregated real-time revenue stream including transaction fees and premium listings."
-      badge={
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-emerald-50 text-[#0A6E5C] border border-emerald-200/80 shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          AUTO-GENERATED
-        </span>
-      }
       actionButton={
         <button
           type="button"

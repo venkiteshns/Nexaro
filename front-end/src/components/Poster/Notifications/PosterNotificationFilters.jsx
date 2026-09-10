@@ -1,9 +1,7 @@
 const TABS = [
   { id: "all", label: "All" },
-  { id: "bids", label: "Bids" },
-  { id: "payments", label: "Payments" },
-  { id: "tasks", label: "Tasks" },
   { id: "unread", label: "Unread" },
+  { id: "payments", label: "Payments" },
   { id: "system", label: "System" },
 ];
 
@@ -14,10 +12,8 @@ const PosterNotificationFilters = ({
 }) => {
   const {
     all = 0,
-    bids = 0,
-    payments = 0,
-    tasks = 0,
     unread = 0,
+    payments = 0,
     system = 0,
   } = counts;
 
@@ -25,14 +21,10 @@ const PosterNotificationFilters = ({
     switch (id) {
       case "all":
         return all;
-      case "bids":
-        return bids;
-      case "payments":
-        return payments;
-      case "tasks":
-        return tasks;
       case "unread":
         return unread;
+      case "payments":
+        return payments;
       case "system":
         return system;
       default:
@@ -44,11 +36,6 @@ const PosterNotificationFilters = ({
     <div className="border-b border-gray-200/80">
       <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar">
         {TABS.map((tab) => {
-          // Hide system tab if 0
-          if (tab.id === "system" && system === 0) return null;
-          // Hide payments tab if 0
-          if (tab.id === "payments" && payments === 0) return null;
-
           const isActive = activeFilter === tab.id;
           const count = getCount(tab.id);
 

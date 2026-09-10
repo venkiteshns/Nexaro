@@ -372,9 +372,9 @@ export function exportMonthlyPlStatementPDF(reportData) {
  */
 export function exportPlatformFeeSummaryPDF(reportData) {
   const fiscalYear = reportData?.fiscalYear || "Current Fiscal Year";
-  const formattedAmount = reportData?.formattedAmount || "₹1.42M";
+  const formattedAmount = reportData?.formattedAmount || "₹0";
   const commissionRate = reportData?.commissionRate || "5%";
-  const totalGmv = reportData?.totalGmv ? `₹${reportData.totalGmv.toLocaleString("en-IN")}` : "₹28.4M";
+  const totalGmv = reportData?.totalGmv ? `₹${Number(reportData.totalGmv).toLocaleString("en-IN")}` : "₹0";
 
   const html = `
     <div class="title-section">

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import ErrorBoundary from "./components/routes/ErrorBoundary.jsx";
@@ -11,7 +11,6 @@ import Map from "./components/Maps/Map.jsx";
 import PosterSignup from "./pages/auth/PosterSignup.jsx";
 import WorkerSignup from "./pages/auth/WorkerSignup.jsx";
 import UserLogin from "./pages/auth/UserLogin.jsx";
-import PosterDasboard from "./pages/poster/PosterDasboard.jsx";
 import PostTask from "./pages/poster/PostTask.jsx";
 import MyTasks from "./pages/poster/MyTasks.jsx";
 import ReviewBids from "./pages/poster/ReviewBids.jsx";
@@ -21,7 +20,6 @@ import PosterProfile from "./pages/poster/PosterProfile.jsx";
 import ReviewPage from "./pages/poster/ReviewPage.jsx";
 import PosterNotifications from "./pages/poster/PosterNotifications.jsx";
 
-import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
 import MyBids from "./pages/worker/MyBids.jsx";
@@ -86,7 +84,8 @@ function AppInner() {
 
           <Route element={<PrivateRoute allowedRoles="poster" />}>
             <Route path="/poster">
-              <Route path="dashboard" element={<PosterDasboard />} />
+              <Route index element={<Navigate to="/poster/my-tasks" replace />} />
+              <Route path="dashboard" element={<Navigate to="/poster/my-tasks" replace />} />
               <Route path="post-task" element={<PostTask />} />
               <Route path="my-tasks" element={<MyTasks />} />
               <Route path="review-bids/:taskId" element={<ReviewBids />} />
@@ -101,7 +100,8 @@ function AppInner() {
 
           <Route element={<PrivateRoute allowedRoles="worker" />}>
             <Route path="/worker">
-              <Route path="dashboard" element={<WorkerDashboard />} />
+              <Route index element={<Navigate to="/worker/nearby-tasks" replace />} />
+              <Route path="dashboard" element={<Navigate to="/worker/nearby-tasks" replace />} />
               <Route path="nearby-tasks" element={<NearbyTasks />} />
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
               <Route path="task-details/:taskId" element={<PlaceBid />} />
@@ -115,7 +115,6 @@ function AppInner() {
               <Route path='all-reviews' element={<WorkerAllReviews />} />
               <Route path='earnings' element={<WorkerEarnings />} />
               <Route path='notifications' element={<WorkerNotifications />} />
-
             </Route>
           </Route>
 

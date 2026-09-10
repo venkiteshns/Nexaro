@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  LayoutDashboard,
   ClipboardList,
   Wallet,
   Bell,
@@ -20,11 +19,6 @@ import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
 
 
   const posterNav = [
-    {
-      label: "Dashboard",
-      icon: <LayoutDashboard size={20} />,
-      redirect: "/poster/dashboard",
-    },
     {
       label: "Post Task",
       icon: <PlusSquare size={20} />,

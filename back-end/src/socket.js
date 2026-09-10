@@ -26,11 +26,14 @@ const initSocket = (socketIo) => {
             if (decoded) {
                 const userId = decoded._id;
                 socket.join(`user:${userId}`);
-                socket.join("all-users");
-                if (decoded.activeRole) {
-                    socket.join(`role:${decoded.activeRole}`);
+                const role = decoded.activeRole || decoded.role;
+                if (role && role !== 'admin') {
+                    socket.join("all-users");
                 }
-                console.log(`User ${userId} (${decoded.activeRole}) joined rooms`);
+                if (role) {
+                    socket.join(`role:${role}`);
+                }
+                console.log(`User ${userId} (${role}) joined rooms`);
             }
 
             if (decoded.activeRole !== 'worker') {

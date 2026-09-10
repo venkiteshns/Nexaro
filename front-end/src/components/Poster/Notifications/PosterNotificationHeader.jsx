@@ -24,7 +24,7 @@ const PosterNotificationHeader = ({
           )}
         </div>
         <p className="text-xs sm:text-sm text-gray-500 pl-10">
-          Stay updated on your tasks and bids
+          Stay updated on your payments and system notices
         </p>
       </div>
 

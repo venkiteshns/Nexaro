@@ -2,7 +2,7 @@ import Task from "../models/taskSchema.js";
 import cloudinary from "../config/cloudinary.js";
 import Bid from "../models/bidsSchema.js";
 import mongoose from "mongoose";
-import user from "../models/userSchema.js";
+import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
 import { recordAdminAlert } from "./adminNotificationHelper.js";
@@ -92,7 +92,7 @@ export const createTaskService = async (body, files, posterId) => {
         })
 
         // Real Admin Notification: New Task Posted
-        const poster = await user.findById(posterId).select("name").lean();
+        const poster = await User.findById(posterId).select("name").lean();
         const posterName = poster?.name || "Poster";
         const locationName = createdTask.address?.landmark?.split(",")[0]?.trim() || createdTask.address?.district || "Kerala";
         await recordAdminAlert({
@@ -314,24 +314,14 @@ export const handleNewBid = async (task, user) => {
         const createdBid = await Bid.create(payload);
 
         // Record real-time notification for poster
-        const bidder = await user.findById(user._id).select("name avatar picture profilePicture").lean();
-        await recordPosterAlert({
-            posterId,
-            type: "new_bid",
-            category: "bids",
-            title: `New Bid Received — ₹${bidAmount}`,
-            description: `${bidder?.name || "A professional"} has submitted a new bid on your task "${isTask.title}".`,
-            amount: bidAmount,
-            taskId: isTask._id,
-            taskTitle: isTask.title,
-            workerId: user._id,
-            workerName: bidder?.name || "A professional",
-            workerAvatar: bidder?.avatar || bidder?.picture || bidder?.profilePicture || null,
-            bidId: createdBid._id,
-            dotColor: "blue",
-            uniqueKey: `p_${posterId}_bid_${createdBid._id}`,
-            metadata: { taskId: isTask._id, bidId: createdBid._id },
-        });
+        const bidder = await User.findById(user._id)
+            .select("name verificationDocuments verificationDocument")
+            .lean();
+        const bidderAvatar =
+            bidder?.verificationDocuments?.selfie?.url ||
+            bidder?.verificationDocument?.selfie?.url ||
+            null;
+
 
         const io = getIo();
 
@@ -355,7 +345,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
     // console.log(search, category, page, limit);
 
     try {
-        const worker = await user.findById(workerId);
+        const worker = await User.findById(workerId);
 
         if (!worker) {
             return { error: "Worker not found" };

@@ -111,9 +111,9 @@ export default function AdminNotifications() {
       <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
         <AdminHeader />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-4 sm:space-y-5">
           {/* Top Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight">
                 Notifications & Announcements
@@ -125,7 +125,7 @@ export default function AdminNotifications() {
           </div>
 
           {/* 2-Column Responsive Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
             {/* Left Column: System Alerts (7 cols) */}
             <section
               aria-label="System Alerts"
@@ -147,7 +147,7 @@ export default function AdminNotifications() {
             {/* Right Column: Send Announcement + Recently Sent (5 cols) */}
             <section
               aria-label="Broadcast Announcements"
-              className="lg:col-span-5 xl:col-span-5 space-y-6"
+              className="lg:col-span-5 xl:col-span-5 space-y-4"
             >
               <SendAnnouncementCard
                 onSend={handleSendAnnouncement}

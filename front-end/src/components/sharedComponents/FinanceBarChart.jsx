@@ -140,14 +140,14 @@ export default function FinanceBarChart({
       </div>
 
       {/* Chart Canvas Area */}
-      <div className="pt-6 pb-2">
+      <div className="pt-3 pb-1">
         {isLoading ? (
-          <div className="w-full h-64 sm:h-72 flex flex-col items-center justify-center gap-2 text-gray-400">
+          <div className="w-full h-44 sm:h-52 flex flex-col items-center justify-center gap-2 text-gray-400">
             <Loader2 className="w-6 h-6 animate-spin text-[#0A6E5C]" />
             <span className="text-xs">Loading chart data...</span>
           </div>
         ) : data && data.length > 0 ? (
-          <div className="w-full h-64 sm:h-72">
+          <div className="w-full h-44 sm:h-52">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}
@@ -206,12 +206,13 @@ export default function FinanceBarChart({
                   fill="url(#financeBarGrad)"
                   radius={[6, 6, 0, 0]}
                   maxBarSize={42}
+                  minPointSize={4}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="w-full h-64 flex flex-col items-center justify-center text-gray-400">
+          <div className="w-full h-44 flex flex-col items-center justify-center text-gray-400">
             <p className="text-xs">No chart data available for this timeframe</p>
           </div>
         )}

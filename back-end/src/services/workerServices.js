@@ -67,7 +67,7 @@ export const workerSignupService = async ({ files, data }) => {
             role: "worker",
             activeRole: "worker",
             worker: {
-                isLive: false,
+                isLive: true,
                 rating: "0"
             }
         };
@@ -1047,9 +1047,7 @@ export const getWorkerNotificationsService = async (workerId, { page = 1, limit 
     await syncWorkerNotifications(workerId);
 
     const query = { workerId: workerObjectId };
-    if (filter === "urgent") {
-        query.type = "urgent_task";
-    } else if (filter === "unread") {
+    if (filter === "unread") {
         query.isRead = false;
     } else if (filter && filter !== "all") {
         query.category = filter;
@@ -1064,20 +1062,14 @@ export const getWorkerNotificationsService = async (workerId, { page = 1, limit 
         totalItems,
         allCount,
         unreadCount,
-        nearbyCount,
-        bidsCount,
         paymentsCount,
-        urgentCount,
         systemCount,
     ] = await Promise.all([
         WorkerNotification.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limitNum).lean(),
         WorkerNotification.countDocuments(query),
         WorkerNotification.countDocuments({ workerId: workerObjectId }),
         WorkerNotification.countDocuments({ workerId: workerObjectId, isRead: false }),
-        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "nearby_tasks" }),
-        WorkerNotification.countDocuments({ workerId: workerObjectId, category: "bid_results" }),
         WorkerNotification.countDocuments({ workerId: workerObjectId, category: "payments" }),
-        WorkerNotification.countDocuments({ workerId: workerObjectId, type: "urgent_task" }),
         WorkerNotification.countDocuments({ workerId: workerObjectId, category: "system" }),
     ]);
 
@@ -1092,10 +1084,7 @@ export const getWorkerNotificationsService = async (workerId, { page = 1, limit 
         counts: {
             all: allCount,
             unread: unreadCount,
-            nearby: nearbyCount,
-            bids: bidsCount,
             payments: paymentsCount,
-            urgent: urgentCount,
             system: systemCount,
         },
     };
@@ -1189,4 +1178,4 @@ export const toggleWorkerLiveStatusService = async (userId, isLive = null) => {
         console.error("toggleWorkerLiveStatusService error:", error.message);
         return { error: error.message };
     }
-};
+};

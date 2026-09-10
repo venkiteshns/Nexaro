@@ -19,6 +19,7 @@ import {
     markNotificationReadService,
     sendAnnouncementService,
     getRecentAnnouncementsService,
+    getAdminDashboardService,
 } from "../../services/adminServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
@@ -388,6 +389,19 @@ export const getAdminRecentAnnouncements = async (req, res) => {
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
         console.error("Get recent announcements error:", error.message);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
+export const getAdminDashboard = async (req, res) => {
+    try {
+        const response = await getAdminDashboardService();
+        return res.status(STATUS_CODES.OK).json(response);
+    } catch (error) {
+        console.error("Get admin dashboard error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

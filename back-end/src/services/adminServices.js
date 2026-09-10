@@ -6,6 +6,8 @@ import Order from "../models/orderSchema.js";
 import AdminNotification from "../models/adminNotificationSchema.js";
 import Announcement from "../models/announcementSchema.js";
 import WorkerNotification from "../models/workerNotificationSchema.js";
+import PosterNotification from "../models/posterNotificationSchema.js";
+import Bid from "../models/bidsSchema.js";
 import { getIo } from "../socket.js";
 import { syncRealPlatformNotifications, recordAdminAlert } from "./adminNotificationHelper.js";
 import MESSAGES from "../constants/messages.js";
@@ -967,13 +969,13 @@ export const getAdminPlatformFeeSummaryService = async () => {
         return `₹${amount.toLocaleString("en-IN")}`;
     };
 
-    const formattedAmount = fyPlatformFee > 0 ? formatCurrencyShort(fyPlatformFee) : "₹1.42M";
+    const formattedAmount = fyPlatformFee > 0 ? formatCurrencyShort(fyPlatformFee) : "₹0";
 
     return {
         success: true,
         reportType: "platform_fee_summary",
         fiscalYear: `FY ${fiscalStartYear}-${(fiscalStartYear + 1).toString().slice(-2)}`,
-        rawAmount: fyPlatformFee || 1420000,
+        rawAmount: fyPlatformFee || 0,
         formattedAmount,
         commissionRate: "5%",
         totalGmv: fyGmv,
@@ -981,23 +983,6 @@ export const getAdminPlatformFeeSummaryService = async () => {
         allTimeFee,
         generatedAt: new Date().toISOString(),
     };
-};
-
-/**
- * Seed initial sample announcement if empty
- */
-const seedInitialAnnouncementsIfEmpty = async () => {
-    const count = await Announcement.countDocuments();
-    if (count > 0) return;
-
-    const sampleAnnouncement = {
-        targetAudience: "WORKERS",
-        title: "New Bonus Program",
-        message: "Earn 10% extra on completing 5 or more urgent tasks this weekend!",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1d ago
-    };
-
-    await Announcement.create(sampleAnnouncement);
 };
 
 export const getAdminNotificationsService = async (page = 1, limit = 6, filter = "all") => {
@@ -1065,7 +1050,7 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         sentBy: adminId || null,
     });
 
-    // Also record as a system notification alert for admin records
+    // Also record as a system notification alert for admin audit records (marked read)
     await AdminNotification.create({
         type: "announcement",
         title: `Announcement: ${title.trim()}`,
@@ -1075,8 +1060,50 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         isRead: true,
     });
 
-    // If target audience includes workers, persist to WorkerNotification immediately
-    if (targetAudience === "WORKERS" || targetAudience === "ALL USERS") {
+    const audience = (targetAudience || "ALL USERS").trim().toUpperCase();
+    const isForPosters = audience === "POSTERS" || audience === "POSTER" || audience === "ALL USERS" || audience === "ALL";
+    const isForWorkers = audience === "WORKERS" || audience === "WORKER" || audience === "ALL USERS" || audience === "ALL";
+
+    // 1. If target audience includes posters, persist to PosterNotification
+    if (isForPosters) {
+        try {
+            const posters = await User.find({
+                $or: [{ role: "poster" }, { activeRole: "poster" }],
+                isDeleted: { $ne: true },
+            }).select("_id").lean();
+
+            if (posters.length > 0) {
+                const bulkOps = posters.map((p) => ({
+                    updateOne: {
+                        filter: { uniqueKey: `p_${p._id}_ann_${announcement._id}` },
+                        update: {
+                            $setOnInsert: {
+                                posterId: p._id,
+                                uniqueKey: `p_${p._id}_ann_${announcement._id}`,
+                                type: "announcement",
+                                category: "system",
+                                title: announcement.title,
+                                description: announcement.message,
+                                actionLink: null,
+                                actionLabel: null,
+                                dotColor: "emerald",
+                                createdAt: announcement.createdAt,
+                                metadata: { announcementId: announcement._id },
+                                isRead: false,
+                            },
+                        },
+                        upsert: true,
+                    },
+                }));
+                await PosterNotification.bulkWrite(bulkOps, { ordered: false });
+            }
+        } catch (posterNotifErr) {
+            console.error("Error creating poster notifications for announcement:", posterNotifErr.message);
+        }
+    }
+
+    // 2. If target audience includes workers, persist to WorkerNotification
+    if (isForWorkers) {
         try {
             const workers = await User.find({
                 $or: [{ role: "worker" }, { activeRole: "worker" }],
@@ -1113,7 +1140,7 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         }
     }
 
-    // Broadcast via socket to targeted audience
+    // 3. Broadcast via socket strictly to targeted recipient rooms (NEVER broadcast to admin)
     try {
         const io = getIo();
         if (io) {
@@ -1125,29 +1152,13 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
                 createdAt: announcement.createdAt,
             };
 
-            if (targetAudience === "WORKERS") {
+            if (audience === "WORKERS" || audience === "WORKER") {
                 io.to("role:worker").emit("admin-announcement", payload);
-                io.to("role:worker").emit("worker-notification", {
-                    notification: {
-                        type: "announcement",
-                        title: announcement.title,
-                        description: announcement.message,
-                    },
-                    message: `📢 ${announcement.title}: ${announcement.message}`,
-                });
-            } else if (targetAudience === "POSTERS") {
+            } else if (audience === "POSTERS" || audience === "POSTER") {
                 io.to("role:poster").emit("admin-announcement", payload);
             } else {
-                // ALL USERS
-                io.emit("admin-announcement", payload);
-                io.to("role:worker").emit("worker-notification", {
-                    notification: {
-                        type: "announcement",
-                        title: announcement.title,
-                        description: announcement.message,
-                    },
-                    message: `📢 ${announcement.title}: ${announcement.message}`,
-                });
+                // ALL USERS: Target both worker and poster rooms specifically (excludes admin)
+                io.to("role:worker").to("role:poster").emit("admin-announcement", payload);
             }
         }
     } catch (socketErr) {
@@ -1162,7 +1173,13 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
 };
 
 export const getRecentAnnouncementsService = async (limit = 5) => {
-    await seedInitialAnnouncementsIfEmpty();
+    // Purge default sample announcement and any linked records
+    await Promise.all([
+        Announcement.deleteMany({ title: "New Bonus Program" }),
+        AdminNotification.deleteMany({ title: { $regex: /New Bonus Program/i } }),
+        WorkerNotification.deleteMany({ title: "New Bonus Program" }),
+        PosterNotification.deleteMany({ title: "New Bonus Program" }),
+    ]);
 
     const announcements = await Announcement.find()
         .sort({ createdAt: -1 })
@@ -1172,6 +1189,220 @@ export const getRecentAnnouncementsService = async (limit = 5) => {
     return {
         success: true,
         announcements,
+    };
+};
+
+export const getAdminDashboardService = async () => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLast7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [
+        totalUsers,
+        activeTasks,
+        pendingVerifications,
+        pendingPayouts,
+        flaggedCount,
+        todayTransactions,
+        monthTransactions,
+        recent7DaysTransactions,
+        recentMonthTransactions,
+        completedTasksCount,
+        totalTasksCount,
+        recentSignups,
+        onlineWorkersCount,
+        tasksTodayCount,
+        bidsTodayCount,
+        totalBidsCount,
+        recentTasks,
+        recentWorkers,
+        recentPayouts,
+        recentVerifUsers,
+        recentAlerts,
+    ] = await Promise.all([
+        User.countDocuments({ activeRole: { $ne: "admin" }, isDeleted: { $ne: true } }),
+        Task.countDocuments({ status: { $in: ["open", "assigned", "in_progress"] } }),
+        User.countDocuments({ isVerified: false, "verificationDocuments.selfie.url": { $exists: true }, isDeleted: { $ne: true } }),
+        Transaction.countDocuments({ transactionType: { $in: ["to_worker", "to_worker_wallet"] }, status: "pending" }),
+        User.countDocuments({ isSuspended: true }),
+        Transaction.find({
+            transactionType: "platform_fee",
+            createdAt: { $gte: startOfToday },
+            status: { $in: ["completed", "success"] },
+        }).lean(),
+        Transaction.find({
+            transactionType: "platform_fee",
+            createdAt: { $gte: startOfMonth },
+            status: { $in: ["completed", "success"] },
+        }).lean(),
+        Transaction.find({
+            transactionType: "platform_fee",
+            createdAt: { $gte: startOfLast7Days },
+            status: { $in: ["completed", "success"] },
+        }).lean(),
+        Transaction.find({
+            transactionType: "platform_fee",
+            createdAt: { $gte: new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000) },
+            status: { $in: ["completed", "success"] },
+        }).lean(),
+        Task.countDocuments({ status: "completed" }),
+        Task.countDocuments(),
+        User.find({ activeRole: { $ne: "admin" }, isDeleted: { $ne: true } })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select("name activeRole createdAt")
+            .lean(),
+        User.countDocuments({ activeRole: "worker", "worker.isLive": true, isDeleted: { $ne: true } }),
+        Task.countDocuments({ createdAt: { $gte: startOfToday } }),
+        Bid.countDocuments({ createdAt: { $gte: startOfToday } }),
+        Bid.countDocuments(),
+        Task.find().sort({ createdAt: -1 }).limit(3).lean(),
+        User.find({ activeRole: "worker" }).sort({ createdAt: -1 }).limit(2).lean(),
+        Transaction.find({ transactionType: { $in: ["to_worker", "to_worker_wallet"] } }).populate("receiverId", "name").sort({ createdAt: -1 }).limit(2).lean(),
+        User.find({ "verificationDocuments.selfie.url": { $exists: true } }).sort({ updatedAt: -1 }).limit(2).lean(),
+        AdminNotification.find().sort({ createdAt: -1 }).limit(3).lean(),
+    ]);
+
+    const revenueTodayAmount = todayTransactions.reduce((acc, tx) => acc + (tx.amount || 0), 0);
+    const revenueMonthAmount = monthTransactions.reduce((acc, tx) => acc + (tx.amount || 0), 0);
+
+    const successRate = totalTasksCount > 0
+        ? Math.min(100, Math.round((completedTasksCount / totalTasksCount) * 100))
+        : 0;
+
+    const avgBidsPerTask = totalTasksCount > 0
+        ? (totalBidsCount / totalTasksCount).toFixed(1)
+        : "0";
+
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const weekTrajectory = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+        const dayName = daysOfWeek[d.getDay()];
+
+        const dayTotal = recent7DaysTransactions
+            .filter((tx) => new Date(tx.createdAt) >= dayStart && new Date(tx.createdAt) <= dayEnd)
+            .reduce((sum, tx) => sum + (tx.amount || 0), 0);
+
+        weekTrajectory.push({
+            day: dayName,
+            date: dayStart.toISOString(),
+            amount: dayTotal,
+        });
+    }
+
+    const weeks = [
+        { name: "Week 1", startDaysAgo: 27, endDaysAgo: 21 },
+        { name: "Week 2", startDaysAgo: 20, endDaysAgo: 14 },
+        { name: "Week 3", startDaysAgo: 13, endDaysAgo: 7 },
+        { name: "Week 4", startDaysAgo: 6, endDaysAgo: 0 },
+    ];
+
+    const monthTrajectory = weeks.map((w) => {
+        const s = new Date(now.getTime() - w.startDaysAgo * 24 * 60 * 60 * 1000);
+        s.setHours(0, 0, 0, 0);
+        const e = new Date(now.getTime() - w.endDaysAgo * 24 * 60 * 60 * 1000);
+        e.setHours(23, 59, 59, 999);
+
+        const total = recentMonthTransactions
+            .filter((tx) => new Date(tx.createdAt) >= s && new Date(tx.createdAt) <= e)
+            .reduce((sum, tx) => sum + (tx.amount || 0), 0);
+
+        return {
+            day: w.name,
+            amount: total,
+        };
+    });
+
+    const activityItems = [];
+    recentTasks.forEach((t) => {
+        activityItems.push({
+            id: `task_${t._id}`,
+            type: "task",
+            title: `New task: "${t.title}" posted`,
+            meta: t.address?.district || t.category || "General",
+            createdAt: t.createdAt,
+            color: "emerald",
+        });
+    });
+    recentWorkers.forEach((w) => {
+        activityItems.push({
+            id: `worker_${w._id}`,
+            type: "worker",
+            title: `Worker registered: ${w.name}`,
+            meta: w.isVerified ? "Verified" : "Pending Verif.",
+            createdAt: w.createdAt,
+            color: "blue",
+        });
+    });
+    recentPayouts.forEach((p) => {
+        activityItems.push({
+            id: `payout_${p._id}`,
+            type: "payout",
+            title: `Payment released to ${p.receiverId?.name || "Worker"}`,
+            meta: `₹${Number(p.amount || 0).toLocaleString("en-IN")}`,
+            createdAt: p.createdAt,
+            color: "teal",
+        });
+    });
+    recentVerifUsers.forEach((v) => {
+        activityItems.push({
+            id: `verif_${v._id}`,
+            type: "verification",
+            title: `Verification submitted: ${v.name}`,
+            meta: "KYC Queue",
+            createdAt: v.updatedAt || v.createdAt,
+            color: "purple",
+        });
+    });
+    recentAlerts.forEach((a) => {
+        if (a.priority === "urgent" || a.type === "flagged") {
+            activityItems.push({
+                id: `alert_${a._id}`,
+                type: "flag",
+                title: a.title,
+                meta: "System Monitor",
+                createdAt: a.createdAt,
+                color: "coral",
+            });
+        }
+    });
+
+    activityItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const liveActivity = activityItems.slice(0, 5);
+
+    return {
+        success: true,
+        stats: {
+            totalUsers: totalUsers || 0,
+            activeTasks: activeTasks || 0,
+            revenueToday: revenueTodayAmount || 0,
+            verifications: pendingVerifications || 0,
+        },
+        revenueOverview: {
+            thisMonth: revenueMonthAmount || 0,
+            today: revenueTodayAmount || 0,
+            successRate: successRate || 0,
+            weekTrajectory,
+            monthTrajectory,
+        },
+        recentSignups: recentSignups.map((u) => ({
+            _id: u._id,
+            name: u.name,
+            role: (u.activeRole || "worker").toUpperCase(),
+            createdAt: u.createdAt,
+        })),
+        liveActivity,
+        platformHealth: {
+            onlineWorkers: onlineWorkersCount || 0,
+            tasksToday: tasksTodayCount || 0,
+            bidsToday: bidsTodayCount || 0,
+            avgBidsPerTask: avgBidsPerTask || "0",
+        },
     };
 };
 

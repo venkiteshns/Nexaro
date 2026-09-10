@@ -1,13 +1,11 @@
 import {
-  Users,
   ShieldCheck,
   CheckCircle2,
-  Briefcase,
-  ClipboardList,
   Star,
   Megaphone,
   Check,
   Bell,
+  IndianRupee,
 } from "lucide-react";
 
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
@@ -18,8 +16,6 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
     type,
     title,
     description,
-    workerName,
-    workerAvatar,
     isRead,
     dotColor = "emerald",
     createdAt,
@@ -38,33 +34,8 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
     }
   };
 
-  // Render left avatar or icon based on notification type
+  // Render left icon based on notification type
   const renderLeftMedia = () => {
-    if (type === "new_bid") {
-      if (workerAvatar) {
-        return (
-          <img
-            src={workerAvatar}
-            alt={workerName || "Worker"}
-            className="w-10 h-10 rounded-full object-cover border border-emerald-200 shrink-0 shadow-2xs"
-          />
-        );
-      }
-      return (
-        <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm border border-emerald-200 shrink-0 shadow-2xs">
-          {workerName ? workerName.charAt(0).toUpperCase() : "W"}
-        </div>
-      );
-    }
-
-    if (type === "multiple_bids") {
-      return (
-        <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center shrink-0 shadow-2xs">
-          <Users size={18} />
-        </div>
-      );
-    }
-
     if (type === "payment_escrow") {
       return (
         <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0A6E5C] border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs">
@@ -73,31 +44,15 @@ const PosterNotificationCard = ({ notification, onMarkRead }) => {
       );
     }
 
-    if (type === "task_completed") {
+    if (type === "payment_released") {
       return (
-        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0A6E5C] border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs">
+        <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center shrink-0 shadow-2xs">
           <CheckCircle2 size={18} />
         </div>
       );
     }
 
-    if (type === "worker_assigned") {
-      return (
-        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shrink-0 shadow-2xs">
-          <Briefcase size={18} />
-        </div>
-      );
-    }
-
-    if (type === "task_posted") {
-      return (
-        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0A6E5C] border border-emerald-200 flex items-center justify-center shrink-0 shadow-2xs">
-          <ClipboardList size={18} />
-        </div>
-      );
-    }
-
-    if (type === "review_reminder") {
+    if (type === "review") {
       return (
         <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0 shadow-2xs">
           <Star size={18} className="fill-amber-400 text-amber-500" />
