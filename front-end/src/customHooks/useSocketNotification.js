@@ -84,7 +84,7 @@ const useSocketNotification = () => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'worker' && activeUser?.role !== 'worker')) return;
 
             setPaymentModalData(data);
-            dispatch(api.util.invalidateTags(['Active_Job', 'Worker_Earnings', 'Worker_Wallet', "Worker_Bids", 'Worker_Notifications']));
+            dispatch(api.util.invalidateTags(['Active_Job', 'Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart', 'Worker_Wallet', 'Worker_Bids', 'Worker_Notifications']));
         });
 
         socket.on('withdrawal-initiated', (data) => {
