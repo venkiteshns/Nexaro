@@ -23,7 +23,6 @@ const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) =
           </p>
         </div>
 
-        {/* Form */}
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmitForm)}>
             <PersonalInfo />
@@ -47,7 +46,6 @@ const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) =
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               className={`w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-3.5 rounded-xl ${(isLoading || isVerified) ? "cursor-not-allowed opacity-50" : ""}`}
@@ -55,7 +53,7 @@ const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) =
               {isVerified ? "Submitting Registration..." : isLoading ? "Validating Data..." : "Create Account"}
             </button>
 
-           
+
           </form>
         </FormProvider>
       </div>

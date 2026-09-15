@@ -14,11 +14,9 @@ const WorkerHeader = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
-  // Unread notifications count
   const { data: unreadData } = useGetWorkerUnreadCountQuery();
   const unreadCount = unreadData?.unreadCount || 0;
 
-  // Real-time worker header status (live state + wallet balance) from DB
   const { data: headerStatus } = useGetWorkerHeaderStatusQuery();
   const [toggleLive, { isLoading: isToggling }] = useToggleWorkerLiveStatusMutation();
 
@@ -43,7 +41,6 @@ const WorkerHeader = () => {
 
   return (
     <div className="shrink-0 h-14 z-10 bg-white border-b border-gray-200 pl-14 pr-6 md:px-6 flex items-center justify-end gap-4 shadow-sm">
-      {/* Live / Offline Toggle Button */}
       <button
         type="button"
         onClick={handleToggleLive}
@@ -70,7 +67,6 @@ const WorkerHeader = () => {
         )}
       </button>
 
-      {/* Notifications Bell */}
       <button
         onClick={() => navigate("/worker/notifications")}
         className="relative p-2 rounded-xl text-gray-500 hover:text-[#0A6E5C] hover:bg-emerald-50 transition-colors cursor-pointer"
@@ -84,7 +80,6 @@ const WorkerHeader = () => {
         )}
       </button>
 
-      {/* Real-time Wallet Balance */}
       <button
         type="button"
         onClick={() => navigate("/worker/earnings")}
@@ -96,7 +91,6 @@ const WorkerHeader = () => {
         </span>
       </button>
 
-      {/* Worker Profile Avatar & Name */}
       <div
         onClick={() => navigate("/worker/profile")}
         className="flex items-center gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3 py-1 shadow-2xs cursor-pointer transition-colors"

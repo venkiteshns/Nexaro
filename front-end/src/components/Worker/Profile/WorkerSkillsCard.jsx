@@ -1,9 +1,5 @@
 import { Wrench } from 'lucide-react';
 
-/**
- * WorkerSkillsCard
- * Props: skills: string[]
- */
 const WorkerSkillsCard = ({ skills }) => {
     const list = skills?.length ? skills : ['Plumbing', 'Electrician', 'HVAC Repair'];
 

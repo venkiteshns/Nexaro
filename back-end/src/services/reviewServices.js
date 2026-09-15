@@ -3,7 +3,7 @@ import Review from "../models/reviewSchema.js";
 import mongoose from "mongoose";
 import MESSAGES from "../constants/messages.js";
 import User from "../models/userSchema.js";
-import { recordAdminAlert } from "./adminNotificationHelper.js";
+import { recordAdminAlert } from "./adminNotificationService.js";
 
 export const createReviewService = async ({ taskId, reviewee, rating, review }, reviewerId) => {
   try {

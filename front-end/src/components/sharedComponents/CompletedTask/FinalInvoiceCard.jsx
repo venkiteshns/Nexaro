@@ -78,7 +78,6 @@ const FinalInvoiceCard = ({ invoice, isWorker = false }) => {
                     />
                 )}
 
-                {/* Escrow badge / Wallet message */}
                 {!isWorker ? (
                     <div className="mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-50 border border-emerald-200">
                         <ShieldCheck size={16} className="text-[#0A6E5C] shrink-0" />

@@ -11,10 +11,6 @@ import { EarningsChart } from "../../components/Worker/Earnings/EarningsChart.js
 
 export default function WorkerEarnings() {
   const { user } = useSelector((state) => state.auth);
-  // State for balances and data (can be linked to RTK query / backend wallet)
-  // const [availableBalance, setAvailableBalance] = useState(1200);
-  // const [totalEarned, setTotalEarned] = useState(28000);
-  // const [totalJobs] = useState(34);
 
 
 
@@ -32,7 +28,6 @@ export default function WorkerEarnings() {
   console.log("is Success", isSuccess);
   console.log("is Error", isError);
 
-  // Transactions state
   const [transactions] = useState([
     {
       id: "tx-1",
@@ -108,10 +103,8 @@ export default function WorkerEarnings() {
     },
   ]);
 
-  // Modals state
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
-  // Handle successful withdrawal
   const handleWithdrawSuccess = () => {
     setIsWithdrawOpen(false);
   };
@@ -119,16 +112,13 @@ export default function WorkerEarnings() {
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
-      {/* Worker Navigation Sidebar */}
       <WorkerNavBar />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <WorkerHeader />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl w-full mx-auto space-y-6">
-            {/* Top Page Title & Subtitle */}
             <div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
                 Earnings
@@ -138,7 +128,6 @@ export default function WorkerEarnings() {
               </p>
             </div>
 
-            {/* 1. AVAILABLE BALANCE HERO CARD */}
             <section aria-label="Available Balance and Summary">
               <EarningsHeroCard
                 availableBalance={availableBalance}
@@ -149,7 +138,6 @@ export default function WorkerEarnings() {
               />
             </section>
 
-            {/* 2. THREE QUICK STATS CARDS */}
             <section aria-label="Quick Performance Stats">
               <EarningsStatCards
                 avgPerJob={averageAmount}
@@ -158,15 +146,10 @@ export default function WorkerEarnings() {
               />
             </section>
 
-            {/* 3. EARNINGS OVERVIEW BAR CHART */}
-            {/* <section aria-label="Earnings Overview Chart">
-              <EarningsOverviewChart />
-            </section> */}
             <section aria-label="Earnings  Chart">
               <EarningsChart />
             </section>
 
-            {/* 4. TRANSACTION HISTORY SECTION */}
             <section aria-label="Transaction History">
               <TransactionHistoryCard transactions={transactions} />
             </section>
@@ -174,7 +157,6 @@ export default function WorkerEarnings() {
         </main>
       </div>
 
-      {/* Interactive Modals */}
       <WithdrawModal
         isOpen={isWithdrawOpen}
         onClose={() => setIsWithdrawOpen(false)}

@@ -8,14 +8,11 @@ import { SectionHeading } from "../../sharedComponents/SectionHeading";
 import Location from "../../Form/FormComponents/Location";
 
 
-/* ─── Divider ─────────────────────────────────────────────────────────────── */
 const Divider = () => <div className="border-t border-gray-100 my-6" />;
 
-/* ─── Input style ─────────────────────────────────────────────────────────── */
 const inputCls =
   "w-full rounded-xl border border-[rgba(10,110,92,0.2)] bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-gray-800 outline-none placeholder:text-gray-400 transition-all duration-200 focus:border-[#0A6E5C]/60 focus:ring-2 focus:ring-[#0A6E5C]/10";
 
-/*  MAIN MODAL                                                                 */
 const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
 
   const methods = useForm({
@@ -57,7 +54,7 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
     if (hasError) return;
 
     if (onSwitch) return onSwitch(data);
-    
+
   };
 
   return (
@@ -66,13 +63,11 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
       style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)" }}
       onClick={onClose}
     >
-      {/* ── Modal Card ── */}
       <div
         className="relative w-full max-w-[580px] rounded-[28px] sm:rounded-[32px] bg-white shadow-2xl overflow-hidden flex flex-col animate-[switchModalIn_0.22s_ease-out]"
         style={{ maxHeight: "78dvh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ── Header ── */}
         <div
           className="px-5 sm:px-8 pt-7 pb-6 relative overflow-hidden"
           style={{ background: "linear-gradient(135deg,#0A6E5C 0%,#14b89a 100%)" }}
@@ -100,7 +95,6 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
             </button>
           </div>
 
-          {/* Step pills */}
           <div className="relative z-10 mt-5 flex items-center gap-1.5 sm:gap-2 flex-wrap">
             {["Skills", "Location", "Identity", "Authorize"].map((step, i) => (
               <div key={step} className="flex items-center gap-1.5 sm:gap-2">
@@ -116,7 +110,6 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
           </div>
         </div>
 
-        {/* ── Body ── */}
         <FormProvider {...methods}>
           <form
             id="switch-to-worker-form"
@@ -124,7 +117,6 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
             className="px-5 sm:px-8 py-6 overflow-y-auto flex-1 min-h-0"
             noValidate
           >
-            {/* 1. Professional Skills */}
             <SectionHeading>Professional Skills</SectionHeading>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
@@ -143,21 +135,17 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
 
             <Divider />
 
-            {/* 2. Service Location */}
             <SectionHeading>Service Location</SectionHeading>
             <Location />
             <Divider />
 
-            {/* 3. Identity Verification */}
             <SectionHeading>Identity Verification</SectionHeading>
-            {/* Strip outer card styling from IdentityVerification */}
             <div className="[&>div]:mt-0 [&>div]:p-0 [&>div]:shadow-none [&>div]:bg-transparent [&>div]:border-0 [&>div]:rounded-none">
               <IdentityVerification />
             </div>
 
             <Divider />
 
-            {/* 4. Authorize Role Change */}
             <SectionHeading>Authorize Role Change</SectionHeading>
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-widest">
@@ -188,7 +176,6 @@ const SwitchToWorkerModal = ({ isOpen, onClose, onSwitch, isSubmitting }) => {
           </form>
         </FormProvider>
 
-        {/* ── Footer / Submit ── */}
         <div className="px-5 sm:px-8 py-4 border-t border-gray-100 bg-white">
           <button
             id="switch-to-worker-submit-btn"

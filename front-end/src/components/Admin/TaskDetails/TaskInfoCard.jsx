@@ -33,7 +33,6 @@ const TaskInfoCard = ({ task }) => {
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
             <p className="font-extrabold text-gray-900 text-base mb-2">Task Information</p>
 
-            {/* Description */}
             {task.description && (
                 <p className="text-sm text-gray-500 leading-relaxed mb-4 border-l-2 border-emerald-200 pl-3">
                     {task.description}
@@ -50,7 +49,6 @@ const TaskInfoCard = ({ task }) => {
                 value={[task.address?.area, task.address?.city, task.address?.district, task.address?.state].filter(Boolean).join(', ')}
             />
 
-            {/* Urgency badge */}
             <div className="flex items-center gap-3 pt-3 mt-1">
                 <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
                     <AlertTriangle size={14} className="text-gray-400" />

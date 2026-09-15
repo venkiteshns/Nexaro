@@ -10,7 +10,6 @@ const PosterCard = ({ poster }) => {
             <p className="font-extrabold text-gray-900 text-base mb-4">Poster Details</p>
 
             <div className="flex items-center gap-3 mb-5">
-                {/* Avatar */}
                 <div className="w-12 h-12 rounded-full bg-emerald-50 border-2 border-emerald-100 overflow-hidden flex items-center justify-center shrink-0">
                     {poster.selfie ? (
                         <img src={poster.selfie} alt={poster.name} className="w-full h-full object-cover" />

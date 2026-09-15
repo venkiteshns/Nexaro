@@ -8,13 +8,6 @@ const RATING_BREAKDOWN = [
     { stars: 1, percent: 0 },
 ];
 
-/**
- * RatingBreakdown — displays the overall rating score with a star breakdown bar chart.
- * Props:
- *   overallRating  {number}  — e.g. 4.9
- *   totalReviews   {number}  — e.g. 87
- *   breakdown      {Array}   — [{ stars, percent }] (optional, falls back to static mock)
- */
 const RatingBreakdown = ({ overallRating = 0, totalReviews = 0, breakdown }) => {
 
     const getBreakDown = (data) => {
@@ -34,7 +27,6 @@ const RatingBreakdown = ({ overallRating = 0, totalReviews = 0, breakdown }) => 
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-3 sm:p-5 md:p-6">
             <div className="flex flex-row gap-4 sm:gap-10 items-center">
 
-                {/* ── Overall score ── */}
                 <div className="flex flex-col items-center shrink-0 text-center">
                     <span className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-[#0A6E5C] leading-none">
                         {overallRating}
@@ -43,7 +35,6 @@ const RatingBreakdown = ({ overallRating = 0, totalReviews = 0, breakdown }) => 
                     <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Based on {totalReviews} reviews</p>
                 </div>
 
-                {/* ── Star bars ── */}
                 <div className="flex-1 w-full space-y-1.5 sm:space-y-2.5">
                     {ratingBreakdown.map(({ stars, percent }) => (
                         <div key={stars} className="flex items-center gap-1.5 sm:gap-3">

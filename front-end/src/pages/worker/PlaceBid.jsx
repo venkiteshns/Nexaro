@@ -35,7 +35,6 @@ import { showError, showSuccess, showWarning } from "../../utils/toast";
 import { api } from "../../store/services/api";
 import Map from "../../components/Maps/Map";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getCategoryIcon(category) {
   const map = {
@@ -57,7 +56,6 @@ function formatDate(dateStr) {
   });
 }
 
-// ─── Photo Gallery with Lightbox ──────────────────────────────────────────────
 
 function PhotoGallery({ photos = [] }) {
   const [lightbox, setLightbox] = useState(null);
@@ -97,7 +95,6 @@ function PhotoGallery({ photos = [] }) {
         })}
       </div>
 
-      {/* Lightbox Modal */}
       {lightbox !== null && (
         <div
           className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-xs"
@@ -144,7 +141,6 @@ function PhotoGallery({ photos = [] }) {
   );
 }
 
-// ─── Task Location Card ────────────────────────────────────────────────────────
 
 function TaskLocationCard({ address, location }) {
   const fullAddress = [address?.landmark, address?.city, address?.district, address?.state]
@@ -154,7 +150,6 @@ function TaskLocationCard({ address, location }) {
   const mapPosition = useMemo(() => {
     const coords = location?.coordinates;
     if (coords && Array.isArray(coords) && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-      // GeoJSON is [longitude, latitude]
       return { lat: coords[1], lng: coords[0] };
     }
     return null;
@@ -196,7 +191,6 @@ function TaskLocationCard({ address, location }) {
   );
 }
 
-// ─── Poster Info Card ──────────────────────────────────────────────────────────
 
 function PosterInfoCard({ poster }) {
   if (!poster) return null;
@@ -236,7 +230,6 @@ function PosterInfoCard({ poster }) {
   );
 }
 
-// ─── Existing Bid Card ─────────────────────────────────────────────────────────
 
 function ExistingBidCard({ bid }) {
   const navigate = useNavigate();
@@ -289,7 +282,6 @@ function ExistingBidCard({ bid }) {
   );
 }
 
-// ─── Status Alert Banner ───────────────────────────────────────────────────────
 
 function TaskStatusBanner({ task, canPlaceBid, isCompleted, isCancelled, isAssignedToMe, isAssignedToOther, hasExistingBid }) {
   const navigate = useNavigate();
@@ -480,7 +472,6 @@ function TaskStatusBanner({ task, canPlaceBid, isCompleted, isCancelled, isAssig
     );
   }
 
-  // Fallback banner
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex items-start gap-3.5">
@@ -506,7 +497,6 @@ function TaskStatusBanner({ task, canPlaceBid, isCompleted, isCancelled, isAssig
   );
 }
 
-// ─── Main Component ────────────────────────────────────────────────────────────
 
 const PlaceBid = () => {
   const navigate = useNavigate();
@@ -518,7 +508,6 @@ const PlaceBid = () => {
 
   const task = data?.task?.[0] || null;
 
-  // Status computation
   const isCompleted = task?.status === "completed";
   const isCancelled = task?.status === "cancelled";
   const isAssigned = task?.status === "assigned" || task?.status === "in_progress";
@@ -526,7 +515,6 @@ const PlaceBid = () => {
   const isAssignedToOther = Boolean(task?.isAssignedToOther || (isAssigned && !isAssignedToMe));
   const hasExistingBid = Boolean(task?.existingBid);
 
-  // If task is completed, cancelled, assigned to other, assigned to me, or worker already placed bid: DO NOT show bid form!
   const canPlaceBid = Boolean(
     task &&
     task.status === "open" &&
@@ -570,9 +558,7 @@ const PlaceBid = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <WorkerHeader />
 
-        {/* ── Scrollable body ── */}
         <div className="flex-1 overflow-y-auto">
-          {/* Header Bar */}
           <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-xs border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
@@ -621,7 +607,6 @@ const PlaceBid = () => {
             <div className="w-20 hidden sm:block" />
           </div>
 
-          {/* Loading State */}
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-28 gap-3 text-gray-400">
               <Loader2 size={28} className="animate-spin text-[#0A6E5C]" />
@@ -629,7 +614,6 @@ const PlaceBid = () => {
             </div>
           )}
 
-          {/* Error / Not Found State */}
           {isError && !task && (
             <div className="flex flex-col items-center justify-center py-28 gap-3 text-gray-500 px-4 text-center">
               <AlertCircle size={40} className="text-red-400" />
@@ -646,7 +630,6 @@ const PlaceBid = () => {
             </div>
           )}
 
-          {/* Bid Success Screen */}
           {bidSuccess && (
             <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
               <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] mb-4">
@@ -663,10 +646,8 @@ const PlaceBid = () => {
             </div>
           )}
 
-          {/* Task Content */}
           {!isLoading && !isError && task && !bidSuccess && (
             <div className="p-4 sm:p-6 w-full space-y-5 pb-16">
-              {/* Status Alert Banner (Shown when cannot place bid) */}
               <TaskStatusBanner
                 task={task}
                 canPlaceBid={canPlaceBid}
@@ -677,13 +658,9 @@ const PlaceBid = () => {
                 hasExistingBid={hasExistingBid}
               />
 
-              {/* Responsive Layout */}
               <div className="flex flex-col lg:flex-row gap-5 items-start">
-                {/* ── Main Column (Task Details + Bid Form if open) ── */}
                 <div className="flex-1 w-full min-w-0 space-y-5">
-                  {/* Task Header Card */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
-                    {/* Category + Budget Row */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2 flex-wrap">
                         {task.category && (
@@ -710,12 +687,10 @@ const PlaceBid = () => {
                       </div>
                     </div>
 
-                    {/* Title */}
                     <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug mb-3">
                       {task.title}
                     </h2>
 
-                    {/* Metadata Row */}
                     <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 pt-2 border-t border-gray-100">
                       {task?.address && (
                         <span className="flex items-center gap-1.5 font-medium">
@@ -738,7 +713,6 @@ const PlaceBid = () => {
                     </div>
                   </div>
 
-                  {/* Description Card */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
                     <div className="flex items-center gap-2 mb-3">
                       <FileText size={16} className="text-[#0A6E5C]" />
@@ -751,7 +725,6 @@ const PlaceBid = () => {
                     </p>
                   </div>
 
-                  {/* Attached Photos Card */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -769,10 +742,8 @@ const PlaceBid = () => {
                     <PhotoGallery photos={task.images} />
                   </div>
 
-                  {/* Location & Map Card */}
                   <TaskLocationCard address={task.address} location={task.location} />
 
-                  {/* ── Place Your Bid Form (ONLY when task is open and eligible) ── */}
                   {canPlaceBid && (
                     <FormProvider {...methods}>
                       <form onSubmit={methods.handleSubmit(handleBidSubmission)}>
@@ -788,17 +759,13 @@ const PlaceBid = () => {
                   )}
                 </div>
 
-                {/* ── Sidebar (Poster Info + Existing Bid + Quick Actions) ── */}
                 <div className="w-full lg:w-80 xl:w-96 space-y-5 shrink-0">
-                  {/* Poster / Client Card */}
                   <PosterInfoCard poster={task.posterId} />
 
-                  {/* Existing Bid Details (if worker placed bid) */}
                   {hasExistingBid && (
                     <ExistingBidCard bid={task.existingBid} taskId={task._id} />
                   )}
 
-                  {/* Quick Actions & Navigation */}
                   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 space-y-3">
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
                       Navigation & Actions

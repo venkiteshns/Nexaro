@@ -51,7 +51,6 @@ const WorkerNotificationCard = ({ notification, onMarkRead }) => {
       }`}
     >
       <div className="flex items-start gap-2.5 sm:gap-3.5">
-        {/* Left Status Dot */}
         <div className="pt-1 shrink-0">
           <span
             className={`block w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full ring-3 transition-transform group-hover:scale-110 ${dotColorClass} ${
@@ -60,9 +59,7 @@ const WorkerNotificationCard = ({ notification, onMarkRead }) => {
           />
         </div>
 
-        {/* Card Body */}
         <div className="flex-1 min-w-0">
-          {/* Top Metadata Row: Badge & Timestamp */}
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex flex-wrap items-center gap-1.5">
               {type === "payment_received" && (
@@ -94,7 +91,6 @@ const WorkerNotificationCard = ({ notification, onMarkRead }) => {
               )}
             </div>
 
-            {/* Relative Time and Mark as Read Button */}
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="text-[10px] sm:text-xs text-gray-400 font-normal">
                 {formatTimeAgo(createdAt)}
@@ -111,7 +107,6 @@ const WorkerNotificationCard = ({ notification, onMarkRead }) => {
             </div>
           </div>
 
-          {/* Title & Amount Header */}
           <div className="flex flex-wrap items-baseline justify-between gap-1.5 mb-1">
             <h3 className="text-xs sm:text-sm md:text-[15px] font-semibold text-gray-900 tracking-tight leading-snug">
               {title}
@@ -123,7 +118,6 @@ const WorkerNotificationCard = ({ notification, onMarkRead }) => {
             )}
           </div>
 
-          {/* Star Rating Display for Reviews */}
           {rating && (
             <div className="flex items-center gap-0.5 mb-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -143,7 +137,6 @@ const WorkerNotificationCard = ({ notification, onMarkRead }) => {
             </div>
           )}
 
-          {/* Description */}
           <p className="text-[11px] sm:text-xs text-gray-500 leading-relaxed">
             {description}
           </p>

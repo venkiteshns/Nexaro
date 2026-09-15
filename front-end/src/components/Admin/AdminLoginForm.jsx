@@ -61,7 +61,6 @@ const AdminLoginForm = () => {
 
   return (
     <div className="min-h-screen flex-1 flex items-center  justify-center px-6 py-12 ">
-      {/* Mobile Logo */}
       <div className="absolute top-8 left-6 lg:hidden flex items-center gap-3">
         <div>
           <Logo />
@@ -69,10 +68,8 @@ const AdminLoginForm = () => {
         </div>
       </div>
 
-      {/* Login */}
       <div className="w-full max-w-md bg-white/80  border border-[#E5ECE8] rounded-[32px] p-8 sm:p-10 ">
         <div className="relative z-10">
-          {/* Header */}
           <div className="text-center mb-10">
             <h2 className="text-4xl font-semibold banner-text tracking-tight text-[#111827]">
               Welcome Back <span className="text-[#0a6e5c]">Admin</span>
@@ -89,7 +86,6 @@ const AdminLoginForm = () => {
               </span>
             </div>
           )}
-          {/* FORM */}
           <FormProvider {...methods}>
             <form
               className="space-y-6"
@@ -98,7 +94,6 @@ const AdminLoginForm = () => {
               <PersonalInfo worker={false} login={true} />
               <Password login={true} forgotPassword={setForgotPassword} />
 
-              {/* Login Button */}
               {!isAdmin && (
                 <div className="text-center bg-red-500/10 rounded-xl py-2 px-4">
                   <p className="italic text-red-600/90 text-sm">
@@ -126,7 +121,6 @@ const AdminLoginForm = () => {
             </form>
           </FormProvider>
 
-          {/* Footer */}
           <div className="mt-7 text-center">
             <div className="inline-flex items-center gap-2 text-xs text-[#7A8580]">
               <Lock className="w-4 h-4" />

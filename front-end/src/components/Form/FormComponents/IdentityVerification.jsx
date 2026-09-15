@@ -12,7 +12,6 @@ const IdentityVerification = () => {
   const selected = watch("id_type");
   return (
     <div className="mt-4 sm:mt-5 w-full rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 md:p-10 shadow-sm">
-      {/* Select */}
       <div className="mb-6 sm:mb-8">
         <label className="mb-2 sm:mb-3 block text-[10px] sm:text-xs uppercase tracking-wide text-gray-700">
           Government ID Type <span className="text-red-500">*</span>
@@ -43,7 +42,6 @@ const IdentityVerification = () => {
         </div>
       </div>
 
-      {/* Upload Cards */}
       <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
         <UploadCard
           title="Upload Front Side"
@@ -58,13 +56,11 @@ const IdentityVerification = () => {
         />
       </div>
 
-      {/* Selfie Text */}
       <p className="mt-4 sm:mt-6 text-[10px] sm:text-xs text-gray-500">
         Upload a clear selfie for identity matching.{" "}
         <span className="text-red-600">*</span>
       </p>
 
-      {/* Selfie Upload */}
       <div className="mt-4 sm:mt-5 flex justify-center">
         <div className="w-full md:w-[420px]">
           <UploadCard
@@ -101,8 +97,6 @@ const UploadCard = ({ title, subtitle, type }) => {
 
     setPreview(url);
 
-    // console.log(files,"__________________");
-    // console.log("_______________", newPreviews[0]);
   }
 
   return (

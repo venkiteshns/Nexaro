@@ -17,7 +17,6 @@ const useSocketNotification = () => {
     const isDedicatedAdmin = !user && Boolean(admin);
     const isCurrentAdmin = isAdminRoute || isDedicatedAdmin || user?.activeRole === 'admin' || user?.role === 'admin';
 
-    // If currently on an admin route or logged in as dedicated admin, use admin credentials; otherwise user credentials
     const activeUser = (isAdminRoute && admin) ? admin : (user || admin);
     const activeToken = (isAdminRoute && adminToken) ? adminToken : (accessToken || adminToken);
 
@@ -45,10 +44,9 @@ const useSocketNotification = () => {
         });
 
 
-        socket.on('new-bid-added', () => {
+        socket.on('new-bid-added', (data) => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'poster' && activeUser?.role !== 'poster')) return;
-
-            // Silently invalidate data so task & bid lists refresh without showing duplicate toast
+            showInfo(`New bid added for "${data.taskTitle}" for amount : ${data.bidAmount} rupees`, { autoClose: 6000 });
             dispatch(api.util.invalidateTags(['Poster_Tasks', 'Poster_Bids']));
         });
 
@@ -131,7 +129,6 @@ const useSocketNotification = () => {
         });
 
         socket.on('admin-announcement', (data) => {
-            // NEVER notify admin users of announcements (announcements are for users, not admin)
             if (isCurrentAdmin) return;
 
             const audience = (data?.targetAudience || 'ALL USERS').trim().toUpperCase();

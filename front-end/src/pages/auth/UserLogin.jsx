@@ -20,12 +20,10 @@ const UserLogin = () => {
           "linear-gradient(160deg, #f0fdf8 0%, #ffffff 50%, #ecfdf5 100%)",
       }}
     >
-      {/* Left banner — desktop only */}
       <span className="hidden lg:block lg:col-span-1">
         <PosterSignUpBanner />
       </span>
 
-      {/* Right form panel */}
       <div className="flex items-center justify-center px-6 py-10 mt-10">
         <div
           className="w-full max-w-md rounded-3xl p-10"
@@ -38,13 +36,11 @@ const UserLogin = () => {
             WebkitBackdropFilter: "blur(16px)",
           }}
         >
-          {/* Logo + heading */}
           <div className="flex flex-col items-center justify-center mb-8">
             <h2 className="lg:hidden text-2xl font-bold tracking-wide text-[#0A6E5C] mb-3">
               <Logo />
             </h2>
             <div className="text-center mt-2">
-              {/* Top accent line */}
               <div
                 className="w-10 h-0.5 rounded-full mx-auto mb-4"
                 style={{
@@ -66,14 +62,12 @@ const UserLogin = () => {
             </div>
           </div>
 
-          {/* Form */}
           <div className="space-y-6">
             <FormProvider {...methods}>
               <LoginForm />
             </FormProvider>
           </div>
 
-          {/* Register link */}
           <p
             className="mt-8 text-center text-xs"
             style={{ color: "#9ca3af", fontFamily: '"DM Sans", sans-serif' }}

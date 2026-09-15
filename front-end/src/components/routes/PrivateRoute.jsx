@@ -12,7 +12,6 @@ function PrivateRoute({ allowedRoles }) {
     return <Outlet />;
 
   } else {
-    // 1. Check if user is logged in
     if (!(userAuth?.accessToken && userAuth?.user)) {
       return <Navigate to="/user/login" replace />;
     }

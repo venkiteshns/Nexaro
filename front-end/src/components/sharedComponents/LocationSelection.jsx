@@ -69,7 +69,7 @@ const LocationSelection = ({ SectionName }) => {
     }, [debouncedSearch]);
 
     const applySelectedPlace = (place, { moveMap } = { moveMap: true }) => {
-        skipNextSearch.current = true; // programmatic searchText change — don't re-search
+        skipNextSearch.current = true;
 
         setSearchText(place.displayName);
         setSuggestions([]);
@@ -88,7 +88,6 @@ const LocationSelection = ({ SectionName }) => {
         setValue('state', place.state || "", { shouldValidate: true });
 
         setMapPosition({ lat, lng });
-        // handleMapPositionChange({lat, lng})
 
         if (moveMap && !initialSelectionDone.current) {
             initialSelectionDone.current = true;
@@ -148,7 +147,6 @@ const LocationSelection = ({ SectionName }) => {
                 <Map position={mapPosition} setPosition={handleMapPositionChange} height="180px" showButton={false} />
             </div>
 
-            {/* Registered so RHF tracks & validates these, even though they're set via setValue */}
             <input type="hidden" {...register('locationLat', { required: true })} />
             <input type="hidden" {...register('locationlng', { required: true })} />
 

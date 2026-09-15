@@ -53,10 +53,9 @@ import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
   const location = useLocation();
 
   return (
-  
+
     <div className="h-full flex flex-col justify-between">
       <div>
-        {/* Logo + toggle */}
         <div className="h-20 flex items-center justify-between px-4 border-b border-gray-100">
           <div className="flex items-center gap-2 overflow-hidden">
             {isExpanded ? (
@@ -78,7 +77,6 @@ import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
           </button>
         </div>
 
-        {/* User avatar — only when expanded */}
         {isExpanded && (
           <div className="px-4 py-4 flex items-center gap-3 border-b border-gray-100">
             <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
@@ -95,7 +93,6 @@ import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
           </div>
         )}
 
-        {/* Navigation links */}
         <div className="p-3 space-y-1 mt-1">
           {posterNav.map((item, index) => {
             const isActive =
@@ -144,7 +141,6 @@ import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
         </div>
       </div>
 
-      {/* Logout */}
       <div className="p-3 border-t border-gray-100">
         <button
           onClick={onLogout}
@@ -164,13 +160,10 @@ const PosterNavBar = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
 
-  // Unread notifications count for poster
   const { data: unreadData } = useGetPosterUnreadCountQuery();
   const unreadCount = unreadData?.unreadCount || 0;
 
-  // md+ desktop: collapsed (icon-only) ↔ expanded
   const [desktopOpen, setDesktopOpen] = useState(false);
-  // <md mobile: hidden ↔ overlay open
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const [userLogout] = useUserLogoutMutation();
@@ -178,8 +171,8 @@ const PosterNavBar = () => {
   const handleLogout = async () => {
     try {
       await userLogout().unwrap();
-    } catch {
-      // log out locally even if API fails
+    } catch (error) {
+      console.error("Poster logout error:", error);
     } finally {
       dispatch(logOut());
       navigate("/user/login");
@@ -188,16 +181,14 @@ const PosterNavBar = () => {
 
   const handleNav = (redirect) => {
     navigate(redirect);
-    setMobileOpen(false); // auto-close overlay on navigation (mobile)
+    setMobileOpen(false);
   };
 
 
-  // ── Shared inner content ──────────────────────────────────────────────────
- 
+
 
   return (
     <>
-      {/* ── MOBILE (<md): floating hamburger ──────────────────────────────── */}
       <button
         onClick={() => setMobileOpen(true)}
         className="md:hidden fixed top-3 left-4 z-50 w-10 h-10 rounded-full  flex items-center justify-center text-gray-600 hover:text-[#0A6E5C] transition-colors"
@@ -206,7 +197,6 @@ const PosterNavBar = () => {
         <Menu size={20} />
       </button>
 
-      {/* ── MOBILE: dim backdrop (click to close) ─────────────────────────── */}
       {mobileOpen && (
         <div
           className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
@@ -214,7 +204,6 @@ const PosterNavBar = () => {
         />
       )}
 
-      {/* ── MOBILE: slide-in sidebar overlay ──────────────────────────────── */}
       <div
         className={`md:hidden fixed top-0 left-0 h-full z-50 w-[220px] bg-white border-r border-gray-200 shadow-2xl transition-transform duration-300 ease-in-out ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
@@ -230,7 +219,6 @@ const PosterNavBar = () => {
         />
       </div>
 
-      {/* ── DESKTOP (md+): in-flow sidebar ────────────────────────────────── */}
       <div
         className={`hidden md:flex h-screen z-50 bg-white border-r border-gray-200 transition-all duration-300 shadow-sm flex-col justify-between shrink-0 ${
           desktopOpen ? "w-[220px]" : "w-[72px]"

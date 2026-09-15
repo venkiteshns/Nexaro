@@ -91,7 +91,6 @@ const ReviewBids = () => {
 
                 <div className="flex-1 overflow-y-auto">
 
-                    {/* ── Sticky top bar ── */}
                     <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200
                                     px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3 min-w-0">
@@ -119,7 +118,6 @@ const ReviewBids = () => {
 
                     <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full">
 
-                        {/* ── Task Summary Banner ── */}
                         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 py-4 mb-6
                                         grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div>
@@ -141,13 +139,11 @@ const ReviewBids = () => {
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Deadline</p>
                                 <p className="font-semibold text-gray-700 text-sm flex items-center gap-1">
                                     <Calendar size={12} className="text-[#0A6E5C]" />
-                                    {/* {MOCK_TASK.deadline} */}
                                     {formatDate(taskData?.deadline)}
                                 </p>
                             </div>
                         </div>
 
-                        {/* ── Compare Bids header + Sort ── */}
                         <div className="flex items-center justify-between mb-4">
                             <h1 className="text-sm md:text-base font-extrabold text-gray-900">Compare Bids</h1>
 
@@ -187,7 +183,7 @@ const ReviewBids = () => {
                         ) : isErrorAcceptBid ? (
                             <ErrorState onRetry={() => { resetAcceptBid?.(); setAcceptedBidDetails(null); }} />
                         ) : isSuccessAcceptBid ? (
-                            
+
                             <SuccessState
                                 bid={acceptedBidDetails}
                                 countdown={countdown}

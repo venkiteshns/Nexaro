@@ -15,26 +15,22 @@ const RightSideBar = ({ title, location, budget }) => {
                     </div>
                 </div>
 
-                {/* card */}
                 <div className="bg-[#F6FAF8] rounded-xl p-4 border border-gray-100">
                     <span className="inline-block text-[10px] font-bold text-[#0A6E5C] bg-emerald-100 rounded-full px-2.5 py-0.5 mb-2">
                         NEW LISTING
                     </span>
                     <h3 className="text-[#111827] font-bold text-base leading-snug mb-2">
-                        {/* test title */}
                         {title || "Add Title"}
                     </h3>
                     <div className="flex items-center gap-3 text-xs text-gray-500 mb-3 flex-wrap">
                         <div className="flex items-center gap-1">
                             <Tag size={11} className="text-[#0A6E5C]" />
                             <span className="text-[#0A6E5C] font-bold text-sm">
-                                {/* budget 200 */}
                                 {budget || "Add Budget"}
                             </span>
                         </div>
                         <div className="flex items-center gap-1">
                             <MapPin size={11} />
-                            {/* kochi */}
                             {location || "Add Location"}
                         </div>
                     </div>
@@ -47,7 +43,6 @@ const RightSideBar = ({ title, location, budget }) => {
                     </div>
                 </div>
 
-                {/* Tips */}
                 <div className="mt-4">
                     <p className="text-xs font-semibold text-gray-600 mb-3">
                         Tips for Better Bids

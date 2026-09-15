@@ -7,7 +7,6 @@ import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-//POST
 router.post("/signup/poster", posterSignup);
 router.post("/signup/worker", upload.fields([{ name: 'id_front' }, { name: 'id_back' }, { name: 'selfie' }]), workerSignup);
 router.post("/login", login);
@@ -20,10 +19,8 @@ router.post("/forgot-password/:role", forgotPasswordOtp);
 router.post("/update-password", updatePassword);
 router.post("/google-login", googleLogin);
 
-//PATCH
 router.patch('/profile/update-password', verifyToken, updateUserPassword);
 
-//DELETE
 router.delete('/profile/delete', verifyToken, deleteUserProfile);
 
 export default router;

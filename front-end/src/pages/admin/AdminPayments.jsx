@@ -10,15 +10,9 @@ import SelectDropdown from "../../components/sharedComponents/SelectDropdown";
 import { Calendar } from "lucide-react";
 import { useAdminGetFinanceStatsQuery } from "../../store/services/adminApi";
 
-/**
- * AdminPayments Page
- * Route: /admin/finance/payments
- * White and green theme for Nexaro Admin Portal
- */
 export default function AdminPayments() {
   const dispatch = useDispatch();
 
-  // Date range filter state
   const [selectedRange, setSelectedRange] = useState("Last 30 Days");
 
   const dateRangeOptions = [
@@ -30,26 +24,21 @@ export default function AdminPayments() {
     "All Time",
   ];
 
-  // Set active navigation page on mount
   useEffect(() => {
     dispatch(setActivePage("Payments & Revenue"));
   }, [dispatch]);
 
-  // Live Stats Query
   const { data: statsData, isLoading: statsLoading } =
     useAdminGetFinanceStatsQuery(selectedRange);
 
   return (
     <div className="min-h-screen bg-[#F6FAF8] flex">
-      {/* SIDEBAR NAVIGATION */}
       <AdminNavBar />
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
         <AdminHeader />
 
         <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
-          {/* Top Page Header: Helper text + Date Filter */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
@@ -60,7 +49,6 @@ export default function AdminPayments() {
               </p>
             </div>
 
-            {/* Reusable Date Range Selector */}
             <div className="self-start sm:self-auto">
               <SelectDropdown
                 options={dateRangeOptions}
@@ -72,7 +60,6 @@ export default function AdminPayments() {
             </div>
           </div>
 
-          {/* 1. TOP STATS CARDS COMPONENT */}
           <section aria-label="Financial Overview">
             <PaymentStatsCards
               stats={statsData?.stats}
@@ -80,12 +67,10 @@ export default function AdminPayments() {
             />
           </section>
 
-          {/* 2. REVENUE TRENDS CHART COMPONENT */}
           <section aria-label="Revenue Trends Chart">
             <RevenueTrendsChart />
           </section>
 
-          {/* 3. PAYMENTS & TRANSACTIONS TABLE COMPONENT */}
           <section aria-label="Transactions Table">
             <PaymentsTable dateRange={selectedRange} />
           </section>

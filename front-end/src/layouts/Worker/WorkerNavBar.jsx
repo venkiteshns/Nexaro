@@ -183,8 +183,8 @@ const WorkerNavBar = () => {
   const handleLogout = async () => {
     try {
       await userLogout().unwrap();
-    } catch {
-      // Logout locally even if server request fails
+    } catch (error) {
+      console.error("Worker logout error:", error);
     } finally {
       dispatch(logOut());
       navigate("/user/login");

@@ -10,7 +10,6 @@ const ActiveJobEntry = () => {
     const navigate = useNavigate();
     const { data, isLoading, isError } = useGetWorkerCurrentActiveJobQuery();
 
-    // Redirect immediately when a taskId is available
     useEffect(() => {
         if (data?.taskFound && data?.taskId) {
             navigate(`/worker/active-job/${data.taskId}`, { replace: true });
@@ -26,7 +25,6 @@ const ActiveJobEntry = () => {
 
                 <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
 
-                    {/* Loading */}
                     {isLoading && (
                         <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20">
                             <div className="relative w-20 h-20">
@@ -40,7 +38,6 @@ const ActiveJobEntry = () => {
                         </div>
                     )}
 
-                    {/* Error */}
                     {isError && !isLoading && (
                         <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20 text-center">
                             <div className="w-20 h-20 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center">
@@ -61,12 +58,10 @@ const ActiveJobEntry = () => {
                         </div>
                     )}
 
-                    {/* No active job */}
                     {!isLoading && !isError && data && !data.taskFound && (
                         <NoActiveJob onNavigate={() => navigate('/worker/nearby-tasks')} />
                     )}
 
-                    {/* Redirecting — show brief loader while useEffect fires */}
                     {!isLoading && !isError && data?.taskFound && (
                         <div className="flex-1 flex flex-col items-center justify-center gap-3 py-20">
                             <Loader2 size={28} className="text-[#0A6E5C] animate-spin" />

@@ -7,7 +7,6 @@ const AdminLoginBanner = () => {
     <div className="relative hidden lg:flex lg:w-1/2 bg-green-600/5 border border-[#DDE7E2] ">
 
       <div className="relative z-10 flex flex-col justify-between h-full w-full px-16 py-12">
-        {/* Logo */}
         <div>
           <div className="flex flex-col justify-center gap-2">
             <Logo />
@@ -17,7 +16,6 @@ const AdminLoginBanner = () => {
           </div>
         </div>
 
-        {/* Hero  */}
         <div className="max-w-xl">
 
           <h2 className="banner-text font-[600] text-4xl tracking-tight w-80">
@@ -29,7 +27,6 @@ const AdminLoginBanner = () => {
             enterprise-grade security and operational intelligence.
           </p>
 
-          {/* Card */}
           <div className=" w-100 mt-12 bg-white/70 border border-[#E2ECE7] rounded-3xl p-8 ">
             <div className="flex items-start gap-5">
               <div className="p-2 rounded-2xl bg-[#0A6E5C]/10 flex items-center justify-center">
@@ -49,7 +46,6 @@ const AdminLoginBanner = () => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="text-sm text-gray-400">
           © 2026 NEXARO Editorial Premium. All rights reserved.
         </div>

@@ -1,13 +1,5 @@
 import { Star } from 'lucide-react';
 
-/**
- * RatingInput — interactive 5-star rating component.
- *
- * Props:
- *   value    {number}   current selected rating (0 = none)
- *   onChange {function} called with the new rating number
- *   error    {string}   validation error message (optional)
- */
 const RatingInput = ({ value, onChange, error }) => {
     return (
         <div>

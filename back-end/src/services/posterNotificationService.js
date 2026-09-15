@@ -7,9 +7,6 @@ import User from "../models/userSchema.js";
 import Announcement from "../models/announcementSchema.js";
 import { getIo } from "../socket.js";
 
-/**
- * Record a single poster notification and broadcast in real-time via Socket.IO
- */
 export const recordPosterAlert = async ({
   posterId,
   type,
@@ -71,7 +68,6 @@ export const recordPosterAlert = async ({
       alert = await PosterNotification.create(doc);
     }
 
-    // Realtime Socket delivery to the specific poster
     try {
       const io = getIo();
       if (io) {
@@ -80,8 +76,8 @@ export const recordPosterAlert = async ({
           message: `${title}: ${description}`,
         });
       }
-    } catch {
-      // Socket not ready or outside web context
+    } catch (err) {
+      console.error("Socket emit poster notification error:", err.message);
     }
 
     return alert;
@@ -91,22 +87,12 @@ export const recordPosterAlert = async ({
   }
 };
 
-/**
- * Sync and compile all real notifications for a specific poster from existing records:
- * - Real worker bids on poster's tasks
- * - Real escrow payments
- * - Real task progress/completion updates
- * - Review reminders
- * - Task posted confirmations
- * - System announcements
- */
 export const syncPosterNotifications = async (posterId) => {
   try {
     const posterObjectId = new mongoose.Types.ObjectId(posterId);
     const poster = await User.findById(posterObjectId).lean();
     if (!poster) return;
 
-    // Purge any legacy bids or tasks notifications for this poster
     await PosterNotification.deleteMany({
       posterId: posterObjectId,
       $or: [
@@ -117,7 +103,6 @@ export const syncPosterNotifications = async (posterId) => {
 
     const alertsToUpsert = [];
 
-    // 1. Process Poster's Real Payment Transactions (Escrow Payments)
     try {
       const escrowTransactions = await Transaction.find({
         senderId: posterObjectId,
@@ -145,7 +130,6 @@ export const syncPosterNotifications = async (posterId) => {
       console.error("Error processing escrow transactions in syncPosterNotifications:", txErr.message);
     }
 
-    // 2. Process Poster's Completed Tasks (Payment Released to Worker)
     try {
       const completedTasks = await Task.find({
         posterId: posterObjectId,
@@ -176,7 +160,6 @@ export const syncPosterNotifications = async (posterId) => {
       console.error("Error processing completed tasks in syncPosterNotifications:", taskErr.message);
     }
 
-    // 3. Process Client Reviews (System)
     try {
       const reviews = await Review.find({ reviewee: posterObjectId })
         .populate("reviewer", "name")
@@ -202,7 +185,6 @@ export const syncPosterNotifications = async (posterId) => {
       console.error("Error processing reviews in syncPosterNotifications:", revErr.message);
     }
 
-    // 4. Process Broadcast Announcements (System)
     try {
       const announcements = await Announcement.find({
         targetAudience: { $in: ["POSTERS", "ALL USERS", "posters", "all users"] },
@@ -228,7 +210,6 @@ export const syncPosterNotifications = async (posterId) => {
       console.error("Error processing announcements in syncPosterNotifications:", annErr.message);
     }
 
-    // 5. Bulk upsert preserving original isRead flags
     if (alertsToUpsert.length > 0) {
       const operations = alertsToUpsert.map((item) => ({
         updateOne: {

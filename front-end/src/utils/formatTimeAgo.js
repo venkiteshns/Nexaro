@@ -1,9 +1,3 @@
-/**
- * Formats a given date/timestamp into a concise relative time string:
- * e.g., "Just now", "2m ago", "1h ago", "1d ago", "3d ago", "2w ago", "Oct 12"
- *
- * Pure utility function reusable across all user roles (Poster, Worker, Admin).
- */
 export const formatTimeAgo = (dateInput) => {
   if (!dateInput) return "";
   const date = new Date(dateInput);

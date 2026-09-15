@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
 import {
   Search,
-  Download,
   Loader2,
   Inbox,
 } from "lucide-react";
 import { useAdminGetFinanceTransactionsQuery } from "../../../store/services/adminApi";
 
-/**
- * Status Badge Component with themed colors
- */
 function PaymentStatusBadge({ status }) {
   const normalized = (status || "").toUpperCase();
 
@@ -53,9 +49,6 @@ function PaymentStatusBadge({ status }) {
   }
 }
 
-/**
- * Avatar with Initials
- */
 function UserAvatar({ initials, name, colorIndex = 0 }) {
   const avatarColors = [
     "bg-emerald-100 text-[#0A6E5C]",
@@ -75,18 +68,13 @@ function UserAvatar({ initials, name, colorIndex = 0 }) {
   );
 }
 
-/**
- * PaymentsTable Component
- * Live transaction table with debounced search, status filter, and pagination
- */
 export default function PaymentsTable({ dateRange = "All Time" }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 3;
 
-  // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
@@ -101,7 +89,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
     setCurrentPage(1);
   }
 
-  // Query live backend
   const { data, isLoading, isFetching } = useAdminGetFinanceTransactionsQuery({
     page: currentPage,
     limit: pageSize,
@@ -130,50 +117,9 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
     }
   };
 
-  // CSV Export
-  const handleExport = () => {
-    if (!transactions || transactions.length === 0) return;
-    const headers = [
-      "Transaction ID",
-      "User Name",
-      "Email",
-      "Task / Purpose",
-      "Amount",
-      "Commission",
-      "Status",
-      "Date",
-    ];
-    const rows = transactions.map((t) => [
-      t.id,
-      `"${t.user?.name || ""}"`,
-      `"${t.user?.email || ""}"`,
-      `"${t.task || ""}"`,
-      `"${t.amount || ""}"`,
-      `"${t.commission || ""}"`,
-      t.status,
-      `"${t.date || ""}"`,
-    ]);
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `nexaro_transactions_${new Date().toISOString().slice(0, 10)}.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <div className="space-y-4">
-      {/* Top Action Bar: Search, Status Filter & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Search Bar */}
         <div className="relative flex-1 max-w-md">
           <Search
             size={17}
@@ -188,9 +134,7 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
           />
         </div>
 
-        {/* Filter Pills and Export Button */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Status Filter */}
           <div className="flex items-center gap-1 p-1 bg-white border border-gray-200 rounded-xl shadow-xs text-xs font-semibold">
             {["ALL", "COMPLETED", "PENDING"].map((status) => (
               <button
@@ -206,21 +150,9 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
               </button>
             ))}
           </div>
-
-          {/* Export Action Button */}
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={transactions.length === 0}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#0A6E5C] transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            <Download size={14} />
-            <span className="hidden sm:inline">Export CSV</span>
-          </button>
         </div>
       </div>
 
-      {/* Main Table Card (Desktop Table + Mobile Cards) */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden relative">
         {isFetching && !isLoading && (
           <div className="absolute top-2 right-4 z-10 flex items-center gap-1 text-[11px] text-[#0A6E5C] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
@@ -229,12 +161,10 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
           </div>
         )}
 
-        {/* DESKTOP TABLE VIEW */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#F8FBFA] border-b border-gray-100 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                {/* <th className="py-4 px-6">TRANS ID</th> */}
                 <th className="py-4 px-6">USER</th>
                 <th className="py-4 px-6">TASK / PURPOSE</th>
                 <th className="py-4 px-6">AMOUNT</th>
@@ -259,27 +189,7 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                     key={item.rawId || item.id}
                     className="hover:bg-[#F6FAF8] transition-colors group"
                   >
-                    {/* Transaction ID with Copy Button */}
-                    {/* <td className="py-4 px-6">
-                      <button
-                        type="button"
-                        onClick={() => handleCopyId(item.rawId || item.id)}
-                        className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#0A6E5C] hover:underline cursor-pointer group-hover:text-emerald-700"
-                        title="Click to copy ID"
-                      >
-                        <span>{item.id}</span>
-                        {copiedTxnId === (item.rawId || item.id) ? (
-                          <Check size={12} className="text-emerald-600" />
-                        ) : (
-                          <Copy
-                            size={12}
-                            className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                          />
-                        )}
-                      </button>
-                    </td> */}
 
-                    {/* User Info with Avatar */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <UserAvatar
@@ -300,7 +210,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                       </div>
                     </td>
 
-                    {/* Task Title */}
                     <td className="py-4 px-6">
                       <div className="max-w-xs">
                         <p className="text-gray-800 font-medium truncate">
@@ -314,26 +223,22 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                       </div>
                     </td>
 
-                    {/* Amount */}
                     <td className="py-4 px-6">
                       <span className="font-bold text-gray-900">
                         {item.amount}
                       </span>
                     </td>
 
-                    {/* Commission */}
                     <td className="py-4 px-6">
                       <span className="font-semibold text-[#0A6E5C]">
                         {item.commission}
                       </span>
                     </td>
 
-                    {/* Status Badge */}
                     <td className="py-4 px-6">
                       <PaymentStatusBadge status={item.status} />
                     </td>
 
-                    {/* Date */}
                     <td className="py-4 px-6">
                       <span className="text-gray-500 text-xs font-medium">
                         {item.date}
@@ -362,7 +267,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
           </table>
         </div>
 
-        {/* MOBILE / TABLET CARD VIEW */}
         <div className="md:hidden divide-y divide-gray-100">
           {isLoading ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-gray-400">
@@ -375,7 +279,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                 key={item.rawId || item.id}
                 className="p-4 space-y-3 hover:bg-[#F6FAF8] transition-colors"
               >
-                {/* Card Header: User & Status */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <UserAvatar
@@ -399,13 +302,11 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                   <PaymentStatusBadge status={item.status} />
                 </div>
 
-                {/* Task Name */}
                 <div className="bg-[#F8FBFA] px-3 py-2 rounded-xl text-xs text-gray-700 font-medium">
                   <span className="text-gray-400 mr-1.5 font-normal">Task:</span>
                   {item.task}
                 </div>
 
-                {/* Amounts & Date Row */}
                 <div className="flex items-center justify-between text-xs pt-1">
                   <div>
                     <span className="text-gray-400 block text-[11px]">Amount</span>
@@ -435,7 +336,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
           )}
         </div>
 
-        {/* Table Footer with Pagination matching reference image */}
         <div className="p-4 sm:px-6 bg-[#FBFDFB] border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs text-gray-500 font-medium">
             Showing{" "}
@@ -449,7 +349,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
             transactions
           </div>
 
-          {/* Previous / Next Controls */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -463,7 +362,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
               PREVIOUS
             </button>
 
-            {/* Page pill indicators */}
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (pageNum) => (

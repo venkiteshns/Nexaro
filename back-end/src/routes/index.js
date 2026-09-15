@@ -3,7 +3,7 @@ import authRouter from "./authRouter.js";
 import adminRouter from "./adminRouter.js";
 import posterRouter from "./posterRouter.js";
 import workerRouter from "./workerRouter.js";
-import paymentRouter from "./paymentRoute.js"; // Import the payment route
+import paymentRouter from "./paymentRoute.js";
 
 const router = express.Router();
 

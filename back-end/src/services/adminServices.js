@@ -8,7 +8,7 @@ import WorkerNotification from "../models/workerNotificationSchema.js";
 import PosterNotification from "../models/posterNotificationSchema.js";
 import Bid from "../models/bidsSchema.js";
 import { getIo } from "../socket.js";
-import { syncRealPlatformNotifications, recordAdminAlert } from "./adminNotificationHelper.js";
+import { syncRealPlatformNotifications, recordAdminAlert } from "./adminNotificationService.js";
 import MESSAGES from "../constants/messages.js";
 
 export const getAllUsersService = async (page, limit) => {
@@ -150,20 +150,16 @@ export const rejectUserService = async (userId) => {
 export const getAllTasksService = async (page, limit, search = '', status = 'all', category = 'all') => {
     const skip = (page - 1) * limit;
 
-    // ── Build the filtered $match (applied to paginated tasks + totalCount) ──
     const filterMatch = {};
     if (status && status !== 'all') filterMatch.status = status;
     if (category && category !== 'all') filterMatch.category = category;
 
-    // ── Search is applied via a $lookup + $or after joining poster ──
     const searchRegex = search ? new RegExp(search, 'i') : null;
 
     const [result] = await Task.aggregate([
-        // Apply status + category match first (DB-level, indexed)
         ...(Object.keys(filterMatch).length ? [{ $match: filterMatch }] : []),
         {
             $facet: {
-                // ── Paginated tasks with poster + search filter ──
                 tasks: [
                     {
                         $lookup: {
@@ -175,7 +171,6 @@ export const getAllTasksService = async (page, limit, search = '', status = 'all
                         },
                     },
                     { $unwind: { path: '$posterId', preserveNullAndEmptyArrays: true } },
-                    // Apply search filter after poster is joined
                     ...(searchRegex ? [{
                         $match: {
                             $or: [
@@ -188,7 +183,6 @@ export const getAllTasksService = async (page, limit, search = '', status = 'all
                     { $skip: skip },
                     { $limit: limit },
                 ],
-                // ── Total count of filtered results ──
                 totalCount: [
                     {
                         $lookup: {
@@ -210,7 +204,6 @@ export const getAllTasksService = async (page, limit, search = '', status = 'all
                     }] : []),
                     { $count: 'count' },
                 ],
-                // ── Platform-wide status counts (no search/category applied) ──
                 statusCounts: [
                     { $group: { _id: '$status', count: { $sum: 1 } } },
                 ],
@@ -371,7 +364,6 @@ const getRangeDates = (range) => {
     return { currentStart, currentEnd, prevStart, prevEnd };
 };
 
-// ── 1. Admin Finance Overview Stats Service ─────────────────────────
 export const getAdminFinanceStatsService = async (range = "Last 30 Days") => {
     const { currentStart, currentEnd } = getRangeDates(range);
 
@@ -453,7 +445,6 @@ export const getAdminFinanceStatsService = async (range = "Last 30 Days") => {
     };
 };
 
-// ── 2. Admin Revenue Trends Chart Service ───────────────────────────
 export const getAdminFinanceChartService = async (timeframe = "7D", metric = "revenue") => {
     const normalizedTimeframe = (timeframe || "7D").toUpperCase();
     const normalizedMetric = (metric || "revenue").toLowerCase();
@@ -555,7 +546,6 @@ export const getAdminFinanceChartService = async (timeframe = "7D", metric = "re
             volume,
         }));
     } else {
-        // "6M", "1Y", or "ALL"
         const monthsCount = normalizedTimeframe === "6M" ? 6 : normalizedTimeframe === "1Y" ? 12 : 12;
         startDate = new Date(now.getFullYear(), now.getMonth() - (monthsCount - 1), 1);
 
@@ -605,7 +595,7 @@ export const getAdminFinanceChartService = async (timeframe = "7D", metric = "re
         return {
             ...item,
             value,
-            earnings: value, // for compatibility with shared chart component
+            earnings: value,
         };
     });
 
@@ -620,7 +610,6 @@ export const getAdminFinanceChartService = async (timeframe = "7D", metric = "re
     };
 };
 
-// ── 3. Admin Finance Transactions Table Service ─────────────────────
 export const getAdminFinanceTransactionsService = async ({
     page = 1,
     limit = 10,
@@ -799,7 +788,6 @@ export const getAdminFinanceTransactionsService = async ({
     };
 };
 
-// ── 4. Admin Daily Revenue Report Service ───────────────────────────
 export const getAdminDailyRevenueReportService = async () => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -866,7 +854,6 @@ export const getAdminDailyRevenueReportService = async () => {
     };
 };
 
-// ── 5. Admin Monthly P&L Report Service ─────────────────────────────
 export const getAdminMonthlyPlReportService = async (yearParam, monthParam) => {
     const now = new Date();
     const year = parseInt(yearParam) || now.getFullYear();
@@ -927,7 +914,6 @@ export const getAdminMonthlyPlReportService = async (yearParam, monthParam) => {
     };
 };
 
-// ── 6. Admin Platform Fee Summary Service ───────────────────────────
 export const getAdminPlatformFeeSummaryService = async () => {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -985,7 +971,6 @@ export const getAdminPlatformFeeSummaryService = async () => {
 };
 
 export const getAdminNotificationsService = async (page = 1, limit = 6, filter = "all") => {
-    // Keep notifications synchronized with real database tasks, transactions, bids, reviews
     await syncRealPlatformNotifications();
 
     const query = {};
@@ -1049,7 +1034,6 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         sentBy: adminId || null,
     });
 
-    // Also record as a system notification alert for admin audit records (marked read)
     await AdminNotification.create({
         type: "announcement",
         title: `Announcement: ${title.trim()}`,
@@ -1063,7 +1047,6 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
     const isForPosters = audience === "POSTERS" || audience === "POSTER" || audience === "ALL USERS" || audience === "ALL";
     const isForWorkers = audience === "WORKERS" || audience === "WORKER" || audience === "ALL USERS" || audience === "ALL";
 
-    // 1. If target audience includes posters, persist to PosterNotification
     if (isForPosters) {
         try {
             const posters = await User.find({
@@ -1101,7 +1084,6 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         }
     }
 
-    // 2. If target audience includes workers, persist to WorkerNotification
     if (isForWorkers) {
         try {
             const workers = await User.find({
@@ -1139,7 +1121,6 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
         }
     }
 
-    // 3. Broadcast via socket strictly to targeted recipient rooms (NEVER broadcast to admin)
     try {
         const io = getIo();
         if (io) {
@@ -1156,7 +1137,6 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
             } else if (audience === "POSTERS" || audience === "POSTER") {
                 io.to("role:poster").emit("admin-announcement", payload);
             } else {
-                // ALL USERS: Target both worker and poster rooms specifically (excludes admin)
                 io.to("role:worker").to("role:poster").emit("admin-announcement", payload);
             }
         }
@@ -1172,7 +1152,6 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
 };
 
 export const getRecentAnnouncementsService = async (limit = 5) => {
-    // Purge default sample announcement and any linked records
     await Promise.all([
         Announcement.deleteMany({ title: "New Bonus Program" }),
         AdminNotification.deleteMany({ title: { $regex: /New Bonus Program/i } }),

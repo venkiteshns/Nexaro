@@ -3,17 +3,6 @@ import { ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import { useInitiatePaymentMutation } from '../../../store/services/paymentApi';
 import { formatInrToUsd } from '../../../utils/currency';
 
-/**
- * ReleaseModal — confirms and initiates payment payout.
- *
- * Props:
- *   bidId      {string}
- *   taskId     {string}  passed so onSuccess can navigate to review page
- *   amount     {number}
- *   workerName {string}
- *   onCancel   {function}
- *   onSuccess  {function(taskId)} called only when payout API succeeds
- */
 export default function ReleaseModal({ amount, workerName, onCancel, bidId, taskId, onSuccess }) {
     const [initiatePayout, { isLoading }] = useInitiatePaymentMutation();
     const [apiError, setApiError] = useState(null);
@@ -23,7 +12,6 @@ export default function ReleaseModal({ amount, workerName, onCancel, bidId, task
         try {
             const res = await initiatePayout(bidId).unwrap();
             if (res?.success) {
-                // Payment confirmed — let parent close modal and navigate to review page
                 if (onSuccess) onSuccess(taskId);
             } else {
                 setApiError(res?.message || 'Payment release failed. Please try again.');
@@ -62,7 +50,6 @@ export default function ReleaseModal({ amount, workerName, onCancel, bidId, task
                         action cannot be undone.
                     </p>
 
-                    {/* API error */}
                     {apiError && (
                         <div className="w-full bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex items-start gap-2 text-left">
                             <AlertTriangle size={15} className="text-red-500 shrink-0 mt-0.5" />

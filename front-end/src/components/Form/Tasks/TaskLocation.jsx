@@ -274,7 +274,6 @@ const TaskLocation = () => {
                         <FieldError name="houseNumber" errors={errors} />
                     </div>
 
-                    {/* Full Address */}
                     <div>
                         <textarea
                             placeholder="Full Address (House No, Street, Landmark)"

@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-/**
- * Format relative time for announcements
- */
 const formatSentTime = (dateInput) => {
   if (!dateInput) return "Just now";
   const date = new Date(dateInput);
@@ -19,10 +16,6 @@ const formatSentTime = (dateInput) => {
   return `${diffInDays}d ago`;
 };
 
-/**
- * Reusable RecentlySentAnnouncements component
- * Displays list of previously broadcasted announcements with audience badges and message preview.
- */
 const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) => {
   const [expandedId, setExpandedId] = useState(null);
 
@@ -57,7 +50,6 @@ const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) =>
                 onClick={() => toggleExpand(id)}
                 className="group relative bg-white rounded-2xl border border-gray-200/80 p-4 shadow-2xs hover:shadow-xs transition-all cursor-pointer overflow-hidden"
               >
-                {/* Left accent bar in Nexaro green */}
                 <span
                   className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A6E5C] rounded-l-2xl"
                   aria-hidden="true"
@@ -84,7 +76,6 @@ const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) =>
                     <span>Sent {formatSentTime(announcement.createdAt)}</span>
                   </div>
 
-                  {/* Expandable message content */}
                   {isExpanded && announcement.message && (
                     <div className="mt-2.5 pt-2.5 border-t border-gray-100 text-xs text-gray-600 bg-gray-50/60 p-2.5 rounded-xl leading-relaxed animate-in fade-in duration-150">
                       {announcement.message}

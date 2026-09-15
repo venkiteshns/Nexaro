@@ -24,7 +24,6 @@ const UpdatePasswordModal = ({ onClose }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
             <div className="relative w-full max-w-[540px] rounded-[32px] border border-[#DDE7E2] bg-white shadow-2xl p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-300">
-                {/* Close Button */}
                 <button
                     onClick={onClose}
                     className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-[#F4F7F5] text-gray-500 transition hover:bg-[#E8F3EE] hover:text-[#0A6E5C]"
@@ -53,7 +52,6 @@ const UpdatePasswordModal = ({ onClose }) => {
                                         type="button"
                                         onClick={() => setShowOldPassword((prev) => !prev)}
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0A6E5C] transition"
-                                        // tabIndex={-1}
                                     >
                                         {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>

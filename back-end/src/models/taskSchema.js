@@ -80,9 +80,6 @@ const taskSchema = new mongoose.Schema(
             state: { type: String, required: true },
             district: { type: String, required: true },
             landmark: { type: String },
-            // city: { type: String },
-            // area: { type: String },
-            // houseNumber: { type: String },
         },
 
         location: {

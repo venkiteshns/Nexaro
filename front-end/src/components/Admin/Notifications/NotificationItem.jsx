@@ -18,9 +18,6 @@ import {
 
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
 
-/**
- * Returns icon config based on notification type
- */
 const getNotificationTypeConfig = (type) => {
   switch (type) {
     case "review":
@@ -117,9 +114,6 @@ const getNotificationTypeConfig = (type) => {
   }
 };
 
-/**
- * Reusable NotificationItem component for rendering single alert entries
- */
 const NotificationItem = ({ notification, onMarkRead }) => {
   const {
     _id,
@@ -134,7 +128,6 @@ const NotificationItem = ({ notification, onMarkRead }) => {
 
   const config = getNotificationTypeConfig(type);
 
-  // Custom dot color override if specified in document
   let activeDotClass = config.dotColor;
   if (dotColor === "yellow") activeDotClass = "bg-amber-400 ring-amber-400/30";
   if (dotColor === "blue") activeDotClass = "bg-blue-500 ring-blue-500/30";
@@ -151,7 +144,6 @@ const NotificationItem = ({ notification, onMarkRead }) => {
           : "bg-emerald-50/20 border-emerald-100/70 hover:bg-emerald-50/40 shadow-2xs"
       } ${!isRead ? "cursor-pointer" : ""}`}
     >
-      {/* Active unread accent bar on left */}
       {!isRead && (
         <span
           className={`absolute left-0 top-3 bottom-3 w-1 rounded-r-full ${config.barColor}`}
@@ -159,16 +151,13 @@ const NotificationItem = ({ notification, onMarkRead }) => {
         />
       )}
 
-      {/* Left Icon + Text details */}
       <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1 pl-1">
-        {/* Icon container */}
         <div
           className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 border ${config.bg} shadow-2xs transition-transform group-hover:scale-105`}
         >
           {config.icon}
         </div>
 
-        {/* Content info */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h4
@@ -191,7 +180,6 @@ const NotificationItem = ({ notification, onMarkRead }) => {
         </div>
       </div>
 
-      {/* Right meta info: relative time + status dot / mark read button */}
       <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-center pt-0.5 sm:pt-0">
         <span className="text-xs font-medium text-gray-400 whitespace-nowrap">
           {formatTimeAgo(createdAt)}

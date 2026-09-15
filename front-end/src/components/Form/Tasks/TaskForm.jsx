@@ -37,9 +37,6 @@ const TaskForm = () => {
     }
   };
 
-  // const previewTitle = methods.watch("taskTitle");
-  // const previewLocation = methods.watch("area");
-  // const previewBudget = methods.watch("budget");
 
   const previewTitle = useWatch({ control: methods.control, name: "taskTitle" });
   const previewLocation = useWatch({ control: methods.control, name: "area" });
@@ -55,7 +52,6 @@ const TaskForm = () => {
               <TaskPhotos />
               <LocationSelection SectionName={"Task Location"} />
 
-              {/* <TaskLocation /> */}
             </div>
             <RightSideBar
               title={previewTitle}

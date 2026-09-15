@@ -23,14 +23,13 @@ const Location = ({ worker }) => {
   const [countryCode, setCountryCode] = useState("IN");
   const [district, setDistrict] = useState("Kozhikode");
   const [fetchingLocation, setFetchingLocation] = useState(false);
-  const [fetchCords, setFetchCoords] = useState("idle"); // idle, fetching, success, fail
-  const [WFetchCords, setWFetchCords] = useState("idle"); // idle, fetching, success, fail
+  const [fetchCords, setFetchCoords] = useState("idle");
+  const [WFetchCords, setWFetchCords] = useState("idle");
 
   const [locationError, setLocationError] = useState("");
-  const [afterChangeLocation, setAfterChangeLocation] = useState("idle"); //idle, set, changed
+  const [afterChangeLocation, setAfterChangeLocation] = useState("idle");
   const [afterChangeWorkPlace, setAfterChangeWorkPlace] = useState("idle");
 
-  // UI-only flags — flipped true only on failed confirm or form submit, never on onChange
   const [locationConfirmNeeded, setLocationConfirmNeeded] = useState(false);
   const [workConfirmNeeded, setWorkConfirmNeeded] = useState(false);
 
@@ -41,8 +40,6 @@ const Location = ({ worker }) => {
   const districtAreas =
     district && DISTRICT_AREAS[district] ? DISTRICT_AREAS[district] : [];
 
-  // setValue(type === "city" ? "locationLat" : "workPlacelat", res.lat);
-  // setValue(type === "city" ? "locationlng" : "workPlacelng", res.lng);
   useEffect(() => {
     register("locationLat", {
       required: "Location latitude is required",
@@ -202,7 +199,6 @@ const Location = ({ worker }) => {
 
   return (
     <div className="space-y-5">
-      {/* Location Button */}
       <div className="mt-5 w-full flex flex-col items-center text-center rounded-[24px] sm:rounded-[28px] border border-[rgba(10,110,92,0.15)] bg-white p-5 sm:p-8 shadow-sm">
         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#0A6E5C]/10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 text-[#0A6E5C]">
           <MapPin size={20} className="sm:w-6 sm:h-6" strokeWidth={1.5} />
@@ -241,18 +237,14 @@ const Location = ({ worker }) => {
         )}
       </div>
 
-      {/* Form Fields */}
       <div className="w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm space-y-5">
-        {/* error msg */}
         {(errors.country || errors.state || errors.district || errors.city) && (
           <p className="italic text-red-400/90 text-xs">
             Please fill all the location fields.
           </p>
         )}
 
-        {/* Country & State */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Country */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600">
               Country <span className="text-red-500">*</span>
@@ -274,7 +266,6 @@ const Location = ({ worker }) => {
             </select>
           </div>
 
-          {/* State */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600">
               State <span className="text-red-500">*</span>
@@ -298,7 +289,6 @@ const Location = ({ worker }) => {
           </div>
         </div>
 
-        {/* District & City */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600">
@@ -327,7 +317,6 @@ const Location = ({ worker }) => {
             </select>
           </div>
 
-          {/* City / Place */}
 
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600">
@@ -389,7 +378,6 @@ const Location = ({ worker }) => {
             </button>
           </div>
         )}
-        {/* only workers */}
         {worker && (
           <>
             <div className="space-y-1">

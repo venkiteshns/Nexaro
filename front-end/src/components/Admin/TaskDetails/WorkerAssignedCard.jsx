@@ -9,7 +9,6 @@ const WorkerAssignedCard = ({ worker, bid }) => {
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
             <p className="font-extrabold text-gray-900 text-base mb-4">Assigned Worker</p>
 
-            {/* Profile */}
             <div className="flex items-center gap-3 mb-5">
                 <div className="w-12 h-12 rounded-full bg-emerald-50 border-2 border-emerald-100 overflow-hidden flex items-center justify-center shrink-0">
                     {worker.selfie ? (
@@ -28,7 +27,6 @@ const WorkerAssignedCard = ({ worker, bid }) => {
                             </span>
                         )}
                     </div>
-                    {/* Rating */}
                     {worker.rating != null && (
                         <div className="flex items-center gap-1 mt-0.5">
                             <Star size={12} fill="#FBBF24" color="#FBBF24" />
@@ -38,7 +36,6 @@ const WorkerAssignedCard = ({ worker, bid }) => {
                 </div>
             </div>
 
-            {/* Contact */}
             <div className="space-y-2.5 mb-5">
                 <div className="flex items-center gap-2.5 text-sm text-gray-600">
                     <div className="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center">
@@ -54,7 +51,6 @@ const WorkerAssignedCard = ({ worker, bid }) => {
                 </div>
             </div>
 
-            {/* Accepted bid */}
             {bid && (
                 <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Accepted Bid</p>

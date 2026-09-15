@@ -1,11 +1,4 @@
-/**
- * Nexaro Financial Report Export Utilities
- * Generates branded PDF print views and CSV downloads in the Nexaro green & white theme.
- */
 
-/**
- * Downloads a string content as a file (CSV, JSON, etc.)
- */
 export function downloadFile(content, fileName, mimeType = "text/csv;charset=utf-8;") {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -18,9 +11,6 @@ export function downloadFile(content, fileName, mimeType = "text/csv;charset=utf
   URL.revokeObjectURL(url);
 }
 
-/**
- * Opens a dedicated branded print-to-PDF window with Nexaro styling
- */
 export function openPrintWindow(title, htmlContent) {
   const printWindow = window.open("", "_blank", "width=900,height=800");
   if (!printWindow) {
@@ -205,8 +195,7 @@ export function openPrintWindow(title, htmlContent) {
       ${htmlContent}
 
       <div class="footer">
-        <div>Confidential & Proprietary • Nexaro Inc. Governance & Auditing</div>
-        <div class="footer-sig">Authorized by Nexaro Financial Controller</div>
+        <div>Confidential & Proprietary • Nexaro </div>
       </div>
 
       <script>
@@ -220,9 +209,6 @@ export function openPrintWindow(title, htmlContent) {
   printWindow.document.close();
 }
 
-/**
- * 1. Export Daily Revenue Report PDF
- */
 export function exportDailyRevenueReportPDF(reportData) {
   const summary = reportData?.summary || {};
   const dateLabel = reportData?.dateLabel || new Date().toDateString();
@@ -231,7 +217,7 @@ export function exportDailyRevenueReportPDF(reportData) {
   const html = `
     <div class="title-section">
       <h1>Daily Revenue Report</h1>
-      <p>Aggregated real-time revenue stream including transaction fees, GMV, and worker payouts for <strong>${dateLabel}</strong>.</p>
+      <p>Revenue stream including transaction fees, GMV, and worker payouts for <strong>${dateLabel}</strong>.</p>
     </div>
 
     <div class="kpi-grid">
@@ -264,11 +250,10 @@ export function exportDailyRevenueReportPDF(reportData) {
         </tr>
       </thead>
       <tbody>
-        ${
-          transactions.length > 0
-            ? transactions
-                .map(
-                  (tx) => `
+        ${transactions.length > 0
+      ? transactions
+        .map(
+          (tx) => `
               <tr>
                 <td style="font-family: monospace; font-weight: 600; color: #0A6E5C;">${tx.id}</td>
                 <td>${tx.type || "Service Booking"}</td>
@@ -277,16 +262,16 @@ export function exportDailyRevenueReportPDF(reportData) {
                 <td style="color: #6B7280;">${tx.time || "Today"}</td>
               </tr>
             `
-                )
-                .join("")
-            : `
+        )
+        .join("")
+      : `
             <tr>
               <td colspan="5" style="text-align: center; color: #9CA3AF; padding: 24px;">
                 No transactions recorded today yet.
               </td>
             </tr>
           `
-        }
+    }
       </tbody>
     </table>
   `;
@@ -294,12 +279,15 @@ export function exportDailyRevenueReportPDF(reportData) {
   openPrintWindow("Daily Revenue Report", html);
 }
 
-/**
- * 2. Export Monthly P&L Statement PDF
- */
 export function exportMonthlyPlStatementPDF(reportData) {
   const metrics = reportData?.metrics || {};
   const monthName = reportData?.monthName || "Selected Period";
+
+  const rawPayouts = typeof metrics.workerPayouts === "number"
+    ? metrics.workerPayouts
+    : (parseFloat(String(metrics.formattedPayouts || "0").replace(/[^0-9.-]+/g, "")) || 0);
+  const halfPayouts = rawPayouts / 2;
+  const formattedHalfPayouts = `₹${halfPayouts.toLocaleString("en-IN")}`;
 
   const html = `
     <div class="title-section">
@@ -309,13 +297,13 @@ export function exportMonthlyPlStatementPDF(reportData) {
 
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-label">Gross Merchandise Value (GMV)</div>
+        <div class="kpi-label">Gross Merchandise Value </div>
         <div class="kpi-val">${metrics.formattedGmv || `₹${(metrics.grossVolume || 0).toLocaleString("en-IN")}`}</div>
         <div class="kpi-sub">Total platform transaction volume</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Worker Payouts (COGS)</div>
-        <div class="kpi-val">${metrics.formattedPayouts || `₹${(metrics.workerPayouts || 0).toLocaleString("en-IN")}`}</div>
+        <div class="kpi-label">Worker Payouts </div>
+        <div class="kpi-val">${formattedHalfPayouts}</div>
         <div class="kpi-sub">Disbursed service labor</div>
       </div>
       <div class="kpi-card">
@@ -345,7 +333,7 @@ export function exportMonthlyPlStatementPDF(reportData) {
         <tr>
           <td>Worker Earnings & Disbursals</td>
           <td style="color: #DC2626;">Payouts</td>
-          <td style="font-weight: 700;">${metrics.formattedPayouts || "₹0"}</td>
+          <td style="font-weight: 700;">${formattedHalfPayouts}</td>
           <td>95.0%</td>
         </tr>
         <tr>
@@ -367,9 +355,6 @@ export function exportMonthlyPlStatementPDF(reportData) {
   openPrintWindow(`P&L Statement - ${monthName}`, html);
 }
 
-/**
- * 3. Export Platform Fee Summary PDF
- */
 export function exportPlatformFeeSummaryPDF(reportData) {
   const fiscalYear = reportData?.fiscalYear || "Current Fiscal Year";
   const formattedAmount = reportData?.formattedAmount || "₹0";
@@ -411,9 +396,6 @@ export function exportPlatformFeeSummaryPDF(reportData) {
   openPrintWindow(`Platform Fee Summary - ${fiscalYear}`, html);
 }
 
-/**
- * Export CSV format helper
- */
 export function exportDailyRevenueCSV(reportData) {
   const summary = reportData?.summary || {};
   const transactions = reportData?.transactions || [];

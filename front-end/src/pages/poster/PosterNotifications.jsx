@@ -71,18 +71,13 @@ const PosterNotifications = () => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
-      {/* Poster Left Sidebar */}
       <PosterNavBar />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Header with live bell indicator */}
         <PosterHeader />
 
-        {/* Scrollable Body */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="w-full space-y-3.5">
-            {/* Top Header Banner */}
             <PosterNotificationHeader
               unreadCount={counts.unread}
               isFetching={isFetching}
@@ -91,14 +86,12 @@ const PosterNotifications = () => {
               isMarkingAllRead={isMarkingAll}
             />
 
-            {/* Category Filter Tabs */}
             <PosterNotificationFilters
               activeFilter={filter}
               onFilterChange={handleFilterChange}
               counts={counts}
             />
 
-            {/* Notification Feed */}
             {isLoading ? (
               <PosterNotificationSkeleton count={4} />
             ) : notifications.length === 0 ? (
@@ -118,7 +111,6 @@ const PosterNotifications = () => {
               </div>
             )}
 
-            {/* Pagination and Summary Text */}
             {!isLoading && totalPages > 1 && (
               <div className="pt-2 pb-6 space-y-2">
                 <PaginationSections

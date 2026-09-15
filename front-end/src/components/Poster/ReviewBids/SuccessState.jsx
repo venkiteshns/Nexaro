@@ -50,7 +50,6 @@ export default function SuccessState({ bid, countdown, taskId, navigate }) {
                 )}
             </div>
 
-            {/* Manual redirect */}
             <button
                 onClick={() => navigate(`/poster/work-progress/${taskId}`)}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0A6E5C] text-white text-sm font-bold hover:bg-[#085e4e] transition-all active:scale-[0.98]"

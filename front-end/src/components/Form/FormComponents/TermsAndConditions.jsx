@@ -4,7 +4,6 @@ const TermsAndConditions = () => {
   const {register, formState:{errors}} = useFormContext()
   return (
     <div>
-      {/* Terms */}
       <div className="flex items-center gap-3 pt-2 pb-2">
         <input {...register('terms',{
           required: "Accept terms and conditions to proceed"

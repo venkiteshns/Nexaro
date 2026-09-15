@@ -6,9 +6,6 @@ import User from "../models/userSchema.js";
 import Announcement from "../models/announcementSchema.js";
 import { getIo } from "../socket.js";
 
-/**
- * Record a single worker notification and broadcast in real-time via Socket.IO
- */
 export const recordWorkerAlert = async ({
   workerId,
   type,
@@ -69,7 +66,6 @@ export const recordWorkerAlert = async ({
       alert = await WorkerNotification.create(doc);
     }
 
-    // Realtime Socket delivery to the specific worker
     try {
       const io = getIo();
       if (io) {
@@ -78,8 +74,8 @@ export const recordWorkerAlert = async ({
           message: `${title}: ${description}`,
         });
       }
-    } catch {
-      // Socket not ready or outside web context
+    } catch (err) {
+      console.error("Socket emit worker notification error:", err.message);
     }
 
     return alert;
@@ -89,15 +85,6 @@ export const recordWorkerAlert = async ({
   }
 };
 
-/**
- * Sync and compile all real notifications for a specific worker from existing records:
- * - Real bids won/accepted
- * - Real bids not selected
- * - Real payments received
- * - Real client reviews
- * - Real nearby/urgent open tasks
- * - System announcements
- */
 export const syncWorkerNotifications = async (workerId) => {
   try {
     const workerObjectId = new mongoose.Types.ObjectId(workerId);
@@ -106,7 +93,6 @@ export const syncWorkerNotifications = async (workerId) => {
 
     const alertsToUpsert = [];
 
-    // Purge any legacy nearby tasks, urgent tasks, or bid results notifications
     await WorkerNotification.deleteMany({
       workerId: workerObjectId,
       $or: [
@@ -115,7 +101,6 @@ export const syncWorkerNotifications = async (workerId) => {
       ],
     });
 
-    // 1. Process Worker's Real Payment Transactions
     try {
       const transactions = await Transaction.find({
         receiverId: workerObjectId,
@@ -147,7 +132,6 @@ export const syncWorkerNotifications = async (workerId) => {
       console.error("Error processing transactions in syncWorkerNotifications:", txErr.message);
     }
 
-    // 2. Process Worker's Real Client Reviews (System)
     try {
       const reviews = await Review.find({ reviewee: workerObjectId })
         .populate("reviewer", "name")
@@ -176,7 +160,6 @@ export const syncWorkerNotifications = async (workerId) => {
       console.error("Error processing reviews in syncWorkerNotifications:", revErr.message);
     }
 
-    // 3. Process Broadcast Announcements (System)
     try {
       const announcements = await Announcement.find({
         targetAudience: { $in: ["WORKERS", "ALL USERS", "workers", "all users"] },
@@ -204,7 +187,6 @@ export const syncWorkerNotifications = async (workerId) => {
       console.error("Error processing announcements in syncWorkerNotifications:", annErr.message);
     }
 
-    // 4. Bulk upsert preserving original event timestamps without overwriting existing isRead flags
     if (alertsToUpsert.length > 0) {
       const operations = alertsToUpsert.map((item) => ({
         updateOne: {

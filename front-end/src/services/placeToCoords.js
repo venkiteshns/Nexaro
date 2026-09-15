@@ -17,7 +17,6 @@ export const placeToCoords = async ({ city, area, district, state, country }) =>
       lat: parseFloat(data[0].lat),
       lng: parseFloat(data[0].lon),
     };
-    // throw new Error("test");
   } catch (error) {
     throw new Error(error.message, { cause: error });
   }

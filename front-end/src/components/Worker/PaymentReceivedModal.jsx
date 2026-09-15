@@ -12,21 +12,17 @@ export default function PaymentReceivedModal({ data, onClose, onViewTask }) {
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
                 onClick={onClose}
             />
 
-            {/* Modal Container */}
             <div
                 className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Top gradient accent */}
                 <div className="h-1.5 w-full bg-gradient-to-r from-[#0A6E5C] via-emerald-400 to-teal-500" />
 
-                {/* Close Button */}
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 flex items-center justify-center transition-colors"
@@ -36,7 +32,6 @@ export default function PaymentReceivedModal({ data, onClose, onViewTask }) {
                 </button>
 
                 <div className="p-6 sm:p-7">
-                    {/* Header */}
                     <div className="flex flex-col items-center text-center mb-5">
                         <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-[#0A6E5C] mb-4 shadow-inner">
                             <Wallet size={32} />
@@ -52,7 +47,6 @@ export default function PaymentReceivedModal({ data, onClose, onViewTask }) {
                         </p>
                     </div>
 
-                    {/* Breakdown Card */}
                     <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 space-y-3 mb-5">
                         <div className="flex items-center justify-between text-xs text-gray-600">
                             <span>Task Bid Amount</span>
@@ -76,13 +70,11 @@ export default function PaymentReceivedModal({ data, onClose, onViewTask }) {
                         </div>
                     </div>
 
-                    {/* Note */}
                     <p className="text-xs text-gray-500 text-center leading-relaxed mb-6">
                         5% platform fee has been deducted and the balance of{" "}
                         <strong className="text-gray-800 font-bold">₹{creditedAmount.toLocaleString("en-IN")}</strong> has been credited to your wallet.
                     </p>
 
-                    {/* Action buttons */}
                     <div className="flex flex-col gap-2.5">
                         {onViewTask && (
                             <button

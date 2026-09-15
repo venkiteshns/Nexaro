@@ -1,9 +1,5 @@
 import { Briefcase, IndianRupee, Star } from 'lucide-react';
 
-/**
- * WorkerStatCards
- * Props: stats { jobsCompleted, totalEarned, rating }
- */
 const StatItem = ({ icon, label, value, sub, className = '' }) => (
     <div className={`bg-white border border-gray-200 rounded-2xl shadow-sm px-4 py-3 md:px-5 md:py-4 ${className}`}>
         <div className="flex items-center gap-2 mb-1.5 md:mb-2">
@@ -20,16 +16,13 @@ const StatItem = ({ icon, label, value, sub, className = '' }) => (
 );
 
 const WorkerStatCards = ({ stats }) => (
-    /* Below 416 px → 2-col grid; 416px+ → flex-wrap (original behaviour) */
     <div className="grid grid-cols-2 min-[416px]:flex min-[416px]:flex-wrap gap-3 mb-5">
-        {/* Slot 1 — always first */}
         <StatItem
             icon={<Briefcase size={13} className="text-[#0A6E5C] md:w-4 md:h-4" />}
             label="Jobs Completed"
             value={stats?.jobsCompleted ?? 34}
             className="order-1 min-[416px]:flex-1 min-[416px]:min-w-[120px]"
         />
-        {/* Slot 3 below 416px (full-width row 2); slot 2 on 416px+ */}
         <StatItem
             icon={<IndianRupee size={13} className="text-[#0A6E5C] md:w-4 md:h-4" />}
             label="Total Earned"
@@ -37,7 +30,6 @@ const WorkerStatCards = ({ stats }) => (
             sub="lifetime"
             className="order-3 col-span-2 min-[416px]:order-none min-[416px]:col-span-1 min-[416px]:flex-1 min-[416px]:min-w-[120px]"
         />
-        {/* Slot 2 below 416px (same row as Jobs Completed); slot 3 on 416px+ */}
         <StatItem
             icon={<Star size={13} className="text-[#0A6E5C] md:w-4 md:h-4" />}
             label="Rating"

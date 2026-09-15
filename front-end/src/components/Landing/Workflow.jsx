@@ -30,7 +30,6 @@ const flows = [
   },
 ];
 
-/* ── Workflow Progress Card ── */
 const WorkflowProgressCard = () => (
   <div className="hidden lg:block w-full rounded-2xl bg-white p-4 shadow-lg border border-green-100">
     <div className="flex justify-between items-center mb-2">
@@ -54,7 +53,6 @@ const WorkflowProgressCard = () => (
   </div>
 );
 
-/* ── Category Search Card ── */
 const WorkerSearchCard = () => (
   <div className="hidden lg:flex flex-col gap-4 items-center justify-center">
     <div className="rounded-2xl bg-white border border-green-100 p-4 -rotate-4 shadow-lg">
@@ -105,7 +103,6 @@ const WorkerSearchCard = () => (
   </div>
 );
 
-/* ── Escrow Card ── */
 const EscrowCard = () => (
   <div className="hidden lg:flex items-center justify-center gap-3 bg-white px-5 py-3.5 rounded-2xl shadow-lg border border-green-100">
     <div
@@ -125,7 +122,6 @@ const EscrowCard = () => (
   </div>
 );
 
-/* ── Main Workflow Component ── */
 const Workflow = () => {
   return (
     <div
@@ -135,7 +131,6 @@ const Workflow = () => {
       }}
       className="pb-12"
     >
-      {/* Section heading */}
       <div className="w-head grid grid-cols-1 sm:grid-cols-3 mb-5 p-10 pt-14">
         <h2 className="text-5xl col-span-2 mt-3">
           Built for those who value <br />
@@ -151,7 +146,6 @@ const Workflow = () => {
         </p>
       </div>
 
-      {/* Flow steps */}
       <div
         className="work-flow max-w-6xl mx-auto p-6 rounded-3xl"
         style={{

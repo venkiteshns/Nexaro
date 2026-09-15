@@ -15,10 +15,6 @@ const CredentialRow = ({ icon, label, detail, verified }) => (
     </div>
 );
 
-/**
- * WorkerCredentialsCard
- * Props: credentials { identityVerified, email, phone, address }
- */
 const WorkerCredentialsCard = ({ credentials }) => {
     const email = credentials?.email || 'id****@gmail.com';
     const phone = credentials?.phone || '+91••••••1234';

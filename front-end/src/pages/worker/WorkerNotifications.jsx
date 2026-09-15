@@ -59,18 +59,13 @@ const WorkerNotifications = () => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
-      {/* Worker Left Sidebar */}
       <WorkerNavBar />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Worker Top Header with live status and bell counter */}
         <WorkerHeader />
 
-        {/* Scrollable Body */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="w-full space-y-6">
-            {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -86,7 +81,6 @@ const WorkerNotifications = () => {
                 </p>
               </div>
 
-              {/* Action Buttons: Refresh */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => refetch()}
@@ -100,7 +94,6 @@ const WorkerNotifications = () => {
               </div>
             </div>
 
-            {/* Metric Pills & Category Filters */}
             <WorkerNotificationFilters
               activeFilter={filter}
               onFilterChange={handleFilterChange}
@@ -109,9 +102,7 @@ const WorkerNotifications = () => {
               isMarkingAllRead={isMarkingAll}
             />
 
-            {/* Notifications Feed */}
             {isLoading ? (
-              // Loading Skeleton
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((n) => (
                   <div
@@ -128,7 +119,6 @@ const WorkerNotifications = () => {
                 ))}
               </div>
             ) : notifications.length === 0 ? (
-              // Empty State
               <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center shadow-xs">
                 <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-emerald-50 text-[#0A6E5C] flex items-center justify-center">
                   <Inbox size={24} />
@@ -152,7 +142,6 @@ const WorkerNotifications = () => {
                 )}
               </div>
             ) : (
-              // Notification List
               <div className="space-y-2.5 sm:space-y-3">
                 {notifications.map((notification) => (
                   <WorkerNotificationCard
@@ -164,7 +153,6 @@ const WorkerNotifications = () => {
               </div>
             )}
 
-            {/* Pagination */}
             {!isLoading && totalPages > 1 && (
               <div className="pt-2 pb-6">
                 <PaginationSections

@@ -13,11 +13,9 @@ export default function EarningsHeroCard({
 
   return (
     <div className="bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:p-6 shadow-xs relative overflow-hidden">
-      {/* Decorative subtle background gradient blob */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50/40 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
 
       <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
-        {/* 1. AVAILABLE BALANCE & WITHDRAW ACTION */}
         <div className="pr-0 md:pr-6 flex flex-row items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center gap-1.5 mb-1">
@@ -51,7 +49,6 @@ export default function EarningsHeroCard({
           </div>
         </div>
 
-        {/* 2. TOTAL EARNED */}
         <div className="pt-4 md:pt-0 md:pl-6 flex flex-row items-center justify-between gap-3 sm:gap-4">
           <div>
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">

@@ -6,7 +6,6 @@ import Logo from "../Logo/Logo";
 const Taskcard = () => {
   return (
     <div className="flex flex-col w-[90%] max-w-xs ps-5 mt-5">
-      {/* card1 — Task card */}
       <div
         className="-rotate-6 animate-[bounce_5s_ease-in-out_infinite] p-5 rounded-3xl"
         style={{
@@ -16,9 +15,7 @@ const Taskcard = () => {
             "0 4px 24px rgba(10,110,92,0.08), 0 1px 4px rgba(0,0,0,0.04)",
         }}
       >
-        {/* Top row: badge + price */}
         <div className="flex items-center justify-between mb-4">
-          {/* Active Task pill */}
           <span
             className="text-xs font-semibold px-3 py-1 rounded-full"
             style={{
@@ -30,7 +27,6 @@ const Taskcard = () => {
           >
             Active Task
           </span>
-          {/* Price */}
           <span
             className="flex items-center text-sm font-semibold"
             style={{ color: "#0a6e5c", fontFamily: '"DM Sans", sans-serif' }}
@@ -39,7 +35,6 @@ const Taskcard = () => {
           </span>
         </div>
 
-        {/* Title */}
         <h2
           className="text-base font-bold leading-snug mb-2"
           style={{ color: "#0d1f1a", fontFamily: '"DM Sans", sans-serif', fontWeight: 700 }}
@@ -47,7 +42,6 @@ const Taskcard = () => {
           Fix Bathroom water Leakage
         </h2>
 
-        {/* Location */}
         <p
           className="flex items-center gap-1 text-xs mb-1"
           style={{ color: "#9ca3af", fontFamily: '"DM Sans", sans-serif' }}
@@ -56,7 +50,6 @@ const Taskcard = () => {
           Dwarka, Sector 2
         </p>
 
-        {/* Bidding count */}
         <p
           className="flex items-center gap-1.5 text-xs font-semibold"
           style={{ color: "#0a6e5c", fontFamily: '"DM Sans", sans-serif' }}
@@ -66,7 +59,6 @@ const Taskcard = () => {
         </p>
       </div>
 
-      {/* card2 — Bid notification */}
       <div
         className="flex items-center gap-3 px-4 py-3 rounded-2xl mt-3 w-[82%] self-end rotate-3 animate-[bounce_5s_ease-in-out_infinite]"
         style={{
@@ -76,7 +68,6 @@ const Taskcard = () => {
             "0 4px 20px rgba(10,110,92,0.07), 0 1px 4px rgba(0,0,0,0.04)",
         }}
       >
-        {/* Icon */}
         <div
           className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
           style={{
@@ -86,7 +77,6 @@ const Taskcard = () => {
           <Wallet className="w-4 h-4 text-white" />
         </div>
 
-        {/* Text */}
         <div style={{ fontFamily: '"DM Sans", sans-serif' }}>
           <p
             className="text-sm font-semibold leading-tight"
@@ -144,7 +134,6 @@ const PosterSignUpBanner = () => {
         borderRight: "1px solid rgba(10,110,92,0.10)",
       }}
     >
-      {/* Decorative faint circles */}
       <div
         className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
         style={{ background: "rgba(16,185,129,0.08)" }}

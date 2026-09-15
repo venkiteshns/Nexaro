@@ -29,8 +29,8 @@ const AdminNavBar = () => {
   const handleLogout = async () => {
     try {
       await adminLogoutApi().unwrap();
-    } catch {
-      // Still log out locally even if the backend call fails
+    } catch (error) {
+      console.error("Admin logout error:", error);
     } finally {
       dispatch(adminLogOut());
       navigate("/admin/login");
@@ -74,13 +74,11 @@ const AdminNavBar = () => {
     },
   ];
 
-  // Keep a group expanded when one of its children is the active page
   const [openMenu, setOpenMenu] = useState(
     () => adminNav.find((item) => item.children?.some((child) => child.label === active))?.label || null
   );
 
   const toggleMenu = (label) => {
-    // The labels are hidden while collapsed, so open the sidebar first
     if (!sidebarOpen) dispatch(setSideBar(true));
     setOpenMenu((prev) => (prev === label ? null : label));
   };
@@ -99,7 +97,6 @@ const AdminNavBar = () => {
       }`}
     >
       <div>
-        {/* LOGO */}
         <div className="h-20 flex items-center justify-between px-5 border-b border-gray-100">
           <div className="flex items-center gap-3 overflow-hidden">
             {!sidebarOpen && <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-lg">
@@ -122,7 +119,6 @@ const AdminNavBar = () => {
           </button>
         </div>
 
-        {/* NAVIGATION */}
         <div className="p-4 space-y-2">
           {adminNav.map((item) => {
             const childActive = item.children?.some((child) => child.label === active);
@@ -179,7 +175,6 @@ const AdminNavBar = () => {
         </div>
       </div>
 
-      {/* LOGOUT */}
       <div className="p-4 border-t border-gray-100">
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all">
           <LogOut size={20} />

@@ -11,7 +11,7 @@ export const AvatarUploadField = ({ initials = "AV", currentAvatar, onDirty }) =
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setValue("avatar", file, { shouldDirty: true });
 
     if (fileRef.current.value) {
@@ -86,9 +86,7 @@ export const PersonalInfoFields = ({isVerified = 'false'}) => {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Row 1: Full Name + Email */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Full Name */}
         <div className="flex flex-col gap-1">
           <label className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-widest">
             Full Name
@@ -111,11 +109,9 @@ export const PersonalInfoFields = ({isVerified = 'false'}) => {
           {errors.name && <FormError error={errors.name} />}
         </div>
 
-        {/* Email */}
         <div className={`flex flex-col gap-1`}>
           <label className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-widest flex items-center gap-2 justify-start">
             Email Address
-            {/* Verified badge */}
             {isVerified && <span className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-0.5 pointer-events-none">
               <BadgeCheck size={11} className="text-[#0A6E5C]" />
               <span className="text-[9px] sm:text-[10px] font-bold text-[#0A6E5C] uppercase tracking-wide">
@@ -137,13 +133,12 @@ export const PersonalInfoFields = ({isVerified = 'false'}) => {
               autoComplete="email"
               className={`${inputCls} ${isVerified} ?"pr-24 sm:pr-28" : "" `}
             />
-            
+
           </div>
           {errors.email && <FormError error={errors.email} />}
         </div>
       </div>
 
-      {/* Row 2: Phone (full width) */}
       <div className="flex flex-col gap-1">
         <label className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-widest">
           Phone Number
@@ -164,7 +159,6 @@ export const PersonalInfoFields = ({isVerified = 'false'}) => {
         {errors.phone && <FormError error={errors.phone} />}
       </div>
 
-      {/* Row 2: Phone (full width) */}
       <div className="flex flex-col gap-1">
         <label className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-widest">
           Bio
@@ -192,7 +186,7 @@ export const PersonalInfoFields = ({isVerified = 'false'}) => {
         />
         {errors.bio && <FormError error={errors.bio} />}
       </div>
-      
+
     </div>
   );
 };
