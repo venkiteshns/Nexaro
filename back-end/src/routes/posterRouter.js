@@ -34,7 +34,6 @@ router.post(
 );
 router.post("/review", verifyToken, createReview);
 
-
 router.get("/tasks", verifyToken, getMyTasks);
 router.get("/task/bids/:taskId", verifyToken, getPosterBids);
 router.get("/task/:taskId/progress", verifyToken, getPosterTaskProgress);
