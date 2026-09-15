@@ -245,26 +245,26 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
 
 export const handleNewBid = async (task, user) => {
 
-    if(!task.bidAmount || task.bidAmount < 1){
-        return {error: "Amount required"}
+    if (!task.bidAmount || task.bidAmount < 1) {
+        return { error: "Amount required" }
     }
-    if(!task.pitch){
-        return {error: "Please enter yout pitch"}
+    if (!task.pitch) {
+        return { error: "Please enter yout pitch" }
     }
-    if(!task.availableDate ||  !task.availableTime || !task.estimatedTime){
-        return {error: "Please fill your available dates or ETA"}
+    if (!task.availableDate || !task.availableTime || !task.estimatedTime) {
+        return { error: "Please fill your available dates or ETA" }
     }
 
     try {
         const { taskId, bidAmount, estimatedTime, pitch } = task;
-        console.log("taskId",taskId);
+        console.log("taskId", taskId);
 
         const isTask = await Task.findOne({ _id: taskId });
         if (!isTask) {
             return { error: "No task found" }
         }
-        if(isTask.status === 'cancelled'){
-            return {error: "This task has been cancelled by the poster, Cannot place bid for a cancelled task"}
+        if (isTask.status === 'cancelled') {
+            return { error: "This task has been cancelled by the poster, Cannot place bid for a cancelled task" }
         }
         const isAlreadyBid = await Bid.findOne({
             taskId,
@@ -345,7 +345,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
         const skip = (page - 1) * limit;
 
         const matchCriterias = {
-            status:"open"
+            status: "open"
         };
 
         if (search) {
@@ -687,7 +687,7 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
             { new: true }
         );
 
-         const [task_lng, task_lat] = task.location.coordinates;
+        const [task_lng, task_lat] = task.location.coordinates;
 
         const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
 

@@ -44,9 +44,9 @@ const useSocketNotification = () => {
         });
 
 
-        socket.on('new-bid-added', () => {
+        socket.on('new-bid-added', (data) => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'poster' && activeUser?.role !== 'poster')) return;
-
+            showInfo(`New bid added for "${data.taskTitle}" for amount : ${data.bidAmount} rupees`, { autoClose: 6000 });
             dispatch(api.util.invalidateTags(['Poster_Tasks', 'Poster_Bids']));
         });
 
