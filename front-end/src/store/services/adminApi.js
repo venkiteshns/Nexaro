@@ -133,10 +133,15 @@ export const adminApi = api.injectEndpoints({
     }),
 
     adminGetMonthlyPlReport: builder.query({
-      query: ({ year, month } = {}) => {
+      query: ({ year, month, fromDate, toDate } = {}) => {
         const params = new URLSearchParams();
-        if (year !== undefined && year !== null) params.append("year", year);
-        if (month !== undefined && month !== null) params.append("month", month);
+        if (fromDate && toDate) {
+          params.append("fromDate", fromDate);
+          params.append("toDate", toDate);
+        } else {
+          if (year !== undefined && year !== null) params.append("year", year);
+          if (month !== undefined && month !== null) params.append("month", month);
+        }
         return {
           url: `${ADMIN.GET_MONTHLY_PL_REPORT}?${params.toString()}`,
           method: "GET",

@@ -288,8 +288,8 @@ export const getAdminDailyRevenueReport = async (req, res) => {
 
 export const getAdminMonthlyPlReport = async (req, res) => {
     try {
-        const { year, month } = req.query;
-        const response = await getAdminMonthlyPlReportService(year, month);
+        const { year, month, fromDate, toDate } = req.query;
+        const response = await getAdminMonthlyPlReportService(year, month, fromDate, toDate);
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
         console.error("Get admin monthly P&L report error:", error.message);
