@@ -1,14 +1,42 @@
 import { useState, useMemo } from "react";
-import { Receipt, FileDown, Loader2, Calendar, CheckCircle2 } from "lucide-react";
+import { Receipt } from "lucide-react";
 import ReportCardWrapper from "./ReportCardWrapper";
-import SelectDropdown from "../../../sharedComponents/SelectDropdown";
 import { useAdminGetMonthlyPlReportQuery } from "../../../../store/services/adminApi";
-import { exportMonthlyPlStatementPDF } from "../../../../utils/reportExportUtils";
+import {
+  exportMonthlyPlStatementPDF,
+  exportMonthlyPlStatementCSV,
+} from "../../../../utils/reportExportUtils";
+import {
+  PlModeSelector,
+  PlMonthFilter,
+  PlDateRangeFilter,
+  PlMetricsDisplay,
+  PlActionButtons,
+} from "./PlReport";
+
+const toYMD = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
 
 export default function MonthlyPlReportCard() {
+  const now = useMemo(() => new Date(), []);
+  const todayStr = useMemo(() => toYMD(now), [now]);
+  const defaultFirstDayMonthStr = useMemo(
+    () => toYMD(new Date(now.getFullYear(), now.getMonth(), 1)),
+    [now]
+  );
+
+  const [filterMode, setFilterMode] = useState("month"); // "month" | "range"
+
+  // Date range state
+  const [fromDate, setFromDate] = useState(defaultFirstDayMonthStr);
+  const [toDate, setToDate] = useState(todayStr);
+
   const monthOptions = useMemo(() => {
     const list = [];
-    const now = new Date();
     for (let i = 0; i < 12; i++) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -20,12 +48,13 @@ export default function MonthlyPlReportCard() {
       });
     }
     return list;
-  }, []);
+  }, [now]);
 
   const [selectedMonthValue, setSelectedMonthValue] = useState(
     monthOptions[0]?.value || ""
   );
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   const selectedOption = useMemo(
@@ -33,9 +62,25 @@ export default function MonthlyPlReportCard() {
     [monthOptions, selectedMonthValue]
   );
 
-  const { data, isLoading, refetch } = useAdminGetMonthlyPlReportQuery({
-    year: selectedOption?.year,
-    month: selectedOption?.month,
+  const dateError = useMemo(() => {
+    if (filterMode !== "range") return null;
+    if (!fromDate || !toDate) return "Please choose both From and To dates.";
+    if (fromDate > toDate) return "From Date cannot be later than To Date.";
+    return null;
+  }, [filterMode, fromDate, toDate]);
+
+  const queryArgs = useMemo(() => {
+    if (filterMode === "range") {
+      return { fromDate, toDate };
+    }
+    return {
+      year: selectedOption?.year,
+      month: selectedOption?.month,
+    };
+  }, [filterMode, fromDate, toDate, selectedOption]);
+
+  const { data, isLoading, refetch } = useAdminGetMonthlyPlReportQuery(queryArgs, {
+    skip: filterMode === "range" && Boolean(dateError),
   });
 
   const metrics = data?.metrics || {
@@ -45,7 +90,31 @@ export default function MonthlyPlReportCard() {
     profitMargin: "5.0%",
   };
 
+  const applyPreset = (preset) => {
+    const today = new Date();
+    const tStr = toYMD(today);
+    if (preset === "today") {
+      setFromDate(tStr);
+      setToDate(tStr);
+    } else if (preset === "7days") {
+      const past = new Date(today);
+      past.setDate(past.getDate() - 7);
+      setFromDate(toYMD(past));
+      setToDate(tStr);
+    } else if (preset === "30days") {
+      const past = new Date(today);
+      past.setDate(past.getDate() - 30);
+      setFromDate(toYMD(past));
+      setToDate(tStr);
+    } else if (preset === "thisMonth") {
+      const first = new Date(today.getFullYear(), today.getMonth(), 1);
+      setFromDate(toYMD(first));
+      setToDate(tStr);
+    }
+  };
+
   const handleDownload = async () => {
+    if (dateError) return;
     try {
       setIsExporting(true);
       const result = await refetch();
@@ -62,74 +131,72 @@ export default function MonthlyPlReportCard() {
     }
   };
 
+  const handleDownloadCSV = async () => {
+    if (dateError) return;
+    try {
+      setIsExportingCsv(true);
+      const result = await refetch();
+      const reportData = result?.data || data;
+
+      exportMonthlyPlStatementCSV(reportData);
+    } catch (err) {
+      console.error("Monthly P&L CSV export failed:", err);
+    } finally {
+      setIsExportingCsv(false);
+    }
+  };
+
   return (
     <ReportCardWrapper
       icon={Receipt}
-      title="Monthly P&L Statement"
-      description="Comprehensive profit and loss breakdown including operational overhead and skilled worker payouts."
+      title={filterMode === "range" ? "P&L Statement (Date Range)" : "Monthly P&L Statement"}
+      description={
+        filterMode === "range"
+          ? "Profit and loss breakdown including gross volume, worker payouts and commission for the selected period."
+          : "Comprehensive profit and loss breakdown including operational overhead and skilled worker payouts."
+      }
       actionButton={
-        <button
-          type="button"
-          onClick={handleDownload}
-          disabled={isExporting}
-          className="w-full py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2.5 bg-white border border-gray-200 text-gray-700 hover:text-[#0A6E5C] hover:border-emerald-300 hover:bg-emerald-50/40 shadow-xs transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
-        >
-          {isExporting ? (
-            <>
-              <Loader2 size={17} className="animate-spin text-[#0A6E5C]" />
-              <span>Generating Statement...</span>
-            </>
-          ) : downloadSuccess ? (
-            <>
-              <CheckCircle2 size={17} className="text-emerald-600" />
-              <span className="text-emerald-700">Statement Generated</span>
-            </>
-          ) : (
-            <>
-              <FileDown size={17} className="text-gray-500 group-hover:text-[#0A6E5C]" />
-              <span>Download PDF</span>
-            </>
-          )}
-        </button>
+        <PlActionButtons
+          isExporting={isExporting}
+          downloadSuccess={downloadSuccess}
+          isExportingCsv={isExportingCsv}
+          disabled={Boolean(dateError) || isLoading}
+          onDownloadPdf={handleDownload}
+          onDownloadCsv={handleDownloadCSV}
+        />
       }
     >
       <div className="space-y-2 pt-1">
-        <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">
-          SELECT MONTH
-        </label>
+        {/* Mode Selector */}
+        <PlModeSelector
+          filterMode={filterMode}
+          onSelectMode={setFilterMode}
+        />
 
-        <div className="w-full">
-          <SelectDropdown
-            options={monthOptions}
-            value={selectedMonthValue}
-            onChange={setSelectedMonthValue}
-            icon={Calendar}
-            className="w-full"
-            buttonClassName="w-full justify-between py-2.5 bg-[#F8FBFA] border-gray-200 text-xs sm:text-sm"
-            menuClassName="w-full"
-            align="left"
+        {/* Filter Inputs */}
+        {filterMode === "month" ? (
+          <PlMonthFilter
+            monthOptions={monthOptions}
+            selectedMonthValue={selectedMonthValue}
+            onMonthChange={setSelectedMonthValue}
           />
-        </div>
+        ) : (
+          <PlDateRangeFilter
+            fromDate={fromDate}
+            toDate={toDate}
+            todayStr={todayStr}
+            onFromDateChange={setFromDate}
+            onToDateChange={setToDate}
+            onApplyPreset={applyPreset}
+            dateError={dateError}
+          />
+        )}
 
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="bg-[#F8FBFA] p-3 rounded-xl border border-gray-100">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">
-              Gross Volume
-            </span>
-            <span className="text-sm sm:text-base font-extrabold text-[#111827]">
-              {isLoading ? "..." : metrics.formattedGmv}
-            </span>
-          </div>
-
-          <div className="bg-[#F8FBFA] p-3 rounded-xl border border-gray-100">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0A6E5C] block mb-0.5">
-              Net Margin ({metrics.profitMargin})
-            </span>
-            <span className="text-sm sm:text-base font-extrabold text-[#0A6E5C]">
-              {isLoading ? "..." : metrics.formattedNetProfit}
-            </span>
-          </div>
-        </div>
+        {/* Metrics Display */}
+        <PlMetricsDisplay
+          metrics={metrics}
+          isLoading={isLoading}
+        />
       </div>
     </ReportCardWrapper>
   );
