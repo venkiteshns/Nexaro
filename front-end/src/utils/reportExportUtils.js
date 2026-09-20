@@ -281,7 +281,9 @@ export function exportDailyRevenueReportPDF(reportData) {
 
 export function exportMonthlyPlStatementPDF(reportData) {
   const metrics = reportData?.metrics || {};
-  const monthName = reportData?.monthName || "Selected Period";
+  const monthName = reportData?.dateRangeLabel || reportData?.monthName || "Selected Period";
+  const isCustomRange = reportData?.isCustomRange;
+  const transactions = reportData?.transactions || [];
 
   const rawPayouts = typeof metrics.workerPayouts === "number"
     ? metrics.workerPayouts
@@ -289,10 +291,17 @@ export function exportMonthlyPlStatementPDF(reportData) {
   const halfPayouts = rawPayouts / 2;
   const formattedHalfPayouts = `₹${halfPayouts.toLocaleString("en-IN")}`;
 
+  const titleText = isCustomRange
+    ? "Profit & Loss (P&L) Statement"
+    : "Monthly Profit & Loss (P&L) Statement";
+  const descText = isCustomRange
+    ? `Comprehensive profit and loss breakdown for period: <strong>${monthName}</strong>.`
+    : `Comprehensive profit and loss breakdown for <strong>${monthName}</strong>.`;
+
   const html = `
     <div class="title-section">
-      <h1>Monthly Profit & Loss (P&L) Statement</h1>
-      <p>Comprehensive profit and loss breakdown for <strong>${monthName}</strong>.</p>
+      <h1>${titleText}</h1>
+      <p>${descText}</p>
     </div>
 
     <div class="kpi-grid">
@@ -350,9 +359,80 @@ export function exportMonthlyPlStatementPDF(reportData) {
         </tr>
       </tbody>
     </table>
+
+    ${transactions && transactions.length > 0 ? `
+      <h3 style="font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 8px;">Transactions Recorded in Period (${transactions.length})</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date & Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${transactions.map((tx) => `
+            <tr>
+              <td style="font-family: monospace; font-weight: 600; color: #0A6E5C;">${tx.id}</td>
+              <td>${tx.type || "Service Booking"}</td>
+              <td style="font-weight: 700;">₹${(tx.amount || 0).toLocaleString("en-IN")}</td>
+              <td><span class="badge">${(tx.status || "COMPLETED").toUpperCase()}</span></td>
+              <td style="color: #6B7280;">${tx.date ? `${tx.date} ` : ""}${tx.time || ""}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    ` : ""}
   `;
 
   openPrintWindow(`P&L Statement - ${monthName}`, html);
+}
+
+export function exportMonthlyPlStatementCSV(reportData) {
+  const metrics = reportData?.metrics || {};
+  const periodLabel = reportData?.dateRangeLabel || reportData?.monthName || "Selected Period";
+  const transactions = reportData?.transactions || [];
+
+  const rawPayouts = typeof metrics.workerPayouts === "number"
+    ? metrics.workerPayouts
+    : (parseFloat(String(metrics.formattedPayouts || "0").replace(/[^0-9.-]+/g, "")) || 0);
+  const halfPayouts = rawPayouts / 2;
+
+  const summaryHeader = ["Summary Metric", "Value"];
+  const summaryRows = [
+    ["Report Period", `"${periodLabel}"`],
+    ["Gross Merchandise Value (GMV)", metrics.grossVolume || 0],
+    ["Worker Payouts", halfPayouts],
+    ["Platform Commission", metrics.platformCommission || 0],
+    ["Net Operating Profit", metrics.netProfit || 0],
+    ["Profit Margin", `"${metrics.profitMargin || "5.0%"}"`],
+    ["Completed Tasks Count", metrics.completedTasksCount || 0],
+  ];
+
+  const txHeaders = ["Transaction ID", "Type", "Amount", "Status", "Date", "Time"];
+  const txRows = transactions.map((t) => [
+    t.id,
+    `"${t.type || "Service Booking"}"`,
+    t.amount,
+    t.status,
+    `"${t.date || ""}"`,
+    `"${t.time || ""}"`,
+  ]);
+
+  const csv = [
+    `--- PROFIT & LOSS STATEMENT (${periodLabel}) ---`,
+    summaryHeader.join(","),
+    ...summaryRows.map((r) => r.join(",")),
+    "",
+    "--- PERIOD TRANSACTIONS ---",
+    txHeaders.join(","),
+    ...txRows.map((r) => r.join(",")),
+  ].join("\n");
+
+  const safeFileLabel = periodLabel.replace(/[^a-zA-Z0-9_-]/g, "_");
+  downloadFile(csv, `pl_statement_${safeFileLabel}.csv`);
 }
 
 export function exportPlatformFeeSummaryPDF(reportData) {

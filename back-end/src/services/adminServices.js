@@ -854,17 +854,55 @@ export const getAdminDailyRevenueReportService = async () => {
     };
 };
 
-export const getAdminMonthlyPlReportService = async (yearParam, monthParam) => {
+export const getAdminMonthlyPlReportService = async (yearParam, monthParam, fromDateParam, toDateParam) => {
     const now = new Date();
-    const year = parseInt(yearParam) || now.getFullYear();
-    const month = monthParam !== undefined && monthParam !== null && monthParam !== "" ? parseInt(monthParam) : now.getMonth();
+    let startDate;
+    let endDate;
+    let dateRangeLabel;
+    let isCustomRange = false;
 
-    const startOfMonth = new Date(year, month, 1, 0, 0, 0, 0);
-    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
+    if (fromDateParam && toDateParam) {
+        isCustomRange = true;
+        const parseDateBoundary = (dateStr, isEnd = false) => {
+            const parts = String(dateStr).trim().split("-");
+            if (parts.length === 3) {
+                const y = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10) - 1;
+                const d = parseInt(parts[2], 10);
+                return isEnd ? new Date(y, m, d, 23, 59, 59, 999) : new Date(y, m, d, 0, 0, 0, 0);
+            }
+            const dt = new Date(dateStr);
+            if (isEnd) dt.setHours(23, 59, 59, 999);
+            else dt.setHours(0, 0, 0, 0);
+            return dt;
+        };
+
+        startDate = parseDateBoundary(fromDateParam, false);
+        endDate = parseDateBoundary(toDateParam, true);
+
+        if (startDate > endDate) {
+            const temp = startDate;
+            startDate = new Date(endDate);
+            startDate.setHours(0, 0, 0, 0);
+            endDate = new Date(temp);
+            endDate.setHours(23, 59, 59, 999);
+        }
+
+        const startStr = startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        const endStr = endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        dateRangeLabel = startStr === endStr ? startStr : `${startStr} - ${endStr}`;
+    } else {
+        const year = parseInt(yearParam) || now.getFullYear();
+        const month = monthParam !== undefined && monthParam !== null && monthParam !== "" ? parseInt(monthParam) : now.getMonth();
+
+        startDate = new Date(year, month, 1, 0, 0, 0, 0);
+        endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
+        dateRangeLabel = startDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    }
 
     const match = {
         status: { $in: ["completed", "success"] },
-        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+        createdAt: { $gte: startDate, $lte: endDate },
     };
 
     const gmvAgg = await Transaction.aggregate([
@@ -890,14 +928,22 @@ export const getAdminMonthlyPlReportService = async (yearParam, monthParam) => {
     const netProfit = platformCommission;
     const profitMargin = grossVolume > 0 ? ((platformCommission / grossVolume) * 100).toFixed(1) : "5.0";
 
-    const monthName = startOfMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const recentTxs = await Transaction.find(match)
+        .sort({ createdAt: -1 })
+        .limit(100);
 
     return {
         success: true,
-        reportType: "monthly_pl",
-        monthName,
-        year,
-        month,
+        reportType: isCustomRange ? "custom_date_pl" : "monthly_pl",
+        monthName: dateRangeLabel,
+        dateRangeLabel,
+        isCustomRange,
+        fromDate: fromDateParam || null,
+        toDate: toDateParam || null,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        year: startDate.getFullYear(),
+        month: startDate.getMonth(),
         generatedAt: new Date().toISOString(),
         metrics: {
             grossVolume,
@@ -911,6 +957,14 @@ export const getAdminMonthlyPlReportService = async (yearParam, monthParam) => {
             formattedCommission: `₹${platformCommission.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             formattedNetProfit: `₹${netProfit.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         },
+        transactions: recentTxs.map((t) => ({
+            id: `#TXN-${t._id.toString().slice(-6).toUpperCase()}`,
+            amount: t.amount,
+            type: t.transactionType,
+            status: t.status,
+            date: new Date(t.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+            time: new Date(t.createdAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+        })),
     };
 };
 
