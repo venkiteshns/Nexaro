@@ -10,9 +10,11 @@ import {
 } from "../../store/services/authApi";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const PosterSignup = () => {
+  const [searchParams] = useSearchParams();
+  const refCodeFromUrl = (searchParams.get("ref") || "").trim().toUpperCase();
   const [showOtp, setShowOtp] = useState(false);
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
@@ -96,6 +98,7 @@ const PosterSignup = () => {
         <PosterSignupForm
           onSubmitForm={handleFormData}
           isVerified={isVerified}
+          initialReferralCode={refCodeFromUrl}
           otpStatus={{ isLoading, isSuccess, isError, error, data }}
           formStatus={{
             signUpLoading,

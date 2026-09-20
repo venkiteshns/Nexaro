@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import HeaderWorkerSignup from "../../components/Worker/HeaderWorkerSignup";
 import Header from "../../components/Landing/Header";
@@ -10,11 +10,25 @@ import {
 } from "../../store/services/authApi";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { showWarning } from '../../utils/toast.js'
 
 const WorkerSignup = () => {
-  const methods = useForm();
+  const [searchParams] = useSearchParams();
+  const refCodeFromUrl = (searchParams.get("ref") || "").trim().toUpperCase();
+
+  const methods = useForm({
+    defaultValues: {
+      referralCode: refCodeFromUrl,
+    },
+  });
+
+  useEffect(() => {
+    if (refCodeFromUrl) {
+      methods.setValue("referralCode", refCodeFromUrl, { shouldValidate: true });
+    }
+  }, [refCodeFromUrl, methods]);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -52,6 +66,7 @@ const WorkerSignup = () => {
       "locationlng",
       "workPlacelat",
       "workPlacelng",
+      "referralCode",
     ];
 
     textFields.forEach((key) => {

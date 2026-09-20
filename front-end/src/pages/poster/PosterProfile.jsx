@@ -20,6 +20,7 @@ import DangerZone from "../../components/Poster/Profile/DangerZone";
 import DeleteProfileModal from "../../components/sharedComponents/DeleteProfileModal";
 import EditProfileModal from "./EditProfileModal";
 import SwitchToWorkerModal from "../../components/Poster/RoleSwitch/SwitchToWorkerModal";
+import ReferAndEarnCard from "../../components/sharedComponents/Referral/ReferAndEarnCard";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
@@ -155,6 +156,10 @@ const PosterProfile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
             <PersonalInfo posterInfo={posterInfo} />
             <RecentTasks recentTasks={recentTasks} isLoading={isLoading} />
+          </div>
+
+          <div className="mb-5">
+            <ReferAndEarnCard role="poster" />
           </div>
 
           <ReviewsSection

@@ -146,6 +146,21 @@ const useSocketNotification = () => {
             }
         });
 
+        socket.on("referral-reward-earned", (data) => {
+            if (data?.isWelcomeBonus) {
+                showSuccess(`🎁 Welcome Bonus Credited: ₹${data.amount} added to your wallet!`, { autoClose: 8000 });
+            } else {
+                showSuccess(`🎉 Referral Reward Credited: ₹${data.amount} earned from ${data?.friendName || "your friend"}'s first task!`, { autoClose: 8000 });
+            }
+            dispatch(api.util.invalidateTags([
+                'Referral_Stats',
+                'Earning_Hero_Data',
+                'Transaction_History',
+                'Worker_Notifications',
+                'Poster_Notifications'
+            ]));
+        });
+
         return () => {
             disconnectSocket();
         };

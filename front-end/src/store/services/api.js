@@ -133,6 +133,7 @@ export const api = createApi({
     "Poster_Notifications",
     "Poster_Unread_Count",
     "Admin_Dashboard",
+    "Referral_Stats",
   ],
   endpoints: () => ({}),
 });

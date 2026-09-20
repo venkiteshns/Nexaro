@@ -8,6 +8,7 @@ import TransactionHistoryCard from "../../components/Worker/Earnings/Transaction
 import WithdrawModal from "../../components/Worker/Earnings/WithdrawModal";
 import { useGetEarningHeroDataQuery } from "../../store/services/workerApi.js";
 import { EarningsChart } from "../../components/Worker/Earnings/EarningsChart.jsx";
+import ReferAndEarnCard from "../../components/sharedComponents/Referral/ReferAndEarnCard.jsx";
 
 export default function WorkerEarnings() {
   const { user } = useSelector((state) => state.auth);
@@ -144,6 +145,10 @@ export default function WorkerEarnings() {
                 highestPaidJob={highestPaidAmount}
                 earnedThisWeek={earnedLast7Days}
               />
+            </section>
+
+            <section aria-label="Refer and Earn Rewards">
+              <ReferAndEarnCard role="worker" />
             </section>
 
             <section aria-label="Earnings  Chart">

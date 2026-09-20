@@ -22,6 +22,7 @@ const posterNotificationSchema = new mongoose.Schema(
         "worker_assigned",
         "task_posted",
         "review_reminder",
+        "referral_reward",
       ],
       default: "system",
     },

@@ -97,3 +97,8 @@ export const SHARED = {
     DELETE_PROFILE: "/auth/profile/delete",
 };
 
+export const REFERRAL = {
+    GET_STATS: "/referral/stats",
+    VALIDATE_CODE: "/referral/validate",
+};
+

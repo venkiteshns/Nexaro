@@ -11,6 +11,7 @@ import mongoose from "mongoose";
 import { convertInrToUsd, convertUsdToInr } from "../utils/currency.js";
 import Transaction from "../models/transactionSchema.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
+import { checkAndProcessReferralMilestone } from "./referralService.js";
 
 export async function getPayoutStatus(payoutBatchId, accessToken) {
   if (!accessToken) {
@@ -470,7 +471,13 @@ export const orderPayoutService = async ({ bidId, user }) => {
     poster.poster.inEscrow -= bid.amount;
     await poster.save();
 
-    return { success: true, message: "Payment has been released to Worker" }
+    // Check and process referral milestone rewards asynchronously
+    checkAndProcessReferralMilestone({
+      posterId: user._id,
+      workerId: bid.workerId,
+    }).catch((err) => console.error("Referral milestone processing error:", err.message));
+
+    return { success: true, message: "Payment has been released to Worker" };
 
   } catch (error) {
     console.error(error)

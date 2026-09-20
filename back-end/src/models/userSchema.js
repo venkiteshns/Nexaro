@@ -131,7 +131,29 @@ const userSchema = new mongoose.Schema({
     refreshToken: {
         type: String,
         default: ""
-    }
+    },
+    referralCode: {
+        type: String,
+        unique: true,
+        sparse: true,
+        uppercase: true,
+        index: true,
+    },
+    referredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+    },
+    referralStats: {
+        totalReferred: {
+            type: Number,
+            default: 0,
+        },
+        totalEarnings: {
+            type: Number,
+            default: 0,
+        },
+    },
 }, { timestamps: true })
 
 userSchema.index({ location: "2dsphere" }, { sparse: true });

@@ -18,6 +18,7 @@ const workerNotificationSchema = new mongoose.Schema(
         "payment_received",
         "review",
         "announcement",
+        "referral_reward",
         "system",
       ],
       default: "system",
