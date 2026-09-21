@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useLazyValidateReferralCodeQuery } from "../../../store/services/referralApi";
 import { Gift, CheckCircle2, XCircle, Loader2 } from "lucide-react";
@@ -8,53 +8,47 @@ const ReferralInput = () => {
   const currentCode = watch("referralCode") || "";
 
   const [triggerValidate, { isFetching }] = useLazyValidateReferralCodeQuery();
-  const [validationState, setValidationState] = useState({
-    checked: false,
+  const [validationResult, setValidationResult] = useState({
+    code: "",
     valid: false,
     message: "",
     referrerName: "",
   });
 
-  const debounceTimerRef = useRef(null);
+  const trimmed = currentCode.trim().toUpperCase();
+  const validationState = {
+    checked: Boolean(trimmed && validationResult.code === trimmed),
+    valid: validationResult.valid,
+    message: validationResult.message,
+    referrerName: validationResult.referrerName,
+  };
 
   useEffect(() => {
-    const trimmed = currentCode.trim().toUpperCase();
-
     if (!trimmed) {
-      setValidationState({
-        checked: false,
-        valid: false,
-        message: "",
-        referrerName: "",
-      });
       return;
     }
 
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       try {
         const res = await triggerValidate(trimmed).unwrap();
         if (res?.valid) {
-          setValidationState({
-            checked: true,
+          setValidationResult({
+            code: trimmed,
             valid: true,
             referrerName: res.referrerName,
             message: `Invited by ${res.referrerName || "a Nexaro User"}! You'll get a ₹50 Welcome Bonus.`,
           });
         } else {
-          setValidationState({
-            checked: true,
+          setValidationResult({
+            code: trimmed,
             valid: false,
             referrerName: "",
             message: res?.message || "Invalid or expired referral code",
           });
         }
       } catch (err) {
-        setValidationState({
-          checked: true,
+        setValidationResult({
+          code: trimmed,
           valid: false,
           referrerName: "",
           message: err?.data?.message || "Invalid referral code",
@@ -63,11 +57,9 @@ const ReferralInput = () => {
     }, 500);
 
     return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
+      clearTimeout(timer);
     };
-  }, [currentCode, triggerValidate]);
+  }, [trimmed, triggerValidate]);
 
   const handleChange = (e) => {
     const val = e.target.value.toUpperCase().replace(/\s/g, "");

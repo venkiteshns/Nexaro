@@ -26,7 +26,12 @@ export const paymentApi = api.injectEndpoints({
                 url: PAYMENT.PAYOUT.replace(':bidId', bidId),
                 method: "POST"
             }),
-            invalidatesTags: ['Poster_Tasks'],
+            invalidatesTags: [
+                'Poster_Tasks',
+                'Poster_Payments_Overview',
+                'Poster_Payments_History',
+                'Poster_Payments_Chart'
+            ],
         })
 
     })

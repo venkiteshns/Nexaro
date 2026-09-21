@@ -97,6 +97,135 @@ export const linkReferralOnSignup = async ({ newUserId, referralCode }) => {
   }
 };
 
+const processCandidateReferral = async (candidate) => {
+  const referral = await Referral.findOne({
+    refereeId: new mongoose.Types.ObjectId(candidate.id),
+    status: "registered",
+  });
+
+  if (!referral) return;
+
+  const referrer = await User.findById(referral.referrerId);
+  const referee = await User.findById(referral.refereeId);
+
+  if (!referrer || !referee) return;
+
+  const { referrerReward, refereeReward } = referral;
+
+  // 1. Credit Referrer Wallet
+  await Wallet.findOneAndUpdate(
+    { userId: referrer._id },
+    {
+      $inc: {
+        walletAmount: referrerReward,
+        totalEarned: referrerReward,
+      },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  // 2. Credit Referee Wallet
+  await Wallet.findOneAndUpdate(
+    { userId: referee._id },
+    {
+      $inc: {
+        walletAmount: refereeReward,
+        totalEarned: refereeReward,
+      },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  // 3. Record Transactions
+  await Transaction.create([
+    {
+      senderId: referrer._id,
+      receiverId: referrer._id,
+      amount: referrerReward,
+      transactionType: "referral_reward",
+      status: "completed",
+      processedAt: new Date(),
+    },
+    {
+      senderId: referee._id,
+      receiverId: referee._id,
+      amount: refereeReward,
+      transactionType: "referral_reward",
+      status: "completed",
+      processedAt: new Date(),
+    },
+  ]);
+
+  // 4. Mark referral as completed
+  referral.status = "completed";
+  referral.rewardedAt = new Date();
+  await referral.save();
+
+  // 5. Update referrer total earnings
+  await User.findByIdAndUpdate(referrer._id, {
+    $inc: { "referralStats.totalEarnings": referrerReward },
+  });
+
+  // 6. Notifications
+  const io = getIo();
+
+  // Alert Referrer
+  const referrerPayload = {
+    type: "referral_reward",
+    category: "payments",
+    title: "Referral Bonus Credited!",
+    description: `You earned ₹${referrerReward} because ${referee.name} completed their first task on Nexaro!`,
+    amount: referrerReward,
+    dotColor: "emerald",
+    uniqueKey: `referral_reward_referrer_${referral._id}`,
+  };
+
+  if (referrer.activeRole === "worker") {
+    await recordWorkerAlert({ workerId: referrer._id, ...referrerPayload });
+  } else {
+    await recordPosterAlert({ posterId: referrer._id, ...referrerPayload });
+  }
+
+  // Alert Referee
+  const refereePayload = {
+    type: "referral_reward",
+    category: "payments",
+    title: "Welcome Bonus Credited!",
+    description: `You earned ₹${refereeReward} welcome referral reward on your first completed task!`,
+    amount: refereeReward,
+    dotColor: "emerald",
+    uniqueKey: `referral_reward_referee_${referral._id}`,
+  };
+
+  if (referee.activeRole === "worker") {
+    await recordWorkerAlert({ workerId: referee._id, ...refereePayload });
+  } else {
+    await recordPosterAlert({ posterId: referee._id, ...refereePayload });
+  }
+
+  // Admin Alert
+  await recordAdminAlert({
+    uniqueKey: `referral_payout_${referral._id}`,
+    type: "platform_fee",
+    title: "Referral Rewards Distributed",
+    description: `Referral rewards (₹${referrerReward} to ${referrer.name} & ₹${refereeReward} to ${referee.name}) credited.`,
+    priority: "normal",
+    dotColor: "emerald",
+  });
+
+  // Realtime Sockets
+  if (io) {
+    io.to(`user:${referrer._id}`).emit("referral-reward-earned", {
+      amount: referrerReward,
+      friendName: referee.name,
+    });
+    io.to(`user:${referee._id}`).emit("referral-reward-earned", {
+      amount: refereeReward,
+      isWelcomeBonus: true,
+    });
+  }
+};
+
 /**
  * Process referral rewards when a milestone is completed (first task payment released).
  * Checks both posterId and workerId to see if either has a pending referral.
@@ -107,134 +236,7 @@ export const checkAndProcessReferralMilestone = async ({ posterId, workerId }) =
     if (posterId) candidates.push({ id: posterId, role: "poster" });
     if (workerId) candidates.push({ id: workerId, role: "worker" });
 
-    for (const candidate of candidates) {
-      const referral = await Referral.findOne({
-        refereeId: new mongoose.Types.ObjectId(candidate.id),
-        status: "registered",
-      });
-
-      if (!referral) continue;
-
-      const referrer = await User.findById(referral.referrerId);
-      const referee = await User.findById(referral.refereeId);
-
-      if (!referrer || !referee) continue;
-
-      const { referrerReward, refereeReward } = referral;
-
-      // 1. Credit Referrer Wallet
-      await Wallet.findOneAndUpdate(
-        { userId: referrer._id },
-        {
-          $inc: {
-            walletAmount: referrerReward,
-            totalEarned: referrerReward,
-          },
-        },
-        { upsert: true, returnDocument: "after" }
-      );
-
-      // 2. Credit Referee Wallet
-      await Wallet.findOneAndUpdate(
-        { userId: referee._id },
-        {
-          $inc: {
-            walletAmount: refereeReward,
-            totalEarned: refereeReward,
-          },
-        },
-        { upsert: true, returnDocument: "after" }
-      );
-
-      // 3. Record Transactions
-      await Transaction.create([
-        {
-          senderId: referrer._id,
-          receiverId: referrer._id,
-          amount: referrerReward,
-          transactionType: "referral_reward",
-          status: "completed",
-          processedAt: new Date(),
-        },
-        {
-          senderId: referee._id,
-          receiverId: referee._id,
-          amount: refereeReward,
-          transactionType: "referral_reward",
-          status: "completed",
-          processedAt: new Date(),
-        },
-      ]);
-
-      // 4. Mark referral as completed
-      referral.status = "completed";
-      referral.rewardedAt = new Date();
-      await referral.save();
-
-      // 5. Update referrer total earnings
-      await User.findByIdAndUpdate(referrer._id, {
-        $inc: { "referralStats.totalEarnings": referrerReward },
-      });
-
-      // 6. Notifications
-      const io = getIo();
-
-      // Alert Referrer
-      const referrerPayload = {
-        type: "referral_reward",
-        category: "payments",
-        title: "Referral Bonus Credited! 🎉",
-        description: `You earned ₹${referrerReward} because ${referee.name} completed their first task on Nexaro!`,
-        amount: referrerReward,
-        dotColor: "emerald",
-        uniqueKey: `referral_reward_referrer_${referral._id}`,
-      };
-
-      if (referrer.activeRole === "worker") {
-        await recordWorkerAlert({ workerId: referrer._id, ...referrerPayload });
-      } else {
-        await recordPosterAlert({ posterId: referrer._id, ...referrerPayload });
-      }
-
-      // Alert Referee
-      const refereePayload = {
-        type: "referral_reward",
-        category: "payments",
-        title: "Welcome Bonus Credited! 🎁",
-        description: `You earned ₹${refereeReward} welcome referral reward on your first completed task!`,
-        amount: refereeReward,
-        dotColor: "emerald",
-        uniqueKey: `referral_reward_referee_${referral._id}`,
-      };
-
-      if (referee.activeRole === "worker") {
-        await recordWorkerAlert({ workerId: referee._id, ...refereePayload });
-      } else {
-        await recordPosterAlert({ posterId: referee._id, ...refereePayload });
-      }
-
-      // Admin Alert
-      await recordAdminAlert({
-        uniqueKey: `referral_payout_${referral._id}`,
-        type: "platform_fee",
-        title: "Referral Rewards Distributed",
-        description: `Referral rewards (₹${referrerReward} to ${referrer.name} & ₹${refereeReward} to ${referee.name}) credited.`,
-        priority: "normal",
-        dotColor: "emerald",
-      });
-
-      // Realtime Sockets
-      if (io) {
-        io.to(`user:${referrer._id}`).emit("referral-reward-earned", {
-          amount: referrerReward,
-          friendName: referee.name,
-        });
-        io.to(`user:${referee._id}`).emit("referral-reward-earned", {
-          amount: refereeReward,
-          isWelcomeBonus: true,
-        });
-      }
-    }
+    await Promise.all(candidates.map((candidate) => processCandidateReferral(candidate)));
   } catch (error) {
     console.error("checkAndProcessReferralMilestone error:", error.message);
   }

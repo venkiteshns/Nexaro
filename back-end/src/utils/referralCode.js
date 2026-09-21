@@ -7,16 +7,10 @@ import User from "../models/userSchema.js";
  * 4 bytes = 4.29 billion combinations.
  */
 export const generateUniqueReferralCode = async () => {
-  let isUnique = false;
-  let code = "";
-
-  while (!isUnique) {
-    code = "NEX" + crypto.randomBytes(4).toString("hex").toUpperCase();
-    const existing = await User.exists({ referralCode: code });
-    if (!existing) {
-      isUnique = true;
-    }
+  const code = "NEX" + crypto.randomBytes(4).toString("hex").toUpperCase();
+  const existing = await User.exists({ referralCode: code });
+  if (existing) {
+    return generateUniqueReferralCode();
   }
-
   return code;
 };

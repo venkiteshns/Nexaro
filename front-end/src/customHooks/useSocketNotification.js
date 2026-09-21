@@ -14,14 +14,24 @@ const useSocketNotification = () => {
     const { admin, accessToken: adminToken } = useSelector((state) => state.adminAuth);
 
     const isAdminRoute = location.pathname.startsWith('/admin');
-    const isDedicatedAdmin = !user && Boolean(admin);
-    const isCurrentAdmin = isAdminRoute || isDedicatedAdmin || user?.activeRole === 'admin' || user?.role === 'admin';
 
-    const activeUser = (isAdminRoute && admin) ? admin : (user || admin);
-    const activeToken = (isAdminRoute && adminToken) ? adminToken : (accessToken || adminToken);
+    const activeUser = isAdminRoute
+        ? (admin || (user?.activeRole === 'admin' || user?.role === 'admin' ? user : null))
+        : user;
+
+    const activeToken = isAdminRoute
+        ? (adminToken || (user?.activeRole === 'admin' || user?.role === 'admin' ? accessToken : null))
+        : accessToken;
+
+    const isCurrentAdmin = isAdminRoute && Boolean(
+        admin || activeUser?.activeRole === 'admin' || activeUser?.role === 'admin'
+    );
 
     useEffect(() => {
-        if (!activeUser || !activeToken) return;
+        if (!activeUser || !activeToken) {
+            disconnectSocket();
+            return;
+        }
 
         connectSocket(activeToken);
 
@@ -108,7 +118,9 @@ const useSocketNotification = () => {
         socket.on('worker-notification', (data) => {
             if (isCurrentAdmin) return;
             if (activeUser?.activeRole === 'worker' || activeUser?.role === 'worker') {
-                showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
+                if (data.notification?.type !== 'referral_reward') {
+                    showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
+                }
                 dispatch(api.util.invalidateTags(['Worker_Notifications']));
             }
         });
@@ -116,15 +128,35 @@ const useSocketNotification = () => {
         socket.on('poster-notification', (data) => {
             if (isCurrentAdmin) return;
             if (activeUser?.activeRole === 'poster' || activeUser?.role === 'poster') {
-                showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
+                if (data.notification?.type !== 'referral_reward') {
+                    showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
+                }
                 dispatch(api.util.invalidateTags(['Poster_Notifications', 'Poster_Unread_Count']));
             }
         });
 
         socket.on('admin-notification', (data) => {
             if (isCurrentAdmin) {
-                showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
-                dispatch(api.util.invalidateTags(['Admin_Notifications']));
+                const type = data.notification?.type;
+                const title = (data.notification?.title || data.message || '').toLowerCase();
+
+                // Only show toast notifications for new user registrations and newly posted tasks
+                const isNewUser = type === 'signup' || title.includes('user sign up') || title.includes('joined');
+                const isNewTask = type === 'new_task' || title.includes('task posted') || title.includes('new task');
+
+                if (isNewUser || isNewTask) {
+                    showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
+                }
+
+                // Invalidate admin queries to update dashboard and table data in real time without toasts
+                dispatch(api.util.invalidateTags([
+                    'Admin_Notifications',
+                    'Admin_Dashboard',
+                    'Admin_Tasks',
+                    'Admin_Finance_Stats',
+                    'Admin_Finance_Transactions',
+                    'Users',
+                ]));
             }
         });
 
@@ -146,18 +178,14 @@ const useSocketNotification = () => {
             }
         });
 
-        socket.on("referral-reward-earned", (data) => {
-            if (data?.isWelcomeBonus) {
-                showSuccess(`🎁 Welcome Bonus Credited: ₹${data.amount} added to your wallet!`, { autoClose: 8000 });
-            } else {
-                showSuccess(`🎉 Referral Reward Credited: ₹${data.amount} earned from ${data?.friendName || "your friend"}'s first task!`, { autoClose: 8000 });
-            }
+        socket.on("referral-reward-earned", () => {
             dispatch(api.util.invalidateTags([
                 'Referral_Stats',
                 'Earning_Hero_Data',
                 'Transaction_History',
                 'Worker_Notifications',
-                'Poster_Notifications'
+                'Poster_Notifications',
+                'Worker_Wallet',
             ]));
         });
 

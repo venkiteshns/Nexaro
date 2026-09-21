@@ -102,11 +102,8 @@ const taskSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-taskSchema.index({ location: "2dsphere" }, { sparse: true });
+taskSchema.index({ location: "2dsphere" });
 
 const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
-if (!mongoose.models.Tasks) {
-    mongoose.model("Tasks", taskSchema);
-}
 
 export default Task;

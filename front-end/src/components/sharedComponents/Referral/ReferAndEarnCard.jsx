@@ -113,7 +113,7 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 relative">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 relative">
         <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-3.5 shadow-xs">
           <div className="flex items-center gap-2 text-gray-500 mb-1">
             <Users size={15} className="text-[#0A6E5C]" />
@@ -135,18 +135,6 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
           </div>
           <p className="text-lg sm:text-xl font-bold text-emerald-600">
             ₹{stats.totalEarnings.toLocaleString("en-IN")}
-          </p>
-        </div>
-
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-3.5 shadow-xs">
-          <div className="flex items-center gap-2 text-gray-500 mb-1">
-            <Check size={15} className="text-emerald-500" />
-            <span className="text-[11px] font-medium uppercase tracking-wider">
-              Rewarded
-            </span>
-          </div>
-          <p className="text-lg sm:text-xl font-bold text-gray-900">
-            {stats.completedCount}
           </p>
         </div>
 

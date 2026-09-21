@@ -229,6 +229,30 @@ export const posterApi = api.injectEndpoints({
       invalidatesTags: ["Poster_Notifications", "Poster_Unread_Count"],
     }),
 
+    getPosterPaymentOverview: builder.query({
+      query: () => ({
+        url: POSTER.GET_PAYMENT_OVERVIEW,
+        method: "GET",
+      }),
+      providesTags: ["Poster_Payments_Overview"],
+    }),
+
+    getPosterPaymentHistory: builder.query({
+      query: ({ page = 1, limit = 5, search = "", status = "all" } = {}) => ({
+        url: `${POSTER.GET_PAYMENT_HISTORY}?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&status=${status}`,
+        method: "GET",
+      }),
+      providesTags: ["Poster_Payments_History"],
+    }),
+
+    getPosterSpendingChart: builder.query({
+      query: (timeframe = "30D") => ({
+        url: `${POSTER.GET_PAYMENT_CHART}?timeframe=${timeframe}`,
+        method: "GET",
+      }),
+      providesTags: ["Poster_Payments_Chart"],
+    }),
+
   }),
 
 });
@@ -253,5 +277,8 @@ export const {
   useGetPosterUnreadCountQuery,
   useMarkAllPosterNotificationsReadMutation,
   useMarkPosterNotificationReadMutation,
+  useGetPosterPaymentOverviewQuery,
+  useGetPosterPaymentHistoryQuery,
+  useGetPosterSpendingChartQuery,
 } = posterApi;
 

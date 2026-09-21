@@ -19,6 +19,7 @@ import CompletedTaskDetails from "./pages/poster/CompletedTaskDetails.jsx";
 import PosterProfile from "./pages/poster/PosterProfile.jsx";
 import ReviewPage from "./pages/poster/ReviewPage.jsx";
 import PosterNotifications from "./pages/poster/PosterNotifications.jsx";
+import PosterPayments from "./pages/poster/PosterPayments.jsx";
 
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
@@ -94,6 +95,7 @@ function AppInner() {
               <Route path="profile" element={<PosterProfile />} />
               <Route path="review/:taskId" element={<ReviewPage />} />
               <Route path="notifications" element={<PosterNotifications />} />
+              <Route path="payments" element={<PosterPayments />} />
             </Route>
           </Route>
 

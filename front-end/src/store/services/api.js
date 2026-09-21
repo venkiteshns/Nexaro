@@ -134,6 +134,9 @@ export const api = createApi({
     "Poster_Unread_Count",
     "Admin_Dashboard",
     "Referral_Stats",
+    "Poster_Payments_Overview",
+    "Poster_Payments_History",
+    "Poster_Payments_Chart",
   ],
   endpoints: () => ({}),
 });

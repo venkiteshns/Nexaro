@@ -29,6 +29,9 @@ export const POSTER = {
     GET_UNREAD_COUNT: "/poster/notifications/unread-count",
     MARK_ALL_NOTIFICATIONS_READ: "/poster/notifications/mark-all-read",
     MARK_NOTIFICATION_READ: "/poster/notifications/:id/read",
+    GET_PAYMENT_OVERVIEW: "/poster/payments/overview",
+    GET_PAYMENT_HISTORY: "/poster/payments/history",
+    GET_PAYMENT_CHART: "/poster/payments/chart",
 }
 
 export const WORKER = {

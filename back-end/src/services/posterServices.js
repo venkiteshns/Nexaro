@@ -491,7 +491,7 @@ export const getPosterProfileService = async (posterId) => {
     ]);
 
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
-      "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea",
+      "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea isVerified",
     );
     const isWorkerActive = posterUser?.skills?.length > 0 && posterUser?.languages?.length > 0 && posterUser?.serviceArea?.coordinates?.length === 2;
     console.log(isWorkerActive);
@@ -553,6 +553,7 @@ export const getPosterProfileService = async (posterId) => {
         email: posterUser?.email || null,
         phone: posterUser?.phone || null,
         isWorkerActive,
+        isVerified: Boolean(posterUser?.isVerified),
         city: posterUser?.city || null,
         createdAt: posterUser?.createdAt || null,
         selfie: posterUser?.verificationDocuments?.selfie?.url || process.env.DEFAULT_AVATAR_URL,
