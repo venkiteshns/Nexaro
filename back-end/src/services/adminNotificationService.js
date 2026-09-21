@@ -32,7 +32,7 @@ export const recordAdminAlert = async ({
               createdAt,
             },
           },
-          { upsert: true, new: true }
+          { upsert: true, returnDocument: 'after' }
         );
       } else {
         alert = await AdminNotification.create({

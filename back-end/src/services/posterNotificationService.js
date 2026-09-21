@@ -62,7 +62,7 @@ export const recordPosterAlert = async ({
       alert = await PosterNotification.findOneAndUpdate(
         { uniqueKey },
         { $setOnInsert: { ...doc, isRead: false } },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       );
     } else {
       alert = await PosterNotification.create(doc);

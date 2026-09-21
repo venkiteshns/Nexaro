@@ -1255,9 +1255,9 @@ export const getAdminDashboardService = async () => {
     ] = await Promise.all([
         User.countDocuments({ activeRole: { $ne: "admin" }, isDeleted: { $ne: true } }),
         Task.countDocuments({ status: { $in: ["open", "assigned", "in_progress"] } }),
-        User.countDocuments({ isVerified: false, "verificationDocuments.selfie.url": { $exists: true }, isDeleted: { $ne: true } }),
+        User.countDocuments({ activeRole: { $ne: "admin" }, isVerified: false, "verificationDocuments.selfie.url": { $exists: true }, isDeleted: { $ne: true } }),
         Transaction.countDocuments({ transactionType: { $in: ["to_worker", "to_worker_wallet"] }, status: "pending" }),
-        User.countDocuments({ isSuspended: true }),
+        User.countDocuments({ activeRole: { $ne: "admin" }, isSuspended: true, isDeleted: { $ne: true } }),
         Transaction.find({
             transactionType: "platform_fee",
             createdAt: { $gte: startOfToday },
@@ -1290,10 +1290,17 @@ export const getAdminDashboardService = async () => {
         Bid.countDocuments({ createdAt: { $gte: startOfToday } }),
         Bid.countDocuments(),
         Task.find().sort({ createdAt: -1 }).limit(3).lean(),
-        User.find({ activeRole: "worker" }).sort({ createdAt: -1 }).limit(2).lean(),
+        User.find({ activeRole: "worker", isDeleted: { $ne: true } }).sort({ createdAt: -1 }).limit(2).lean(),
         Transaction.find({ transactionType: { $in: ["to_worker", "to_worker_wallet"] } }).populate("receiverId", "name").sort({ createdAt: -1 }).limit(2).lean(),
-        User.find({ "verificationDocuments.selfie.url": { $exists: true } }).sort({ updatedAt: -1 }).limit(2).lean(),
-        AdminNotification.find().sort({ createdAt: -1 }).limit(3).lean(),
+        User.find({
+            activeRole: { $ne: "admin" },
+            isVerified: false,
+            "verificationDocuments.selfie.url": { $exists: true },
+            isDeleted: { $ne: true },
+        }).sort({ updatedAt: -1 }).limit(2).lean(),
+        AdminNotification.find({
+            $or: [{ priority: "urgent" }, { type: "flagged" }],
+        }).sort({ createdAt: -1 }).limit(3).lean(),
     ]);
 
     const revenueTodayAmount = todayTransactions.reduce((acc, tx) => acc + (tx.amount || 0), 0);

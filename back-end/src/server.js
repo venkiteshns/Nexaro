@@ -17,9 +17,9 @@ const io = new Server(server, {
 
 initSocket(io);
 
-connectDB();
+await connectDB();
 
 server.listen(process.env.PORT, () => {
     console.log(`Server is running on port : ${process.env.PORT}`);
-})
+});
 

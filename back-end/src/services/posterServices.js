@@ -14,6 +14,8 @@ import { recordAdminAlert } from "./adminNotificationService.js";
 import PosterNotification from "../models/posterNotificationSchema.js";
 import { syncPosterNotifications } from "./posterNotificationService.js";
 import MESSAGES from "../constants/messages.js";
+import { generateUniqueReferralCode } from "../utils/referralCode.js";
+import { linkReferralOnSignup } from "./referralService.js";
 
 export const posterSignupService = async (data) => {
   try {
@@ -41,6 +43,7 @@ export const posterSignupService = async (data) => {
       isDeleted: false,
       isSuspended: false,
       activeRole: "poster",
+      referralCode: await generateUniqueReferralCode(),
     };
 
     if (hasValidLocation) {
@@ -52,14 +55,21 @@ export const posterSignupService = async (data) => {
 
     const createdUser = await User.create(payload);
 
+    if (data.referralCode) {
+      await linkReferralOnSignup({
+        newUserId: createdUser._id,
+        referralCode: data.referralCode,
+      });
+    }
+
     const accessToken = generateAccessToken(createdUser);
     const refreshToken = generateRefreshToken(createdUser);
 
     createdUser.refreshToken = refreshToken;
     await createdUser.save({ validateBeforeSave: false });
 
-    const { _id, name, email, activeRole } = createdUser;
-    const responseUser = { id: _id, name, email, role: activeRole };
+    const { _id, name, email, activeRole, referralCode } = createdUser;
+    const responseUser = { id: _id, name, email, role: activeRole, referralCode };
 
     await recordAdminAlert({
       uniqueKey: `user_signup_${_id}`,
@@ -481,7 +491,7 @@ export const getPosterProfileService = async (posterId) => {
     ]);
 
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
-      "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea",
+      "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea isVerified",
     );
     const isWorkerActive = posterUser?.skills?.length > 0 && posterUser?.languages?.length > 0 && posterUser?.serviceArea?.coordinates?.length === 2;
     console.log(isWorkerActive);
@@ -543,6 +553,7 @@ export const getPosterProfileService = async (posterId) => {
         email: posterUser?.email || null,
         phone: posterUser?.phone || null,
         isWorkerActive,
+        isVerified: Boolean(posterUser?.isVerified),
         city: posterUser?.city || null,
         createdAt: posterUser?.createdAt || null,
         selfie: posterUser?.verificationDocuments?.selfie?.url || process.env.DEFAULT_AVATAR_URL,

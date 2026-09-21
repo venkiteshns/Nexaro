@@ -60,7 +60,7 @@ export const recordWorkerAlert = async ({
       alert = await WorkerNotification.findOneAndUpdate(
         { uniqueKey },
         { $setOnInsert: { ...doc, isRead: false } },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       );
     } else {
       alert = await WorkerNotification.create(doc);

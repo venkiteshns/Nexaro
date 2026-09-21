@@ -22,7 +22,11 @@ import {
   markPosterNotificationRead,
 } from "../controller/PosterControllers/posterController.js";
 import { createReview } from "../controller/PosterControllers/reviewController.js";
-
+import {
+  getPosterPaymentOverview,
+  getPosterPaymentHistory,
+  getPosterSpendingChart,
+} from "../controller/PosterControllers/posterPaymentController.js";
 
 const router = express.Router();
 
@@ -38,6 +42,10 @@ router.get("/tasks", verifyToken, getMyTasks);
 router.get("/task/bids/:taskId", verifyToken, getPosterBids);
 router.get("/task/:taskId/progress", verifyToken, getPosterTaskProgress);
 router.get("/task/completed/:taskId", verifyToken, getCompletedTaskPosterSide);
+
+router.get("/payments/overview", verifyToken, getPosterPaymentOverview);
+router.get("/payments/history", verifyToken, getPosterPaymentHistory);
+router.get("/payments/chart", verifyToken, getPosterSpendingChart);
 
 router.get("/profile", verifyToken, getPosterProfile);
 router.get("/notifications", verifyToken, getPosterNotifications);

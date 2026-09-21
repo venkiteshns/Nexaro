@@ -1,4 +1,5 @@
 import { useFormContext } from "react-hook-form";
+import ReferralInput from "./ReferralInput";
 
 const PersonalInfo = (props) => {
   const {
@@ -87,6 +88,8 @@ const PersonalInfo = (props) => {
         </div>
         }
       </div>
+
+      {!login && <ReferralInput />}
 
       {worker && (
         <div>

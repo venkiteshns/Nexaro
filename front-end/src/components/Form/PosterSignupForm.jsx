@@ -1,15 +1,31 @@
+import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import PersonalInfo from "./FormComponents/PersonalInfo";
 import Password from "./FormComponents/Password";
 import Location from "./FormComponents/Location";
 import TermsAndConditions from "./FormComponents/TermsAndConditions";
 
-const PosterSignupForm = ({ onSubmitForm, isVerified, otpStatus, formStatus }) => {
-
+const PosterSignupForm = ({
+  onSubmitForm,
+  isVerified,
+  otpStatus,
+  formStatus,
+  initialReferralCode = "",
+}) => {
   const { isLoading, isError, error } = otpStatus;
   const { isSignUpError, signUpError } = formStatus;
 
-  const methods = useForm();
+  const methods = useForm({
+    defaultValues: {
+      referralCode: initialReferralCode,
+    },
+  });
+
+  useEffect(() => {
+    if (initialReferralCode) {
+      methods.setValue("referralCode", initialReferralCode, { shouldValidate: true });
+    }
+  }, [initialReferralCode, methods]);
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl shadow-xl p-8 md:p-10">

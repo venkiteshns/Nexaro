@@ -355,13 +355,14 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
             matchCriterias.category = category;
         }
 
-        const result = await Task.aggregate([
+        const buildPipeline = () => [
             {
                 $geoNear: {
                     near: {
                         type: "Point",
                         coordinates: [lng, lat],
                     },
+                    key: "location",
                     distanceField: "distance",
                     maxDistance: 50000,
                     spherical: true,
@@ -431,7 +432,20 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
                     ]
                 }
             }
-        ]);
+        ];
+
+        let result;
+        try {
+            result = await Task.aggregate(buildPipeline());
+        } catch (aggErr) {
+            if (aggErr.code === 27 || aggErr.codeName === "IndexNotFound" || aggErr.message?.includes("2dsphere index")) {
+                console.warn("2dsphere index missing on tasks collection. Creating index and retrying...");
+                await Task.createIndexes();
+                result = await Task.aggregate(buildPipeline());
+            } else {
+                throw aggErr;
+            }
+        }
 
         const categoryList = result[0].categoryList.map((c) => c._id);
         const total = result[0].totalCount[0]?.count || 0;
@@ -662,11 +676,11 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
 
         let address = task.address;
         if (body.address) {
-            try { address = JSON.parse(body.address); } catch (err) { address = body.address; }
+            try { address = JSON.parse(body.address); } catch { address = body.address; }
         }
         let location = task.location;
         if (body.location) {
-            try { location = JSON.parse(body.location); } catch (err) { location = body.location; }
+            try { location = JSON.parse(body.location); } catch { location = body.location; }
         }
 
         const updatedTask = await Task.findByIdAndUpdate(

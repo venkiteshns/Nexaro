@@ -15,7 +15,7 @@ import {
 } from "../../store/services/adminApi";
 import { api } from "../../store/services/api";
 import { getSocket } from "../../services/socketService";
-import { showSuccess, showError, showInfo } from "../../utils/toast";
+import { showSuccess, showError } from "../../utils/toast";
 
 export default function AdminNotifications() {
   const dispatch = useDispatch();
@@ -29,8 +29,7 @@ export default function AdminNotifications() {
     const socket = getSocket();
     if (!socket) return;
 
-    const handleNewAlert = (data) => {
-      showInfo(data?.message || "New system notification received", { autoClose: 6000 });
+    const handleNewAlert = () => {
       dispatch(api.util.invalidateTags(["Admin_Notifications"]));
     };
 

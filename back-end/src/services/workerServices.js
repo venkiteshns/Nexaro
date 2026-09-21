@@ -13,6 +13,8 @@ import { getIo } from "../socket.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
 import WorkerNotification from "../models/workerNotificationSchema.js";
 import { syncWorkerNotifications } from "./workerNotificationService.js";
+import { generateUniqueReferralCode } from "../utils/referralCode.js";
+import { linkReferralOnSignup } from "./referralService.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -67,6 +69,7 @@ export const workerSignupService = async ({ files, data }) => {
             isSuspended: false,
             role: "worker",
             activeRole: "worker",
+            referralCode: await generateUniqueReferralCode(),
             worker: {
                 isLive: true,
                 rating: "0"
@@ -105,13 +108,20 @@ export const workerSignupService = async ({ files, data }) => {
 
         const createdUser = await User.create(payLoad);
 
+        if (data.referralCode) {
+            await linkReferralOnSignup({
+                newUserId: createdUser._id,
+                referralCode: data.referralCode,
+            });
+        }
+
         const accessToken = generateAccessToken(createdUser);
         const refreshToken = generateRefreshToken(createdUser);
 
         createdUser.refreshToken = refreshToken;
         await createdUser.save({ validateBeforeSave: false });
-        const { _id, name, email, verificationDocuments, activeRole } = createdUser;
-        const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role: activeRole };
+        const { _id, name, email, verificationDocuments, activeRole, referralCode } = createdUser;
+        const responseUser = { id: _id, name, email, selfie: verificationDocuments.selfie.url, role: activeRole, referralCode };
 
         await recordAdminAlert({
             uniqueKey: `user_signup_${_id}`,

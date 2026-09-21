@@ -1,4 +1,4 @@
-import { MapPin, ClipboardList, Edit3, ArrowLeftRight, BadgeCheck } from "lucide-react";
+import { MapPin, ClipboardList, Edit3, ArrowLeftRight, BadgeCheck, Clock } from "lucide-react";
 
 const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
   <div className="relative bg-white rounded-2xl border border-gray-100 shadow-sm mb-5">
@@ -35,9 +35,15 @@ const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
               <h1 className="text-base font-extrabold text-white">
                 {posterInfo?.name || "Rahul Sharma"}
               </h1>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold tracking-wide border border-white/30">
-                <BadgeCheck size={10} /> VERIFIED
-              </span>
+              {posterInfo?.isVerified ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold tracking-wide border border-white/30">
+                  <BadgeCheck size={10} /> VERIFIED
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-white text-[10px] font-bold tracking-wide border border-amber-300/40">
+                  <Clock size={10} /> PENDING
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3 mt-0.5 flex-wrap">
               <span className="flex items-center gap-1 text-xs text-white/80">
@@ -103,9 +109,15 @@ const ProfileBanner = ({ posterInfo, onEditClick, onRoleSwitch }) => (
                 <h1 className="text-xl font-extrabold text-gray-100">
                   {posterInfo?.name || "Rahul Sharma"}
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[#0A6E5C] text-[10px] font-bold tracking-wide border border-emerald-200">
-                  <BadgeCheck size={11} /> VERIFIED
-                </span>
+                {posterInfo?.isVerified ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white text-[#0A6E5C] text-[10px] font-bold tracking-wide border border-emerald-100 shadow-2xs">
+                    <BadgeCheck size={11} /> VERIFIED
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold tracking-wide border border-amber-200 shadow-2xs">
+                    <Clock size={11} /> PENDING
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="flex items-center gap-1 text-xs text-gray-500">
