@@ -647,7 +647,7 @@ const PlaceBid = () => {
           )}
 
           {!isLoading && !isError && task && !bidSuccess && (
-            <div className="p-4 sm:p-6 w-full space-y-5 pb-16">
+            <div className="p-3 sm:p-5 w-full space-y-3.5 pb-12">
               <TaskStatusBanner
                 task={task}
                 canPlaceBid={canPlaceBid}
@@ -658,9 +658,9 @@ const PlaceBid = () => {
                 hasExistingBid={hasExistingBid}
               />
 
-              <div className="flex flex-col lg:flex-row gap-5 items-start">
-                <div className="flex-1 w-full min-w-0 space-y-5">
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
+              <div className="flex flex-col lg:flex-row gap-3.5 items-start">
+                <div className="flex-1 w-full min-w-0 space-y-3.5">
+                  <div className="bg-white rounded-xl border border-gray-200/80 shadow-xs p-3.5 sm:p-4">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2 flex-wrap">
                         {task.category && (

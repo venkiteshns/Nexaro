@@ -6,7 +6,7 @@ export default function TaskOverviewHeader({ mainData, bid }) {
             <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-widest mb-1">
                 Task Overview
             </p>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
+            <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 leading-tight">
                 {mainData?.title}
             </h1>
             <div className="flex flex-wrap items-center gap-3 mt-2">

@@ -3,7 +3,7 @@ import { TrendingUp } from "lucide-react";
 import { useGetWorkerEarningsChartQuery } from "../../../store/services/workerApi";
 import FinanceBarChart from "../../sharedComponents/FinanceBarChart";
 
-export const EarningsChart = () => {
+export const EarningsChart = ({ showBadge = true }) => {
   const [timeframe, setTimeframe] = useState("7D");
   const { data, isLoading, isFetching } = useGetWorkerEarningsChartQuery(timeframe);
 
@@ -18,7 +18,7 @@ export const EarningsChart = () => {
       dataKey="earnings"
       timeframe={timeframe}
       onTimeframeChange={setTimeframe}
-      badgeText={`₹${Number(totalEarnings || 0).toLocaleString("en-IN")}`}
+      badgeText={showBadge ? `₹${Number(totalEarnings || 0).toLocaleString("en-IN")}` : null}
       badgeIcon={TrendingUp}
       isLoading={isLoading}
       isFetching={isFetching}

@@ -10,23 +10,23 @@ export default function JobChecklistCard({
     onRequestComplete,
 }) {
     return (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-            <div className="flex items-center justify-between mb-2">
+        <div className="bg-white border border-gray-200/80 rounded-xl shadow-xs p-3.5 sm:p-4">
+            <div className="flex items-center justify-between mb-1.5">
                 <div>
-                    <p className="font-extrabold text-gray-900">Job Checklist</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Track your progress and update the poster</p>
+                    <p className="font-bold text-xs sm:text-sm text-gray-900">Job Checklist</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Track your progress and update the poster</p>
                 </div>
-                <span className="text-2xl font-extrabold text-[#0A6E5C]">{pct}%</span>
+                <span className="text-lg sm:text-xl font-extrabold text-[#0A6E5C]">{pct}%</span>
             </div>
 
-            <div className="h-1.5 bg-gray-100 rounded-full mb-5 overflow-hidden">
+            <div className="h-1.5 bg-gray-100 rounded-full mb-3 overflow-hidden">
                 <div
                     className="h-full bg-[#0A6E5C] rounded-full transition-all duration-700"
                     style={{ width: `${pct}%` }}
                 />
             </div>
 
-            <ul className="space-y-2.5">
+            <ul className="space-y-1.5">
                 {CHECKLIST.map((item) => {
                     const itemDone = item.stepIndex <= done;
                     const isNext = UPDATE_ORDER[done + 1] === item.key;
@@ -34,27 +34,27 @@ export default function JobChecklistCard({
                     return (
                         <li
                             key={item.key}
-                            className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all
+                            className={`flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg border transition-all
                                 ${itemDone
-                                    ? 'bg-emerald-50 border-emerald-200'
+                                    ? 'bg-emerald-50/70 border-emerald-200'
                                     : isNext
-                                        ? 'bg-white border-gray-300 shadow-sm'
-                                        : 'bg-gray-50 border-gray-100'
+                                        ? 'bg-white border-gray-300 shadow-2xs'
+                                        : 'bg-gray-50/70 border-gray-100'
                                 }`}
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2.5">
                                 {itemDone ? (
-                                    <CheckCircle size={18} className="text-[#0A6E5C] shrink-0" />
+                                    <CheckCircle size={15} className="text-[#0A6E5C] shrink-0" />
                                 ) : (
-                                    <Circle size={18} className="text-gray-300 shrink-0" />
+                                    <Circle size={15} className="text-gray-300 shrink-0" />
                                 )}
-                                <span className={`text-sm font-medium ${itemDone ? 'text-[#0A6E5C]' : 'text-gray-500'}`}>
+                                <span className={`text-xs font-semibold ${itemDone ? 'text-[#0A6E5C]' : 'text-gray-600'}`}>
                                     {item.label}
                                 </span>
                             </div>
 
                             {itemDone && (
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-[#0A6E5C]">
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-[#0A6E5C]">
                                     DONE
                                 </span>
                             )}

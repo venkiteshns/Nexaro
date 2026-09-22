@@ -23,7 +23,7 @@ const ActiveJobEntry = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <WorkerHeader />
 
-                <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
 
                     {isLoading && (
                         <div className="flex-1 flex flex-col items-center justify-center gap-5 py-20">

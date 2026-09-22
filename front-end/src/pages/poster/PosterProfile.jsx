@@ -4,7 +4,6 @@ import {
   CheckCircle,
   DollarSign,
   Star,
-  Loader,
 } from "lucide-react";
 import { useGetPosterProfileQuery, useSwitchRoleActiveWorkerMutation, useSwitchtoworkerMutation } from "../../store/services/posterApi";
 
@@ -62,7 +61,7 @@ const PosterProfile = () => {
           refreshToken,
           accessToken
         }))
-        navigate('/worker/nearby-tasks', { replace: true });
+        navigate('/worker/dashboard', { replace: true });
       }, 2600);
     } catch (error) {
       console.log(error);
@@ -84,7 +83,7 @@ const PosterProfile = () => {
             refreshToken,
             accessToken
           }))
-          navigate('/worker/nearby-tasks', { replace: true });
+          navigate('/worker/dashboard', { replace: true });
         }, 2600);
         return;
       } catch (error) {
@@ -111,20 +110,29 @@ const PosterProfile = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <PosterHeader />
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
           <ProfileBanner
             posterInfo={posterInfo}
+            isLoading={isLoading}
             onEditClick={() => setShowEditModal(true)}
             onRoleSwitch={handleRoleSwitch}
           />
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-6 text-gray-400">
-              <Loader size={20} className="animate-spin mr-2" /> Loading
-              stats...
+            <div className="flex flex-wrap gap-3 mb-4 animate-pulse">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl border border-gray-100 shadow-xs p-2.5 sm:p-3.5 flex flex-col items-start gap-1.5 sm:gap-2 flex-1 min-w-[75px] sm:min-w-[110px]"
+                >
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gray-100" />
+                  <div className="w-12 h-4 sm:h-5 bg-gray-100 rounded" />
+                  <div className="w-16 h-2.5 sm:h-3 bg-gray-100 rounded" />
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="flex flex-wrap gap-3 mb-5">
+            <div className="flex flex-wrap gap-3 mb-4">
               <StatCard
                 icon={<ClipboardList size={18} />}
                 label="Tasks Posted"
@@ -152,13 +160,14 @@ const PosterProfile = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
-            <PersonalInfo posterInfo={posterInfo} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-4">
+            <PersonalInfo posterInfo={posterInfo} isLoading={isLoading} />
             <RecentTasks recentTasks={recentTasks} isLoading={isLoading} />
           </div>
 
           <ReviewsSection
             reviews={reviews}
+            isLoading={isLoading}
             reviewPage={reviewPage}
             setReviewPage={setReviewPage}
           />

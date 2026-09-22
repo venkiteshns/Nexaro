@@ -35,6 +35,7 @@ export const POSTER = {
 }
 
 export const WORKER = {
+    GET_DASHBOARD: "/worker/dashboard",
     GET_TASKS: "/worker/tasks/nearby",
     GET_TASK_FOR_BID: "/worker/task/:taskId",
     ADD_BID: "/worker/tasks/add_bid",

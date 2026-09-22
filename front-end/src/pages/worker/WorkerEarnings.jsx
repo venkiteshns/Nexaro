@@ -45,13 +45,13 @@ export default function WorkerEarnings() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <WorkerHeader />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+          <div className="max-w-7xl w-full mx-auto space-y-3.5 sm:space-y-4">
             <div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
+              <h1 className="text-lg sm:text-xl font-extrabold text-[#111827] tracking-tight">
                 Earnings
               </h1>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">
+              <p className="text-xs text-gray-400 mt-0.5">
                 Your complete earnings overview and payout history
               </p>
             </div>

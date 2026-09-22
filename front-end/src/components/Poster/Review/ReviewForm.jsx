@@ -65,9 +65,9 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
 
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
-                <h2 className="text-gray-900 font-extrabold text-lg mb-1">Rate Your Experience</h2>
-                <p className="text-gray-500 text-sm mb-5">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4 mb-3">
+                <h2 className="text-gray-900 font-extrabold text-sm sm:text-base mb-0.5">Rate Your Experience</h2>
+                <p className="text-gray-500 text-xs mb-3">
                     How would you describe the service provided by {workerName}?
                 </p>
 
@@ -88,19 +88,19 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
             </div>
 
 
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-4">
-                <h2 className="font-extrabold text-gray-900 text-lg mb-0.5">Share Your Feedback</h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4 mb-3">
+                <h2 className="font-extrabold text-gray-900 text-sm sm:text-base mb-0.5">Share Your Feedback</h2>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-3">
                     Detailed Written Testimonial
                 </p>
 
                 <div className="relative">
                     <textarea
                         id="review-text"
-                        rows={5}
+                        rows={4}
                         placeholder="Describe the quality of work and your experience with the worker…"
                         maxLength={MAX_CHARS}
-                        className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400
+                        className={`w-full resize-none rounded-lg border px-3 py-2 text-xs text-gray-700 placeholder:text-gray-400
                                     focus:outline-none focus:ring-2 transition-all duration-150
                                     ${errors.review
                                 ? 'border-red-300 focus:ring-red-200'
@@ -120,14 +120,14 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
                     />
                 </div>
 
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-1.5">
                     {errors.review ? (
-                        <p className="text-xs text-red-500 font-medium">{errors.review.message}</p>
+                        <p className="text-[11px] text-red-500 font-medium">{errors.review.message}</p>
                     ) : (
                         <span />
                     )}
                     <p
-                        className={`text-xs font-medium ml-auto ${charCount > MAX_CHARS ? 'text-red-500' : 'text-gray-400'}`}
+                        className={`text-[11px] font-medium ml-auto ${charCount > MAX_CHARS ? 'text-red-500' : 'text-gray-400'}`}
                     >
                         {charCount}/{MAX_CHARS}
                     </p>
@@ -135,8 +135,8 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
             </div>
 
             {errors.root && (
-                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
-                    <p className="text-sm text-red-600 font-medium">{errors.root.message}</p>
+                <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-3">
+                    <p className="text-xs text-red-600 font-medium">{errors.root.message}</p>
                 </div>
             )}
 
@@ -144,14 +144,14 @@ const ReviewForm = ({ taskId, revieweeId, workerName, onSuccess }) => {
                 id="submit-review-btn"
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3.5 rounded-2xl bg-[#0A6E5C] text-white font-bold text-sm
+                className="w-full py-2 rounded-lg bg-[#0A6E5C] text-white font-bold text-xs
                            hover:bg-[#085e4e] active:scale-[0.98] transition-all duration-150
-                           disabled:opacity-60 disabled:cursor-not-allowed shadow-md
-                           flex items-center justify-center gap-2"
+                           disabled:opacity-60 disabled:cursor-not-allowed shadow-xs
+                           flex items-center justify-center gap-1.5 cursor-pointer"
             >
                 {isLoading ? (
                     <>
-                        <Loader2 size={16} className="animate-spin" />
+                        <Loader2 size={14} className="animate-spin" />
                         Submitting…
                     </>
                 ) : (

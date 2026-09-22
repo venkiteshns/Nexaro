@@ -1,6 +1,8 @@
 import User from "../models/userSchema.js";
 import Wallet from "../models/walletSchema.js"
 import Review from "../models/reviewSchema.js";
+import Task from "../models/taskSchema.js";
+import Bid from "../models/bidsSchema.js";
 import { hashData } from "../utils/hasing.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
@@ -1170,3 +1172,150 @@ export const toggleWorkerLiveStatusService = async (userId, isLive = null) => {
         return { error: error.message };
     }
 };
+
+export const getWorkerDashboardService = async ({ userId, category }) => {
+    try {
+        const workerId = new mongoose.Types.ObjectId(userId);
+        const user = await User.findById(userId).select("name email worker serviceArea").lean();
+        if (!user) {
+            return { error: MESSAGES.USER_NOT_FOUND };
+        }
+
+        // 1. KPI Stats
+        const activeBidsCount = await Bid.countDocuments({
+            workerId,
+            status: "pending",
+        });
+
+        const jobsCompletedCount = await Task.countDocuments({
+            workerId,
+            status: "completed",
+        });
+
+        const wallet = await Wallet.findOne({ userId: workerId }).lean();
+        const totalEarned = wallet?.totalEarned || 0;
+        const walletAmount = wallet?.walletAmount || 0;
+
+        const reviewAggregation = await Review.aggregate([
+            { $match: { reviewee: workerId } },
+            { $group: { _id: null, avgRating: { $avg: "$rating" }, totalReviews: { $sum: 1 } } },
+        ]);
+        const avgRating = reviewAggregation[0]?.avgRating
+            ? Number(reviewAggregation[0].avgRating.toFixed(1))
+            : (user.worker?.rating || 4.8);
+
+        // 2. Recent Bids (Proposals status)
+        const recentBidsRaw = await Bid.find({ workerId })
+            .populate({
+                path: "taskId",
+                select: "title category amount urgencyLevel status address deadline createdAt",
+            })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .lean();
+
+        const recentBids = recentBidsRaw.map((b) => ({
+            _id: b._id,
+            taskId: b.taskId?._id || b.taskId,
+            taskTitle: b.taskId?.title || "Task Proposal",
+            category: b.taskId?.category || "General",
+            bidAmount: b.amount,
+            status: b.status,
+            createdAt: b.createdAt,
+            taskStatus: b.taskId?.status || "open",
+        }));
+
+        // 3. Available Opportunities (Jobs)
+        const taskFilter = { status: "open" };
+        if (category && category.toLowerCase() !== "all") {
+            taskFilter.category = { $regex: new RegExp(`^${category}$`, "i") };
+        }
+
+        const workerBids = await Bid.find({ workerId }).select("taskId amount status").lean();
+        const workerBidMap = new Map();
+        workerBids.forEach((b) => {
+            if (b.taskId) workerBidMap.set(String(b.taskId), b);
+        });
+
+        let availableTasks = [];
+        const hasServiceArea = user.serviceArea?.coordinates?.length === 2;
+
+        if (hasServiceArea) {
+            try {
+                const [lng, lat] = user.serviceArea.coordinates;
+                const geoTasks = await Task.aggregate([
+                    {
+                        $geoNear: {
+                            near: { type: "Point", coordinates: [lng, lat] },
+                            key: "location",
+                            distanceField: "distance",
+                            maxDistance: 75000,
+                            spherical: true,
+                            query: taskFilter,
+                        },
+                    },
+                    { $sort: { createdAt: -1 } },
+                    { $limit: 6 },
+                ]);
+                if (geoTasks && geoTasks.length > 0) {
+                    availableTasks = geoTasks;
+                }
+            } catch (geoErr) {
+                console.log("GeoNear fallback in dashboard:", geoErr.message);
+            }
+        }
+
+        if (availableTasks.length === 0) {
+            availableTasks = await Task.find(taskFilter)
+                .sort({ createdAt: -1 })
+                .limit(6)
+                .lean();
+        }
+
+        const now = Date.now();
+        const formattedJobs = availableTasks.map((t) => {
+            const myBid = workerBidMap.get(String(t._id));
+            const isNew = (now - new Date(t.createdAt).getTime()) < 48 * 60 * 60 * 1000;
+            return {
+                _id: t._id,
+                title: t.title,
+                description: t.description || "Professional task services needed. Click Place Bid to submit your quotation.",
+                category: t.category,
+                amount: t.amount,
+                deadline: t.deadline,
+                urgencyLevel: t.urgencyLevel,
+                address: t.address,
+                createdAt: t.createdAt,
+                distance: t.distance ? Math.round(t.distance / 1000) : null,
+                isNew,
+                hasBid: Boolean(myBid),
+                myBidAmount: myBid?.amount,
+                myBidStatus: myBid?.status,
+            };
+        });
+
+        // 4. Category list from open tasks + standard categories
+        const distinctCategories = await Task.distinct("category", { status: "open" });
+        const defaultCategories = ["Electrician", "Plumber", "Painter", "Tutor", "Cleaning"];
+        const combinedCategories = Array.from(new Set([...defaultCategories, ...distinctCategories])).filter(Boolean);
+
+        return {
+            stats: {
+                activeBids: activeBidsCount,
+                jobsCompleted: jobsCompletedCount,
+                totalEarned,
+                rating: avgRating,
+            },
+            isLive: user.worker?.isLive ?? true,
+            walletAmount,
+            userName: user.name,
+            categories: ["All", ...combinedCategories],
+            recentBids,
+            availableJobs: formattedJobs,
+        };
+    } catch (error) {
+        console.error("getWorkerDashboardService error:", error);
+        return { error: error.message };
+    }
+};
+

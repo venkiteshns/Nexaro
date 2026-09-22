@@ -76,9 +76,9 @@ function PhotoGallery({ photos }) {
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="h-28 w-32 rounded-xl bg-gray-100 flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
-        <ImageIcon size={24} />
-        <span className="text-xs mt-1">No Photos</span>
+      <div className="h-20 w-24 rounded-lg bg-gray-100 flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-300">
+        <ImageIcon size={20} />
+        <span className="text-[11px] mt-1">No Photos</span>
       </div>
     );
   }
@@ -88,12 +88,12 @@ function PhotoGallery({ photos }) {
 
   return (
     <>
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex gap-2.5 flex-wrap">
         {visible.map((img, i) => (
           <div
             key={i}
             onClick={() => setLightbox(i)}
-            className="relative h-28 w-36 rounded-xl overflow-hidden shrink-0 bg-gray-100 cursor-pointer group border border-gray-200 hover:border-[#0A6E5C] transition-colors"
+            className="relative h-20 w-28 rounded-lg overflow-hidden shrink-0 bg-gray-100 cursor-pointer group border border-gray-200 hover:border-[#0A6E5C] transition-colors"
           >
             <img
               src={img?.url || img}
@@ -102,7 +102,7 @@ function PhotoGallery({ photos }) {
             />
             {i === 2 && extra > 0 && (
               <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
-                <span className="text-white text-sm font-bold">
+                <span className="text-white text-xs font-bold">
                   +{extra} Photos
                 </span>
               </div>
@@ -164,48 +164,48 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
         <div className="h-1 w-full bg-[#0A6E5C]" />
 
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+        <div className="p-3.5 sm:p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
               Your Submitted Bid
             </p>
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${badge}`}
+              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${badge}`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
               {label}
             </span>
           </div>
 
-          <div className="flex items-end justify-between mb-4">
+          <div className="flex items-end justify-between mb-3">
             <div>
-              <p className="text-3xl font-extrabold text-gray-900">
+              <p className="text-xl sm:text-2xl font-extrabold text-gray-900">
                 ₹{Number(bid?.amount || 0).toLocaleString("en-IN")}
               </p>
             </div>
-            <div className="flex items-center gap-1.5 text-gray-500 text-sm bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-              <Clock size={13} className="text-[#0A6E5C]" />
-              <span className="text-xs font-medium">{bid?.eta || "—"} ETA</span>
+            <div className="flex items-center gap-1.5 text-gray-500 text-xs bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-200">
+              <Clock size={12} className="text-[#0A6E5C]" />
+              <span className="font-medium">{bid?.eta || "—"} ETA</span>
             </div>
           </div>
 
           {bid?.pitch && (
-            <div className="mb-4">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            <div className="mb-3">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
                 Your Pitch
               </p>
-              <blockquote className="text-sm text-gray-600 italic leading-relaxed border-l-2 border-[#0A6E5C] pl-3 bg-emerald-50/50 py-2 rounded-r-lg">
+              <blockquote className="text-xs text-gray-600 italic leading-relaxed border-l-2 border-[#0A6E5C] pl-2.5 bg-emerald-50/50 py-1.5 rounded-r-lg">
                 "{bid.pitch}"
               </blockquote>
             </div>
           )}
 
           {bid?.availableDate && (
-            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-              <Calendar size={13} className="text-[#0A6E5C]" />
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+              <Calendar size={12} className="text-[#0A6E5C]" />
               Available from:{" "}
               <span className="font-semibold text-gray-700">
                 {formatDate(bid.availableDate)}
@@ -216,19 +216,19 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
           {bid?.status === "pending" && (
             <button onClick={() => {
               setShowWithdrawModal(true)
-            }} className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+            }} className="w-full mt-1 py-1.5 rounded-lg text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
               Withdraw Bid
             </button>
           )}
 
           {bid?.status === "accepted" && (
-            <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors flex items-center justify-center gap-2">
-              Go to Active Job <span className="text-base">→</span>
+            <button className="w-full mt-1 py-1.5 rounded-lg text-xs font-semibold bg-[#0A6E5C] text-white hover:bg-[#085e4e] transition-colors flex items-center justify-center gap-1.5">
+              Go to Active Job <span className="text-sm">→</span>
             </button>
           )}
 
           {bid?.status === "rejected" && (
-            <button className="w-full mt-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+            <button className="w-full mt-1 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
               Find Similar Tasks
             </button>
           )}
@@ -243,22 +243,22 @@ function YourBidCard({ bid, taskTitle, isWithdrawSuccess }) {
 
 function CompetitionCard({ bidCount, averageBid }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4">
+      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
         Competition Insight
       </p>
 
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-          <Users size={16} className="text-[#0A6E5C]" />
+      <div className="flex items-center gap-2.5 mb-3">
+        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+          <Users size={15} className="text-[#0A6E5C]" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-800">
+          <p className="text-xs sm:text-sm font-semibold text-gray-800">
             {bidCount > 0
               ? `${bidCount} other worker${bidCount > 1 ? "s" : ""} have bid`
               : "No other bids yet"}
           </p>
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] text-gray-400">
             {bidCount === 0
               ? "You're the first bidder!"
               : "Stand out with a strong pitch"}
@@ -267,12 +267,12 @@ function CompetitionCard({ bidCount, averageBid }) {
       </div>
 
       {averageBid && (
-        <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
-          <div className="flex items-center gap-2 text-gray-500 text-xs font-medium">
-            <IndianRupee size={13} />
+        <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
+          <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium">
+            <IndianRupee size={12} />
             Average Bid
           </div>
-          <p className="text-lg font-extrabold text-gray-900">
+          <p className="text-base font-extrabold text-gray-900">
             ₹{Number(averageBid).toLocaleString("en-IN")}
           </p>
         </div>
@@ -282,29 +282,28 @@ function CompetitionCard({ bidCount, averageBid }) {
 }
 
 function PostedByCard({ poster }) {
-
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4">
+      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
         Posted By
       </p>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {poster?.picture ? (
           <img
             src={poster?.picture}
             alt={poster?.name}
-            className="w-11 h-11 rounded-full object-cover border-2 border-[#0A6E5C]/20"
+            className="w-9 h-9 rounded-full object-cover border-2 border-[#0A6E5C]/20"
           />
         ) : (
-          <div className="w-11 h-11 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm border-2 border-[#0A6E5C]/20">
+          <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs border-2 border-[#0A6E5C]/20">
             {poster?.name?.charAt(0)?.toUpperCase() || "?"}
           </div>
         )}
         <div>
-          <p className="font-semibold text-gray-800 text-sm">
+          <p className="font-semibold text-gray-800 text-xs sm:text-sm">
             {poster?.name || "Anonymous"}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">Task Poster</p>
+          <p className="text-[11px] text-gray-400">Task Poster</p>
         </div>
       </div>
     </div>
@@ -325,9 +324,9 @@ function LocationCard({ address, location }) {
   }, [location]);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
+      <div className="flex items-center justify-between px-3.5 sm:px-4 pt-3.5 pb-2.5">
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
           Task Location
         </p>
         {cityDistrict && (
@@ -338,23 +337,23 @@ function LocationCard({ address, location }) {
         )}
       </div>
 
-      <div className="mx-5 mb-3 rounded-xl overflow-hidden border border-gray-200">
+      <div className="mx-3.5 sm:mx-4 mb-2.5 rounded-lg overflow-hidden border border-gray-200">
         {mapPosition ? (
           <Map
             position={mapPosition}
-            height="192px"
+            height="150px"
             showButton={false}
           />
         ) : (
-          <div className="h-48 bg-linear-to-br from-emerald-50 to-teal-100 flex flex-col items-center justify-center text-gray-400">
-            <MapPin size={28} className="text-[#0A6E5C]/40 mb-1" />
+          <div className="h-36 bg-linear-to-br from-emerald-50 to-teal-100 flex flex-col items-center justify-center text-gray-400">
+            <MapPin size={24} className="text-[#0A6E5C]/40 mb-1" />
             <span className="text-xs">Location not available</span>
           </div>
         )}
       </div>
 
       {address?.landmark && (
-        <div className="px-5 pb-5 text-xs text-gray-500 leading-relaxed">
+        <div className="px-3.5 sm:px-4 pb-3.5 text-xs text-gray-500 leading-relaxed">
           📍{" "}
           {[address.landmark, address.city, address.district, address.state]
             .filter(Boolean)
@@ -455,35 +454,35 @@ const TaskBidDetails = () => {
 
         {!isWithdrawSuccess && <div className="flex-1 overflow-y-auto">
 
-          <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
+          <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200 px-3.5 sm:px-5 py-2 flex items-center justify-between">
             <button
               onClick={() => navigate("/worker/my-bids", { replace: true })}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium"
+              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium"
             >
-              <ArrowLeft size={16} />
+              <ArrowLeft size={14} />
               <span className="hidden sm:inline">Back to My Bids</span>
               <span className="sm:hidden">Back</span>
             </button>
-            <h1 className="text-base font-bold text-gray-900">Task Details</h1>
-            <div className="w-24 hidden sm:block" />
+            <h1 className="text-xs sm:text-sm font-bold text-gray-900">Task Details</h1>
+            <div className="w-20 hidden sm:block" />
           </div>
 
           {isLoading && (
-            <div className="flex items-center justify-center py-24 gap-3 text-gray-400">
-              <Loader2 size={22} className="animate-spin text-[#0A6E5C]" />
-              <span className="text-sm">Loading bid details...</span>
+            <div className="flex items-center justify-center py-20 gap-2.5 text-gray-400">
+              <Loader2 size={20} className="animate-spin text-[#0A6E5C]" />
+              <span className="text-xs">Loading bid details...</span>
             </div>
           )}
 
           {isError && (
-            <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-500">
-              <AlertCircle size={36} className="text-red-400" />
-              <p className="text-sm font-semibold text-gray-700">
+            <div className="flex flex-col items-center justify-center py-20 gap-2.5 text-gray-500">
+              <AlertCircle size={32} className="text-red-400" />
+              <p className="text-xs font-semibold text-gray-700">
                 Could not load bid details
               </p>
               <button
                 onClick={() => navigate(-1)}
-                className="mt-1 px-5 py-2 bg-[#0A6E5C] text-white text-sm font-semibold rounded-xl hover:bg-[#085e4e] transition-colors"
+                className="mt-1 px-4 py-1.5 bg-[#0A6E5C] text-white text-xs font-semibold rounded-lg hover:bg-[#085e4e] transition-colors"
               >
                 Go Back
               </button>
@@ -491,16 +490,16 @@ const TaskBidDetails = () => {
           )}
 
           {!isLoading && !isError && (task || bid) && (
-            <div className="p-4 sm:p-6 max-w-6xl mx-auto w-full">
-              <div className="flex flex-col lg:flex-row gap-5">
+            <div className="p-3 sm:p-5 lg:p-6 max-w-6xl mx-auto w-full">
+              <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
 
-                <div className="flex-1 min-w-0 space-y-4">
+                <div className="flex-1 min-w-0 space-y-3 sm:space-y-3.5">
 
-                  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                    <div className="flex flex-col md:flex-row items-start justify-between mb-3 gap-3">
+                  <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4">
+                    <div className="flex flex-col md:flex-row items-start justify-between mb-2.5 gap-2.5">
                       <div className="flex items-center gap-2 flex-wrap">
                         {task?.category && (
-                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#0A6E5C] text-xs font-bold border border-emerald-200">
+                          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#0A6E5C] text-[11px] font-bold border border-emerald-200">
                             {getCategoryIcon(task.category)}
                             {task.category}
                           </span>
@@ -512,26 +511,26 @@ const TaskBidDetails = () => {
                           <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">
                             Poster's Budget
                           </p>
-                          <p className="text-2xl font-extrabold text-gray-900">
+                          <p className="text-lg sm:text-xl font-extrabold text-gray-900">
                             ₹{Number(task.budget).toLocaleString("en-IN")}
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-snug mb-3">
+                    <h2 className="text-base sm:text-lg font-extrabold text-gray-900 leading-snug mb-2">
                       {task?.title || "Task Title"}
                     </h2>
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                       {task?.createdAt && (
                         <span className="flex items-center gap-1.5">
-                          <Calendar size={13} />
+                          <Calendar size={12} />
                           Posted {formatDate(task.createdAt)}
                         </span>
                       )}
                       {task?.address?.city && (
                         <span className="flex items-center gap-1.5">
-                          <MapPin size={13} className="text-[#0A6E5C]" />
+                          <MapPin size={12} className="text-[#0A6E5C]" />
                           {[task.address.landmark, task.address.city]
                             .filter(Boolean)
                             .join(", ")}
@@ -540,11 +539,11 @@ const TaskBidDetails = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                  <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
                       Full Description
                     </p>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-3">
                       {task?.description || "No description provided."}
                     </p>
 
@@ -552,27 +551,27 @@ const TaskBidDetails = () => {
                       <PhotoGallery photos={task.images} />
                     )}
 
-                    <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                    <div className="mt-3.5 pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
                       {task?.deadline && (
                         <div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">
                             Completion Deadline
                           </p>
-                          <div className="flex items-center gap-1.5 text-sm font-bold text-gray-800">
-                            <Calendar size={14} className="text-[#0A6E5C]" />
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-800">
+                            <Calendar size={13} className="text-[#0A6E5C]" />
                             By {formatDate(task.deadline)}
                           </div>
                         </div>
                       )}
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">
                           Urgency
                         </p>
                         <div
-                          className={`flex items-center gap-1.5 text-sm font-bold ${isUrgent ? "text-red-600" : "text-gray-500"
+                          className={`flex items-center gap-1.5 text-xs sm:text-sm font-bold ${isUrgent ? "text-red-600" : "text-gray-500"
                             }`}
                         >
-                          <Zap size={14} />
+                          <Zap size={13} />
                           {isUrgent
                             ? "High Priority"
                             : task?.urgencyLevel === "low"
@@ -589,7 +588,7 @@ const TaskBidDetails = () => {
                   />
                 </div>
 
-                <div className="w-full lg:w-80 xl:w-96 space-y-4 shrink-0">
+                <div className="w-full lg:w-72 xl:w-80 space-y-3 sm:space-y-3.5 shrink-0">
                   <YourBidCard bid={bid} taskTitle={task?.title} isWithdrawSuccess={setIsWithdrawSuccess} />
                   <CompetitionCard
                     bidCount={competitionData?.otherBidCount ?? task?.bidCount ?? 0}

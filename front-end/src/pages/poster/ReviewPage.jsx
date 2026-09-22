@@ -114,58 +114,58 @@ const ReviewPage = () => {
                     )}
 
                     {!isLoading && !isError && raw && (
-                        <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full">
+                        <div className="p-3 sm:p-5 lg:p-6 max-w-5xl mx-auto w-full">
 
-                            <div className="mb-5">
+                            <div className="mb-3 sm:mb-4">
                                 <button
                                     onClick={() => navigate(-1)}
-                                    className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium mb-4"
+                                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium mb-2"
                                 >
-                                    <ArrowLeft size={16} />
+                                    <ArrowLeft size={14} />
                                     Back
                                 </button>
-                                <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-widest mb-1">
+                                <p className="text-[10px] font-bold text-[#0A6E5C] uppercase tracking-widest mb-0.5">
                                     Review Worker
                                 </p>
-                                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                                <h1 className="text-lg sm:text-xl font-extrabold text-gray-900">
                                     Rate Your Experience
                                 </h1>
-                                <p className="text-sm text-gray-500 mt-1">{raw.title}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{raw.title}</p>
                             </div>
 
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4 flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-full bg-[#0A6E5C] flex items-center justify-center shrink-0">
-                                    <CheckCircle2 size={20} className="text-white" />
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2.5 mb-3.5">
+                                <div className="w-8 h-8 rounded-full bg-[#0A6E5C] flex items-center justify-center shrink-0">
+                                    <CheckCircle2 size={16} className="text-white" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-[#0A6E5C]">Payment Released Successfully!</p>
-                                    <p className="text-sm text-emerald-700">
+                                    <p className="font-bold text-[#0A6E5C] text-xs sm:text-sm">Payment Released Successfully!</p>
+                                    <p className="text-xs text-emerald-700">
                                         ₹{taskProps?.amount ?? 0} has been sent to {workerProps?.name ?? 'the worker'}.
                                     </p>
                                 </div>
                             </div>
 
                             {alreadyReviewed ? (
-                                <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 text-center">
-                                    <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center mx-auto mb-4">
-                                        <CheckCircle2 size={28} className="text-[#0A6E5C]" />
+                                <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-6 text-center">
+                                    <div className="w-12 h-12 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center mx-auto mb-3">
+                                        <CheckCircle2 size={22} className="text-[#0A6E5C]" />
                                     </div>
-                                    <p className="text-lg font-extrabold text-gray-900 mb-1">
+                                    <p className="text-base font-extrabold text-gray-900 mb-1">
                                         Already Reviewed
                                     </p>
-                                    <p className="text-sm text-gray-500 mb-5">
+                                    <p className="text-xs text-gray-500 mb-4">
                                         You have already submitted a review for this task.
                                     </p>
                                     <button
                                         onClick={() => navigate(`/poster/completed-task/${taskId}`)}
-                                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0A6E5C] text-white text-sm font-bold hover:bg-[#085e4e] transition-all"
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0A6E5C] text-white text-xs font-bold hover:bg-[#085e4e] transition-all"
                                     >
                                         View Task Details
                                     </button>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                                    <div className="lg:col-span-2 space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-3.5">
+                                    <div className="lg:col-span-2 space-y-3">
                                         {revieweeId && (
                                             <ReviewForm
                                                 taskId={taskId}

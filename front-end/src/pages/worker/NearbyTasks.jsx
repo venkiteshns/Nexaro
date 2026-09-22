@@ -57,41 +57,41 @@ const NearbyTasks = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <WorkerHeader />
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
 
-          <div className="mb-5">
-            <h1 className="text-[22px] font-extrabold text-gray-900">Nearby Tasks</h1>
-            <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-              <MapPin size={13} />
+          <div className="mb-3.5">
+            <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 tracking-tight">Nearby Tasks</h1>
+            <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+              <MapPin size={12} />
               Showing open tasks within 50 km of your service area
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-5 shadow-sm">
-            <Search size={16} className="text-gray-400 shrink-0" />
+          <div className="flex items-center gap-2 bg-white border border-gray-200/80 rounded-xl px-3.5 py-2 mb-3 shadow-xs">
+            <Search size={15} className="text-gray-400 shrink-0" />
             <input
               type="text"
               placeholder="Search for tasks (e.g. Plumbing, Electrical...)"
               value={searchText}
               onChange={handleSearchChange}
-              className="border-none outline-none bg-transparent text-sm text-gray-900 w-full placeholder-gray-400"
+              className="border-none outline-none bg-transparent text-xs text-gray-900 w-full placeholder-gray-400"
             />
             {searchText && (
               <button onClick={() => { setSearchText(""); setPage(1); }}>
-                <X size={15} className="text-gray-400 hover:text-gray-600 transition-colors" />
+                <X size={14} className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer" />
               </button>
             )}
           </div>
 
-          <div className="flex flex-wrap gap-2 items-center mb-5">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wide mr-1">
+          <div className="flex flex-wrap gap-1.5 items-center mb-3.5">
+            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mr-1">
               Category
             </span>
 
             <button
               onClick={() => handleCategoryChange(null)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${!selectedCategory
-                ? "bg-[#0A6E5C] text-white"
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${!selectedCategory
+                ? "bg-[#0A6E5C] text-white shadow-xs"
                 : "bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
                 }`}
             >
@@ -102,8 +102,8 @@ const NearbyTasks = () => {
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(selectedCategory === cat ? null : cat)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${selectedCategory === cat
-                  ? "bg-[#0A6E5C] text-white"
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${selectedCategory === cat
+                  ? "bg-[#0A6E5C] text-white shadow-xs"
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50 hover:text-[#0A6E5C]"
                   }`}
               >

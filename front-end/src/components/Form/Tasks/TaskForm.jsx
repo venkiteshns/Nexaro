@@ -46,8 +46,8 @@ const TaskForm = () => {
     <div>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmitForm)}>
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6">
-            <div className="space-y-5">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-4">
+            <div className="space-y-3.5 sm:space-y-4">
               <TaskDetails />
               <TaskPhotos />
               <LocationSelection SectionName={"Task Location"} />
@@ -59,11 +59,11 @@ const TaskForm = () => {
               budget={previewBudget}
             />
           </div>
-          <div className="mt-6 flex justify-center pb-4">
+          <div className="mt-4 flex justify-center pb-3">
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full max-w-lg py-4 rounded-2xl bg-[#0A6E5C] text-white font-semibold text-base hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#0A6E5C]/20 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full max-w-sm py-2.5 rounded-xl bg-[#0A6E5C] text-white font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-[#0A6E5C]/20 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading ? "Posting..." : "Post New Task"}
             </button>

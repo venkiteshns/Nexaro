@@ -74,11 +74,11 @@ const ActiveJob = () => {
                     <div className="flex-1 overflow-y-auto">
                         <ActiveJobHeader onBack={() => navigate('/worker/my-bids', { replace: true })} />
 
-                        <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4">
+                        <div className="p-3 sm:p-5 max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5">
                             <TaskOverviewHeader mainData={mainData} bid={bid} />
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                <div className="lg:col-span-2 space-y-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-3.5">
+                                <div className="lg:col-span-2 space-y-3">
                                     <PosterSummaryCard
                                         poster={poster}
                                         amount={bid?.amount ?? mainData.amount}

@@ -103,7 +103,7 @@ const WorkerCompletedTaskDetails = () => {
                     )}
 
                     {!isLoading && !isError && task && (
-                        <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4 pb-16">
+                        <div className="p-3 sm:p-5 lg:p-6 max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5 pb-12">
                             <TaskHeaderBanner
                                 title={task.title}
                                 backUrl="/worker/my-bids"
@@ -117,7 +117,7 @@ const WorkerCompletedTaskDetails = () => {
                                 poster={poster}
                             />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
                                 <FinalInvoiceCard
                                     invoice={invoice}
                                     isWorker={true}

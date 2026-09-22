@@ -82,7 +82,7 @@ export default function TransactionHistoryCard() {
 
     if (status === "failed") {
       return {
-        icon: <AlertCircle size={16} className="text-red-600" />,
+        icon: <AlertCircle size={14} className="text-red-600" />,
         iconBg: "bg-red-50 text-red-600",
         amountColor: "text-red-600",
         prefix: "",
@@ -93,7 +93,7 @@ export default function TransactionHistoryCard() {
 
     if (status === "pending" || type === "pending") {
       return {
-        icon: <Clock size={16} className="text-amber-600" />,
+        icon: <Clock size={14} className="text-amber-600" />,
         iconBg: "bg-amber-50 text-amber-600",
         amountColor: "text-amber-600",
         prefix: "",
@@ -104,7 +104,7 @@ export default function TransactionHistoryCard() {
 
     if (type === "withdrawn" || type === "withdrawal" || type === "to_worker") {
       return {
-        icon: <Building2 size={16} className="text-gray-600" />,
+        icon: <Building2 size={14} className="text-gray-600" />,
         iconBg: "bg-gray-100 text-gray-600",
         amountColor: "text-[#111827]",
         prefix: "-",
@@ -114,7 +114,7 @@ export default function TransactionHistoryCard() {
     }
 
     return {
-      icon: <ArrowDownLeft size={16} className="text-[#0A6E5C]" />,
+      icon: <ArrowDownLeft size={14} className="text-[#0A6E5C]" />,
       iconBg: "bg-emerald-50 text-[#0A6E5C]",
       amountColor: "text-[#0A6E5C]",
       prefix: "+",
@@ -124,43 +124,43 @@ export default function TransactionHistoryCard() {
   };
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between h-full min-h-[360px]">
+    <div className="bg-white border border-gray-200/80 rounded-2xl p-3.5 sm:p-4 lg:p-5 shadow-xs flex flex-col justify-between h-full">
       <div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-bold text-[#111827]">Transaction History</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Recent credits, payouts and pending invoices</p>
+            <h3 className="text-sm sm:text-base font-bold text-[#111827]">Transaction History</h3>
+            <p className="text-[11px] text-gray-400 mt-0.5">Recent credits, payouts and pending invoices</p>
           </div>
         </div>
 
-        <div className="divide-y divide-gray-50 mt-1">
+        <div className="divide-y divide-gray-50 mt-0.5">
           {isLoading ? (
-            <div className="py-16 flex flex-col items-center justify-center gap-3 text-center">
-              <Loader2 size={26} className="animate-spin text-[#0A6E5C]" />
+            <div className="py-12 flex flex-col items-center justify-center gap-2.5 text-center">
+              <Loader2 size={22} className="animate-spin text-[#0A6E5C]" />
               <p className="text-xs text-gray-400 font-medium">Loading transactions...</p>
             </div>
           ) : isError ? (
-            <div className="py-12 flex flex-col items-center justify-center gap-3 text-center px-4">
-              <div className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center text-red-500">
-                <AlertCircle size={20} />
+            <div className="py-8 flex flex-col items-center justify-center gap-2.5 text-center px-4">
+              <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
+                <AlertCircle size={16} />
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">Failed to load transactions</p>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs font-bold text-gray-800">Failed to load transactions</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">
                   {error?.data?.message || "An unexpected error occurred while fetching records."}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => refetch()}
-                className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0A6E5C] hover:bg-[#085a4b] text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                className="mt-1 inline-flex items-center gap-1 px-2.5 py-1 bg-[#0A6E5C] hover:bg-[#085a4b] text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer"
               >
-                <RefreshCw size={12} />
+                <RefreshCw size={11} />
                 Try Again
               </button>
             </div>
           ) : transactionsData.length === 0 ? (
-            <div className="py-14 text-center text-gray-400 text-xs">
+            <div className="py-10 text-center text-gray-400 text-xs">
               No transactions found.
             </div>
           ) : (
@@ -173,30 +173,30 @@ export default function TransactionHistoryCard() {
               return (
                 <div
                   key={tx._id || tx.id}
-                  className="py-3.5 sm:py-4 flex items-center justify-between gap-3 hover:bg-[#F6FAF8] -mx-2 px-2 rounded-2xl transition-colors"
+                  className="py-2.5 sm:py-3 flex items-center justify-between gap-3 hover:bg-[#F6FAF8] -mx-1.5 px-1.5 rounded-xl transition-colors"
                 >
-                  <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${config.iconBg}`}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${config.iconBg}`}
                     >
                       {config.icon}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-[#111827] truncate leading-tight">
+                      <p className="text-xs sm:text-sm font-bold text-[#111827] truncate leading-tight">
                         {title}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-[10px] sm:text-[11px] text-gray-400 mt-0.5">
                         {formattedDate} • {category}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-sm font-extrabold ${config.amountColor}`}>
+                    <p className={`text-xs sm:text-sm font-extrabold ${config.amountColor}`}>
                       {config.prefix}₹{Number(tx.amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </p>
                     <span
-                      className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${config.badge}`}
+                      className={`inline-block mt-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold border uppercase tracking-wider ${config.badge}`}
                     >
                       {config.statusText}
                     </span>
@@ -209,8 +209,8 @@ export default function TransactionHistoryCard() {
       </div>
 
       {!isLoading && !isError && totalTransactions > 0 && (
-        <div className="pt-4 border-t border-gray-100 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-400">
+        <div className="pt-3 border-t border-gray-100 mt-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[11px] text-gray-400">
             Showing <span className="font-semibold text-gray-700">{startIndex + 1}</span>–
             <span className="font-semibold text-gray-700">
               {Math.min(startIndex + ITEMS_PER_PAGE, totalTransactions)}

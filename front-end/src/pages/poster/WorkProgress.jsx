@@ -159,51 +159,51 @@ const WorkProgress = () => {
                 {(!isLoading && !isError) && <div className="flex-1 overflow-y-auto">
 
                     <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200
-                                    px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+                                    px-3.5 sm:px-5 py-2 flex items-center justify-between gap-3">
                         <button
                             onClick={() => navigate('/poster/my-tasks', { replace: true })}
-                            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium"
+                            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0A6E5C] transition-colors font-medium"
                         >
-                            <ArrowLeft size={16} />
+                            <ArrowLeft size={14} />
                             <span className="hidden sm:inline">Back to My Tasks</span>
                             <span className="sm:hidden">Back</span>
                         </button>
 
-                        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                                         bg-emerald-50 border border-emerald-200 text-[#0A6E5C] text-xs font-bold">
+                        <span className="flex items-center gap-1 px-2.5 py-1 rounded-full
+                                         bg-emerald-50 border border-emerald-200 text-[#0A6E5C] text-[11px] font-bold">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             WORK IN PROGRESS
                         </span>
                     </div>
 
-                    <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-5">
+                    <div className="p-3 sm:p-5 lg:p-6 max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5">
 
                         <div>
-                            <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-widest mb-1">
+                            <p className="text-[10px] font-bold text-[#0A6E5C] uppercase tracking-widest mb-0.5">
                                 Task Progress
                             </p>
-                            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                            <h1 className="text-lg sm:text-xl font-extrabold text-gray-900">
                                 {mainData?.title}
                             </h1>
                         </div>
 
-                        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4 sm:px-8 py-5 overflow-x-auto">
-                            <div className="flex items-center min-w-[380px]">
+                        <div className="bg-white border border-gray-200 rounded-xl shadow-xs px-3.5 sm:px-6 py-3.5 overflow-x-auto">
+                            <div className="flex items-center min-w-[340px]">
                                 {steps.map((step, idx) => {
                                     const Icon = step.icon;
                                     return (
                                         <Fragment key={step.key}>
-                                            <div className="flex flex-col items-center gap-2 shrink-0">
+                                            <div className="flex flex-col items-center gap-1.5 shrink-0">
                                                 <div
-                                                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all
+                                                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all
                                                         ${step.done
                                                             ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white'
                                                             : step.active
-                                                                ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white shadow-lg shadow-emerald-200 animate-pulse'
+                                                                ? 'bg-[#0A6E5C] border-[#0A6E5C] text-white shadow-sm shadow-emerald-200 animate-pulse'
                                                                 : 'bg-gray-100 border-gray-300 text-gray-400'
                                                         }`}
                                                 >
-                                                    <Icon size={16} />
+                                                    <Icon size={14} />
                                                 </div>
                                                 <span
                                                     className={`text-[8px] sm:text-[9px] font-bold tracking-wider text-center whitespace-nowrap
@@ -228,76 +228,76 @@ const WorkProgress = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
 
-                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5
+                            <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4
                                             sm:col-span-2 lg:col-span-1">
-                                <div className="flex items-center gap-4 sm:flex-col sm:items-center sm:text-center lg:flex-col lg:items-center lg:text-center">
-                                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 border-2 border-emerald-100
+                                <div className="flex items-center gap-3 sm:flex-col sm:items-center sm:text-center lg:flex-col lg:items-center lg:text-center">
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-50 border-2 border-emerald-100
                                                     flex items-center justify-center overflow-hidden shrink-0">
                                         {workerData?.selfie ? (
                                             <img src={workerData?.selfie} alt={workerData?.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-2xl sm:text-3xl font-extrabold text-[#0A6E5C]">
+                                            <span className="text-xl sm:text-2xl font-extrabold text-[#0A6E5C]">
                                                 {workerData?.name?.charAt(0)}
                                             </span>
                                         )}
                                     </div>
 
                                     <div className="flex-1 sm:flex-none">
-                                        <p className="font-bold text-gray-900 text-base">{workerData?.name}</p>
-                                        <div className="flex items-center gap-1 mt-1 sm:justify-center">
-                                            <Star size={12} fill="#FBBF24" color="#FBBF24" />
-                                            <span className="text-sm font-bold text-gray-700">{workerData?.rating}</span>
-                                            <span className="text-xs text-gray-400">({workerData?.completedJobs} jobs)</span>
+                                        <p className="font-bold text-gray-900 text-sm sm:text-base">{workerData?.name}</p>
+                                        <div className="flex items-center gap-1 mt-0.5 sm:justify-center">
+                                            <Star size={11} fill="#FBBF24" color="#FBBF24" />
+                                            <span className="text-xs font-bold text-gray-700">{workerData?.rating}</span>
+                                            <span className="text-[11px] text-gray-400">({workerData?.completedJobs} jobs)</span>
                                         </div>
 
-                                        <div className="mt-2 sm:hidden">
+                                        <div className="mt-1.5 sm:hidden">
                                             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Agreed Bid</p>
-                                            <p className="text-xl font-extrabold text-gray-900">₹{bid?.amount}</p>
+                                            <p className="text-lg font-extrabold text-gray-900">₹{bid?.amount}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="hidden sm:block w-full mt-3 text-center">
-                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Agreed Bid</p>
-                                    <p className="text-2xl font-extrabold text-gray-900">₹{bid?.amount}</p>
+                                <div className="hidden sm:block w-full mt-2 text-center">
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Agreed Bid</p>
+                                    <p className="text-lg sm:text-xl font-extrabold text-gray-900">₹{bid?.amount}</p>
                                 </div>
 
                                 <a
                                     href={`tel:${workerData?.phone}`}
-                                    className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5
-                                               border border-gray-200 rounded-xl text-sm font-semibold text-gray-700
+                                    className="w-full mt-3 flex items-center justify-center gap-1.5 px-3 py-1.5
+                                               border border-gray-200 rounded-lg text-xs font-semibold text-gray-700
                                                hover:border-[#0A6E5C] hover:text-[#0A6E5C] hover:bg-emerald-50 transition-all"
                                 >
-                                    <Phone size={14} />
+                                    <Phone size={13} />
                                     Contact Worker
                                 </a>
                             </div>
 
-                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                                <div className="flex items-center justify-between mb-3">
-                                    <p className="font-bold text-gray-900 text-sm">Job Checklist</p>
+                            <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4">
+                                <div className="flex items-center justify-between mb-2.5">
+                                    <p className="font-bold text-gray-900 text-xs sm:text-sm">Job Checklist</p>
                                     <span className="text-xs font-bold text-[#0A6E5C]">{pct}% Done</span>
                                 </div>
 
-                                <div className="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
+                                <div className="h-1.5 bg-gray-100 rounded-full mb-3 overflow-hidden">
                                     <div
                                         className="h-full bg-[#0A6E5C] rounded-full transition-all duration-500"
                                         style={{ width: `${pct}%` }}
                                     />
                                 </div>
 
-                                <ul className="space-y-2.5">
+                                <ul className="space-y-2">
                                     {displayChecklist.map((item) => (
-                                        <li key={item.id} className="flex items-center gap-2.5">
+                                        <li key={item.id} className="flex items-center gap-2">
                                             {item.done ? (
-                                                <CheckCircle size={16} className="text-[#0A6E5C] shrink-0" />
+                                                <CheckCircle size={14} className="text-[#0A6E5C] shrink-0" />
                                             ) : (
-                                                <Circle size={16} className="text-gray-300 shrink-0" />
+                                                <Circle size={14} className="text-gray-300 shrink-0" />
                                             )}
                                             <span
-                                                className={`text-sm ${item.done ? 'text-gray-700 font-medium' : 'text-gray-400'}`}
+                                                className={`text-xs ${item.done ? 'text-gray-700 font-medium' : 'text-gray-400'}`}
                                             >
                                                 {item.label}
                                             </span>
@@ -306,10 +306,10 @@ const WorkProgress = () => {
                                 </ul>
                             </div>
 
-                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                                <p className="font-bold text-gray-900 text-sm mb-4">Timeline</p>
+                            <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4">
+                                <p className="font-bold text-gray-900 text-xs sm:text-sm mb-3">Timeline</p>
 
-                                <div className="space-y-3">
+                                <div className="space-y-2.5">
                                     {[
                                         { icon: Clock, label: 'POSTED', value: new Date(mainData?.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) },
                                         { icon: Calendar, label: 'EST. DURATION', value: bid?.eta },
@@ -317,12 +317,12 @@ const WorkProgress = () => {
                                     ].map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="flex items-start justify-between gap-2">
                                             <div className="flex items-center gap-1.5">
-                                                <Icon size={13} className="text-[#0A6E5C] shrink-0" />
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                                <Icon size={12} className="text-[#0A6E5C] shrink-0" />
+                                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
                                                     {label}
                                                 </span>
                                             </div>
-                                            <span className="text-xs font-semibold text-gray-700 text-right">{value}</span>
+                                            <span className="text-[11px] font-semibold text-gray-700 text-right">{value}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -330,13 +330,13 @@ const WorkProgress = () => {
                         </div>
 
                         {(released || update === 'payment') ? (
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 sm:px-6 py-5
-                                            flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle size={24} className="text-[#0A6E5C] shrink-0" />
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 sm:px-5 py-3.5
+                                            flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-2.5">
+                                    <CheckCircle size={20} className="text-[#0A6E5C] shrink-0" />
                                     <div>
-                                        <p className="font-bold text-[#0A6E5C]">Payment Released!</p>
-                                        <p className="text-sm text-emerald-700 mt-0.5">
+                                        <p className="font-bold text-[#0A6E5C] text-xs sm:text-sm">Payment Released!</p>
+                                        <p className="text-xs text-emerald-700 mt-0.5">
                                             ₹{bid?.amount}.00 has been transferred to {workerData?.name}.
                                         </p>
                                     </div>
@@ -344,36 +344,36 @@ const WorkProgress = () => {
 
                                 <button
                                     onClick={() => navigate(`/poster/review/${taskId}`)}
-                                    className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-[#0A6E5C] text-white
-                                               text-sm font-bold hover:bg-[#085e4e] active:scale-[0.98]
-                                               transition-all duration-150 shadow-md whitespace-nowrap shrink-0"
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0A6E5C] text-white
+                                               text-xs font-bold hover:bg-[#085e4e] active:scale-[0.98]
+                                               transition-all duration-150 shadow-xs whitespace-nowrap shrink-0"
                                 >
                                     Write a Review
-                                    <ChevronRight size={16} />
+                                    <ChevronRight size={14} />
                                 </button>
                             </div>
                         ) : (
-                            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm px-5 sm:px-6 py-5
-                                            flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4
+                                            flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                 <div>
-                                    <h2 className="text-base sm:text-lg font-extrabold text-gray-900 mb-1">
+                                    <h2 className="text-xs sm:text-sm font-extrabold text-gray-900 mb-0.5">
                                         Complete Payment &amp; Release Escrow
                                     </h2>
-                                    <p className="text-sm text-gray-500 leading-relaxed max-w-md">
+                                    <p className="text-xs text-gray-500 leading-relaxed max-w-md">
                                         Confirm that the work has been completed to your satisfaction. The funds
                                         will be released to {workerData?.name} immediately after confirmation.
                                     </p>
                                 </div>
 
-                                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start w-full sm:w-auto gap-3 sm:gap-2 shrink-0">
+                                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start w-full sm:w-auto gap-2.5 sm:gap-1.5 shrink-0">
                                     <div className="sm:text-right">
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                                             Amount Held
                                         </p>
-                                        <div className="flex items-baseline sm:justify-end gap-1.5">
-                                            <span className="text-xl sm:text-2xl font-extrabold text-gray-900">₹{bid?.amount}.00</span>
+                                        <div className="flex items-baseline sm:justify-end gap-1">
+                                            <span className="text-lg sm:text-xl font-extrabold text-gray-900">₹{bid?.amount}.00</span>
                                             {bid?.amount && (
-                                                <span className="text-xs sm:text-sm font-semibold text-gray-500">
+                                                <span className="text-xs font-semibold text-gray-500">
                                                     ({formatInrToUsd(bid.amount)})
                                                 </span>
                                             )}
@@ -384,18 +384,18 @@ const WorkProgress = () => {
                                         <button
                                             disabled={!isCompleted}
                                             onClick={() => setShowReleaseModal(true)}
-                                            className={`flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-sm font-bold whitespace-nowrap transition-all duration-150 ${
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-150 ${
                                                 isCompleted
-                                                    ? 'bg-[#0A6E5C] text-white hover:bg-[#085e4e] active:scale-[0.98] shadow-md cursor-pointer'
+                                                    ? 'bg-[#0A6E5C] text-white hover:bg-[#085e4e] active:scale-[0.98] shadow-xs cursor-pointer'
                                                     : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed shadow-none'
                                             }`}
                                             title={!isCompleted ? 'Payment can be released once the job is marked completed' : ''}
                                         >
                                             Release Payment
-                                            <ChevronRight size={16} />
+                                            <ChevronRight size={14} />
                                         </button>
                                         {!isCompleted && (
-                                            <p className="text-[11px] text-gray-400 text-center sm:text-right">
+                                            <p className="text-[10px] text-gray-400 text-center sm:text-right">
                                                 Available once task is completed
                                             </p>
                                         )}

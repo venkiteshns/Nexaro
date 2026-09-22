@@ -32,14 +32,14 @@ const TaskDetails = () => {
 
     return (
         <div>
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-                <h2 className="flex items-center gap-2 text-[#111827] font-semibold mb-5">
-                    <ClipboardList size={18} className="text-[#0A6E5C]" />
+            <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-gray-100 shadow-xs">
+                <h2 className="flex items-center gap-2 text-sm sm:text-base text-[#111827] font-bold mb-3">
+                    <ClipboardList size={16} className="text-[#0A6E5C]" />
                     Task Details
                 </h2>
 
-                <div className="mb-4">
-                    <label className="block text-sm text-gray-500 mb-2 font-medium">
+                <div className="mb-3">
+                    <label className="block text-xs text-gray-500 mb-1 font-medium">
                         Task Title
                     </label>
                     <input
@@ -50,14 +50,14 @@ const TaskDetails = () => {
                             maxLength: { value: 250, message: "Title cannot exceed 250 characters" }
                         })}
                         placeholder="e.g., Professional Home Deep Cleaning"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] placeholder-gray-400 text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[#111827] placeholder-gray-400 text-xs sm:text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
                     />
                     <FormError error={errors?.taskTitle} />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <div>
-                        <label className="block text-sm text-gray-500 mb-2 font-medium">
+                        <label className="block text-xs text-gray-500 mb-1 font-medium">
                             Category
                         </label>
                         <div className="relative">
@@ -65,7 +65,7 @@ const TaskDetails = () => {
                                 {...register('category', {
                                     required: "Please select a category"
                                 })}
-                                className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors cursor-pointer pr-10"
+                                className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[#111827] text-xs sm:text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors cursor-pointer pr-8"
                             >
                                 <option value="" className='text-xs text-slate-600' >Select Category</option>
                                 {categories.map((cat) => (
@@ -76,18 +76,18 @@ const TaskDetails = () => {
                             </select>
                             <FormError error={errors?.category} />
                             <ChevronDown
-                                size={16}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                                size={14}
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm text-gray-500 mb-2 font-medium">
+                        <label className="block text-xs text-gray-500 mb-1 font-medium">
                             Budget (Estimated)
                         </label>
                         <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-medium">
                                 ₹
                             </span>
                             <input
@@ -98,16 +98,16 @@ const TaskDetails = () => {
                                     max: { value: 100000, message: "Budget cannot exceed 100000" }
                                 })}
                                 placeholder="5,000"
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-[#111827] placeholder-gray-400 text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-[#111827] placeholder-gray-400 text-xs sm:text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
                             />
                             <FormError error={errors?.budget} />
                         </div>
                     </div>
                 </div>
 
-                <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm text-gray-500 font-medium">
+                <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-gray-500 font-medium">
                             Description
                         </label>
                         <span className="text-xs text-gray-400">
@@ -120,15 +120,15 @@ const TaskDetails = () => {
                             maxLength: { value: 1000, message: "Description cannot exceed 1000 characters" }
                         })}
                         placeholder="Detail the work, required skills, and expectations..."
-                        rows={5}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] placeholder-gray-400 text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors resize-none"
+                        rows={3}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[#111827] placeholder-gray-400 text-xs sm:text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors resize-none"
                     />
                     <FormError error={errors?.description} />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label className="block text-sm text-gray-500 mb-2 font-medium">
+                        <label className="block text-xs text-gray-500 mb-1 font-medium">
                             Preferred Deadline
                         </label>
                         <input
@@ -148,24 +148,24 @@ const TaskDetails = () => {
                                 }
                             })}
                             type="date"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[#111827] text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[#111827] text-xs sm:text-sm outline-none focus:border-[#0A6E5C] focus:bg-white transition-colors"
                         />
                         <FormError error={errors?.deadline} />
                     </div>
 
                     <div>
-                        <label className="block text-sm text-gray-500 mb-2 font-medium">
+                        <label className="block text-xs text-gray-500 mb-1 font-medium">
                             Urgency Level
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5">
                             {["flexible", "normal", "urgent"].map((level) => (
                                 <button type='button'
                                     key={level}
                                     onClick={() => {
                                         setValue('urgency', level, { shouldValidate: true });
                                     }}
-                                    className={`flex-1 py-3 rounded-xl text-sm font-medium capitalize transition-all ${urgency === level
-                                        ? "bg-[#0A6E5C] text-white shadow-sm"
+                                    className={`flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all ${urgency === level
+                                        ? "bg-[#0A6E5C] text-white shadow-xs"
                                         : "bg-gray-50 border border-gray-200 text-gray-600 hover:border-[#0A6E5C]/50 hover:text-[#0A6E5C]"
                                         }`}
                                 >

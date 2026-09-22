@@ -15,7 +15,8 @@ import {
   markWorkerNotificationReadService,
   getWorkerUnreadCountService,
   getWorkerHeaderStatusService,
-  toggleWorkerLiveStatusService
+  toggleWorkerLiveStatusService,
+  getWorkerDashboardService
 } from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
 
@@ -533,4 +534,30 @@ export const toggleWorkerLiveStatus = async (req, res) => {
         });
     }
 };
+
+export const getWorkerDashboard = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const category = req.query.category || "";
+        const result = await getWorkerDashboardService({ userId, category });
+        if (result?.error) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.error,
+            });
+        }
+        return res.status(STATUS_CODES.OK).json({
+            success: true,
+            message: MESSAGES.WORKER_DASHBOARD_FETCHED,
+            data: result,
+        });
+    } catch (error) {
+        console.error("getWorkerDashboard controller error:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.INTERNAL_SERVER_ERROR,
+        });
+    }
+};
+
 

@@ -10,12 +10,12 @@ const PostTask = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <PosterHeader />
 
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#111827]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+          <div className="mb-3 sm:mb-4">
+            <h1 className="text-lg sm:text-xl font-extrabold text-[#111827]">
               Post a New Task
             </h1>
-            <p className="text-gray-500 mt-1 text-sm">
+            <p className="text-gray-500 mt-0.5 text-xs">
               Describe your task clearly to attract the best workers near you.
             </p>
           </div>
