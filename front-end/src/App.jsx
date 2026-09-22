@@ -21,6 +21,7 @@ import ReviewPage from "./pages/poster/ReviewPage.jsx";
 import PosterNotifications from "./pages/poster/PosterNotifications.jsx";
 import PosterPayments from "./pages/poster/PosterPayments.jsx";
 
+import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
 import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
 import PlaceBid from "./pages/worker/PlaceBid.jsx";
 import MyBids from "./pages/worker/MyBids.jsx";
@@ -102,8 +103,8 @@ function AppInner() {
 
           <Route element={<PrivateRoute allowedRoles="worker" />}>
             <Route path="/worker">
-              <Route index element={<Navigate to="/worker/nearby-tasks" replace />} />
-              <Route path="dashboard" element={<Navigate to="/worker/nearby-tasks" replace />} />
+              <Route index element={<Navigate to="/worker/dashboard" replace />} />
+              <Route path="dashboard" element={<WorkerDashboard />} />
               <Route path="nearby-tasks" element={<NearbyTasks />} />
               <Route path="place-bid/:taskId" element={<PlaceBid />} />
               <Route path="task-details/:taskId" element={<PlaceBid />} />

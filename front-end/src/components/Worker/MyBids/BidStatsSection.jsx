@@ -3,7 +3,7 @@ import BidStatCard from './BidStatCard';
 
 export default function BidStatsSection({ counts, winRate }) {
     return (
-        <div className="flex gap-3 mb-5 flex-wrap">
+        <div className="flex gap-2.5 sm:gap-3 mb-3.5 flex-wrap">
             <BidStatCard
                 icon={<Briefcase size={20} />}
                 count={counts.all}

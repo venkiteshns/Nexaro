@@ -24,21 +24,21 @@ const RatingBreakdown = ({ overallRating = 0, totalReviews = 0, breakdown }) => 
     }
     const ratingBreakdown = getBreakDown(breakdown) || RATING_BREAKDOWN;
     return (
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-3 sm:p-5 md:p-6">
-            <div className="flex flex-row gap-4 sm:gap-10 items-center">
+        <div className="bg-white border border-gray-100 rounded-xl shadow-xs p-3 sm:p-4">
+            <div className="flex flex-row gap-3 sm:gap-6 items-center">
 
                 <div className="flex flex-col items-center shrink-0 text-center">
-                    <span className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-[#0A6E5C] leading-none">
+                    <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0A6E5C] leading-none">
                         {overallRating}
                     </span>
-                    <StarRow rating={5} size={14} />
-                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Based on {totalReviews} reviews</p>
+                    <StarRow rating={5} size={12} />
+                    <p className="text-[10px] text-gray-400 mt-1">Based on {totalReviews} reviews</p>
                 </div>
 
-                <div className="flex-1 w-full space-y-1.5 sm:space-y-2.5">
+                <div className="flex-1 w-full space-y-1.5">
                     {ratingBreakdown.map(({ stars, percent }) => (
-                        <div key={stars} className="flex items-center gap-1.5 sm:gap-3">
-                            <span className="text-[9px] sm:text-[11px] font-semibold text-gray-500 w-8 sm:w-12 shrink-0 text-right">
+                        <div key={stars} className="flex items-center gap-1.5 sm:gap-2.5">
+                            <span className="text-[9px] sm:text-[10px] font-semibold text-gray-500 w-7 sm:w-9 shrink-0 text-right">
                                 {stars}★
                             </span>
                             <div className="flex-1 h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">

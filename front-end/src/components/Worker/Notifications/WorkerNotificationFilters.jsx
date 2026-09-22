@@ -37,8 +37,8 @@ const WorkerNotificationFilters = ({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2 md:p-2.5 rounded-2xl border border-gray-200 shadow-xs mb-6">
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-1.5 sm:p-2 rounded-xl border border-gray-200/80 shadow-xs">
+      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
         {FILTER_TABS.map((tab) => {
           const isActive = activeFilter === tab.id;
           const count = getTabCount(tab.id);
@@ -47,7 +47,7 @@ const WorkerNotificationFilters = ({
             <button
               key={tab.id}
               onClick={() => onFilterChange(tab.id)}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                 isActive
                   ? "bg-[#0A6E5C] text-white shadow-xs"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -55,7 +55,7 @@ const WorkerNotificationFilters = ({
             >
               {tab.hasDot && (
                 <span
-                  className={`w-2 h-2 rounded-full ${
+                  className={`w-1.5 h-1.5 rounded-full ${
                     unread > 0 ? "bg-emerald-400 animate-pulse" : "bg-gray-300"
                   }`}
                 />
@@ -63,7 +63,7 @@ const WorkerNotificationFilters = ({
               <span>{tab.label}</span>
               {count > 0 && (
                 <span
-                  className={`px-1.5 py-0.2 rounded-full text-[11px] font-bold ${
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                     isActive
                       ? "bg-white/20 text-white"
                       : "bg-gray-100 text-gray-600"
@@ -77,13 +77,13 @@ const WorkerNotificationFilters = ({
         })}
       </div>
 
-      <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+      <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
         <button
           onClick={onMarkAllRead}
           disabled={unread === 0 || isMarkingAllRead}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-emerald-50 hover:text-[#0A6E5C] hover:border-emerald-200 disabled:opacity-40 disabled:pointer-events-none transition-all"
+          className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-emerald-50 hover:text-[#0A6E5C] hover:border-emerald-200 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer"
         >
-          <CheckCheck size={14} className={unread > 0 ? "text-[#0A6E5C]" : ""} />
+          <CheckCheck size={13} className={unread > 0 ? "text-[#0A6E5C]" : ""} />
           <span>{isMarkingAllRead ? "Marking..." : "Mark all as read"}</span>
         </button>
       </div>

@@ -49,6 +49,7 @@ const MESSAGES = {
     ACCESS_RESTRICTED_ADMIN: "Access restricted to admins only",
 
     WORKER_REGISTERED: "Worker registered successfully",
+    WORKER_DASHBOARD_FETCHED: "Worker dashboard data fetched successfully",
     NEARBY_TASKS_FETCHED: "Nearby tasks fetched successfully",
     TASK_FETCHED: "Task fetched successfully",
     SERVICE_AREA_NOT_SET: "Worker service area location is not set. Please update your profile.",

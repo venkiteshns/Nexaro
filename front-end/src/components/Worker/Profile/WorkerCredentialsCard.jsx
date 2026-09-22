@@ -1,16 +1,16 @@
 import { ShieldCheck, Phone, MapPin, CheckCircle, TriangleAlert } from 'lucide-react';
 
 const CredentialRow = ({ icon, label, detail, verified }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
-        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${verified ? 'bg-emerald-50' : 'bg-gray-50'}`}>
+    <div className="flex items-start gap-2.5 py-2 border-b border-gray-100 last:border-0">
+        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${verified ? 'bg-emerald-50' : 'bg-gray-50'}`}>
             {icon}
         </div>
         <div className="flex-1 min-w-0">
-            <p className="text-xs md:text-sm font-semibold text-gray-900">{label}</p>
-            {detail && <p className="text-xs text-gray-400 mt-0.5 truncate">{detail}</p>}
+            <p className="text-xs font-semibold text-gray-900">{label}</p>
+            {detail && <p className="text-[11px] text-gray-400 mt-0.5 truncate">{detail}</p>}
         </div>
         {verified && (
-            <CheckCircle size={13} className="text-[#0A6E5C] shrink-0 mt-0.5 md:w-4 md:h-4" />
+            <CheckCircle size={12} className="text-[#0A6E5C] shrink-0 mt-0.5" />
         )}
     </div>
 );
@@ -22,34 +22,34 @@ const WorkerCredentialsCard = ({ credentials }) => {
     const isVerified = credentials.isVerified || false;
 
     return (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-            <div className="flex items-center gap-2 mb-1">
-                <div className={`w-7 h-7 md:w-8 md:h-8 rounded-xl ${isVerified ? "bg-emerald-50" : "bg-amber-100"} flex items-center justify-center`}>
-                    {isVerified ? <ShieldCheck size={13} className="text-[#0A6E5C] md:w-4 md:h-4" /> : <TriangleAlert size={13} className='text-amber-700 md:w-4 md:h-4' />}
+        <div className="bg-white border border-gray-200/80 rounded-xl shadow-xs p-3.5 sm:p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+                <div className={`w-6 h-6 rounded-lg ${isVerified ? "bg-emerald-50" : "bg-amber-100"} flex items-center justify-center`}>
+                    {isVerified ? <ShieldCheck size={12} className="text-[#0A6E5C]" /> : <TriangleAlert size={12} className='text-amber-700' />}
                 </div>
-                <h2 className="font-extrabold text-gray-900 text-sm md:text-base">{isVerified ? "Verified Credentials" : <> Credentials <span className="ms-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-amber-100/80 text-amber-700 border border-amber-200 shadow-sm">
+                <h2 className="font-bold text-gray-900 text-xs sm:text-sm">{isVerified ? "Verified Credentials" : <> Credentials <span className="ms-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100/80 text-amber-700 border border-amber-200 shadow-2xs">
                     Verification Pending
                 </span> </>}</h2>
             </div>
 
-            <div className="mt-2">
+            <div className="mt-1">
                 <CredentialRow
-                    icon={<ShieldCheck size={12} className="text-[#0A6E5C] md:w-[15px] md:h-[15px]" />}
+                    icon={<ShieldCheck size={12} className="text-[#0A6E5C]" />}
                     label={isVerified ? "Identity Verified" : "Email"}
                     detail={email}
-                    isVerified
+                    verified
                 />
                 <CredentialRow
-                    icon={<Phone size={12} className="text-[#0A6E5C] md:w-[15px] md:h-[15px]" />}
+                    icon={<Phone size={12} className="text-[#0A6E5C]" />}
                     label="Phone"
                     detail={phone}
-                    isVerified
+                    verified
                 />
                 <CredentialRow
-                    icon={<MapPin size={12} className="text-[#0A6E5C] md:w-[15px] md:h-[15px]" />}
+                    icon={<MapPin size={12} className="text-[#0A6E5C]" />}
                     label="Location"
                     detail={address}
-                    isVerified
+                    verified
                 />
             </div>
         </div>

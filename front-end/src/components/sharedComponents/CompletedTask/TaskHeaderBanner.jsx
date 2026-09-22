@@ -11,30 +11,30 @@ const TaskHeaderBanner = ({
     const navigate = useNavigate();
 
     return (
-        <div className="mb-6">
+        <div className="mb-3 sm:mb-4">
             <button
                 onClick={() => navigate(backUrl)}
-                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-semibold mb-4"
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0A6E5C] transition-colors font-semibold mb-2 sm:mb-2.5"
             >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={14} />
                 {backText}
             </button>
 
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2.5 sm:gap-3">
                 <div>
-                    <p className="text-xs font-bold text-[#0A6E5C] uppercase tracking-widest mb-1">
+                    <p className="text-[10px] font-bold text-[#0A6E5C] uppercase tracking-widest mb-0.5">
                         {tagText}
                     </p>
-                    <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
+                    <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 leading-tight">
                         Completed Task Details
                     </h1>
                     {title && (
-                        <p className="text-sm text-gray-500 mt-1 font-medium">{title}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-0.5 font-medium">{title}</p>
                     )}
                 </div>
 
-                <span className="self-start flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-[#0A6E5C] text-xs font-bold shrink-0 shadow-xs">
-                    <CheckCircle size={14} />
+                <span className="self-start flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#0A6E5C] text-[11px] font-bold shrink-0 shadow-xs">
+                    <CheckCircle size={12} />
                     {badgeText}
                 </span>
             </div>

@@ -36,13 +36,13 @@ const WorkerAllReviews = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <WorkerHeader />
 
-                <div className="flex-1 overflow-y-auto px-4 md:px-6 pb-4 md:pb-6">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
                     <div>
 
-                        <div className="mb-4 sm:mb-6 pt-3 sm:pt-4 md:pt-6">
+                        <div className="mb-3 sm:mb-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[#0A6E5C] transition-colors mb-2 sm:mb-3 group"
+                                className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[#0A6E5C] transition-colors mb-1.5 sm:mb-2 group"
                             >
                                 <ArrowLeft
                                     size={13}
@@ -50,25 +50,25 @@ const WorkerAllReviews = () => {
                                 />
                                 Back to Profile
                             </button>
-                            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0A6E5C]">
+                            <h1 className="text-lg sm:text-xl font-extrabold text-[#0A6E5C]">
                                 My Reviews
                             </h1>
-                            <p className="text-xs sm:text-sm text-gray-400 mt-0.5">
+                            <p className="text-xs text-gray-400 mt-0.5">
                                 Feedback from your clients and task history.
                             </p>
                         </div>
 
-                        <div className="sticky top-0 z-10 -mx-4 md:-mx-6 px-4 md:px-6 pt-2 pb-3 bg-gray-50">
+                        <div className="sticky top-0 z-10 -mx-3 sm:-mx-5 lg:-mx-6 px-3 sm:px-5 lg:px-6 pt-1 pb-2.5 bg-gray-50">
                             <RatingBreakdown overallRating={overallRating} totalReviews={total} breakdown={ratingBreakdown} />
                         </div>
 
-                        <div className="mb-2 sm:mb-4">
-                            <h2 className="text-sm sm:text-base font-extrabold text-[#0A6E5C]">
+                        <div className="mb-2 sm:mb-3">
+                            <h2 className="text-xs sm:text-sm font-extrabold text-[#0A6E5C]">
                                 Recent Feedback
                             </h2>
                         </div>
 
-                        <div className="space-y-2 sm:space-y-4">
+                        <div className="space-y-2.5 sm:space-y-3">
                             {reviews.map((review, idx) => (
                                 <ReviewCard
                                     key={review._id}

@@ -22,7 +22,7 @@ const WorkerProfile = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
 
-    const {data} = useGetWorkerProfileQuery();
+    const { data, isLoading } = useGetWorkerProfileQuery();
     const [updateWorkerProfile, {isLoading:isProfileUpdating}] = useUpdateWorkerProfileMutation();
     const [switchRole] = useSwitchRoleToPosterMutation();
 
@@ -124,22 +124,23 @@ const WorkerProfile = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <WorkerHeader />
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-6">
-
+                <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+                    <div className="max-w-6xl mx-auto space-y-3 sm:space-y-3.5">
                         <WorkerProfileBanner
                             worker={workerData}
+                            isLoading={isLoading}
                             onEditClick={toggleEditModal}
                             onSwitchToPoster={handleRoleChange}
                         />
 
                         <WorkerStatCards stats={stats} />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <WorkerSkillsCard skills={skills} />
                             <WorkerAboutCard bio={bio} languages={languages} />
                         </div>
 
-                        <div className="mb-5">
+                        <div>
                             <WorkerCredentialsCard credentials={credentials} />
                         </div>
 
@@ -160,7 +161,7 @@ const WorkerProfile = () => {
                         {openEditModal && (
                             <EditWorkerProfileModal loading={isProfileUpdating} isOpen={openEditModal}  onClose ={toggleEditModal}  worker ={workerEditData}  onSave={handleEditProfile} />
                         )}
-
+                    </div>
                 </div>
             </div>
         </div>

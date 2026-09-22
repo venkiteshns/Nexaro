@@ -82,26 +82,26 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
   }
 
   return (
-    <div className="w-full rounded-3xl bg-gradient-to-br from-white via-[#fafdfb] to-[#f0f9f6] border border-[#0A6E5C]/15 shadow-sm p-5 sm:p-7 relative overflow-hidden">
+    <div className="w-full rounded-2xl bg-gradient-to-br from-white via-[#fafdfb] to-[#f0f9f6] border border-[#0A6E5C]/15 shadow-xs p-3.5 sm:p-4 lg:p-5 relative overflow-hidden">
       {/* Decorative top-right accent */}
       <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-[#0A6E5C]/10 to-emerald-200/20 rounded-full blur-2xl pointer-events-none" />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative">
-        <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0A6E5C] to-emerald-600 flex items-center justify-center text-white shadow-md shadow-[#0A6E5C]/20 shrink-0">
-            <Gift size={24} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 relative">
+        <div className="flex items-start gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0A6E5C] to-emerald-600 flex items-center justify-center text-white shadow-xs shadow-[#0A6E5C]/20 shrink-0">
+            <Gift size={18} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-sm sm:text-base font-bold text-gray-900">
                 Refer & Earn
               </h2>
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-100 text-[#0A6E5C] px-2.5 py-0.5 rounded-full">
-                <Sparkles size={11} /> ₹100 / Friend
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-emerald-100 text-[#0A6E5C] px-2 py-0.5 rounded-full">
+                <Sparkles size={10} /> ₹100 / Friend
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 max-w-xl">
+            <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5 max-w-xl">
               Earn <span className="font-semibold text-gray-800">₹100</span> in
               your Nexaro wallet when your friend signs up and completes their
               first job. They also get a{" "}
@@ -113,85 +113,85 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 relative">
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-3.5 shadow-xs">
-          <div className="flex items-center gap-2 text-gray-500 mb-1">
-            <Users size={15} className="text-[#0A6E5C]" />
-            <span className="text-[11px] font-medium uppercase tracking-wider">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-3.5 relative">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2.5 sm:p-3 shadow-xs">
+          <div className="flex items-center gap-1.5 text-gray-500 mb-0.5">
+            <Users size={13} className="text-[#0A6E5C]" />
+            <span className="text-[10px] font-medium uppercase tracking-wider">
               Invited
             </span>
           </div>
-          <p className="text-lg sm:text-xl font-bold text-gray-900">
+          <p className="text-base sm:text-lg font-extrabold text-gray-900">
             {stats.totalReferred}
           </p>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-3.5 shadow-xs">
-          <div className="flex items-center gap-2 text-gray-500 mb-1">
-            <Coins size={15} className="text-amber-500" />
-            <span className="text-[11px] font-medium uppercase tracking-wider">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2.5 sm:p-3 shadow-xs">
+          <div className="flex items-center gap-1.5 text-gray-500 mb-0.5">
+            <Coins size={13} className="text-amber-500" />
+            <span className="text-[10px] font-medium uppercase tracking-wider">
               Earned
             </span>
           </div>
-          <p className="text-lg sm:text-xl font-bold text-emerald-600">
+          <p className="text-base sm:text-lg font-extrabold text-emerald-600">
             ₹{stats.totalEarnings.toLocaleString("en-IN")}
           </p>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-3.5 shadow-xs">
-          <div className="flex items-center gap-2 text-gray-500 mb-1">
-            <Clock size={15} className="text-amber-500" />
-            <span className="text-[11px] font-medium uppercase tracking-wider">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2.5 sm:p-3 shadow-xs">
+          <div className="flex items-center gap-1.5 text-gray-500 mb-0.5">
+            <Clock size={13} className="text-amber-500" />
+            <span className="text-[10px] font-medium uppercase tracking-wider">
               Pending
             </span>
           </div>
-          <p className="text-lg sm:text-xl font-bold text-gray-900">
+          <p className="text-base sm:text-lg font-extrabold text-gray-900">
             {stats.pendingCount}
           </p>
         </div>
       </div>
 
       {/* Code & Share Hub */}
-      <div className="bg-white rounded-2xl border border-gray-200/80 p-4 sm:p-5 shadow-xs relative mb-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-xl border border-gray-200/80 p-3 sm:p-3.5 shadow-xs relative mb-2.5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Referral Code Box */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
               Your Code:
             </span>
-            <div className="inline-flex items-center justify-between gap-3 bg-emerald-50/70 border border-emerald-200/60 rounded-xl px-4 py-2">
-              <span className="text-base sm:text-lg font-black tracking-widest text-[#0A6E5C] font-mono select-all">
+            <div className="inline-flex items-center justify-between gap-2.5 bg-emerald-50/70 border border-emerald-200/60 rounded-lg px-3 py-1.5">
+              <span className="text-sm sm:text-base font-black tracking-widest text-[#0A6E5C] font-mono select-all">
                 {code}
               </span>
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="text-gray-500 hover:text-[#0A6E5C] transition p-1"
+                className="text-gray-500 hover:text-[#0A6E5C] transition p-0.5"
                 title="Copy Referral Code"
               >
                 {copiedCode ? (
-                  <Check size={16} className="text-emerald-600" />
+                  <Check size={14} className="text-emerald-600" />
                 ) : (
-                  <Copy size={16} />
+                  <Copy size={14} />
                 )}
               </button>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl transition duration-150"
+              className="inline-flex items-center gap-1.5 text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition duration-150 cursor-pointer"
             >
               {copiedLink ? (
                 <>
-                  <Check size={16} className="text-emerald-600" /> Link Copied!
+                  <Check size={14} className="text-emerald-600" /> Link Copied!
                 </>
               ) : (
                 <>
-                  <Copy size={16} /> Copy Invite Link
+                  <Copy size={14} /> Copy Invite Link
                 </>
               )}
             </button>
@@ -199,9 +199,9 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
             <button
               type="button"
               onClick={handleWhatsAppShare}
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold bg-[#25D366] hover:bg-[#20ba59] text-white px-4 py-2.5 rounded-xl transition shadow-xs duration-150"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#25D366] hover:bg-[#20ba59] text-white px-3 py-1.5 rounded-lg transition shadow-xs duration-150 cursor-pointer"
             >
-              <Share2 size={16} /> Share on WhatsApp
+              <Share2 size={14} /> Share on WhatsApp
             </button>
           </div>
         </div>

@@ -4,6 +4,19 @@ import { api } from "./api";
 export const workerApi = api.injectEndpoints({
   endpoints: (builder) => ({
 
+    getWorkerDashboard: builder.query({
+      query: ({ category = "" } = {}) => {
+        const params = new URLSearchParams();
+        if (category && category.toLowerCase() !== "all") params.append("category", category);
+        const queryString = params.toString() ? `?${params.toString()}` : "";
+        return {
+          url: `${WORKER.GET_DASHBOARD}${queryString}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Worker_Tasks", "Worker_Bids", "Worker_Header_Status"],
+    }),
+
     getWorkerNearbyTasks: builder.query({
       query: ({ search = "", category = "", page = 1, limit = 9 } = {}) => {
         let params = new URLSearchParams();
@@ -244,6 +257,7 @@ export const workerApi = api.injectEndpoints({
 });
 
 export const {
+  useGetWorkerDashboardQuery,
   useGetWorkerNearbyTasksQuery,
   useGetTaskForBidQuery,
   useAddNewBidMutation,

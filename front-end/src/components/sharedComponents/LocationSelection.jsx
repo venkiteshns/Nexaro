@@ -122,9 +122,9 @@ const LocationSelection = ({ SectionName }) => {
     };
 
     return (
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="flex items-center gap-2 text-[#111827] font-semibold mb-5">
-                <MapPin size={18} className="text-[#0A6E5C]" />
+        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-gray-100 shadow-xs">
+            <h2 className="flex items-center gap-2 text-sm sm:text-base text-[#111827] font-bold mb-3">
+                <MapPin size={16} className="text-[#0A6E5C]" />
                 {SectionName}
             </h2>
 
@@ -133,25 +133,26 @@ const LocationSelection = ({ SectionName }) => {
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     type="text"
-                    className="w-full max-w-5xl rounded-[18px] border border-[#E5E7EB] bg-[#F9FAFB] px-6 py-2 text-[16px] font-normal text-[#111827] placeholder:text-[#9CA3AF] shadow-sm outline-none transition focus:border-[#0A6E5C] focus:ring-4 focus:ring-[#0A6E5C]/10"
+                    placeholder="Search location or area..."
+                    className="w-full max-w-5xl rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] px-3 py-2 text-xs sm:text-sm font-normal text-[#111827] placeholder:text-[#9CA3AF] shadow-2xs outline-none transition focus:border-[#0A6E5C] focus:ring-2 focus:ring-[#0A6E5C]/10"
                 />
                 {(isOpen && showResult) &&
                     <DropDownUnRegister options={placeOptions} onValueSelect={onPlaceSelect} />
                 }
                 {(!!searchText && suggestions.length < 1 && showResult) &&
-                    <div>No results found</div>
+                    <div className="text-xs text-gray-400 py-1.5">No results found</div>
                 }
             </div>
 
-            <div className="relative rounded-xl overflow-hidden border border-gray-200 min-h-[180px] mt-3">
-                <Map position={mapPosition} setPosition={handleMapPositionChange} height="180px" showButton={false} />
+            <div className="relative rounded-lg overflow-hidden border border-gray-200 min-h-[160px] mt-2.5">
+                <Map position={mapPosition} setPosition={handleMapPositionChange} height="160px" showButton={false} />
             </div>
 
             <input type="hidden" {...register('locationLat', { required: true })} />
             <input type="hidden" {...register('locationlng', { required: true })} />
 
             {(errors.locationLat || errors.locationlng) &&
-                <p className="text-sm text-red-500 mt-2">Please select a location on the map or from the search results.</p>
+                <p className="text-xs text-red-500 mt-1.5">Please select a location on the map or from the search results.</p>
             }
         </div>
     )

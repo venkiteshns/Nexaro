@@ -14,26 +14,26 @@ export default function PosterSpendingChart() {
   const maxAmount = Math.max(...chartData.map((d) => d.amount || 0), 100);
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs">
+    <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 sm:p-4 shadow-xs">
       {/* Chart Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-base sm:text-lg font-bold text-[#111827]">
+            <h3 className="text-xs sm:text-sm font-bold text-[#111827]">
               Spending Overview
             </h3>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#0A6E5C] border border-emerald-200/50">
-              <TrendingUp size={12} />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-[#0A6E5C] border border-emerald-200/50">
+              <TrendingUp size={11} />
               ₹{Number(totalSpent).toLocaleString("en-IN")}
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-[11px] text-gray-400 mt-0.5">
             Your task payment distributions and escrow investments over time
           </p>
         </div>
 
         {/* Timeframe Selector Tabs */}
-        <div className="flex items-center p-1 bg-[#F6FAF8] border border-emerald-100 rounded-xl self-start sm:self-auto">
+        <div className="flex items-center p-0.5 bg-[#F6FAF8] border border-emerald-100 rounded-lg self-start sm:self-auto">
           {["7D", "30D", "3M", "6M"].map((tf) => (
             <button
               key={tf}
@@ -42,7 +42,7 @@ export default function PosterSpendingChart() {
                 setTimeframe(tf);
                 setHoveredIndex(null);
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${timeframe === tf
+              className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${timeframe === tf
                   ? "bg-[#0A6E5C] text-white shadow-xs"
                   : "text-gray-500 hover:text-gray-800"
                 }`}
@@ -54,7 +54,7 @@ export default function PosterSpendingChart() {
       </div>
 
       {/* Chart Area */}
-      <div className="pt-6">
+      <div className="pt-3">
         {isLoading ? (
           <div className="h-56 flex items-center justify-center animate-pulse">
             <div className="flex items-end gap-3 h-36 w-full px-4 justify-between">

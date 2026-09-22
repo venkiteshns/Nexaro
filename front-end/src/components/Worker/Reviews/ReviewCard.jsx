@@ -22,13 +22,13 @@ function getInitials(name = '') {
 const ReviewCard = ({ review, colorIdx = 0 }) => {
     const color = AVATAR_COLORS[colorIdx % AVATAR_COLORS.length];
     return (
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-3 sm:p-5 hover:shadow-md hover:border-emerald-100 transition-all duration-200">
+        <div className="bg-white border border-gray-100 rounded-xl shadow-xs p-3 sm:p-3.5 hover:shadow-sm hover:border-emerald-100 transition-all duration-200">
 
-            <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
-                <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2 sm:gap-2.5">
 
                     <div
-                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${color.bg} flex items-center justify-center shrink-0 border border-gray-100`}
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${color.bg} flex items-center justify-center shrink-0 border border-gray-100`}
                     >
                         <span className={`text-[10px] sm:text-xs font-extrabold ${color.text}`}>
                             {getInitials(review?.reviewerName)}
@@ -37,18 +37,18 @@ const ReviewCard = ({ review, colorIdx = 0 }) => {
 
                     <div>
                         <p className="text-xs sm:text-sm font-bold text-gray-900">{review?.reviewerName}</p>
-                        <StarRow rating={review?.rating} size={10} />
+                        <StarRow rating={review?.rating} size={9} />
                     </div>
 
                 </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-2 sm:mb-3">{review?.review}</p>
+            <p className="text-xs text-gray-600 leading-relaxed mb-2 sm:mb-2.5">{review?.review}</p>
 
             <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-500 rounded-full px-2 sm:px-3 py-0.5 sm:py-1">
-                    <Wrench size={9} className="text-[#0A6E5C] shrink-0" />
-                    <span className="text-[10px] sm:text-[11px] font-semibold">{review?.taskTitle}</span>
+                <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 text-gray-500 rounded-full px-2 py-0.5">
+                    <Wrench size={8} className="text-[#0A6E5C] shrink-0" />
+                    <span className="text-[10px] font-semibold">{review?.taskTitle}</span>
                 </div>
             </div>
 

@@ -54,32 +54,33 @@ export default function FinanceBarChart({
   isLoading = false,
   isFetching = false,
   currencySymbol = "₹",
+  className = "",
 }) {
   const isVolumeMetric = activeMetric === "volume" || activeMetric === "orders";
 
   return (
-    <div className="bg-white border border-gray-200/80 rounded-3xl p-5 sm:p-7 shadow-xs">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+    <div className={`bg-white border border-gray-200/80 rounded-2xl p-3.5 sm:p-4 lg:p-5 shadow-xs ${className}`}>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 pb-3 sm:pb-3.5 border-b border-gray-100">
         <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-base sm:text-lg font-bold text-[#111827]">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <h3 className="text-sm sm:text-base font-bold text-[#111827]">
               {title}
             </h3>
             {badgeText && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-[#0A6E5C] border border-emerald-100">
-                {BadgeIcon && <BadgeIcon size={12} />}
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-[#0A6E5C] border border-emerald-100">
+                {BadgeIcon && <BadgeIcon size={11} />}
                 {badgeText}
               </span>
             )}
           </div>
           {subtitle && (
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">{subtitle}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {metricTabs && metricTabs.length > 0 && (
-            <div className="flex items-center gap-1 p-1 bg-[#F6FAF8] border border-emerald-100/60 rounded-2xl text-xs font-semibold">
+            <div className="flex items-center gap-1 p-0.5 bg-[#F6FAF8] border border-emerald-100/60 rounded-xl text-xs font-semibold">
               {metricTabs.map((tab) => {
                 const isActive = activeMetric === tab.value;
                 return (
@@ -87,7 +88,7 @@ export default function FinanceBarChart({
                     key={tab.value}
                     type="button"
                     onClick={() => onMetricChange && onMetricChange(tab.value)}
-                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                       isActive
                         ? "bg-white text-[#0A6E5C] shadow-xs font-bold border border-emerald-200/60"
                         : "text-gray-500 hover:text-gray-900"
@@ -101,11 +102,11 @@ export default function FinanceBarChart({
           )}
 
           {timeframeOptions && timeframeOptions.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {isFetching && !isLoading && (
-                <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 text-emerald-600 animate-spin" />
               )}
-              <div className="flex items-center p-1 bg-[#F6FAF8] border border-emerald-100/80 rounded-2xl">
+              <div className="flex items-center p-0.5 bg-[#F6FAF8] border border-emerald-100/80 rounded-xl">
                 {timeframeOptions.map((option) => {
                   const isSelected = timeframe === option.value;
                   return (
@@ -114,7 +115,7 @@ export default function FinanceBarChart({
                       type="button"
                       disabled={isLoading}
                       onClick={() => onTimeframeChange && onTimeframeChange(option.value)}
-                      className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed ${
                         isSelected
                           ? "bg-[#0A6E5C] text-white shadow-xs"
                           : "text-gray-500 hover:text-gray-800 hover:bg-emerald-50/50"

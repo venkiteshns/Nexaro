@@ -51,34 +51,34 @@ function CancelConfirmModal({ task, onConfirm, onClose }) {
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="h-1 w-full bg-linear-to-r from-red-400 to-red-500" />
 
-                <div className="p-7 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mb-5">
-                        <Trash2 size={28} className="text-red-500" />
+                <div className="p-5 sm:p-6 flex flex-col items-center text-center">
+                    <div className="w-12 h-12 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center mb-3">
+                        <Trash2 size={22} className="text-red-500" />
                     </div>
 
-                    <h2 className="text-xl font-extrabold text-gray-900 mb-1">Cancel this task?</h2>
-                    <p className="text-sm text-gray-500 leading-relaxed mb-1 px-2">
+                    <h2 className="text-base sm:text-lg font-extrabold text-gray-900 mb-1">Cancel this task?</h2>
+                    <p className="text-xs text-gray-500 leading-relaxed mb-1 px-2">
                         <span className="font-semibold text-gray-700">"{task.title}"</span>
                     </p>
-                    <p className="text-xs text-gray-400 mb-6">
+                    <p className="text-[11px] text-gray-400 mb-4">
                         This will cancel the task. Any pending bids will be rejected.
                     </p>
 
                     <button
                         onClick={onConfirm}
-                        className="w-full py-3 rounded-2xl bg-red-500 text-white text-sm font-bold
-                                   hover:bg-red-600 active:scale-[0.98] transition-all duration-150 shadow-sm mb-3"
+                        className="w-full py-2 rounded-xl bg-red-500 text-white text-xs font-bold
+                                   hover:bg-red-600 active:scale-[0.98] transition-all duration-150 shadow-xs mb-2"
                     >
                         Yes, Cancel Task
                     </button>
                     <button
                         onClick={onClose}
-                        className="text-sm text-gray-400 hover:text-gray-600 transition-colors py-1"
+                        className="text-xs text-gray-400 hover:text-gray-600 transition-colors py-1"
                     >
                         Keep Task
                     </button>
@@ -135,32 +135,32 @@ function TaskCard({ task }) {
 
     return (
         <>
-            <div className={`bg-white rounded-xl border border-gray-200 border-l-4 ${border} mb-3 shadow-sm overflow-hidden`}>
+            <div className={`bg-white rounded-xl border border-gray-200 border-l-4 ${border} mb-2.5 shadow-xs overflow-hidden`}>
 
-                <div className="flex justify-between items-start px-5 pt-4 pb-3">
+                <div className="flex justify-between items-start px-3.5 sm:px-4 pt-3 pb-2">
 
-                    <div className="flex flex-col md:flex-row items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-                            <AlertCircle size={20} className="text-[#0A6E5C]" />
+                    <div className="flex flex-col md:flex-row items-start gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                            <AlertCircle size={16} className="text-[#0A6E5C]" />
                         </div>
-                        <div className='flex flex-col  ' >
-                            <p className="font-semibold text-[15px] text-gray-900">{task.title}</p>
-                            <div className="flex items-center gap-3 mt-1 flex-wrap">
+                        <div className='flex flex-col'>
+                            <p className="font-bold text-xs sm:text-sm text-gray-900">{task.title}</p>
+                            <div className="flex items-center gap-2.5 mt-0.5 flex-wrap">
                                 {task.address && (
-                                    <span className="flex items-center gap-1 text-xs text-gray-500">
-                                        <MapPin size={12} />
+                                    <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                                        <MapPin size={11} />
                                         {task.address.landmark}
                                     </span>
                                 )}
                                 {postedDate && (
-                                    <span className="flex items-center gap-1 text-xs text-gray-500">
-                                        <Clock size={12} />
+                                    <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                                        <Clock size={11} />
                                         Posted {postedDate}
                                     </span>
                                 )}
                                 {task.assignedWorker && (
-                                    <span className="flex items-center gap-1 text-xs text-gray-500">
-                                        <User size={12} />
+                                    <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                                        <User size={11} />
                                         Assigned to{' '}
                                         <strong className="text-gray-800">{task.assignedWorker?.name || 'Worker'}</strong>
                                     </span>
@@ -170,20 +170,20 @@ function TaskCard({ task }) {
                     </div>
 
                     <div className="text-right shrink-0">
-                        <p className="font-bold text-base text-gray-900">
+                        <p className="font-extrabold text-sm sm:text-base text-gray-900">
                             ₹{Number(task.amount).toLocaleString('en-IN')}
                         </p>
-                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide ${badge}`}>
+                        <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wide ${badge}`}>
                             {label}
                         </span>
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 pb-4 pt-2 border-t border-gray-100 gap-2">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-3.5 sm:px-4 pb-3 pt-2 border-t border-gray-100 gap-2">
 
                     <div className="text-xs text-gray-500">
                         {task.status === 'open' && task.bidCount > 0 && (
-                            <span className="text-[#0A6E5C] font-semibold">
+                            <span className="text-[#0A6E5C] font-semibold text-xs">
                                 {task.bidCount} new bid{task.bidCount > 1 ? 's' : ''} waiting
                             </span>
                         )}
@@ -200,7 +200,7 @@ function TaskCard({ task }) {
                         )}
                         {task.status === 'completed' && task.update === 'payment' && (
                             <span className="flex items-center gap-1.5 text-[#0A6E5C] font-semibold">
-                                <CheckCircle size={13} />
+                                <CheckCircle size={12} />
                                 Completed · Payment Released
                                 {task.hasReview && (
                                     <span className="text-gray-400 font-normal">· Reviewed</span>
@@ -210,7 +210,7 @@ function TaskCard({ task }) {
                         {task.status === 'payment' && (
                             <span className="flex items-center gap-1">
                                 Completed, Payment Completed
-                                <Star size={13} fill="#FBBF24" color="#FBBF24" />
+                                <Star size={12} fill="#FBBF24" color="#FBBF24" />
                                 You rated 5 stars
                             </span>
                         )}
@@ -219,38 +219,38 @@ function TaskCard({ task }) {
                         )}
                     </div>
 
-                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <div className="flex flex-wrap gap-1.5 w-full sm:w-auto">
                         {task.status === 'open' && (
                             <>
                                 {!isLoading && <button
                                     onClick={() => setShowCancelModal(true)}
-                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-red-200 bg-red-50 text-red-600 cursor-pointer hover:bg-red-100 transition-colors">
+                                    className="flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-200 bg-red-50 text-red-600 cursor-pointer hover:bg-red-100 transition-colors">
                                     Cancel
                                 </button>}
                                 {isLoading && <button
-                                    className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold border border-red-200 bg-red-50 text-red-600 transition-colors">
-                                    Cancelling Task <Loader className="animate-spin" size={14} />
+                                    className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-200 bg-red-50 text-red-600 transition-colors">
+                                    Cancelling Task <Loader className="animate-spin" size={12} />
                                 </button>}
                                 {isSuccess && <button
-                                    className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold border border-green-200 bg-green-50 text-green-600 transition-colors">
+                                    className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-green-200 bg-green-50 text-green-600 transition-colors">
                                     Task Cancelled
                                 </button>}
 
                                 {!hasBids ? (
                                     <button
                                         onClick={() => setShowEditModal(true)}
-                                        className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold border border-[#0A6E5C] bg-emerald-50 text-[#0A6E5C] cursor-pointer hover:bg-emerald-100 transition-colors"
+                                        className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#0A6E5C] bg-emerald-50 text-[#0A6E5C] cursor-pointer hover:bg-emerald-100 transition-colors"
                                     >
-                                        <Pencil size={13} />
+                                        <Pencil size={12} />
                                         Edit
                                     </button>
                                 ) : (
                                     <button
                                         disabled
                                         title="Bids are waiting — editing is disabled"
-                                        className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed select-none"
+                                        className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed select-none"
                                     >
-                                        <Lock size={13} />
+                                        <Lock size={12} />
                                         Bids Waiting
                                     </button>
                                 )}
@@ -258,7 +258,7 @@ function TaskCard({ task }) {
                                 {task.bidCount > 0 && (
                                     <button
                                         onClick={() => navigate(`/poster/review-bids/${task._id}`)}
-                                        className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors"
+                                        className="flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors"
                                     >
                                         Review Bids
                                     </button>)}
@@ -269,7 +269,7 @@ function TaskCard({ task }) {
                             <>
                                 <button
                                     onClick={() => navigate(`/poster/work-progress/${task._id}`)}
-                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-green-200 bg-green-50 text-green-700 cursor-pointer hover:bg-green-100 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-green-200 bg-green-50 text-green-700 cursor-pointer hover:bg-green-100 transition-colors"
                                 >
                                     View Progress
                                 </button>
@@ -280,14 +280,14 @@ function TaskCard({ task }) {
                             <>
                                 <button
                                     onClick={() => navigate(`/poster/work-progress/${task._id}`)}
-                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
                                 >
                                     View Progress
                                 </button>
                                 <button
                                     disabled={task.status !== 'completed'}
                                     onClick={() => { handleOpenPaymentReleaseModal(task._id) }}
-                                    className={`flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
+                                    className={`flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                                         task.status === 'completed'
                                             ? 'bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e]'
                                             : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
@@ -303,14 +303,14 @@ function TaskCard({ task }) {
                             <>
                                 <button
                                     onClick={() => navigate(`/poster/completed-task/${task._id}`)}
-                                    className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 bg-white text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors"
                                 >
                                     Show Details
                                 </button>
                                 {!task.hasReview && (
                                     <button
                                         onClick={() => navigate(`/poster/review/${task._id}`)}
-                                        className="flex-1 sm:flex-none justify-center px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors"
+                                        className="flex-1 sm:flex-none justify-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0A6E5C] text-white cursor-pointer hover:bg-[#085e4e] transition-colors"
                                     >
                                         Write a Review
                                     </button>
@@ -347,13 +347,13 @@ function TaskCard({ task }) {
 function StatCard({ icon, count, label, topColor }) {
     return (
         <div
-            className="flex-1 min-w-[110px] bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm"
+            className="flex-1 min-w-[95px] bg-white border border-gray-200 rounded-xl px-3 py-2.5 flex items-center gap-2.5 shadow-xs"
             style={{ borderTop: `3px solid ${topColor}` }}
         >
             <div style={{ color: topColor }}>{icon}</div>
             <div>
-                <p className="text-2xl font-extrabold text-gray-900 leading-none">{count}</p>
-                <p className="text-[11px] text-gray-500 font-medium mt-0.5">{label}</p>
+                <p className="text-lg sm:text-xl font-extrabold text-gray-900 leading-none">{count}</p>
+                <p className="text-[10px] text-gray-500 font-medium mt-0.5">{label}</p>
             </div>
         </div>
     );
@@ -410,52 +410,52 @@ const MyTasks = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <PosterHeader />
 
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
 
-                    <div className="flex flex-col sm:flex-row justify-between items-start mb-5">
+                    <div className="flex flex-col sm:flex-row justify-between items-start mb-3 sm:mb-3.5 gap-2.5">
                         <div>
-                            <h1 className="text-[22px] font-extrabold text-gray-900">My Tasks</h1>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <h1 className="text-lg sm:text-xl font-extrabold text-gray-900">My Tasks</h1>
+                            <p className="text-xs text-gray-500 mt-0.5">
                                 Manage all your posted tasks from one central dashboard.
                             </p>
                         </div>
-                        <div className='flex items-end justify-end w-full' >
+                        <div className='flex items-end justify-end w-full sm:w-auto' >
                             <button
                                 onClick={() => navigate('/poster/post-task')}
-                                className="mt-2 sm:mt-0 flex items-center gap-1.5 px-5 py-2.5 bg-[#0A6E5C] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#085e4e] transition-colors"
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0A6E5C] text-white rounded-lg font-semibold text-xs shadow-xs hover:bg-[#085e4e] transition-colors"
                             >
-                                <Plus size={16} />
+                                <Plus size={14} />
                                 Post New Task
                             </button>
                         </div>
                     </div>
 
-                    <div className="flex gap-3 mb-5 flex-wrap">
-                        <StatCard icon={<CheckCircle size={20} />} count={counts.total} label="TOTAL POSTED" topColor="#0A6E5C" />
-                        <StatCard icon={<Clock size={20} />} count={counts.open} label="OPEN" topColor="#EA580C" />
-                        <StatCard icon={<AlertCircle size={20} />} count={counts.in_progress} label="IN PROGRESS" topColor="#2563EB" />
-                        <StatCard icon={<CheckCircle size={20} />} count={counts.completed} label="COMPLETED" topColor="#16A34A" />
-                        <StatCard icon={<XCircle size={20} />} count={counts.cancelled} label="CANCELLED" topColor="#DC2626" />
+                    <div className="flex gap-2 sm:gap-2.5 mb-3.5 flex-wrap">
+                        <StatCard icon={<CheckCircle size={17} />} count={counts.total} label="TOTAL POSTED" topColor="#0A6E5C" />
+                        <StatCard icon={<Clock size={17} />} count={counts.open} label="OPEN" topColor="#EA580C" />
+                        <StatCard icon={<AlertCircle size={17} />} count={counts.in_progress} label="IN PROGRESS" topColor="#2563EB" />
+                        <StatCard icon={<CheckCircle size={17} />} count={counts.completed} label="COMPLETED" topColor="#16A34A" />
+                        <StatCard icon={<XCircle size={17} />} count={counts.cancelled} label="CANCELLED" topColor="#DC2626" />
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-xl px-4 py-4 mb-5">
-                        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mb-3">
-                            <Search size={16} className="text-gray-400 shrink-0" />
+                    <div className="bg-white border border-gray-200 rounded-xl px-3 py-3 mb-3.5">
+                        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 mb-2.5">
+                            <Search size={14} className="text-gray-400 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Filter by task name or location..."
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
-                                className="border-none outline-none bg-transparent text-sm text-gray-900 w-full placeholder-gray-400"
+                                className="border-none outline-none bg-transparent text-xs text-gray-900 w-full placeholder-gray-400"
                             />
                         </div>
 
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-1.5 flex-wrap">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
-                                    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${activeTab === tab.key
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${activeTab === tab.key
                                         ? 'bg-[#0A6E5C] text-white'
                                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                                         }`}
@@ -463,7 +463,7 @@ const MyTasks = () => {
                                     {tab.label}
                                     {tab.count > 0 && (
                                         <span
-                                            className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] ${activeTab === tab.key
+                                            className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${activeTab === tab.key
                                                 ? 'bg-white/25 text-white'
                                                 : 'bg-gray-200 text-gray-700'
                                                 }`}

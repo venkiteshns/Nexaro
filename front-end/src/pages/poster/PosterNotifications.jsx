@@ -76,8 +76,8 @@ const PosterNotifications = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <PosterHeader />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="w-full space-y-3.5">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+          <div className="w-full space-y-3 sm:space-y-3.5">
             <PosterNotificationHeader
               unreadCount={counts.unread}
               isFetching={isFetching}

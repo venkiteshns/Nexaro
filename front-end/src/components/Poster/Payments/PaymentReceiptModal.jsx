@@ -47,25 +47,25 @@ export default function PaymentReceiptModal({ isOpen, onClose, transaction }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-gray-100 relative">
+      <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-gray-100 relative">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
 
         {/* Invoice Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-gray-100">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100">
           <div>
             <Logo />
-            <p className="text-[11px] font-semibold text-gray-400 tracking-wider uppercase mt-1">
+            <p className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase mt-1">
               Official Payment Receipt
             </p>
           </div>
 
           <div
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${statusInfo.bg}`}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusInfo.bg}`}
           >
             {statusInfo.icon}
             <span>{statusInfo.label}</span>
@@ -73,37 +73,37 @@ export default function PaymentReceiptModal({ isOpen, onClose, transaction }) {
         </div>
 
         {/* Transaction Metadata */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 py-4 border-b border-gray-100 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-3 border-b border-gray-100 text-xs">
           <div>
-            <p className="text-gray-400 font-medium text-[11px] uppercase tracking-wider">Date & Time</p>
+            <p className="text-gray-400 font-medium text-[10px] uppercase tracking-wider">Date & Time</p>
             <p className="font-semibold text-gray-800 mt-0.5">{formattedDate}</p>
           </div>
           <div>
-            <p className="text-gray-400 font-medium text-[11px] uppercase tracking-wider">Payment Method</p>
+            <p className="text-gray-400 font-medium text-[10px] uppercase tracking-wider">Payment Method</p>
             <p className="font-semibold text-gray-800 mt-0.5">{transaction.paymentMethod || "Nexaro Escrow"}</p>
           </div>
           <div>
-            <p className="text-gray-400 font-medium text-[11px] uppercase tracking-wider">Service Category</p>
-            <span className="inline-block px-2 py-0.5 mt-0.5 rounded-md bg-gray-100 text-gray-700 font-semibold text-[11px] uppercase">
+            <p className="text-gray-400 font-medium text-[10px] uppercase tracking-wider">Service Category</p>
+            <span className="inline-block px-2 py-0.5 mt-0.5 rounded-md bg-gray-100 text-gray-700 font-semibold text-[10px] uppercase">
               {transaction.category}
             </span>
           </div>
         </div>
 
         {/* Task and Worker details */}
-        <div className="py-4 border-b border-gray-100 space-y-2.5 text-xs">
+        <div className="py-3 border-b border-gray-100 space-y-2 text-xs">
           <div>
-            <p className="text-gray-400 font-medium text-[11px] uppercase tracking-wider">Task Title</p>
-            <p className="text-sm font-bold text-gray-900 mt-0.5">{transaction.taskTitle}</p>
+            <p className="text-gray-400 font-medium text-[10px] uppercase tracking-wider">Task Title</p>
+            <p className="text-xs sm:text-sm font-bold text-gray-900 mt-0.5">{transaction.taskTitle}</p>
           </div>
 
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between pt-0.5">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs">
+              <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs">
                 {transaction.workerName ? transaction.workerName.charAt(0).toUpperCase() : "W"}
               </div>
               <div>
-                <p className="font-semibold text-gray-800">{transaction.workerName}</p>
+                <p className="font-semibold text-gray-800 text-xs">{transaction.workerName}</p>
                 <p className="text-[10px] text-gray-400">Assigned Professional</p>
               </div>
             </div>
@@ -111,32 +111,20 @@ export default function PaymentReceiptModal({ isOpen, onClose, transaction }) {
         </div>
 
         {/* Financial Breakdown */}
-        <div className="py-4 border-b border-gray-100 space-y-2 text-xs">
-          <div className="flex justify-between text-gray-600">
-            <span>Agreed Task Amount</span>
-            <span className="font-semibold text-gray-900">
-              ₹{Number(transaction.amount).toLocaleString("en-IN")}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-gray-500 text-[11px]">
-            <span>Platform Fee (5% included)</span>
-            <span>₹{Number(transaction.platformFee || Math.round(transaction.amount * 0.05)).toLocaleString("en-IN")}</span>
-          </div>
-
-          <div className="flex justify-between items-baseline pt-2 border-t border-gray-100 text-sm font-extrabold text-gray-900">
-            <span>Total Paid</span>
-            <span className="text-lg text-[#0A6E5C]">
+        <div className="py-3 border-b border-gray-100 text-xs">
+          <div className="flex justify-between items-baseline text-xs sm:text-sm font-extrabold text-gray-900">
+            <span>Paid Amount</span>
+            <span className="text-base sm:text-lg text-[#0A6E5C]">
               ₹{Number(transaction.amount).toLocaleString("en-IN")}
             </span>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="mt-6 flex items-center justify-end">
+        <div className="mt-4 flex items-center justify-end">
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#0A6E5C] text-white font-bold text-xs hover:bg-[#085a4b] active:scale-[0.98] transition cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2 rounded-lg bg-[#0A6E5C] text-white font-bold text-xs hover:bg-[#085a4b] active:scale-[0.98] transition cursor-pointer"
           >
             Close
           </button>

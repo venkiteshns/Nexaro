@@ -65,15 +65,15 @@ export default function PosterPayments() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <PosterHeader />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+          <div className="max-w-7xl w-full mx-auto space-y-3 sm:space-y-3.5">
             {/* Page Header Banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827] tracking-tight">
+                <h1 className="text-lg sm:text-xl font-extrabold text-[#111827] tracking-tight">
                   Payment History
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 mt-0.5">
                   Complete record of all your payments and escrow deposits on Nexaro
                 </p>
               </div>

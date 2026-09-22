@@ -50,7 +50,7 @@ const LoginForm = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      const targetRoute = res.user.role === "worker" ? "/worker/nearby-tasks" : "/poster/my-tasks";
+      const targetRoute = res.user.role === "worker" ? "/worker/dashboard" : "/poster/my-tasks";
       navigate(targetRoute);
     } catch (err) {
       console.log(" error: ", err);
@@ -74,7 +74,7 @@ const LoginForm = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      const targetRoute = res.user.role === "worker" ? "/worker/nearby-tasks" : "/poster/my-tasks";
+      const targetRoute = res.user.role === "worker" ? "/worker/dashboard" : "/poster/my-tasks";
       navigate(targetRoute);
     } catch (err) {
       setGoogleError(

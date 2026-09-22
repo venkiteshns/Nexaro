@@ -12,7 +12,7 @@ function PublicRoute({ user: roleProp }) {
   } else {
     if (userAuth?.accessToken && userAuth?.user) {
       const role = userAuth?.user?.role;
-      if (role === "worker") return <Navigate to="/worker/nearby-tasks" replace />;
+      if (role === "worker") return <Navigate to="/worker/dashboard" replace />;
       if (role === "poster") return <Navigate to="/poster/my-tasks" replace />;
     }
   }

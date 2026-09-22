@@ -45,10 +45,10 @@ const MyBids = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <WorkerHeader />
 
-                <div className="flex-1 overflow-y-auto p-6">
-                    <div className="mb-5">
-                        <h1 className="text-[22px] font-extrabold text-gray-900">My Bids</h1>
-                        <p className="text-sm text-gray-500 mt-1">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+                    <div className="mb-3.5">
+                        <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 tracking-tight">My Bids</h1>
+                        <p className="text-xs text-gray-400 mt-0.5">
                             Track all your placed bids and their current status.
                         </p>
                     </div>

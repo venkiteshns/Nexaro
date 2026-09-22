@@ -23,7 +23,8 @@ import {
   markWorkerNotificationRead,
   getWorkerUnreadCount,
   getWorkerHeaderStatus,
-  toggleWorkerLiveStatus
+  toggleWorkerLiveStatus,
+  getWorkerDashboard
 } from "../controller/WorkerControllers/workerController.js";
 
 import { addNewBid } from "../controller/PosterControllers/taskController.js";
@@ -31,6 +32,7 @@ import upload from "../middlewares/upload.js";
 
 const router = express.Router();
 
+router.get("/dashboard", verifyToken, getWorkerDashboard);
 router.get("/tasks/nearby", verifyToken, getNearbyTasks);
 router.get("/task/:taskId", verifyToken, getTaskForBid);
 router.get("/my-bids", verifyToken, getWorkerBids);

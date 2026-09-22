@@ -22,25 +22,25 @@ const TaskPhotos = () => {
     };
 
     return (
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="flex items-center gap-2 text-[#111827] font-semibold mb-5">
-                <Camera size={18} className="text-[#0A6E5C]" />
+        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-gray-100 shadow-xs">
+            <h2 className="flex items-center gap-2 text-sm sm:text-base text-[#111827] font-bold mb-3">
+                <Camera size={16} className="text-[#0A6E5C]" />
                 Task Photos
             </h2>
 
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2.5 flex-wrap">
                 {photos?.length < 5 && (
                     <label
-                        className={`w-28 h-28 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#0A6E5C] hover:bg-emerald-50 transition-all group ${errors.photos ? 'border-red-400 bg-red-50' : 'border-gray-200'
+                        className={`w-20 h-20 sm:w-24 sm:h-24 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#0A6E5C] hover:bg-emerald-50 transition-all group ${errors.photos ? 'border-red-400 bg-red-50' : 'border-gray-200'
                             }`}
                     >
                         <Upload
-                            size={22}
+                            size={18}
                             className={`mb-1 transition-colors group-hover:text-[#0A6E5C] ${errors.photos ? 'text-red-400' : 'text-gray-400'
                                 }`}
                         />
                         <span
-                            className={`text-xs transition-colors group-hover:text-[#0A6E5C] ${errors.photos ? 'text-red-400' : 'text-gray-400'
+                            className={`text-[10px] sm:text-xs transition-colors group-hover:text-[#0A6E5C] ${errors.photos ? 'text-red-400' : 'text-gray-400'
                                 }`}
                         >
                             Upload Media
@@ -58,7 +58,7 @@ const TaskPhotos = () => {
                 {photos && photos?.map((file, i) => (
                     <div
                         key={i}
-                        className="w-28 h-28 rounded-xl overflow-hidden border border-gray-200 relative group"
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border border-gray-200 relative group"
                     >
                         <img
                             src={URL.createObjectURL(file)}
@@ -68,9 +68,9 @@ const TaskPhotos = () => {
                         <button
                             type="button"
                             onClick={() => handleRemovePhoto(i)}
-                            className="bg-white hover:bg-red-700 hover:border-red-100 hover:text-white absolute top-1.5 right-1.5 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                            className="bg-white hover:bg-red-700 hover:border-red-100 hover:text-white absolute top-1 right-1 p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-xs"
                         >
-                            <X size={14} className="text-red-600 hover:text-white" />
+                            <X size={12} className="text-red-600 hover:text-white" />
                         </button>
                     </div>
                 ))}
@@ -80,9 +80,9 @@ const TaskPhotos = () => {
                 }).map((_, i) => (
                     <div
                         key={`empty-${i}`}
-                        className="w-28 h-28 border border-gray-100 rounded-xl bg-gray-50 flex items-center justify-center"
+                        className="w-20 h-20 sm:w-24 sm:h-24 border border-gray-100 rounded-lg bg-gray-50 flex items-center justify-center"
                     >
-                        <Image size={22} className="text-gray-300" />
+                        <Image size={18} className="text-gray-300" />
                     </div>
                 ))}
             </div>

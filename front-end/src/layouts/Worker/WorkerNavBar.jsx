@@ -9,6 +9,7 @@ import {
   Menu,
   X,
   Wrench,
+  LayoutDashboard,
 } from "lucide-react";
 import Logo from "../../components/Logo/Logo";
 import logo from "../../assets/Nex_Logo.png";
@@ -19,6 +20,11 @@ import { useUserLogoutMutation } from "../../store/services/authApi";
 import { useGetWorkerUnreadCountQuery } from "../../store/services/workerApi";
 
 const workerNav = [
+  {
+    label: "Dashboard",
+    icon: <LayoutDashboard size={20} />,
+    redirect: "/worker/dashboard",
+  },
   {
     label: "Nearby Tasks",
     icon: <ListChecks size={20} />,
@@ -52,6 +58,7 @@ const workerNav = [
 ];
 
 const routeGroups = {
+  "/worker/dashboard": ["/worker/dashboard"],
   "/worker/my-bids": ["/worker/my-bids", "/worker/task-bid-details"],
   "/worker/nearby-tasks": ["/worker/nearby-tasks", "/worker/place-bid"],
   "/worker/active-job": ["/worker/active-job"],
