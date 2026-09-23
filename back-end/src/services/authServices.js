@@ -38,8 +38,15 @@ export const googleLoginService = async (accessToken) => {
 
   if (!existingUser) {
     return {
-      success: false,
-      message: "No account found with this Google email. Please sign up first.",
+      success: true,
+      exists: false,
+      message: "No account found with this Google email.",
+      googleUser: {
+        email,
+        name: payload.name || "",
+        picture: payload.picture || "",
+        sub: payload.sub,
+      },
     };
   }
 
@@ -67,11 +74,11 @@ export const googleLoginService = async (accessToken) => {
 
   return {
     success: true,
+    exists: true,
     responseUser,
     accessToken: accessTokenJwt,
     refreshToken,
   };
-
 };
 
 export const createOtp = async (email, phone, resendFlag) => {

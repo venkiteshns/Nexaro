@@ -17,22 +17,28 @@ import { setSideBar, adminLogOut, setActivePage } from "../../store/Slices/Admin
 import { useAdminLogoutMutation } from "../../store/services/authApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmModal";
 
 const AdminNavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const sidebarOpen = useSelector((state) => state.adminAuth.sideBarOpen);
 
-  const active = useSelector((state) => state.adminAuth.activePage)
+  const active = useSelector((state) => state.adminAuth.activePage);
   const [adminLogoutApi] = useAdminLogoutMutation();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = async () => {
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await adminLogoutApi().unwrap();
     } catch (error) {
       console.error("Admin logout error:", error);
     } finally {
       dispatch(adminLogOut());
+      setIsLoggingOut(false);
+      setShowLogoutModal(false);
       navigate("/admin/login");
     }
   };
@@ -176,12 +182,24 @@ const AdminNavBar = () => {
       </div>
 
       <div className="p-4 border-t border-gray-100">
-        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all">
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+        >
           <LogOut size={20} />
 
           {sidebarOpen && <span className="font-medium text-sm">Logout</span>}
         </button>
       </div>
+
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
+        title="Log Out of Admin?"
+        message="Are you sure you want to log out of the admin panel? You will need to sign in again to access the admin controls."
+      />
     </div>
   );
 };

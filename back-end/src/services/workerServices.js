@@ -69,6 +69,7 @@ export const workerSignupService = async ({ files, data }) => {
             isVerified: false,
             isDeleted: false,
             isSuspended: false,
+            isGoogleAuth: Boolean(data.isGoogleAuth),
             role: "worker",
             activeRole: "worker",
             referralCode: await generateUniqueReferralCode(),

@@ -159,8 +159,18 @@ export const googleLogin = async (req, res) => {
         const response = await googleLoginService(accessToken);
 
         if (response.success) {
+            if (response.exists === false) {
+                return res.status(STATUS_CODES.OK).json({
+                    success: true,
+                    exists: false,
+                    message: response.message,
+                    googleUser: response.googleUser,
+                });
+            }
+
             return res.status(STATUS_CODES.OK).json({
                 success: true,
+                exists: true,
                 message: MESSAGES.LOGIN_SUCCESS,
                 user: response.responseUser,
                 accessToken: response.accessToken,

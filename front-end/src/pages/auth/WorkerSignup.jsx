@@ -7,21 +7,32 @@ import OtpModal from "../../components/OtpModal/OtpModal";
 import {
   useSendOtpMutation,
   useWorkerSignUpMutation,
+  useGoogleLoginMutation,
 } from "../../store/services/authApi";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { useDispatch } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import { showWarning } from '../../utils/toast.js'
 
 const WorkerSignup = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const refCodeFromUrl = (searchParams.get("ref") || "").trim().toUpperCase();
 
   const methods = useForm({
     defaultValues: {
       referralCode: refCodeFromUrl,
+      email: location.state?.googleUser?.email || "",
+      name: location.state?.googleUser?.name || "",
     },
   });
+
+  const [googleUser, setGoogleUser] = useState(location.state?.googleUser || null);
+  const [isGoogleVerified, setIsGoogleVerified] = useState(
+    Boolean(location.state?.isGoogleVerified && location.state?.googleUser?.email)
+  );
+  const [googleError, setGoogleError] = useState("");
 
   useEffect(() => {
     if (refCodeFromUrl) {
@@ -43,6 +54,67 @@ const WorkerSignup = () => {
   ] = useSendOtpMutation();
 
   const [workerSignUp] = useWorkerSignUpMutation();
+  const [googleLogin, { isLoading: isGoogleLoading }] = useGoogleLoginMutation();
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    try {
+      setGoogleError("");
+      const res = await googleLogin(tokenResponse.access_token).unwrap();
+
+      if (res.user?.role === "admin") {
+        setGoogleError("Invalid user credentials");
+        return;
+      }
+
+      if (res.exists === true || res.user) {
+        // User account exists: log them in immediately!
+        dispatch(
+          setCredentials({
+            user: res.user,
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          }),
+        );
+        const targetRoute = res.user.role === "worker" ? "/worker/dashboard" : "/poster/my-tasks";
+        navigate(targetRoute);
+        return;
+      }
+
+      if (res.exists === false) {
+        // New user: prefill email & name, bypass OTP
+        setGoogleUser(res.googleUser);
+        setIsGoogleVerified(true);
+        if (res.googleUser.email) {
+          methods.setValue("email", res.googleUser.email, { shouldValidate: true });
+        }
+        if (res.googleUser.name && !methods.getValues("name")) {
+          methods.setValue("name", res.googleUser.name, { shouldValidate: true });
+        }
+      }
+    } catch (err) {
+      setGoogleError(err?.data?.message || "Google authentication failed. Please try again.");
+    }
+  };
+
+  const signInWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => setGoogleError("Google sign-in was cancelled or failed."),
+  });
+
+  const handleClearGoogle = () => {
+    setGoogleUser(null);
+    setIsGoogleVerified(false);
+    methods.setValue("email", "");
+  };
+
+  const handleSwitchToPoster = () => {
+    navigate("/signup/poster", {
+      state: {
+        googleUser,
+        isGoogleVerified,
+      },
+    });
+  };
 
   const sendDataToBackend = useCallback(async (dataToSubmit) => {
     const data = dataToSubmit || formData;
@@ -67,6 +139,7 @@ const WorkerSignup = () => {
       "workPlacelat",
       "workPlacelng",
       "referralCode",
+      "isGoogleAuth",
     ];
 
     textFields.forEach((key) => {
@@ -119,6 +192,12 @@ const WorkerSignup = () => {
   };
 
   const handleFormSubmit = async (data) => {
+    if (isGoogleVerified) {
+      // Google verified: directly submit without OTP!
+      await sendDataToBackend({ ...data, isGoogleAuth: true });
+      return;
+    }
+
     try {
       setEmail(data.email);
       setFormData(data);
@@ -144,6 +223,12 @@ const WorkerSignup = () => {
           isOtpError={isOtpError}
           otpError={otpError}
           isOtpSuccess={isOtpSuccess}
+          isGoogleVerified={isGoogleVerified}
+          onClearGoogle={handleClearGoogle}
+          onGoogleSignUp={signInWithGoogle}
+          isGoogleLoading={isGoogleLoading}
+          googleError={googleError}
+          onSwitchRole={handleSwitchToPoster}
         />
       </FormProvider>
       {showOtp && (

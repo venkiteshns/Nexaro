@@ -18,6 +18,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
 import { useGetWorkerUnreadCountQuery } from "../../store/services/workerApi";
+import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmModal";
 
 const workerNav = [
   {
@@ -181,19 +182,24 @@ const WorkerNavBar = () => {
 
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { data: unreadData } = useGetWorkerUnreadCountQuery();
   const unreadCount = unreadData?.unreadCount || 0;
 
   const [userLogout] = useUserLogoutMutation();
 
-  const handleLogout = async () => {
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await userLogout().unwrap();
     } catch (error) {
       console.error("Worker logout error:", error);
     } finally {
       dispatch(logOut());
+      setIsLoggingOut(false);
+      setShowLogoutModal(false);
       navigate("/user/login");
     }
   };
@@ -231,7 +237,7 @@ const WorkerNavBar = () => {
           unreadCount={unreadCount}
           onToggle={() => setMobileOpen(false)}
           onNavClick={handleNav}
-          onLogout={handleLogout}
+          onLogout={() => setShowLogoutModal(true)}
         />
       </div>
 
@@ -246,9 +252,18 @@ const WorkerNavBar = () => {
           unreadCount={unreadCount}
           onToggle={() => setDesktopOpen(!desktopOpen)}
           onNavClick={handleNav}
-          onLogout={handleLogout}
+          onLogout={() => setShowLogoutModal(true)}
         />
       </div>
+
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
+        title="Log Out of Nexaro?"
+        message="Are you sure you want to log out? You will need to sign in again to access your worker dashboard."
+      />
     </>
   );
 };

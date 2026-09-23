@@ -16,7 +16,7 @@ export default function CompletedTaskContent({
     className = "",
 }) {
     return (
-        <div className={`p-3 sm:p-5 lg:p-6 max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5 pb-12 ${className}`}>
+        <div className={`p-3 sm:p-5 lg:p-6 w-full space-y-3 sm:space-y-3.5 pb-8 ${className}`}>
             <TaskHeaderBanner title={task?.title} {...headerProps} />
 
             <TaskSummaryCard

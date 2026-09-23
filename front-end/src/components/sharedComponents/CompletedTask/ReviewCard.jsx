@@ -10,18 +10,18 @@ const ReviewCard = ({
     viewAllText = "View All Reviews"
 }) => {
     return (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3.5 sm:p-4 flex flex-col justify-between">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-xs p-3 sm:p-3.5 flex flex-col justify-between">
             <div>
-                <p className="font-extrabold text-gray-900 text-sm mb-3">{title}</p>
+                <p className="font-extrabold text-gray-900 text-sm mb-2">{title}</p>
 
                 {review?.rating != null ? (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                         <div className="flex items-center gap-2">
                             <div className="flex items-center gap-0.5">
                                 {Array.from({ length: 5 }).map((_, i) => (
                                     <Star
                                         key={i}
-                                        size={15}
+                                        size={14}
                                         fill={i < Math.round(review.rating) ? '#FBBF24' : 'none'}
                                         color={i < Math.round(review.rating) ? '#FBBF24' : '#D1D5DB'}
                                     />
@@ -33,7 +33,7 @@ const ReviewCard = ({
                         </div>
 
                         {review.text ? (
-                            <blockquote className="text-xs text-gray-700 leading-relaxed italic border-l-2 border-[#0A6E5C] pl-2.5 py-1 bg-gray-50/80 rounded-r-lg">
+                            <blockquote className="text-xs text-gray-700 leading-relaxed italic border-l-2 border-[#0A6E5C] pl-2.5 py-1 pr-3 bg-gray-50/80 rounded-r-lg inline-block max-w-2xl">
                                 "{review.text}"
                             </blockquote>
                         ) : (

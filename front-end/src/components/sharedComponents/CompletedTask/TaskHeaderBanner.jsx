@@ -11,10 +11,10 @@ const TaskHeaderBanner = ({
     const navigate = useNavigate();
 
     return (
-        <div className="mb-3 sm:mb-4">
+        <div>
             <button
                 onClick={() => navigate(backUrl)}
-                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0A6E5C] transition-colors font-semibold mb-2 sm:mb-2.5"
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0A6E5C] transition-colors font-semibold mb-1.5"
             >
                 <ArrowLeft size={14} />
                 {backText}

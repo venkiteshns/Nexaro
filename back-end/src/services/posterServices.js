@@ -19,9 +19,14 @@ import { linkReferralOnSignup } from "./referralService.js";
 
 export const posterSignupService = async (data) => {
   try {
-    const existing = await User.findOne({ email: data.email });
+    const existing = await User.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
     if (existing) {
-      throw new Error("User Already Exists");
+      if (existing.email === data.email) {
+        throw new Error(MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL || "User Already Exists");
+      }
+      if (existing.phone === Number(data.phone)) {
+        throw new Error(MESSAGES.PHONE_ALREADY_IN_USE || "Phone number already in use");
+      }
     }
 
     const locationLat = parseFloat(data.locationLat);
@@ -42,6 +47,7 @@ export const posterSignupService = async (data) => {
       isVerified: false,
       isDeleted: false,
       isSuspended: false,
+      isGoogleAuth: Boolean(data.isGoogleAuth),
       activeRole: "poster",
       referralCode: await generateUniqueReferralCode(),
     };
@@ -616,6 +622,8 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
           status: 1,
           category: 1,
           createdAt: 1,
+          description: 1,
+          photos: 1,
           address: 1,
           amount: 1,
           platformFee: 1,

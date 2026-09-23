@@ -7,18 +7,28 @@ import OtpModal from "../../components/OtpModal/OtpModal";
 import {
   usePosterSignUpMutation,
   useSendOtpMutation,
+  useGoogleLoginMutation,
 } from "../../store/services/authApi";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const PosterSignup = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const refCodeFromUrl = (searchParams.get("ref") || "").trim().toUpperCase();
+
   const [showOtp, setShowOtp] = useState(false);
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
   const [isVerified, setIsVerified] = useState(false);
+
+  const [googleUser, setGoogleUser] = useState(location.state?.googleUser || null);
+  const [isGoogleVerified, setIsGoogleVerified] = useState(
+    Boolean(location.state?.isGoogleVerified && location.state?.googleUser?.email)
+  );
+  const [googleError, setGoogleError] = useState("");
 
   const [sendOtp, { isLoading, isSuccess, isError, error, data }] =
     useSendOtpMutation();
@@ -34,8 +44,63 @@ const PosterSignup = () => {
     },
   ] = usePosterSignUpMutation();
 
+  const [googleLogin, { isLoading: isGoogleLoading }] = useGoogleLoginMutation();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    try {
+      setGoogleError("");
+      const res = await googleLogin(tokenResponse.access_token).unwrap();
+
+      if (res.user?.role === "admin") {
+        setGoogleError("Invalid user credentials");
+        return;
+      }
+
+      if (res.exists === true || res.user) {
+        // User account exists: log them in immediately!
+        dispatch(
+          setCredentials({
+            user: res.user,
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          }),
+        );
+        const targetRoute = res.user.role === "worker" ? "/worker/dashboard" : "/poster/my-tasks";
+        navigate(targetRoute);
+        return;
+      }
+
+      if (res.exists === false) {
+        // New user: prefill form with Google email & name, bypass OTP
+        setGoogleUser(res.googleUser);
+        setIsGoogleVerified(true);
+      }
+    } catch (err) {
+      setGoogleError(err?.data?.message || "Google authentication failed. Please try again.");
+    }
+  };
+
+  const signInWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => setGoogleError("Google sign-in was cancelled or failed."),
+  });
+
+  const handleClearGoogle = () => {
+    setGoogleUser(null);
+    setIsGoogleVerified(false);
+  };
+
+  const handleSwitchToWorker = () => {
+    navigate("/signup/worker", {
+      state: {
+        googleUser,
+        isGoogleVerified,
+      },
+    });
+  };
 
   const resendOtp = async () => {
     try {
@@ -50,6 +115,26 @@ const PosterSignup = () => {
 
   const handleFormData = async (data) => {
     console.log("signup page", data);
+
+    if (isGoogleVerified) {
+      // Google verified: directly sign up without OTP!
+      try {
+        const res = await posterSignUp({ ...data, isGoogleAuth: true }).unwrap();
+        console.log("signUpResponse Res ", res);
+        dispatch(
+          setCredentials({
+            user: res.user,
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          }),
+        );
+        navigate("/poster/my-tasks");
+      } catch (error) {
+        console.log("Poster signup error:", error);
+      }
+      return;
+    }
+
     try {
       setEmail(data.email);
       setFormData(data);
@@ -63,19 +148,23 @@ const PosterSignup = () => {
     }
   };
 
-  const sendDataToBackend = useCallback( async () => {
+  const sendDataToBackend = useCallback(async () => {
     if (!isVerified) return;
-    let res = await posterSignUp(formData).unwrap();
-    console.log("signUpResponse Res ", res);
-    dispatch(
-      setCredentials({
-        user: res.user,
-        accessToken: res.accessToken,
-        refreshToken: res.refreshToken,
-      }),
-    );
-    navigate("/poster/my-tasks");
-  },[isVerified, navigate, dispatch, posterSignUp, formData]);
+    try {
+      let res = await posterSignUp(formData).unwrap();
+      console.log("signUpResponse Res ", res);
+      dispatch(
+        setCredentials({
+          user: res.user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        }),
+      );
+      navigate("/poster/my-tasks");
+    } catch (error) {
+      console.log("Poster signup error:", error);
+    }
+  }, [isVerified, navigate, dispatch, posterSignUp, formData]);
 
   useEffect(() => {
     sendDataToBackend();
@@ -99,6 +188,14 @@ const PosterSignup = () => {
           onSubmitForm={handleFormData}
           isVerified={isVerified}
           initialReferralCode={refCodeFromUrl}
+          initialEmail={googleUser?.email || ""}
+          initialName={googleUser?.name || ""}
+          isGoogleVerified={isGoogleVerified}
+          onClearGoogle={handleClearGoogle}
+          onGoogleSignUp={signInWithGoogle}
+          isGoogleLoading={isGoogleLoading}
+          googleError={googleError}
+          onSwitchRole={handleSwitchToWorker}
           otpStatus={{ isLoading, isSuccess, isError, error, data }}
           formStatus={{
             signUpLoading,
