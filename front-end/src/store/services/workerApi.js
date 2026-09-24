@@ -117,9 +117,12 @@ export const workerApi = api.injectEndpoints({
         profileData.append('phone', data.phone)
         profileData.append('skills', JSON.stringify(data.skills))
         profileData.append('languages', JSON.stringify(data.languages))
-        if (data.avatar) {
-          console.log(data.avatar);
-          profileData.append('avatar', data?.avatar)
+        if (data.avatarObject) {
+          profileData.append('avatarObject', JSON.stringify(data.avatarObject));
+        } else if (data.avatarUrl) {
+          profileData.append('avatarUrl', data.avatarUrl);
+        } else if (data.avatar) {
+          profileData.append('avatar', data?.avatar);
         }
         return {
           url: WORKER.UPDATE_PROFILE,

@@ -106,3 +106,9 @@ export const REFERRAL = {
     VALIDATE_CODE: "/referral/validate",
 };
 
+export const UPLOAD = {
+    PRESIGN: "/upload/presign",
+    PRESIGN_BATCH: "/upload/presign-batch",
+    FALLBACK: "/upload/fallback",
+};
+

@@ -17,7 +17,6 @@ const WithdrawBidModal = ({
   const onConfirm = async () => {
     try {
       const response = await withdrawBid(bidId).unwrap();
-      console.log("response", response);
       if (response.success) {
         showSuccess(response.message);
         if (isWithdrawSuccess) {
@@ -26,14 +25,11 @@ const WithdrawBidModal = ({
         onClose();
       }
     } catch (error) {
-      console.log(error);
       showError(error.data.message);
       setTimeout(() => {
         onClose();
       }, 1500);
     }
-    console.log(bidId);
-    console.log("Confirming bid withdrawal");
   };
 
   const formattedAmount = Number(bidAmount).toLocaleString("en-IN");

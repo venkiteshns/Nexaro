@@ -108,19 +108,16 @@ const PosterSignup = () => {
         email: formData.email,
         phone: formData.phone,
       }).unwrap();
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // ignore
     }
   };
 
   const handleFormData = async (data) => {
-    console.log("signup page", data);
-
     if (isGoogleVerified) {
       // Google verified: directly sign up without OTP!
       try {
         const res = await posterSignUp({ ...data, isGoogleAuth: true }).unwrap();
-        console.log("signUpResponse Res ", res);
         dispatch(
           setCredentials({
             user: res.user,
@@ -129,8 +126,8 @@ const PosterSignup = () => {
           }),
         );
         navigate("/poster/my-tasks");
-      } catch (error) {
-        console.log("Poster signup error:", error);
+      } catch {
+        // ignore
       }
       return;
     }
@@ -143,8 +140,8 @@ const PosterSignup = () => {
         phone: data.phone,
       }).unwrap();
       setShowOtp(true);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // ignore
     }
   };
 
@@ -152,7 +149,6 @@ const PosterSignup = () => {
     if (!isVerified) return;
     try {
       let res = await posterSignUp(formData).unwrap();
-      console.log("signUpResponse Res ", res);
       dispatch(
         setCredentials({
           user: res.user,
@@ -161,8 +157,8 @@ const PosterSignup = () => {
         }),
       );
       navigate("/poster/my-tasks");
-    } catch (error) {
-      console.log("Poster signup error:", error);
+    } catch {
+      // ignore
     }
   }, [isVerified, navigate, dispatch, posterSignUp, formData]);
 

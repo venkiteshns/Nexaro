@@ -13,7 +13,8 @@ import { setCredentials } from "../../store/Slices/UserSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import { showWarning } from '../../utils/toast.js'
+import { showWarning } from '../../utils/toast.js';
+import { uploadFileToS3 } from "../../utils/s3Upload.js";
 
 const WorkerSignup = () => {
   const [searchParams] = useSearchParams();
@@ -120,7 +121,6 @@ const WorkerSignup = () => {
     const data = dataToSubmit || formData;
     if (!data) return;
     const fd = new FormData();
-    console.log("called");
 
     const textFields = [
       "name",
@@ -152,17 +152,50 @@ const WorkerSignup = () => {
     if (data.language)
       fd.append("language", JSON.stringify(data.language));
 
-    const fileFields = ["id_front", "id_back", "selfie"];
-    fileFields.forEach((key) => {
-      const fileList = data[key];
-      if (fileList && fileList[0] instanceof File) {
-        fd.append(key, fileList[0]);
+    const uploadedDocs = {};
+    const uploadPromises = [];
+
+    if (data.id_front?.[0] instanceof File) {
+      uploadPromises.push(
+        uploadFileToS3(data.id_front[0], `user/${data.email}/verification`).then((res) => {
+          uploadedDocs.idFront = res;
+        })
+      );
+    }
+    if (data.id_back?.[0] instanceof File) {
+      uploadPromises.push(
+        uploadFileToS3(data.id_back[0], `user/${data.email}/verification`).then((res) => {
+          uploadedDocs.idBack = res;
+        })
+      );
+    }
+    if (data.selfie?.[0] instanceof File) {
+      uploadPromises.push(
+        uploadFileToS3(data.selfie[0], `user/${data.email}/verification`).then((res) => {
+          uploadedDocs.selfie = res;
+        })
+      );
+    }
+
+    if (uploadPromises.length > 0) {
+      try {
+        await Promise.all(uploadPromises);
+        fd.append("uploadedDocuments", JSON.stringify(uploadedDocs));
+      } catch (uploadErr) {
+        console.warn("Direct S3 upload error, will fallback to server stream:", uploadErr);
+        // Fallback: append raw files if S3 upload throws
+        const fileFields = ["id_front", "id_back", "selfie"];
+        fileFields.forEach((key) => {
+          const fileList = data[key];
+          if (fileList && fileList[0] instanceof File) {
+            fd.append(key, fileList[0]);
+          }
+        });
       }
-    });
+    }
 
     try {
       const res = await workerSignUp(fd).unwrap();
-      console.log("signUpResponse Res", res);
       dispatch(
         setCredentials({
           user: res.user,
@@ -173,7 +206,6 @@ const WorkerSignup = () => {
       navigate("/worker/dashboard");
     } catch (err) {
       showWarning(err.data?.message);
-      console.log("Sign up error", err);
       setIsVerified(false);
     }
   }, [formData, workerSignUp, navigate, dispatch]);
@@ -184,11 +216,10 @@ const WorkerSignup = () => {
   };
 
   const resendOtp = async () => {
-    const response = await sendOtp({
+    await sendOtp({
       email: formData.email,
       phone: formData.phone,
     }).unwrap();
-    console.log(response);
   };
 
   const handleFormSubmit = async (data) => {
@@ -201,16 +232,14 @@ const WorkerSignup = () => {
     try {
       setEmail(data.email);
       setFormData(data);
-      const response = await sendOtp({
+      await sendOtp({
         email: data.email,
         phone: data.phone,
       }).unwrap();
       setShowOtp(true);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // ignore
     }
-    console.log("WorkerSignUp", data);
   };
 
   return (

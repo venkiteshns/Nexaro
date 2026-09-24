@@ -111,9 +111,8 @@ function TaskCard({ task }) {
             }
             setWork(payload);
             setShowReleasePaymentModal(true);
-        } catch (error) {
+        } catch {
             showWarning("Unable to intiate payment, Please click view progress")
-            console.log(error);
         }
     }
 

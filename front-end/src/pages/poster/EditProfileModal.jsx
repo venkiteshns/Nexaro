@@ -15,6 +15,7 @@ import {
 
 import { showError, showSuccess } from "../../utils/toast";
 import UpdatePasswordModal from "../../components/sharedComponents/UpdatePasswordModal";
+import { uploadFileToS3 } from "../../utils/s3Upload";
 
 const EditProfileModal = ({ onClose, posterInfo }) => {
 
@@ -55,7 +56,15 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
     const formData = new FormData();
     formData.append("email", data.email);
     formData.append("phone", data.phone);
-    if (selectedAvatar) {
+    if (selectedAvatar instanceof File) {
+      try {
+        const avatarObj = await uploadFileToS3(selectedAvatar, "avatars");
+        formData.append("avatarObject", JSON.stringify(avatarObj));
+      } catch (err) {
+        console.warn("Direct S3 upload failed, sending raw avatar:", err);
+        formData.append("avatar", selectedAvatar);
+      }
+    } else if (selectedAvatar) {
       formData.append("avatar", selectedAvatar);
     }
     if(!isVerified && emailChanged) {
@@ -66,7 +75,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
       showSuccess("Profile updated successfully");
       onClose();
     } catch (error) {
-      console.log(error);
       showError(error?.data?.message || "Failed to update profile");
     } finally {
       setPendingData(null);
@@ -172,7 +180,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
               accept="image/*"
               className="hidden"
               onChange={(e) => {
-                console.log(e.target.files);
                 setSelectedAvatar(e.target.files[0]);
               }}
               ref={(el) => {

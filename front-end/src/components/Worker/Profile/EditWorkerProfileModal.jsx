@@ -41,7 +41,6 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
         onSave(pendingData)
       }
     })()
-    console.log("isVerified status", isVerified)
   }, [isVerified, onSave, pendingData])
 
   if (!isOpen) return null;
@@ -53,9 +52,6 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
 
 
   const { formState: { isDirty } } = methods;
-
-  console.log(dirty, isDirty);
-
 
   const handleSubmit = methods.handleSubmit((data) => {
     let hasError = false;
@@ -73,7 +69,6 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
         if (onSave) onSave(data);
       }
       sendOtp({ email: data.email, phone: worker?.phone, resendFlag: true })
-      console.log("not Verified");
       setPendingData(data);
       setShowOtp(true);
       return;

@@ -1065,7 +1065,7 @@ export const markNotificationReadService = async (notificationId) => {
     const notification = await AdminNotification.findByIdAndUpdate(
         notificationId,
         { $set: { isRead: true } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     if (!notification) {
         return { success: false, message: "Notification not found" };

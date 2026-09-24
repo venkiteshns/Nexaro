@@ -37,7 +37,13 @@ export const createTaskService = async (body, files, posterId) => {
         const address = JSON.parse(body.address);
         const location = JSON.parse(body.location);
         let images = [];
-        if (files && files.length > 0) {
+        if (body.images) {
+            try {
+                images = typeof body.images === "string" ? JSON.parse(body.images) : body.images;
+            } catch {
+                images = [];
+            }
+        } else if (files && files.length > 0) {
             images = await uploadImagesToCloudinary(files);
         }
 
@@ -664,7 +670,13 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
         }
 
         let uploadedImages = [];
-        if (newFiles && newFiles.length > 0) {
+        if (body.newImages) {
+            try {
+                uploadedImages = typeof body.newImages === "string" ? JSON.parse(body.newImages) : body.newImages;
+            } catch {
+                uploadedImages = [];
+            }
+        } else if (newFiles && newFiles.length > 0) {
             uploadedImages = await uploadImagesToCloudinary(newFiles);
         }
 
@@ -698,7 +710,7 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
                     location,
                 },
             },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         const [task_lng, task_lat] = task.location.coordinates;

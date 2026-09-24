@@ -195,8 +195,11 @@ export const verifyOtp = async (email, otp) => {
   return { success: true, message: messages.OTP_VERIFIED };
 };
 
-export const loginService = async (userData, isAdmin) => {
-  const { email, password } = userData;
+export const loginService = async (userData = {}, isAdmin) => {
+  const { email, password } = userData || {};
+  if (!email || !password) {
+    return { success: false, message: messages.EMAIL_AND_PASSWORD_REQUIRED };
+  }
   if (isAdmin) {
     const existingUser = await User.findOne({ email, activeRole: "admin" });
     if (!existingUser) {

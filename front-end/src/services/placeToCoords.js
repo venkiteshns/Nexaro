@@ -1,7 +1,6 @@
 export const placeToCoords = async ({ city, area, district, state, country }) => {
   const parts = [area, city, district, state, country].filter(Boolean);
   const query = parts.join(", ");
-  console.log("query : ", query);
 
   try {
     let response = await fetch(

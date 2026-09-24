@@ -37,7 +37,11 @@ export const refreshAccessToken = async (req, res) => {
 
 export const getOtpForSignUp = async (req, res) => {
     try {
-        const response = await setOtp(req.body.email);
+        const { email } = req.body || {};
+        if (!email) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.EMAIL_REQUIRED });
+        }
+        const response = await setOtp(email);
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.OTP_SENT });
         } else {
@@ -52,7 +56,11 @@ export const getOtpForSignUp = async (req, res) => {
 
 export const verifySignUpOtp = async (req, res) => {
     try {
-        const response = await verifyRedisOtp(req.body.email, req.body.otp);
+        const { email, otp } = req.body || {};
+        if (!email || !otp) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.INVALID_OTP });
+        }
+        const response = await verifyRedisOtp(email, otp);
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.OTP_VERIFIED });
         } else {

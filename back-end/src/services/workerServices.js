@@ -94,17 +94,24 @@ export const workerSignupService = async ({ files, data }) => {
             };
         }
 
-        console.log("files", files);
+        if (data.uploadedDocuments) {
+            const docs = typeof data.uploadedDocuments === "string"
+                ? JSON.parse(data.uploadedDocuments)
+                : data.uploadedDocuments;
+            payLoad.verificationDocuments.selfie = docs.selfie;
+            payLoad.verificationDocuments.idFront = docs.idFront || docs.id_front;
+            payLoad.verificationDocuments.idBack = docs.idBack || docs.id_back;
+        } else if (files && Object.keys(files).length > 0) {
+            const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 
-        const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
+            if (uploadStatus.error) {
+                throw new Error("Error in Uploading Files")
+            }
 
-        if (uploadStatus.error) {
-            throw new Error("Error in Uploading Files")
+            payLoad.verificationDocuments.selfie = uploadStatus.selfie;
+            payLoad.verificationDocuments.idFront = uploadStatus.id_front;
+            payLoad.verificationDocuments.idBack = uploadStatus.id_back;
         }
-
-        payLoad.verificationDocuments.selfie = uploadStatus.selfie;
-        payLoad.verificationDocuments.idFront = uploadStatus.id_front;
-        payLoad.verificationDocuments.idBack = uploadStatus.id_back;
 
         console.log(payLoad);
 
@@ -340,7 +347,16 @@ export const updateWorkerProfileService = async ({ user, data, avatar }) => {
         if (!userData) {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
-        if (avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
+        if (data.avatarObject) {
+            const avatarObj = typeof data.avatarObject === "string" ? JSON.parse(data.avatarObject) : data.avatarObject;
+            userData.verificationDocuments.selfie = avatarObj;
+        } else if (data.avatarUrl) {
+            userData.verificationDocuments.selfie = {
+                url: data.avatarUrl,
+                key: data.avatarKey || "",
+                format: data.avatarFormat || "image/jpeg"
+            };
+        } else if (avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
             const uploadStatus = await uploadManyFiles(avatar, `user/${data.email}/verification`);
             if (uploadStatus.error) {
                 return { error: "Unable to upload profile picture, Please try again." }
@@ -949,7 +965,7 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
                 $set: { walletAmount: 0 },
                 $inc: { withDrawn: withdrawAmount },
             },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         const itemStatus = payoutResponse.finalStatus?.itemStatus;
@@ -1099,7 +1115,7 @@ export const markWorkerNotificationReadService = async (workerId, notificationId
     const notification = await WorkerNotification.findOneAndUpdate(
         { _id: notifObjectId, workerId: workerObjectId },
         { $set: { isRead: true } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     if (!notification) {
         return { error: "Notification not found" };

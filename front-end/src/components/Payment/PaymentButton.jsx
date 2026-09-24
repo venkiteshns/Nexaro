@@ -36,9 +36,6 @@ export default function PaymentButton({ amount, bidId, onSuccess }) {
                         try {
                             const captureResult = await capturePayment(data.orderID).unwrap();
 
-                            console.log(captureResult);
-
-
                             switch (captureResult?.status) {
                                 case "Success":
                                 case "AlreadyCaptured":

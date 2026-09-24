@@ -450,7 +450,7 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
     if (!user) {
       return { error: "user not found" };
     }
-    const { email, phone } = body;
+    const { email, phone, avatarObject, avatarUrl, avatarKey, avatarFormat } = body;
 
     const isDuplicateEmail = await User.findOne({ email, _id: { $ne: userId } });
     if (isDuplicateEmail) {
@@ -464,7 +464,16 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
 
     user.email = email;
     user.phone = phone;
-    if (avatar && avatar.length > 0) {
+    if (avatarObject) {
+      const avatarObj = typeof avatarObject === "string" ? JSON.parse(avatarObject) : avatarObject;
+      user.verificationDocuments.selfie = avatarObj;
+    } else if (avatarUrl) {
+      user.verificationDocuments.selfie = {
+        url: avatarUrl,
+        key: avatarKey || "",
+        format: avatarFormat || "image/jpeg",
+      };
+    } else if (avatar && avatar.length > 0) {
       const uploadedAvatar = await uploadManyFiles([avatar], "avatars");
       user.verificationDocuments.selfie = uploadedAvatar[0];
     }
@@ -701,16 +710,27 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
     userData.isVerified = false;
     userData.serviceArea.coordinates = [data.lng, data.lat];
 
-    const uploadedFiles = await uploadManyFiles(files, `user/${user._id}/verification`)
+    if (data.uploadedDocuments) {
+      const docs = typeof data.uploadedDocuments === "string"
+        ? JSON.parse(data.uploadedDocuments)
+        : data.uploadedDocuments;
+      userData.verificationDocuments = {
+        idFront: docs.idFront || docs.id_front,
+        idBack: docs.idBack || docs.id_back,
+        selfie: docs.selfie,
+      };
+    } else if (files && Object.keys(files).length > 0) {
+      const uploadedFiles = await uploadManyFiles(files, `user/${user._id}/verification`);
 
-    if (uploadedFiles.error) {
-      return { error: "Unable to upload images, try again later" };
+      if (uploadedFiles.error) {
+        return { error: "Unable to upload images, try again later" };
+      }
+      userData.verificationDocuments = {
+        idFront: uploadedFiles.id_front,
+        idBack: uploadedFiles.id_back,
+        selfie: uploadedFiles.selfie,
+      };
     }
-    userData.verificationDocuments = {
-      idFront: uploadedFiles.id_front,
-      idBack: uploadedFiles.id_back,
-      selfie: uploadedFiles.selfie,
-    };
 
     await userData.save();
 
@@ -805,7 +825,7 @@ export const markPosterNotificationReadService = async (posterId, notificationId
   const notification = await PosterNotification.findOneAndUpdate(
     { _id: notifObjectId, posterId: posterObjectId },
     { $set: { isRead: true } },
-    { new: true }
+    { returnDocument: 'after' }
   );
   if (!notification) {
     return { error: "Notification not found" };

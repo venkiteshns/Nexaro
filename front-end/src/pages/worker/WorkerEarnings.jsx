@@ -15,10 +15,8 @@ export default function WorkerEarnings() {
 
 
 
-  const { data, isLoading, isError, isSuccess } = useGetEarningHeroDataQuery();
+  const { data } = useGetEarningHeroDataQuery();
 
-  console.log("is Loading", isLoading);
-  console.log("Data : ", data);
   const availableBalance = data?.earningsData?.walletAmount;
   const totalEarned = data?.earningsData?.totalEarned;
   const totalJobs = data?.earningsData?.completedTasks;
@@ -26,8 +24,6 @@ export default function WorkerEarnings() {
   const earnedLast7Days = data?.earningsData?.earnedLast7Days;
   const averageAmount = data?.earningsData?.averageAmount;
   const sinceDate = data?.earningsData?.sinceDate;
-  console.log("is Success", isSuccess);
-  console.log("is Error", isError);
 
   const [transactions] = useState();
 

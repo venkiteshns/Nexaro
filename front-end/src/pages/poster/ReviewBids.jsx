@@ -55,11 +55,9 @@ const ReviewBids = () => {
     const handleConfirmAccept = async () => {
         try {
             setAcceptedBidDetails(pendingAccept);
-            const response = await acceptBid(pendingAccept._id).unwrap();
+            await acceptBid(pendingAccept._id).unwrap();
             showSuccess("Bid accepted successfully");
-            console.log('response : ', response);
-        } catch (error) {
-            console.log(error);
+        } catch {
             showError("Failed to accept bid, Please retry after some time");
         } finally {
             setPendingAccept(null);

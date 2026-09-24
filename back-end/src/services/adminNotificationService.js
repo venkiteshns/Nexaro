@@ -76,7 +76,16 @@ const formatTaskLocation = (address) => {
   return address.city || address.district || "Kerala";
 };
 
-export const syncRealPlatformNotifications = async () => {
+let isSyncing = false;
+let lastSyncTime = 0;
+const SYNC_COOLDOWN_MS = 15 * 60 * 1000;
+
+export const syncRealPlatformNotifications = async (force = false) => {
+  const now = Date.now();
+  if (isSyncing || (!force && now - lastSyncTime < SYNC_COOLDOWN_MS)) {
+    return;
+  }
+  isSyncing = true;
   try {
     await AdminNotification.deleteMany({
       $or: [
@@ -282,9 +291,10 @@ export const syncRealPlatformNotifications = async () => {
     if (operations.length > 0) {
       await AdminNotification.bulkWrite(operations, { ordered: false });
     }
-
-    console.log(`Synced ${operations.length} real platform notifications to AdminNotification collection.`);
   } catch (err) {
     console.error("Error syncing real platform notifications:", err.message);
+  } finally {
+    isSyncing = false;
+    lastSyncTime = Date.now();
   }
 };

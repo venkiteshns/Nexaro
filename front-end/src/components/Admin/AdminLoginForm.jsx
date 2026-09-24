@@ -38,8 +38,6 @@ const AdminLoginForm = () => {
         setIsAdmin(false);
         return;
       }
-      console.log(res.success);
-
       if (res.success) {
         dispatch(
           setAdminCredentials({
@@ -50,14 +48,10 @@ const AdminLoginForm = () => {
         );
         navigate(`/admin/dashboard`);
       }
-    } catch (err) {
-      console.log("Admin login error:", err);
+    } catch {
+      // ignore error
     }
   };
-
-  useEffect(() => {
-    console.log("forgot ", forgotPassword);
-  }, [forgotPassword]);
 
   return (
     <div className="min-h-screen flex-1 flex items-center  justify-center px-6 py-12 ">
