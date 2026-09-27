@@ -1,5 +1,6 @@
 import { captureOrderService, createOrderService, orderPayoutService } from "../services/paymentServices.js";
 import STATUS_CODES from "../constants/statusCodes.js";
+import logger from "../utils/logger.js";
 
 export const createOrder = async (req, res) => {
     const response = await createOrderService(req.body);
@@ -12,7 +13,6 @@ export const createOrder = async (req, res) => {
 
 export const captureOrder = async (req, res) => {
     const response = await captureOrderService(req.params.orderId, req.user);
-    console.log("response", response);
     if (response.success) {
         res.status(STATUS_CODES.OK).json({status: response.status, order: response.order });
     } else {
@@ -23,7 +23,6 @@ export const captureOrder = async (req, res) => {
 export const orderPayout = async (req, res) => {
 
     const response = await orderPayoutService({bidId: req.params.bidId, user:req.user})
-    console.log(response);
     if(response.success){
         return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
     }

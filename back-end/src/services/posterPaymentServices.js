@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 import Transaction from "../models/transactionSchema.js";
 import Task from "../models/taskSchema.js";
+import logger from "../utils/logger.js";
 
 /**
  * Get payment statistics and overview for a poster:
@@ -76,7 +77,7 @@ export const getPosterPaymentOverviewService = async ({ userId }) => {
       },
     };
   } catch (error) {
-    console.error("getPosterPaymentOverviewService error:", error.message);
+    logger.error("getPosterPaymentOverviewService error:", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -186,7 +187,7 @@ export const getPosterPaymentHistoryService = async ({
       },
     };
   } catch (error) {
-    console.error("getPosterPaymentHistoryService error:", error.message);
+    logger.error("getPosterPaymentHistoryService error:", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -288,7 +289,7 @@ export const getPosterSpendingChartService = async ({ userId, timeframe = "30D" 
       chartData,
     };
   } catch (error) {
-    console.error("getPosterSpendingChartService error:", error.message);
+    logger.error("getPosterSpendingChartService error:", error.message);
     return { success: false, error: error.message };
   }
 };

@@ -125,7 +125,6 @@ const TaskLocation = () => {
             setValue("district", place.district || "", { shouldValidate: true });
             setValue("city", place.city || "", { shouldValidate: true });
             clearErrors("city");
-            console.log("place : ", place);
             setFetchCords("success");
         } catch {
             setFetchCords("fail");

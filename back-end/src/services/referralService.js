@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Referral from "../models/referralSchema.js";
 import Wallet from "../models/walletSchema.js";
@@ -7,6 +7,7 @@ import { recordWorkerAlert } from "./workerNotificationService.js";
 import { recordPosterAlert } from "./posterNotificationService.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
 import { getIo } from "../socket.js";
+import logger from "../utils/logger.js";
 
 const DEFAULT_REFERRER_REWARD = Number(process.env.REFERRAL_REFERRER_BONUS) || 100;
 const DEFAULT_REFEREE_REWARD = Number(process.env.REFERRAL_REFEREE_BONUS) || 50;
@@ -41,7 +42,7 @@ export const validateReferralCodeService = async (code, currentUserId = null) =>
       code: referrer.referralCode,
     };
   } catch (error) {
-    console.error("validateReferralCodeService error:", error.message);
+    logger.error("validateReferralCodeService error:", error.message);
     return { valid: false, message: "Error validating referral code" };
   }
 };
@@ -61,12 +62,12 @@ export const linkReferralOnSignup = async ({ newUserId, referralCode }) => {
     });
 
     if (!referrer) {
-      console.warn(`Referral code ${trimmedCode} not found for user ${newUserId}`);
+      logger.warn(`Referral code ${trimmedCode} not found for user ${newUserId}`);
       return null;
     }
 
     if (referrer._id.toString() === newUserId.toString()) {
-      console.warn(`Self-referral attempted by user ${newUserId}`);
+      logger.warn(`Self-referral attempted by user ${newUserId}`);
       return null;
     }
 
@@ -92,7 +93,7 @@ export const linkReferralOnSignup = async ({ newUserId, referralCode }) => {
 
     return referral;
   } catch (error) {
-    console.error("linkReferralOnSignup error:", error.message);
+    logger.error("linkReferralOnSignup error:", error.message);
     return null;
   }
 };
@@ -238,7 +239,7 @@ export const checkAndProcessReferralMilestone = async ({ posterId, workerId }) =
 
     await Promise.all(candidates.map((candidate) => processCandidateReferral(candidate)));
   } catch (error) {
-    console.error("checkAndProcessReferralMilestone error:", error.message);
+    logger.error("checkAndProcessReferralMilestone error:", error.message);
   }
 };
 
@@ -285,7 +286,7 @@ export const getUserReferralStatsService = async (userId) => {
       },
     };
   } catch (error) {
-    console.error("getUserReferralStatsService error:", error.message);
+    logger.error("getUserReferralStatsService error:", error.message);
     return { success: false, message: error.message };
   }
 };

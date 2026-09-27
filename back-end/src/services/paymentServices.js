@@ -12,6 +12,7 @@ import { convertInrToUsd, convertUsdToInr } from "../utils/currency.js";
 import Transaction from "../models/transactionSchema.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
 import { checkAndProcessReferralMilestone } from "./referralService.js";
+import logger from "../utils/logger.js";
 
 export async function getPayoutStatus(payoutBatchId, accessToken) {
   if (!accessToken) {
@@ -52,7 +53,7 @@ export async function pollPayoutStatus(payoutBatchId, accessToken, maxAttempts =
     const item = data.items?.[0];
     const itemStatus = item?.transaction_status;
 
-    console.log(`Poll attempt ${attempt}: item status = ${itemStatus}`);
+    logger.debug(`Poll attempt ${attempt}: item status = ${itemStatus}`);
 
     if (itemStatus && TERMINAL_STATUSES.includes(itemStatus)) {
       return {
@@ -124,12 +125,10 @@ export async function payoutTransferService(receiverEmail, amount, currency = "U
         break;
       } catch (fetchErr) {
         if (attempt === 2) throw fetchErr;
-        console.warn(`payoutTransferService attempt ${attempt} failed (${fetchErr.message}). Retrying...`);
+        logger.warn(`payoutTransferService attempt ${attempt} failed (${fetchErr.message}). Retrying...`);
         await new Promise(r => setTimeout(r, 600));
       }
     }
-
-    console.log("Payout Initiation Response:", data);
 
     if (!response.ok) {
       let errorMsg = data.message || data.name || "Failed to initiate PayPal payout";
@@ -158,15 +157,12 @@ export async function payoutTransferService(receiverEmail, amount, currency = "U
     };
 
   } catch (error) {
-    console.error("payoutTransferService error:", error);
+    logger.error("payoutTransferService error:", error);
     return { success: false, stage: 'exception', error: error.message };
   }
 }
 
 export const createOrderService = async (orderDetails) => {
-
-  console.log(orderDetails);
-
   try {
     const { items, totalAmount, bidId } = orderDetails;
 
@@ -198,11 +194,10 @@ export const createOrderService = async (orderDetails) => {
 
     dbOrder.paypalOrderId = paypalOrder.id;
     await dbOrder.save();
-    console.log(paypalOrder);
 
     return { success: true, order: paypalOrder };
   } catch (error) {
-    console.error('Error creating order:', error);
+    logger.error('Error creating order:', error);
     return { success: false, error: 'Failed to create order' };
   }
 }
@@ -211,7 +206,7 @@ const recordEscrowTransaction = async ({ dbOrder, user, status }) => {
   try {
     const adminUserId = process.env.ADMIN_USER_ID;
     if (!adminUserId) {
-      console.warn("ADMIN_USER_ID is not configured in environment variables.");
+      logger.warn("ADMIN_USER_ID is not configured in environment variables.");
     }
 
     const bid = await Bid.findById(dbOrder.bidId);
@@ -238,7 +233,7 @@ const recordEscrowTransaction = async ({ dbOrder, user, status }) => {
       await existingTransaction.save();
     }
   } catch (err) {
-    console.error("Error recording escrow transaction:", err);
+    logger.error("Error recording escrow transaction:", err);
   }
 };
 
@@ -276,7 +271,7 @@ export const captureOrderService = async (orderId, user) => {
     }
 
     if (!response.ok) {
-      console.error('PayPal capture failed:', captureData);
+      logger.error('PayPal capture failed:', captureData);
       dbOrder.status = 'Failed';
       await dbOrder.save();
       await recordEscrowTransaction({ dbOrder, user, status: "failed" });
@@ -338,7 +333,7 @@ export const captureOrderService = async (orderId, user) => {
     }
 
     if (captureStatus === "COMPLETED") {
-      console.error("Amount/currency mismatch on completed capture", {
+      logger.error("Amount/currency mismatch on completed capture", {
         capturedAmount,
         capturedCurrency,
         expectedAmount: dbOrder.totalAmount,
@@ -360,13 +355,12 @@ export const captureOrderService = async (orderId, user) => {
       data: captureData,
     };
   } catch (error) {
-    console.error('Error capturing order:', error);
+    logger.error('Error capturing order:', error);
     return { success: false, error: 'Failed to process capture' };
   }
 }
 
 export const orderPayoutService = async ({ bidId, user }) => {
-  console.log(bidId, user);
   try {
     const order = await Order.findOne({ bidId })
     const bid = await Bid.findById(bidId)
@@ -475,12 +469,12 @@ export const orderPayoutService = async ({ bidId, user }) => {
     checkAndProcessReferralMilestone({
       posterId: user._id,
       workerId: bid.workerId,
-    }).catch((err) => console.error("Referral milestone processing error:", err.message));
+    }).catch((err) => logger.error("Referral milestone processing error:", err.message));
 
     return { success: true, message: "Payment has been released to Worker" };
 
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     return { success: false, message: "Unexpected error occoured" }
   }
 }

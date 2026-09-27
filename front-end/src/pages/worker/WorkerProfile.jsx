@@ -15,8 +15,7 @@ import { showError, showSuccess, showWarning } from '../../utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials } from '../../store/Slices/UserSlice';
-
-
+import { uploadFileToS3 } from '../../utils/s3Upload';
 
 const WorkerProfile = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -32,16 +31,18 @@ const WorkerProfile = () => {
 
     const handleEditProfile = async (data) => {
         try {
-            let response = await updateWorkerProfile (data).unwrap();
-            console.log(response);
-            showSuccess(response.message)
+            let avatarObject = null;
+            if (data.avatar instanceof File) {
+                avatarObject = await uploadFileToS3(data.avatar, `user/${data.email}/verification`);
+            }
+            let response = await updateWorkerProfile({ ...data, avatarObject }).unwrap();
+            showSuccess(response.message);
             return setOpenEditModal(false);
         } catch (error) {
             console.error(error);
-            showWarning(error.data.message);
+            showWarning(error?.data?.message || "Failed to update profile");
         }
-        console.log(data);
-    }
+    };
 
     const navigateReviewPage = () => {
        return navigate('/worker/all-reviews')

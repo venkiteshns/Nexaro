@@ -1,8 +1,9 @@
-import STATUS_CODES from "../constants/statusCodes.js";
+﻿import STATUS_CODES from "../constants/statusCodes.js";
 import {
   getUserReferralStatsService,
   validateReferralCodeService,
 } from "../services/referralService.js";
+import logger from "../utils/logger.js";
 
 /**
  * Controller to get authenticated user's referral code, stats, and invited friends.
@@ -24,7 +25,7 @@ export const getReferralStats = async (req, res) => {
       data: response.data,
     });
   } catch (error) {
-    console.error("getReferralStats controller error:", error.message);
+    logger.error("getReferralStats controller error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to fetch referral statistics",
@@ -50,7 +51,7 @@ export const validateReferralCode = async (req, res) => {
       code: response.code,
     });
   } catch (error) {
-    console.error("validateReferralCode controller error:", error.message);
+    logger.error("validateReferralCode controller error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       valid: false,

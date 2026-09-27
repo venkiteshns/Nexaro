@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import { showError, showSuccess, showWarning } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
+import { uploadFileToS3 } from "../../utils/s3Upload";
 
 const PosterProfile = () => {
   const { data, isLoading } = useGetPosterProfileQuery();
@@ -51,8 +52,41 @@ const PosterProfile = () => {
 
   const handleRoleSwitchSubmission = async (data) => {
     try {
-      let response = await switchRole(data).unwrap();
-      console.log(response);
+      const uploadedDocs = {};
+      const uploadPromises = [];
+
+      if (data.id_front?.[0] instanceof File) {
+        uploadPromises.push(
+          uploadFileToS3(data.id_front[0], `user/${user?._id || "switch"}/verification`).then((res) => {
+            uploadedDocs.idFront = res;
+          })
+        );
+      }
+      if (data.id_back?.[0] instanceof File) {
+        uploadPromises.push(
+          uploadFileToS3(data.id_back[0], `user/${user?._id || "switch"}/verification`).then((res) => {
+            uploadedDocs.idBack = res;
+          })
+        );
+      }
+      if (data.selfie?.[0] instanceof File) {
+        uploadPromises.push(
+          uploadFileToS3(data.selfie[0], `user/${user?._id || "switch"}/verification`).then((res) => {
+            uploadedDocs.selfie = res;
+          })
+        );
+      }
+
+      if (uploadPromises.length > 0) {
+        try {
+          await Promise.all(uploadPromises);
+          data.uploadedDocuments = uploadedDocs;
+        } catch (uploadErr) {
+          console.warn("Direct S3 upload failed during role switch, using fallback stream:", uploadErr);
+        }
+      }
+
+      await switchRole(data).unwrap();
       const updatedUser = { ...user, role: 'worker' };
       showSuccess("Switching to Worker Mode");
       setTimeout(() => {
@@ -60,21 +94,18 @@ const PosterProfile = () => {
           user: updatedUser,
           refreshToken,
           accessToken
-        }))
+        }));
         navigate('/worker/dashboard', { replace: true });
       }, 2600);
     } catch (error) {
-      console.log(error);
       showError(error?.data?.message || "Couldn't switch role now ! Try later..");
     }
-    console.log("RoleData", data);
-  }
+  };
 
   const handleRoleSwitch = async () => {
     if (posterInfo.isWorkerActive) {
       try {
         await roleSwitch().unwrap();
-        console.log("redirect to worker profile");
         const updatedUser = { ...user, role: 'worker' };
         showSuccess("Switching to Worker Mode");
         setTimeout(() => {
@@ -92,7 +123,6 @@ const PosterProfile = () => {
 
     }
     setShowRoleSwitchModal(true);
-    console.log("redirect to role switch modal");
   }
 
   const closeDeleteModal = useCallback(() => {

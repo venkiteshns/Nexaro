@@ -20,8 +20,7 @@ const OtpModal = (props) => {
 
   const handleOtp = async (otp) => {
     try {
-      const res = await verifyOtp({ otp, email }).unwrap();
-      console.log("OTP verified:", res);
+      await verifyOtp({ otp, email }).unwrap();
       isVerified(true);
       setTimeout(() => {
         show(false);

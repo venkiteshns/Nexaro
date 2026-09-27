@@ -1,9 +1,10 @@
-import AdminNotification from "../models/adminNotificationSchema.js";
+﻿import AdminNotification from "../models/adminNotificationSchema.js";
 import Task from "../models/taskSchema.js";
 import Transaction from "../models/transactionSchema.js";
 import Review from "../models/reviewSchema.js";
 import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
+import logger from "../utils/logger.js";
 
 export const recordAdminAlert = async ({
     type,
@@ -56,12 +57,12 @@ export const recordAdminAlert = async ({
           });
         }
       } catch (err) {
-        console.error("Socket emit admin notification error:", err.message);
+        logger.error("Socket emit admin notification error:", err.message);
       }
 
       return alert;
     } catch (error) {
-      console.error("Error recording admin alert:", error.message);
+      logger.error("Error recording admin alert:", error.message);
       return null;
     }
   };
@@ -76,7 +77,16 @@ const formatTaskLocation = (address) => {
   return address.city || address.district || "Kerala";
 };
 
-export const syncRealPlatformNotifications = async () => {
+let isSyncing = false;
+let lastSyncTime = 0;
+const SYNC_COOLDOWN_MS = 15 * 60 * 1000;
+
+export const syncRealPlatformNotifications = async (force = false) => {
+  const now = Date.now();
+  if (isSyncing || (!force && now - lastSyncTime < SYNC_COOLDOWN_MS)) {
+    return;
+  }
+  isSyncing = true;
   try {
     await AdminNotification.deleteMany({
       $or: [
@@ -282,9 +292,10 @@ export const syncRealPlatformNotifications = async () => {
     if (operations.length > 0) {
       await AdminNotification.bulkWrite(operations, { ordered: false });
     }
-
-    console.log(`Synced ${operations.length} real platform notifications to AdminNotification collection.`);
   } catch (err) {
-    console.error("Error syncing real platform notifications:", err.message);
+    logger.error("Error syncing real platform notifications:", err.message);
+  } finally {
+    isSyncing = false;
+    lastSyncTime = Date.now();
   }
 };

@@ -10,6 +10,7 @@ import Bid from "../models/bidsSchema.js";
 import { getIo } from "../socket.js";
 import { syncRealPlatformNotifications, recordAdminAlert } from "./adminNotificationService.js";
 import MESSAGES from "../constants/messages.js";
+import logger from "../utils/logger.js";
 
 export const getAllUsersService = async (page, limit) => {
     const skip = (page - 1) * limit;
@@ -1065,7 +1066,7 @@ export const markNotificationReadService = async (notificationId) => {
     const notification = await AdminNotification.findByIdAndUpdate(
         notificationId,
         { $set: { isRead: true } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     if (!notification) {
         return { success: false, message: "Notification not found" };
@@ -1134,7 +1135,7 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
                 await PosterNotification.bulkWrite(bulkOps, { ordered: false });
             }
         } catch (posterNotifErr) {
-            console.error("Error creating poster notifications for announcement:", posterNotifErr.message);
+            logger.error("Error creating poster notifications for announcement:", posterNotifErr.message);
         }
     }
 
@@ -1171,7 +1172,7 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
                 await WorkerNotification.bulkWrite(bulkOps, { ordered: false });
             }
         } catch (workerNotifErr) {
-            console.error("Error creating worker notifications for announcement:", workerNotifErr.message);
+            logger.error("Error creating worker notifications for announcement:", workerNotifErr.message);
         }
     }
 
@@ -1195,7 +1196,7 @@ export const sendAnnouncementService = async ({ targetAudience = "ALL USERS", ti
             }
         }
     } catch (socketErr) {
-        console.warn("Socket notification could not be broadcasted:", socketErr.message);
+        logger.warn("Socket notification could not be broadcasted:", socketErr.message);
     }
 
     return {
@@ -1282,7 +1283,7 @@ export const getAdminDashboardService = async () => {
         Task.countDocuments(),
         User.find({ activeRole: { $ne: "admin" }, isDeleted: { $ne: true } })
             .sort({ createdAt: -1 })
-            .limit(5)
+            .limit(3)
             .select("name activeRole createdAt")
             .lean(),
         User.countDocuments({ activeRole: "worker", "worker.isLive": true, isDeleted: { $ne: true } }),

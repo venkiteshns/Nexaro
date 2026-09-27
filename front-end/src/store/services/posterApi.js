@@ -16,7 +16,9 @@ export const posterApi = api.injectEndpoints({
         formData.append("amount", formValues.budget);
         formData.append("category", formValues.category);
 
-        if (formValues.photos && formValues.photos.length > 0) {
+        if (formValues.uploadedImages && formValues.uploadedImages.length > 0) {
+          formData.append("images", JSON.stringify(formValues.uploadedImages));
+        } else if (formValues.photos && formValues.photos.length > 0) {
           Array.from(formValues.photos).forEach((file) => {
             formData.append("photos", file);
           });
@@ -39,8 +41,7 @@ export const posterApi = api.injectEndpoints({
           ],
         };
         formData.append("location", JSON.stringify(location));
-        console.log(formValues);
-        
+
         return {
           url: POSTER.CREATE_TASK,
           method: "POST",
@@ -141,8 +142,6 @@ export const posterApi = api.injectEndpoints({
 
     updatePosterProfile: builder.mutation({
       query: (formValues) => {
-        console.log("formValues", formValues);
-
         return {
           url: POSTER.UPDATE_PROFILE,
           method: "PATCH",
@@ -165,10 +164,12 @@ export const posterApi = api.injectEndpoints({
     switchtoworker: builder.mutation({
       query: (data) => {
         const roleData = new FormData();
-        console.log(data);
         roleData.append('city', data.city);
         roleData.append('country', data.country);
         roleData.append('district', data.district);
+        if (data.uploadedDocuments) {
+          roleData.append('uploadedDocuments', JSON.stringify(data.uploadedDocuments));
+        }
         if (data.id_back && data.id_back.length > 0) roleData.append('id_back', data.id_back[0]);
         if (data.id_front && data.id_front.length > 0) roleData.append('id_front', data.id_front[0]);
         roleData.append('languages', JSON.stringify(data.languages));

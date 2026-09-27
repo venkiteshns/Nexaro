@@ -16,12 +16,24 @@ const CompletedTaskDetails = () => {
 
     const raw = data?.data?.[0];
 
+    const address = raw?.address;
+    const fullAddress = typeof address === 'string'
+        ? address
+        : address && typeof address === 'object'
+            ? [address.houseNumber, address.landmark, address.area, address.city, address.district, address.state]
+                .filter(Boolean)
+                .join(", ")
+            : null;
+
     const task = raw ? {
         title: raw.title,
         category: raw.category,
         budget: raw.amount,
         finalPayment: raw.bid?.amount ?? raw.amount,
         ratingGiven: raw.review?.rating ?? null,
+        description: raw.description,
+        address: fullAddress,
+        photos: raw.photos || [],
         completedOn: raw.completedOn
             ? new Date(raw.completedOn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
             : '—',

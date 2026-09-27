@@ -3,6 +3,7 @@ import crypto from "crypto";
 import MESSAGES from "../constants/messages.js";
 import { compareHash, hashData } from "../utils/hasing.js";
 import { sendOtp } from "./authServices.js";
+import logger from "../utils/logger.js";
 
 const OTP_PREFIX = "otp:";
 const OTP_TTL_MS = 10 * 60 * 1000;
@@ -12,8 +13,6 @@ const generateOtp = () => {
 }
 
 export const setOtp = async (identifier) => {
-    console.log("setOtp", identifier);
-
     const otp = generateOtp();
     const hashedOtp = await hashData(otp);
 
@@ -23,11 +22,8 @@ export const setOtp = async (identifier) => {
     if (existingOtp) {
         await redisClient.del(key);
     }
-    console.log("hashedOtp", otp, hashedOtp);
-
     await redisClient.set(key, hashedOtp, { EX: OTP_TTL_MS });
     const otpSend = await sendOtp(identifier, otp);
-    console.log("OTP SEND", otpSend);
 
     if (!otpSend) {
         await redisClient.del(key);

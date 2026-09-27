@@ -6,6 +6,7 @@ import { useCreateTaskMutation } from "../../../store/services/posterApi";
 import { showError, showSuccess } from "../../../utils/toast";
 import { useNavigate } from "react-router-dom";
 import LocationSelection from "../../sharedComponents/LocationSelection";
+import { uploadFilesToS3 } from "../../../utils/s3Upload";
 
 const TaskForm = () => {
   const methods = useForm({
@@ -18,13 +19,20 @@ const TaskForm = () => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
 
   const onSubmitForm = async (data) => {
-    console.log("Form data:", data);
-
     try {
-      const result = await createTask(data).unwrap();
+      let uploadedImages = [];
+      if (data.photos && data.photos.length > 0) {
+        uploadedImages = await uploadFilesToS3(Array.from(data.photos), "tasks");
+      }
+
+      const payload = {
+        ...data,
+        uploadedImages,
+      };
+
+      await createTask(payload).unwrap();
 
       showSuccess("Task created successfully!");
-      console.log("Task created successfully:", result);
 
       methods.reset();
 

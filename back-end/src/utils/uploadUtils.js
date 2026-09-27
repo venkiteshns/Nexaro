@@ -3,6 +3,7 @@ import fs from "fs"
 import { randomUUID } from "crypto";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3.js";
+import logger from "../utils/logger.js";
 
 export const uploadManyFiles = async (files, folder) => {
     try {
@@ -13,7 +14,6 @@ export const uploadManyFiles = async (files, folder) => {
         const uploadPromises = Object.entries(files).map(
             async ([filedName, fileArray]) => {
                 const file = fileArray[0];
-                console.log("file", file, "_________");
 
                 const extension = path.extname(file.originalname);
 
@@ -56,13 +56,9 @@ export const uploadManyFiles = async (files, folder) => {
             }
         })
 
-        console.log("-------------------------------------------------");
-        console.log("res", result);
-        console.log("-------------------------------------------------");
-
         return result;
     } catch (error) {
-        console.log("Error in uploading files : ", error);
+        logger.error("Error in uploading files:", error);
         return { error }
     }
 }

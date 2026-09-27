@@ -1,6 +1,7 @@
-import { createReviewService } from "../../services/reviewServices.js";
+﻿import { createReviewService } from "../../services/reviewServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
+import logger from "../../utils/logger.js";
 
 export const createReview = async (req, res) => {
   try {
@@ -37,7 +38,7 @@ export const createReview = async (req, res) => {
       data: { reviewId: response.review._id },
     });
   } catch (error) {
-    console.error("createReview controller error:", error.message);
+    logger.error("createReview controller error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,

@@ -38,9 +38,6 @@ const useSocketNotification = () => {
         const socket = getSocket();
         if (!socket) return;
 
-        socket.on('connect', () => {
-            console.log('Socket connected:', socket.id);
-        });
 
         socket.on('new-task-nearby', (data) => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'worker' && activeUser?.role !== 'worker')) return;

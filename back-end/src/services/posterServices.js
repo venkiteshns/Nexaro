@@ -16,12 +16,18 @@ import { syncPosterNotifications } from "./posterNotificationService.js";
 import MESSAGES from "../constants/messages.js";
 import { generateUniqueReferralCode } from "../utils/referralCode.js";
 import { linkReferralOnSignup } from "./referralService.js";
+import logger from "../utils/logger.js";
 
 export const posterSignupService = async (data) => {
   try {
-    const existing = await User.findOne({ email: data.email });
+    const existing = await User.findOne({ $or: [{ email: data.email }, { phone: data.phone }] });
     if (existing) {
-      throw new Error("User Already Exists");
+      if (existing.email === data.email) {
+        throw new Error(MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL || "User Already Exists");
+      }
+      if (existing.phone === Number(data.phone)) {
+        throw new Error(MESSAGES.PHONE_ALREADY_IN_USE || "Phone number already in use");
+      }
     }
 
     const locationLat = parseFloat(data.locationLat);
@@ -42,6 +48,7 @@ export const posterSignupService = async (data) => {
       isVerified: false,
       isDeleted: false,
       isSuspended: false,
+      isGoogleAuth: Boolean(data.isGoogleAuth),
       activeRole: "poster",
       referralCode: await generateUniqueReferralCode(),
     };
@@ -83,7 +90,7 @@ export const posterSignupService = async (data) => {
 
     return { responseUser, accessToken, refreshToken };
   } catch (error) {
-    console.error("posterSignupService error:", error.message);
+    logger.error("posterSignupService error:", error.message);
     return { error: error.message };
   }
 };
@@ -207,7 +214,6 @@ export const getTasksService = async (posterId, query) => {
         },
       },
     ]);
-    console.log(tasks);
     const totalCount = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId) })
     const openTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "open" });
     const inProgressTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "in_progress" });
@@ -236,7 +242,7 @@ export const getTasksService = async (posterId, query) => {
       }
     };
   } catch (error) {
-    console.error("getTasksService error:", error.message);
+    logger.error("getTasksService error:", error.message);
     return { error: error.message };
   }
 };
@@ -289,7 +295,7 @@ export const getPosterBidsService = async (taskId, sort) => {
     const task = await Task.findOne({ _id: taskId });
     return { bids, task };
   } catch (error) {
-    console.error("getPosterBidsService error:", error.message);
+    logger.error("getPosterBidsService error:", error.message);
     return { error: error.message };
   }
 };
@@ -365,7 +371,7 @@ export const acceptBidService = async (bidId) => {
       task: updatedTask,
     };
   } catch (error) {
-    console.error("acceptBidService error:", error.message);
+    logger.error("acceptBidService error:", error.message);
     return { error: error.message };
   }
 };
@@ -431,20 +437,18 @@ export const getPosterTaskProgressService = async (taskId) => {
 
     return result;
   } catch (error) {
-    console.error("getPosterTaskProgressService error:", error.message);
+    logger.error("getPosterTaskProgressService error:", error.message);
     return { error: error.message };
   }
 };
 
 export const updateUserProfileService = async ({ userId, body, avatar }) => {
   try {
-    console.log(userId, body, avatar);
-
     const user = await User.findOne({ _id: new mongoose.Types.ObjectId(userId) });
     if (!user) {
       return { error: "user not found" };
     }
-    const { email, phone } = body;
+    const { email, phone, avatarObject, avatarUrl, avatarKey, avatarFormat } = body;
 
     const isDuplicateEmail = await User.findOne({ email, _id: { $ne: userId } });
     if (isDuplicateEmail) {
@@ -458,16 +462,24 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
 
     user.email = email;
     user.phone = phone;
-    if (avatar && avatar.length > 0) {
+    if (avatarObject) {
+      const avatarObj = typeof avatarObject === "string" ? JSON.parse(avatarObject) : avatarObject;
+      user.verificationDocuments.selfie = avatarObj;
+    } else if (avatarUrl) {
+      user.verificationDocuments.selfie = {
+        url: avatarUrl,
+        key: avatarKey || "",
+        format: avatarFormat || "image/jpeg",
+      };
+    } else if (avatar && avatar.length > 0) {
       const uploadedAvatar = await uploadManyFiles([avatar], "avatars");
       user.verificationDocuments.selfie = uploadedAvatar[0];
     }
-    const savedUser = await user.save();
-    console.log(savedUser);
+    await user.save();
 
     return ({ message: "user profile updated successfully" })
   } catch (error) {
-    console.log(error);
+    logger.error("updateUserProfileService error:", error);
 
     return { error: error.message };
   }
@@ -493,8 +505,6 @@ export const getPosterProfileService = async (posterId) => {
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
       "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea isVerified",
     );
-    const isWorkerActive = posterUser?.skills?.length > 0 && posterUser?.languages?.length > 0 && posterUser?.serviceArea?.coordinates?.length === 2;
-    console.log(isWorkerActive);
 
 
     const stats = {
@@ -560,7 +570,7 @@ export const getPosterProfileService = async (posterId) => {
       },
     };
   } catch (error) {
-    console.error("getPosterProfileService error:", error.message);
+    logger.error("getPosterProfileService error:", error.message);
     return { error: error.message };
   }
 };
@@ -616,6 +626,8 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
           status: 1,
           category: 1,
           createdAt: 1,
+          description: 1,
+          photos: 1,
           address: 1,
           amount: 1,
           platformFee: 1,
@@ -642,7 +654,6 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
 };
 
 export const switchRoleToWorkerService = async ({ user, data, files }) => {
-  console.log(data);
   if (!user._id) {
     return { forbidden: "Access Restricted!" }
   }
@@ -675,7 +686,6 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
     }
 
     const isPasswordValid = await compareHash(data.password, userData.password);
-    console.log(isPasswordValid);
 
     if (!isPasswordValid) {
       return { error: MESSAGES.CURRENT_PASSWORD_INVALID };
@@ -693,22 +703,33 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
     userData.isVerified = false;
     userData.serviceArea.coordinates = [data.lng, data.lat];
 
-    const uploadedFiles = await uploadManyFiles(files, `user/${user._id}/verification`)
+    if (data.uploadedDocuments) {
+      const docs = typeof data.uploadedDocuments === "string"
+        ? JSON.parse(data.uploadedDocuments)
+        : data.uploadedDocuments;
+      userData.verificationDocuments = {
+        idFront: docs.idFront || docs.id_front,
+        idBack: docs.idBack || docs.id_back,
+        selfie: docs.selfie,
+      };
+    } else if (files && Object.keys(files).length > 0) {
+      const uploadedFiles = await uploadManyFiles(files, `user/${user._id}/verification`);
 
-    if (uploadedFiles.error) {
-      return { error: "Unable to upload images, try again later" };
+      if (uploadedFiles.error) {
+        return { error: "Unable to upload images, try again later" };
+      }
+      userData.verificationDocuments = {
+        idFront: uploadedFiles.id_front,
+        idBack: uploadedFiles.id_back,
+        selfie: uploadedFiles.selfie,
+      };
     }
-    userData.verificationDocuments = {
-      idFront: uploadedFiles.id_front,
-      idBack: uploadedFiles.id_back,
-      selfie: uploadedFiles.selfie,
-    };
 
     await userData.save();
 
     return { success: true, message: "Data uploaded Successfully" }
   } catch (error) {
-    console.log(error);
+    logger.error("switchRoleToWorkerService error:", error);
 
     return { error: MESSAGES.UNEXPECTED_ERROR }
   }
@@ -728,7 +749,7 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
     await isUser.save();
     return { success: true, message: "Role Updated" }
   } catch (error) {
-    console.log("Role swiitch to poster without Data service error", error);
+    logger.error("posterRoleSwitchAlreadyDataUploadedService error:", error);
     return { error: MESSAGES.UNEXPECTED_ERROR }
   }
 }
@@ -797,7 +818,7 @@ export const markPosterNotificationReadService = async (posterId, notificationId
   const notification = await PosterNotification.findOneAndUpdate(
     { _id: notifObjectId, posterId: posterObjectId },
     { $set: { isRead: true } },
-    { new: true }
+    { returnDocument: 'after' }
   );
   if (!notification) {
     return { error: "Notification not found" };

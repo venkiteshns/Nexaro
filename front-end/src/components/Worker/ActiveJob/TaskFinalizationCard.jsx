@@ -26,8 +26,8 @@ export default function TaskFinalizationCard({ update, onMarkComplete }) {
             </div>
             <button
                 onClick={onMarkComplete}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg
-                           bg-linear-to-r from-[#0A6E5C] to-emerald-500 text-white
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-lg
+                           bg-gradient-to-r from-[#0A6E5C] to-emerald-500 text-white
                            text-xs font-bold shadow-2xs hover:from-[#085e4e] hover:to-emerald-600
                            active:scale-[0.98] transition-all duration-150 shrink-0 cursor-pointer"
             >

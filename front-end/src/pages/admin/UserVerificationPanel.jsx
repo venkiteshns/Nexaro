@@ -43,12 +43,10 @@ const UserVerificationPanel = () => {
 
   const handleRejectUser = async (id) => {
     await rejectUser(id)
-    console.log(id);
   }
 
   const handleApproveUser = async (id) => {
     await approveUser(id)
-    console.log(id);
   }
 
 

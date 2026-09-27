@@ -17,6 +17,7 @@ import WorkerNotification from "../models/workerNotificationSchema.js";
 import { syncWorkerNotifications } from "./workerNotificationService.js";
 import { generateUniqueReferralCode } from "../utils/referralCode.js";
 import { linkReferralOnSignup } from "./referralService.js";
+import logger from "../utils/logger.js";
 
 export const workerSignupService = async ({ files, data }) => {
 
@@ -43,10 +44,10 @@ export const workerSignupService = async ({ files, data }) => {
         let parsedSkills = [];
         let parsedLanguages = [];
         try { parsedSkills = typeof data.skill === 'string' ? JSON.parse(data.skill) : data.skill; } catch (e) {
-            console.log("Parse skills error", e);
+            logger.error("Parse skills error:", e);
         }
         try { parsedLanguages = typeof data.language === 'string' ? JSON.parse(data.language) : data.language; } catch (e) {
-            console.log("Parse error", e);
+            logger.error("Parse error:", e);
         }
 
         const hashedPassword = await hashData(data.password);
@@ -69,6 +70,7 @@ export const workerSignupService = async ({ files, data }) => {
             isVerified: false,
             isDeleted: false,
             isSuspended: false,
+            isGoogleAuth: Boolean(data.isGoogleAuth),
             role: "worker",
             activeRole: "worker",
             referralCode: await generateUniqueReferralCode(),
@@ -93,20 +95,24 @@ export const workerSignupService = async ({ files, data }) => {
             };
         }
 
-        console.log("files", files);
+        if (data.uploadedDocuments) {
+            const docs = typeof data.uploadedDocuments === "string"
+                ? JSON.parse(data.uploadedDocuments)
+                : data.uploadedDocuments;
+            payLoad.verificationDocuments.selfie = docs.selfie;
+            payLoad.verificationDocuments.idFront = docs.idFront || docs.id_front;
+            payLoad.verificationDocuments.idBack = docs.idBack || docs.id_back;
+        } else if (files && Object.keys(files).length > 0) {
+            const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
 
-        const uploadStatus = await uploadManyFiles(files, `user/${payLoad.email}/verification`);
+            if (uploadStatus.error) {
+                throw new Error("Error in Uploading Files")
+            }
 
-        if (uploadStatus.error) {
-            throw new Error("Error in Uploading Files")
+            payLoad.verificationDocuments.selfie = uploadStatus.selfie;
+            payLoad.verificationDocuments.idFront = uploadStatus.id_front;
+            payLoad.verificationDocuments.idBack = uploadStatus.id_back;
         }
-
-        payLoad.verificationDocuments.selfie = uploadStatus.selfie;
-        payLoad.verificationDocuments.idFront = uploadStatus.id_front;
-        payLoad.verificationDocuments.idBack = uploadStatus.id_back;
-
-        console.log(payLoad);
-
 
         const createdUser = await User.create(payLoad);
 
@@ -147,7 +153,7 @@ export const workerSignupService = async ({ files, data }) => {
 
         return { responseUser, accessToken, refreshToken };
     } catch (error) {
-        console.log(error)
+        logger.error("workerSignupService error:", error);
         return { error: error.message || MESSAGES.UNEXPECTED_ERROR };
     }
 }
@@ -289,19 +295,16 @@ export const getWorkerProfileService = async (user) => {
                 }
             }
         ]);
-        console.log(userData[0]);
 
         return { success: true, profileData: userData[0] }
 
     } catch (error) {
-        console.log("Worker profile service error ", error);
+        logger.error("Worker profile service error:", error);
         return { error: error.message || MESSAGES.UNEXPECTED_ERROR }
     }
 }
 
 export const updateWorkerProfileService = async ({ user, data, avatar }) => {
-    console.log(user);
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!user) {
         return { unauthorized: MESSAGES.UNAUTHORIZED_USER }
@@ -339,7 +342,16 @@ export const updateWorkerProfileService = async ({ user, data, avatar }) => {
         if (!userData) {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
-        if (avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
+        if (data.avatarObject) {
+            const avatarObj = typeof data.avatarObject === "string" ? JSON.parse(data.avatarObject) : data.avatarObject;
+            userData.verificationDocuments.selfie = avatarObj;
+        } else if (data.avatarUrl) {
+            userData.verificationDocuments.selfie = {
+                url: data.avatarUrl,
+                key: data.avatarKey || "",
+                format: data.avatarFormat || "image/jpeg"
+            };
+        } else if (avatar && Array.isArray(avatar?.avatar) && avatar?.avatar.length > 0) {
             const uploadStatus = await uploadManyFiles(avatar, `user/${data.email}/verification`);
             if (uploadStatus.error) {
                 return { error: "Unable to upload profile picture, Please try again." }
@@ -356,7 +368,7 @@ export const updateWorkerProfileService = async ({ user, data, avatar }) => {
 
         return { success: true, message: MESSAGES.USER_PROFILE_UPDATED }
     } catch (error) {
-        console.error("Worker profile update service error ", error);
+        logger.error("Worker profile update service error ", error);
         return { error: "Unexpected error occoured" }
     }
 }
@@ -376,7 +388,7 @@ export const switchRoleToPosterService = async ({ user }) => {
 
         return { success: true, message: "Role Updated" }
     } catch (error) {
-        console.log("Role swiitch to poster without Data service error", error);
+        logger.error("Role switch to poster without Data service error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR }
     }
 }
@@ -393,7 +405,6 @@ export const getAllReviewService = async ({ user, query }) => {
         if (!isUser) {
             return { error: MESSAGES.USER_NOT_FOUND }
         }
-        console.log(isUser.worker.rating);
 
         const reviewDatas = await Review.aggregate([
             {
@@ -478,11 +489,10 @@ export const getAllReviewService = async ({ user, query }) => {
         }
         responseReviews.totalPages = Math.ceil(responseReviews.totalReviews / limit);
         responseReviews.overallRating = isUser.worker.rating.toFixed(1);
-        console.log(responseReviews);
         return { success: true, reviews: responseReviews, message: 'fetched reviews Successfully' }
 
     } catch (error) {
-        console.log(error);
+        logger.error("getAllReviewService error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR }
     }
 }
@@ -606,14 +616,13 @@ export const getEarningHeroDataService = async ({ userId }) => {
         return { success: true, message: "Earnings data fetched successfully", earningsData: heroData };
 
     } catch (error) {
-        console.log(error);
+        logger.error("getEarningHeroDataService error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR }
     }
 }
 
 export const getTransactionHistoryService = async ({ userId, page, limit }) => {
     const skip = (page - 1) * limit;
-    console.log("userId", userId);
     try {
         const isUser = await User.findOne({ _id: userId })
         if (!isUser) {
@@ -654,7 +663,7 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
                 })
             );
         } catch (syncErr) {
-            console.warn("Background PayPal status sync error:", syncErr.message);
+            logger.warn("Background PayPal status sync error:", syncErr.message);
         }
 
         const filter = { receiverId: new mongoose.Types.ObjectId(userId) };
@@ -692,7 +701,7 @@ export const getTransactionHistoryService = async ({ userId, page, limit }) => {
             }
         };
     } catch (error) {
-        console.log(error);
+        logger.error("getTransactionHistoryService error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR }
     }
 }
@@ -888,7 +897,7 @@ export const getWorkerEarningsChartService = async ({ userId, timeframe = "7D" }
             chartData,
         };
     } catch (error) {
-        console.error("getWorkerEarningsChartService error:", error);
+        logger.error("getWorkerEarningsChartService error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR };
     }
 };
@@ -931,12 +940,12 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             return { error: "Withdrawal amount is too small to process via PayPal." };
         }
 
-        console.log(`[PayPal Payout] Converted ₹${withdrawAmount} INR -> $${usdAmount} USD. Initiating payout to ${isUser.email}`);
+        logger.info(`[PayPal Payout] Converted ₹${withdrawAmount} INR -> $${usdAmount} USD. Initiating payout to ${isUser.email}`);
 
         const payoutResponse = await payoutTransferService(isUser.email, usdAmount, "USD");
 
         if (!payoutResponse.success) {
-            console.error("PayPal withdrawal initiation failed:", payoutResponse);
+            logger.error("PayPal withdrawal initiation failed:", payoutResponse);
             return {
                 error: payoutResponse.error || "Failed to initiate PayPal transfer. Your wallet balance was not changed.",
             };
@@ -948,7 +957,7 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
                 $set: { walletAmount: 0 },
                 $inc: { withDrawn: withdrawAmount },
             },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         const itemStatus = payoutResponse.finalStatus?.itemStatus;
@@ -1016,7 +1025,7 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
                 payoutBatchId: payoutResponse.payoutBatchId,
             });
         } catch (socketError) {
-            console.warn("Could not emit withdrawal realtime notification:", socketError.message);
+            logger.warn("Could not emit withdrawal realtime notification:", socketError.message);
         }
 
         return {
@@ -1027,7 +1036,7 @@ export const withdrawWorkerEarningsService = async ({ userId, amount }) => {
             transaction,
         };
     } catch (error) {
-        console.error("withdrawWorkerEarningsService error:", error);
+        logger.error("withdrawWorkerEarningsService error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR };
     } finally {
         activeWithdrawals.delete(userLockKey);
@@ -1098,7 +1107,7 @@ export const markWorkerNotificationReadService = async (workerId, notificationId
     const notification = await WorkerNotification.findOneAndUpdate(
         { _id: notifObjectId, workerId: workerObjectId },
         { $set: { isRead: true } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     if (!notification) {
         return { error: "Notification not found" };
@@ -1138,7 +1147,7 @@ export const getWorkerHeaderStatusService = async (userId) => {
             walletAmount: wallet?.walletAmount ?? 0,
         };
     } catch (error) {
-        console.error("getWorkerHeaderStatusService error:", error.message);
+        logger.error("getWorkerHeaderStatusService error:", error.message);
         return { error: error.message };
     }
 };
@@ -1168,7 +1177,7 @@ export const toggleWorkerLiveStatusService = async (userId, isLive = null) => {
                 : "You are now Offline. You won't appear active to posters.",
         };
     } catch (error) {
-        console.error("toggleWorkerLiveStatusService error:", error.message);
+        logger.error("toggleWorkerLiveStatusService error:", error.message);
         return { error: error.message };
     }
 };
@@ -1204,14 +1213,14 @@ export const getWorkerDashboardService = async ({ userId, category }) => {
             ? Number(reviewAggregation[0].avgRating.toFixed(1))
             : (user.worker?.rating || 4.8);
 
-        // 2. Recent Bids (Proposals status)
+        // 2. Recent Bids (Proposals status - show recent 3 bids)
         const recentBidsRaw = await Bid.find({ workerId })
             .populate({
                 path: "taskId",
                 select: "title category amount urgencyLevel status address deadline createdAt",
             })
             .sort({ createdAt: -1 })
-            .limit(5)
+            .limit(3)
             .lean();
 
         const recentBids = recentBidsRaw.map((b) => ({
@@ -1224,6 +1233,45 @@ export const getWorkerDashboardService = async ({ userId, category }) => {
             createdAt: b.createdAt,
             taskStatus: b.taskId?.status || "open",
         }));
+
+        // 2.5 Recent Completed Tasks (Show recent 3-4 completed tasks)
+        const completedTasksRaw = await Task.find({
+            workerId,
+            $or: [{ status: "completed" }, { update: "payment" }],
+        })
+            .populate({
+                path: "acceptedBid",
+                select: "amount",
+            })
+            .sort({ completedOn: -1, updatedAt: -1, createdAt: -1 })
+            .limit(3)
+            .lean();
+
+        const completedTaskIds = completedTasksRaw.map((t) => t._id);
+        const taskReviews = await Review.find({
+            taskId: { $in: completedTaskIds },
+            reviewee: workerId,
+        })
+            .select("taskId rating review")
+            .lean();
+
+        const reviewMap = new Map();
+        taskReviews.forEach((r) => {
+            reviewMap.set(String(r.taskId), r);
+        });
+
+        const completedTasks = completedTasksRaw.map((t) => {
+            const review = reviewMap.get(String(t._id));
+            return {
+                _id: t._id,
+                title: t.title,
+                category: t.category,
+                amount: t.acceptedBid?.amount ?? t.amount ?? 0,
+                completedOn: t.completedOn || t.updatedAt || t.createdAt,
+                status: t.status,
+                rating: review?.rating ?? null,
+            };
+        });
 
         // 3. Available Opportunities (Jobs)
         const taskFilter = { status: "open" };
@@ -1261,7 +1309,7 @@ export const getWorkerDashboardService = async ({ userId, category }) => {
                     availableTasks = geoTasks;
                 }
             } catch (geoErr) {
-                console.log("GeoNear fallback in dashboard:", geoErr.message);
+                logger.warn(`GeoNear fallback in dashboard: ${geoErr.message}`);
             }
         }
 
@@ -1311,10 +1359,11 @@ export const getWorkerDashboardService = async ({ userId, category }) => {
             userName: user.name,
             categories: ["All", ...combinedCategories],
             recentBids,
+            completedTasks,
             availableJobs: formattedJobs,
         };
     } catch (error) {
-        console.error("getWorkerDashboardService error:", error);
+        logger.error("getWorkerDashboardService error:", error);
         return { error: error.message };
     }
 };

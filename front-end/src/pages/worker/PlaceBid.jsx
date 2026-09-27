@@ -170,7 +170,7 @@ function TaskLocationCard({ address, location }) {
       </div>
 
       <div className="px-5 pb-5">
-        <div className="rounded-xl overflow-hidden border border-gray-200">
+        <div className="rounded-xl overflow-hidden border border-gray-200 relative z-0 isolate">
           {mapPosition ? (
             <Map
               position={mapPosition}

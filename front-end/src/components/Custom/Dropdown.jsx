@@ -17,23 +17,23 @@ const Dropdown = ({ options, name, field }) => {
 
     return (
         <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+            <label className="block text-[11px] sm:text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 sm:mb-2">
                 {field}
             </label>
             <div className="relative">
                 <button
                     type="button"
                     onClick={() => setOptionOpen((p) => !p)}
-                    className="w-full flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 bg-white text-sm font-semibold text-gray-800 hover:border-[#0A6E5C] transition-colors"
+                    className="w-full flex items-center justify-between border border-gray-200 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 bg-white text-xs sm:text-sm font-semibold text-gray-800 hover:border-[#0A6E5C] transition-colors cursor-pointer"
                 >
                     {option}
                     <ChevronDown
-                        size={16}
+                        size={15}
                         className={`text-gray-400 transition-transform ${optionOpen ? "rotate-180" : ""}`}
                     />
                 </button>
                 {optionOpen && (
-                    <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                    <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-56 overflow-y-auto">
                         {options.map((opt) => (
                             <button
                                 key={opt}
@@ -43,7 +43,7 @@ const Dropdown = ({ options, name, field }) => {
                                     setValue(name, opt);
                                     setOptionOpen(false);
                                 }}
-                                className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors ${option === opt
+                                className={`w-full text-left px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors cursor-pointer ${option === opt
                                     ? "bg-emerald-50 text-[#0A6E5C]"
                                     : "text-gray-700 hover:bg-gray-50"
                                     }`}

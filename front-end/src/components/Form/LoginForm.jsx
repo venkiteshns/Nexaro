@@ -10,13 +10,15 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/Slices/UserSlice";
 import ForgotPasswordModal from "./FormComponents/ForgotPasswordModal";
 import { useGoogleLogin } from "@react-oauth/google";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const LoginForm = () => {
   const { handleSubmit } = useFormContext();
   const { reset } = useFormContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get("role");
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPasswordUpdated, setIsPasswordUpdated] = useState(false);
@@ -52,8 +54,8 @@ const LoginForm = () => {
       );
       const targetRoute = res.user.role === "worker" ? "/worker/dashboard" : "/poster/my-tasks";
       navigate(targetRoute);
-    } catch (err) {
-      console.log(" error: ", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -62,7 +64,19 @@ const LoginForm = () => {
       setGoogleError("");
       const res = await googleLogin(tokenResponse.access_token).unwrap();
 
-      if (res.user.role === "admin") {
+      if (res.exists === false) {
+        // User account not found: redirect to signup with prefilled Google verified info
+        const targetSignup = role === "worker" ? "/signup/worker" : "/signup/poster";
+        navigate(targetSignup, {
+          state: {
+            googleUser: res.googleUser,
+            isGoogleVerified: true,
+          },
+        });
+        return;
+      }
+
+      if (res.user?.role === "admin") {
         setGoogleError("Invalid user credentials");
         return;
       }

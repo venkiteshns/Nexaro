@@ -5,6 +5,7 @@ import { generateAccessToken } from '../utils/generateTokens.js';
 import STATUS_CODES from '../constants/statusCodes.js';
 import MESSAGES from '../constants/messages.js';
 import { setOtp, verifyRedisOtp } from '../services/otpService.js';
+import logger from "../utils/logger.js";
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -30,14 +31,18 @@ export const refreshAccessToken = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Refresh token error:", error.message);
+        logger.error("Refresh token error:", error.message);
         return res.status(STATUS_CODES.FORBIDDEN).json({ success: false, message: MESSAGES.INVALID_REFRESH_TOKEN });
     }
 };
 
 export const getOtpForSignUp = async (req, res) => {
     try {
-        const response = await setOtp(req.body.email);
+        const { email } = req.body || {};
+        if (!email) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.EMAIL_REQUIRED });
+        }
+        const response = await setOtp(email);
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.OTP_SENT });
         } else {
@@ -45,14 +50,18 @@ export const getOtpForSignUp = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("OTP send error:", error.message);
+        logger.error("OTP send error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
 
 export const verifySignUpOtp = async (req, res) => {
     try {
-        const response = await verifyRedisOtp(req.body.email, req.body.otp);
+        const { email, otp } = req.body || {};
+        if (!email || !otp) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.INVALID_OTP });
+        }
+        const response = await verifyRedisOtp(email, otp);
         if (response.success) {
             return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.OTP_VERIFIED });
         } else {
@@ -60,7 +69,7 @@ export const verifySignUpOtp = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("OTP verify error:", error.message);
+        logger.error("OTP verify error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -83,7 +92,7 @@ export const login = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("Login error:", error.message);
+        logger.error("Login error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -103,8 +112,6 @@ export const logout = async (req, res) => {
 };
 
 export const forgotPasswordOtp = async (req, res) => {
-    console.log("req.body ", req.body);
-
     try {
         const { email } = req.body;
         if (!email) {
@@ -120,7 +127,7 @@ export const forgotPasswordOtp = async (req, res) => {
             return res.status(status).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Forgot password OTP error:", error.message);
+        logger.error("Forgot password OTP error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -140,7 +147,7 @@ export const updatePassword = async (req, res) => {
             return res.status(status).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Update password error:", error.message);
+        logger.error("Update password error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -159,8 +166,18 @@ export const googleLogin = async (req, res) => {
         const response = await googleLoginService(accessToken);
 
         if (response.success) {
+            if (response.exists === false) {
+                return res.status(STATUS_CODES.OK).json({
+                    success: true,
+                    exists: false,
+                    message: response.message,
+                    googleUser: response.googleUser,
+                });
+            }
+
             return res.status(STATUS_CODES.OK).json({
                 success: true,
+                exists: true,
                 message: MESSAGES.LOGIN_SUCCESS,
                 user: response.responseUser,
                 accessToken: response.accessToken,
@@ -173,7 +190,7 @@ export const googleLogin = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Google login error:", error.message);
+        logger.error("Google login error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

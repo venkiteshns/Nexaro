@@ -23,9 +23,11 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
   const methods = useForm();
 
   useEffect(() => {
-    (() =>  {if (isSuccess) {
-      setShowOtp(true);
-    }})()
+    (() => {
+      if (isSuccess) {
+        setShowOtp(true);
+      }
+    })()
   }, [isSuccess]);
 
   if (!isOpen) return null;
@@ -38,23 +40,21 @@ const ForgotPasswordModal = ({ isOpen, onClose, isUpdateSuccess, role }) => {
   const handlePasswordResetOtp = async ({ email: emailInput }) => {
     setEmail(emailInput);
     try {
-      const res = await forgotPassword({ email: emailInput, role });
-      console.log("reset otp res", res);
-    } catch (err) {
-      console.log("reset error", err);
+      await forgotPassword({ email: emailInput, role });
+    } catch {
+      // ignore error
     }
   };
 
   const updateNewPassword = async (data) => {
     try {
       const res = await updatePassword({ email, password: data.password });
-      console.log("update res", res);
       if (res.data.success) {
         isUpdateSuccess(true);
         onClose();
       }
-    } catch (err) {
-      console.log("error", err);
+    } catch {
+      // ignore error
     }
   };
 

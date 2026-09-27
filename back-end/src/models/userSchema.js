@@ -88,6 +88,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isGoogleAuth: {
+        type: Boolean,
+        default: false
+    },
     activeRole: {
         type: String,
         enum: ["poster", "worker", "admin"],

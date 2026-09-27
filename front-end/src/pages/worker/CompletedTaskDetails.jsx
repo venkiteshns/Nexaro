@@ -103,7 +103,7 @@ const WorkerCompletedTaskDetails = () => {
                     )}
 
                     {!isLoading && !isError && task && (
-                        <div className="p-3 sm:p-5 lg:p-6 max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5 pb-12">
+                        <div className="p-3 sm:p-5 lg:p-6 w-full space-y-3 sm:space-y-3.5 pb-8">
                             <TaskHeaderBanner
                                 title={task.title}
                                 backUrl="/worker/my-bids"

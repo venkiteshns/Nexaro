@@ -16,6 +16,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
 import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
+import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmModal";
 
 
   const posterNav = [
@@ -165,16 +166,21 @@ const PosterNavBar = () => {
 
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [userLogout] = useUserLogoutMutation();
 
-  const handleLogout = async () => {
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await userLogout().unwrap();
     } catch (error) {
       console.error("Poster logout error:", error);
     } finally {
       dispatch(logOut());
+      setIsLoggingOut(false);
+      setShowLogoutModal(false);
       navigate("/user/login");
     }
   };
@@ -184,28 +190,25 @@ const PosterNavBar = () => {
     setMobileOpen(false);
   };
 
-
-
-
   return (
     <>
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-3 left-4 z-50 w-10 h-10 rounded-full  flex items-center justify-center text-gray-600 hover:text-[#0A6E5C] transition-colors"
+        className="md:hidden fixed top-2.5 left-3 z-50 w-9 h-9 rounded-xl flex items-center justify-center text-gray-700 bg-white/95 backdrop-blur-xs border border-gray-200/80 shadow-2xs hover:text-[#0A6E5C] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer"
         aria-label="Open navigation"
       >
-        <Menu size={20} />
+        <Menu size={19} />
       </button>
 
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-[998] bg-black/40 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       <div
-        className={`md:hidden fixed top-0 left-0 h-full z-50 w-[220px] bg-white border-r border-gray-200 shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`md:hidden fixed top-0 left-0 h-full z-[999] w-[220px] bg-white border-r border-gray-200 shadow-2xl transition-transform duration-300 ease-in-out ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -215,7 +218,7 @@ const PosterNavBar = () => {
           isExpanded={true}
           onToggle={() => setMobileOpen(false)}
           onNavClick={handleNav}
-          onLogout={handleLogout}
+          onLogout={() => setShowLogoutModal(true)}
         />
       </div>
 
@@ -230,9 +233,18 @@ const PosterNavBar = () => {
           isExpanded={desktopOpen}
           onToggle={() => setDesktopOpen(!desktopOpen)}
           onNavClick={handleNav}
-          onLogout={handleLogout}
+          onLogout={() => setShowLogoutModal(true)}
         />
       </div>
+
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
+        title="Log Out of Nexaro?"
+        message="Are you sure you want to log out? You will need to sign in again to access your poster dashboard."
+      />
     </>
   );
 };
