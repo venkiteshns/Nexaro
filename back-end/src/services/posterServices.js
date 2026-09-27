@@ -16,6 +16,7 @@ import { syncPosterNotifications } from "./posterNotificationService.js";
 import MESSAGES from "../constants/messages.js";
 import { generateUniqueReferralCode } from "../utils/referralCode.js";
 import { linkReferralOnSignup } from "./referralService.js";
+import logger from "../utils/logger.js";
 
 export const posterSignupService = async (data) => {
   try {
@@ -89,7 +90,7 @@ export const posterSignupService = async (data) => {
 
     return { responseUser, accessToken, refreshToken };
   } catch (error) {
-    console.error("posterSignupService error:", error.message);
+    logger.error("posterSignupService error:", error.message);
     return { error: error.message };
   }
 };
@@ -213,7 +214,6 @@ export const getTasksService = async (posterId, query) => {
         },
       },
     ]);
-    console.log(tasks);
     const totalCount = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId) })
     const openTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "open" });
     const inProgressTasks = await Task.countDocuments({ posterId: new mongoose.Types.ObjectId(posterId), status: "in_progress" });
@@ -242,7 +242,7 @@ export const getTasksService = async (posterId, query) => {
       }
     };
   } catch (error) {
-    console.error("getTasksService error:", error.message);
+    logger.error("getTasksService error:", error.message);
     return { error: error.message };
   }
 };
@@ -295,7 +295,7 @@ export const getPosterBidsService = async (taskId, sort) => {
     const task = await Task.findOne({ _id: taskId });
     return { bids, task };
   } catch (error) {
-    console.error("getPosterBidsService error:", error.message);
+    logger.error("getPosterBidsService error:", error.message);
     return { error: error.message };
   }
 };
@@ -371,7 +371,7 @@ export const acceptBidService = async (bidId) => {
       task: updatedTask,
     };
   } catch (error) {
-    console.error("acceptBidService error:", error.message);
+    logger.error("acceptBidService error:", error.message);
     return { error: error.message };
   }
 };
@@ -437,15 +437,13 @@ export const getPosterTaskProgressService = async (taskId) => {
 
     return result;
   } catch (error) {
-    console.error("getPosterTaskProgressService error:", error.message);
+    logger.error("getPosterTaskProgressService error:", error.message);
     return { error: error.message };
   }
 };
 
 export const updateUserProfileService = async ({ userId, body, avatar }) => {
   try {
-    console.log(userId, body, avatar);
-
     const user = await User.findOne({ _id: new mongoose.Types.ObjectId(userId) });
     if (!user) {
       return { error: "user not found" };
@@ -477,12 +475,11 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
       const uploadedAvatar = await uploadManyFiles([avatar], "avatars");
       user.verificationDocuments.selfie = uploadedAvatar[0];
     }
-    const savedUser = await user.save();
-    console.log(savedUser);
+    await user.save();
 
     return ({ message: "user profile updated successfully" })
   } catch (error) {
-    console.log(error);
+    logger.error("updateUserProfileService error:", error);
 
     return { error: error.message };
   }
@@ -508,8 +505,6 @@ export const getPosterProfileService = async (posterId) => {
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
       "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea isVerified",
     );
-    const isWorkerActive = posterUser?.skills?.length > 0 && posterUser?.languages?.length > 0 && posterUser?.serviceArea?.coordinates?.length === 2;
-    console.log(isWorkerActive);
 
 
     const stats = {
@@ -575,7 +570,7 @@ export const getPosterProfileService = async (posterId) => {
       },
     };
   } catch (error) {
-    console.error("getPosterProfileService error:", error.message);
+    logger.error("getPosterProfileService error:", error.message);
     return { error: error.message };
   }
 };
@@ -659,7 +654,6 @@ export const getCompletedTaskPosterSideService = async (taskId, posterId) => {
 };
 
 export const switchRoleToWorkerService = async ({ user, data, files }) => {
-  console.log(data);
   if (!user._id) {
     return { forbidden: "Access Restricted!" }
   }
@@ -692,7 +686,6 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
     }
 
     const isPasswordValid = await compareHash(data.password, userData.password);
-    console.log(isPasswordValid);
 
     if (!isPasswordValid) {
       return { error: MESSAGES.CURRENT_PASSWORD_INVALID };
@@ -736,7 +729,7 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
 
     return { success: true, message: "Data uploaded Successfully" }
   } catch (error) {
-    console.log(error);
+    logger.error("switchRoleToWorkerService error:", error);
 
     return { error: MESSAGES.UNEXPECTED_ERROR }
   }
@@ -756,7 +749,7 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
     await isUser.save();
     return { success: true, message: "Role Updated" }
   } catch (error) {
-    console.log("Role swiitch to poster without Data service error", error);
+    logger.error("posterRoleSwitchAlreadyDataUploadedService error:", error);
     return { error: MESSAGES.UNEXPECTED_ERROR }
   }
 }

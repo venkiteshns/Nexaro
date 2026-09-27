@@ -1,12 +1,14 @@
 import {
     generatePresignedUploadUrl,
-    generatePresignedUploadUrls,
 } from "../utils/s3PresignUtils.js";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3.js";
 import { randomUUID } from "crypto";
 import path from "path";
 import fs from "fs";
+import logger from "../utils/logger.js";
+import STATUS_CODES from "../constants/statusCodes.js";
+import MESSAGES from "../constants/messages.js";
 
 /**
  * Controller to generate a single S3 Presigned Upload URL.
@@ -16,9 +18,9 @@ export const getPresignedUrlController = async (req, res) => {
         const { fileName, fileType, folder = "uploads" } = req.body;
 
         if (!fileName || !fileType) {
-            return res.status(400).json({
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
-                message: "fileName and fileType are required.",
+                message: MESSAGES.FILE_NAME_AND_TYPE_REQUIRED,
             });
         }
 
@@ -28,44 +30,16 @@ export const getPresignedUrlController = async (req, res) => {
             folder,
         });
 
-        return res.status(200).json({
+        return res.status(STATUS_CODES.OK).json({
             success: true,
+            message: MESSAGES.PRESIGNED_URL_GENERATED,
             data,
         });
     } catch (error) {
-        console.error("Error generating presigned URL:", error);
-        return res.status(500).json({
+        logger.error("Error generating presigned URL:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: error.message || "Failed to generate presigned URL.",
-        });
-    }
-};
-
-/**
- * Controller to generate multiple S3 Presigned Upload URLs in batch.
- */
-export const getPresignedUrlsBatchController = async (req, res) => {
-    try {
-        const { files, folder = "uploads" } = req.body;
-
-        if (!Array.isArray(files) || files.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "files array is required.",
-            });
-        }
-
-        const data = await generatePresignedUploadUrls(files, folder);
-
-        return res.status(200).json({
-            success: true,
-            data,
-        });
-    } catch (error) {
-        console.error("Error generating batch presigned URLs:", error);
-        return res.status(500).json({
-            success: false,
-            message: error.message || "Failed to generate batch presigned URLs.",
+            message: error.message || MESSAGES.FAILED_TO_GENERATE_PRESIGNED_URL,
         });
     }
 };
@@ -80,9 +54,9 @@ export const directS3ProxyFallbackController = async (req, res) => {
         const folder = req.body.folder || "uploads";
 
         if (!file) {
-            return res.status(400).json({
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
-                message: "No file provided for upload.",
+                message: MESSAGES.NO_FILE_PROVIDED,
             });
         }
 
@@ -107,8 +81,9 @@ export const directS3ProxyFallbackController = async (req, res) => {
 
         const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
-        return res.status(200).json({
+        return res.status(STATUS_CODES.OK).json({
             success: true,
+            message: MESSAGES.FILE_UPLOAD_SUCCESS,
             data: {
                 url: fileUrl,
                 key,
@@ -116,10 +91,10 @@ export const directS3ProxyFallbackController = async (req, res) => {
             },
         });
     } catch (error) {
-        console.error("Error in fallback S3 upload:", error);
-        return res.status(500).json({
+        logger.error("Error in fallback S3 upload:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: error.message || "Failed to upload file to S3.",
+            message: error.message || MESSAGES.FAILED_TO_UPLOAD_FILE,
         });
     }
 };

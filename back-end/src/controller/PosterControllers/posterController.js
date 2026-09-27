@@ -1,4 +1,4 @@
-import {
+﻿import {
   posterSignupService,
   getPosterBidsService,
   acceptBidService,
@@ -15,6 +15,7 @@ import {
 } from "../../services/posterServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
+import logger from "../../utils/logger.js";
 
 export const posterSignup = async (req, res) => {
   try {
@@ -37,7 +38,7 @@ export const posterSignup = async (req, res) => {
       refreshToken,
     });
   } catch (error) {
-    console.error("Poster signup error:", error.message);
+    logger.error("Poster signup error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -64,7 +65,7 @@ export const getPosterBids = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    console.error("getPosterBids error:", error.message);
+    logger.error("getPosterBids error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Internal server error",
@@ -93,7 +94,7 @@ export const acceptBid = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("acceptBid error:", error.message);
+    logger.error("acceptBid error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -116,7 +117,7 @@ export const getPosterTaskProgress = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    console.error("getPosterTaskProgress controller error:", error.message);
+    logger.error("getPosterTaskProgress controller error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -178,7 +179,7 @@ export const getPosterProfile = async (req, res) => {
       data: response,
     });
   } catch (error) {
-    console.error("getPosterProfile controller error:", error.message);
+    logger.error("getPosterProfile controller error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -221,7 +222,7 @@ export const getPosterNotifications = async (req, res) => {
     const result = await getPosterNotificationsService(posterId, { page, limit, filter });
     return res.status(STATUS_CODES.OK).json(result);
   } catch (error) {
-    console.error("getPosterNotifications error:", error);
+    logger.error("getPosterNotifications error:", error);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -235,7 +236,7 @@ export const markAllPosterNotificationsRead = async (req, res) => {
     const result = await markAllPosterNotificationsReadService(posterId);
     return res.status(STATUS_CODES.OK).json(result);
   } catch (error) {
-    console.error("markAllPosterNotificationsRead error:", error);
+    logger.error("markAllPosterNotificationsRead error:", error);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -253,7 +254,7 @@ export const markPosterNotificationRead = async (req, res) => {
     }
     return res.status(STATUS_CODES.OK).json(result);
   } catch (error) {
-    console.error("markPosterNotificationRead error:", error);
+    logger.error("markPosterNotificationRead error:", error);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -267,7 +268,7 @@ export const getPosterUnreadCount = async (req, res) => {
     const result = await getPosterUnreadCountService(posterId);
     return res.status(STATUS_CODES.OK).json(result);
   } catch (error) {
-    console.error("getPosterUnreadCount error:", error);
+    logger.error("getPosterUnreadCount error:", error);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,

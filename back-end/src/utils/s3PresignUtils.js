@@ -4,6 +4,7 @@ import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../config/s3.js";
 
+// Multipurpose Internet Mail Extensions (MIME) types
 const ALLOWED_MIME_TYPES = new Set([
     "image/jpeg",
     "image/png",
@@ -13,18 +14,14 @@ const ALLOWED_MIME_TYPES = new Set([
     "application/pdf",
 ]);
 
-/**
- * Sanitize a filename to avoid problematic characters in S3 keys.
- */
+// Sanitize a filename to avoid problematic characters in S3 keys.
 const sanitizeFileName = (fileName) => {
     return fileName
         .replace(/[^a-zA-Z0-9.-]/g, "_")
         .toLowerCase();
 };
 
-/**
- * Generate a single S3 Presigned Upload (PUT) URL.
- */
+// Generate a single S3 Presigned Upload (PUT) URL.
 export const generatePresignedUploadUrl = async ({
     fileName = "file",
     fileType,
@@ -59,25 +56,6 @@ export const generatePresignedUploadUrl = async ({
         format: fileType,
         expiresIn,
     };
-};
-
-/**
- * Generate multiple S3 Presigned Upload URLs in batch.
- */
-export const generatePresignedUploadUrls = async (files = [], folder = "uploads") => {
-    if (!Array.isArray(files) || files.length === 0) {
-        throw new Error("No files specified for presigned URLs");
-    }
-
-    return await Promise.all(
-        files.map((file) =>
-            generatePresignedUploadUrl({
-                fileName: file.fileName || file.name || "file",
-                fileType: file.fileType || file.type,
-                folder: file.folder || folder,
-            })
-        )
-    );
 };
 
 /**

@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { Camera, X, BadgeCheck, LockKeyhole } from "lucide-react";
+import { Camera, X, BadgeCheck, LockKeyhole, Info } from "lucide-react";
 import FormError from "./FormError";
 
 export const AvatarUploadField = ({ initials = "AV", currentAvatar, onDirty }) => {
@@ -136,6 +136,12 @@ export const PersonalInfoFields = ({isVerified = 'false'}) => {
 
           </div>
           {errors.email && <FormError error={errors.email} />}
+          <p className="text-[10px] sm:text-[11px] text-blue-800 bg-blue-50/80 border border-blue-200/70 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 mt-1 leading-normal">
+            <Info size={13} className="shrink-0 mt-0.5 text-[#0070BA]" />
+            <span>
+              Please ensure this is a <strong className="font-semibold text-[#003087]">PayPal-linked email ID</strong> to receive payments and withdrawal payouts smoothly.
+            </span>
+          </p>
         </div>
       </div>
 

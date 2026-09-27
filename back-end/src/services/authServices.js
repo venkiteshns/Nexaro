@@ -10,6 +10,7 @@ import {
 } from "../utils/generateTokens.js";
 import mongoose from "mongoose";
 import redisClient from "../config/redisClient.js";
+import logger from "../utils/logger.js";
 
 
 const MAX_RETRIES = 3;
@@ -82,8 +83,6 @@ export const googleLoginService = async (accessToken) => {
 };
 
 export const createOtp = async (email, phone, resendFlag) => {
-  console.log(email, phone, resendFlag);
-
   if (!resendFlag) {
     const userData = await User.findOne({ $or: [{ email }, { phone }] });
     if (userData) {
@@ -95,7 +94,6 @@ export const createOtp = async (email, phone, resendFlag) => {
     }
   }
   const otp = crypto.randomInt(100000, 999999).toString();
-  console.log("OTP", otp);
 
   const key = `${OTP_PREFIX}:${email}`;
 
@@ -105,7 +103,6 @@ export const createOtp = async (email, phone, resendFlag) => {
   }
 
   const hashedOtp = await hashData(otp);
-  console.log("Hashed OTP", otp, hashedOtp);
 
   await redisClient.set(key, hashedOtp, { EX: OTP_TTL_SECONDS });
 
@@ -146,7 +143,7 @@ export const sendOtp = async (email, otp) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Brevo API Error:", errorData);
+        logger.error("Brevo API Error:", errorData);
         throw new Error(
           `Brevo API rejected the request: ${errorData?.message ?? response.status}`,
         );
@@ -163,7 +160,7 @@ export const sendOtp = async (email, otp) => {
         error.message === "fetch failed";
 
       if (!isTransient || attempt === MAX_RETRIES) {
-        console.error(
+        logger.error(
           `sendOtp error (attempt ${attempt}/${MAX_RETRIES}):`,
           error,
         );
@@ -171,7 +168,7 @@ export const sendOtp = async (email, otp) => {
       }
 
       const delay = RETRY_BASE_DELAY_MS * 2 ** (attempt - 1);
-      console.warn(
+      logger.warn(
         `sendOtp: transient error on attempt ${attempt}, retrying in ${delay}ms...`,
       );
       sleep(delay);
@@ -271,7 +268,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Brevo API Error:", errorData);
+        logger.error("Brevo API Error:", errorData);
         throw new Error(
           `Brevo API rejected the request: ${errorData?.message ?? response.status}`,
         );
@@ -288,7 +285,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
         error.message === "fetch failed";
 
       if (!isTransient || attempt === MAX_RETRIES) {
-        console.error(
+        logger.error(
           `sendForgotPasswordEmail error (attempt ${attempt}/${MAX_RETRIES}):`,
           error,
         );
@@ -296,7 +293,7 @@ export const sendForgotPasswordEmail = async (email, otp) => {
       }
 
       const delay = RETRY_BASE_DELAY_MS * 2 ** (attempt - 1);
-      console.warn(
+      logger.warn(
         `sendForgotPasswordEmail: transient error on attempt ${attempt}, retrying in ${delay}ms...`,
       );
       await sleep(delay);
@@ -330,7 +327,6 @@ export const forgotPasswordOtpService = async (email, role) => {
   }
 
   const otp = crypto.randomInt(100000, 999999).toString();
-  console.log("Forgot Password OTP", otp);
 
   const key = `${OTP_PREFIX}:${email}`;
 
@@ -339,7 +335,6 @@ export const forgotPasswordOtpService = async (email, role) => {
     await redisClient.del(key);
   }
   const hashedOtp = await hashData(otp);
-  console.log(" Forgot hashedOtp", otp, hashedOtp);
 
   await redisClient.set(key, hashedOtp, { EX: OTP_TTL_SECONDS });
 
@@ -371,7 +366,6 @@ export const updateUserPasswordService = async (data, userId) => {
     if (!user) {
       return { success: false, message: messages.USER_NOT_FOUND };
     }
-    console.log("data in updateUserPasswordService", data);
     const { oldPassword, password } = data;
     const isPasswordValid = await compareHash(oldPassword, user.password);
     if (!isPasswordValid) {
@@ -382,7 +376,7 @@ export const updateUserPasswordService = async (data, userId) => {
     await user.save();
     return { success: true, message: messages.PASSWORD_UPDATED };
   } catch (error) {
-    console.error("Update user password error:", error.message);
+    logger.error("Update user password error:", error.message);
     return { success: false, message: messages.PASSWORD_UPDATE_FAILED };
   }
 }
@@ -401,7 +395,7 @@ export const deleteUserProfileService = async (user) => {
     return { success: true, message: messages.PROFILE_DELETED };
 
   } catch (error) {
-    console.log("Delete user profile error:", error.message);
+    logger.error("Delete user profile error:", error.message);
     return { success: false, message: messages.PROFILE_DELETE_FAILED };
   }
 }

@@ -1,6 +1,4 @@
-/**
- * Utility for uploading files directly to AWS S3 using Presigned Signed URLs.
- */
+// uploading files directly to AWS S3 using Presigned Signed URLs.
 
 const getApiBaseUrl = () => {
     const envUrl = import.meta.env.VITE_API_URL;
@@ -10,15 +8,6 @@ const getApiBaseUrl = () => {
     return "http://localhost:8000/api";
 };
 
-/**
- * Upload a single file directly to S3 via Presigned URL.
- * Falls back to server proxy upload if client-side S3 CORS is blocked.
- *
- * @param {File|Blob} file - The file to upload
- * @param {string} folder - The S3 subfolder (e.g. 'verification', 'tasks', 'avatars')
- * @param {function} [onProgress] - Optional upload progress callback (percent: number) => void
- * @returns {Promise<{ url: string, key: string, format: string }>}
- */
 export const uploadFileToS3 = async (file, folder = "uploads", onProgress = null) => {
     if (!file) {
         throw new Error("No file provided for upload");
@@ -54,35 +43,20 @@ export const uploadFileToS3 = async (file, folder = "uploads", onProgress = null
 
     // 2. Direct upload to S3 via PUT request
     try {
-        await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open("PUT", presignedData.uploadUrl, true);
-            xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
-
-            if (onProgress && xhr.upload) {
-                xhr.upload.onprogress = (e) => {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        onProgress(percent);
-                    }
-                };
-            }
-
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve();
-                } else {
-                    reject(new Error(`S3 upload failed with status ${xhr.status}`));
-                }
-            };
-
-            xhr.onerror = () => {
-                reject(new Error("S3 upload failed due to network or CORS policy"));
-            };
-
-            xhr.send(file);
+        const s3Response = await fetch(presignedData.uploadUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": file.type || "application/octet-stream",
+            },
+            body: file,
         });
 
+        if (!s3Response.ok) {
+            throw new Error(
+                `S3 upload failed with status ${s3Response.status}`
+            );
+        }
+        console.log("S3 Uploaded file URL :", presignedData.fileUrl);
         return {
             url: presignedData.fileUrl,
             key: presignedData.key,

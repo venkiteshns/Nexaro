@@ -1,7 +1,8 @@
 import STATUS_CODES from "../constants/statusCodes.js";
+import logger from "../utils/logger.js";
 
 const errorHandler = (err, req, res, _next) => {
-    console.error(`[ERROR] ${req.method} ${req.originalUrl} →`, err.message || err);
+    logger.error(`${req.method} ${req.originalUrl}`, { message: err.message, stack: err.stack });
 
     if (err.name === 'ValidationError') {
         const messages = Object.values(err.errors).map((e) => e.message);

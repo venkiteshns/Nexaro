@@ -6,6 +6,7 @@ import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
 import ngeohash from 'ngeohash';
 import { recordAdminAlert } from "./adminNotificationService.js";
+import logger from "../utils/logger.js";
 
 const deleteImagesFromCloudinary = async (publicIds) => {
     if (!publicIds || publicIds.length === 0) return;
@@ -32,7 +33,6 @@ const uploadImagesToCloudinary = async (files) => {
 };
 
 export const createTaskService = async (body, files, posterId) => {
-    console.log(body, files, posterId)
     try {
         const address = JSON.parse(body.address);
         const location = JSON.parse(body.location);
@@ -110,7 +110,7 @@ export const createTaskService = async (body, files, posterId) => {
         return { task: createdTask };
 
     } catch (error) {
-        console.error("createTaskService error:", error.message);
+        logger.error("createTaskService error:", error.message);
         return { error: error.message };
     }
 };
@@ -154,7 +154,7 @@ export const getTaskForBidService = async (taskId, workerId = null) => {
         }];
 
     } catch (error) {
-        console.error("getTaskForBidService error:", error.message);
+        logger.error("getTaskForBidService error:", error.message);
         return { error: error.message };
     }
 };
@@ -244,7 +244,7 @@ export const getWorkerBidsService = async (workerId, { status, page, limit }) =>
         return { bids, total, page, limit, totalPages, counts };
 
     } catch (error) {
-        console.error("getWorkerBidsService error:", error.message);
+        logger.error("getWorkerBidsService error:", error.message);
         return { error: error.message };
     }
 };
@@ -263,7 +263,6 @@ export const handleNewBid = async (task, user) => {
 
     try {
         const { taskId, bidAmount, estimatedTime, pitch } = task;
-        console.log("taskId", taskId);
 
         const isTask = await Task.findOne({ _id: taskId });
         if (!isTask) {
@@ -321,7 +320,7 @@ export const handleNewBid = async (task, user) => {
 
         return "bid created successfully";
     } catch (error) {
-        console.log(error);
+        logger.error("addNewBidService error:", error);
         if (error.message) {
             return { error: error.message }
         }
@@ -445,7 +444,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
             result = await Task.aggregate(buildPipeline());
         } catch (aggErr) {
             if (aggErr.code === 27 || aggErr.codeName === "IndexNotFound" || aggErr.message?.includes("2dsphere index")) {
-                console.warn("2dsphere index missing on tasks collection. Creating index and retrying...");
+                logger.warn("2dsphere index missing on tasks collection. Creating index and retrying...");
                 await Task.createIndexes();
                 result = await Task.aggregate(buildPipeline());
             } else {
@@ -464,7 +463,7 @@ export const getNearbyTasksService = async (workerId, { search, category, page =
         };
 
     } catch (error) {
-        console.error("getNearbyTasksService error:", error);
+        logger.error("getNearbyTasksService error:", error);
         return { error: "Something went wrong while fetching nearby tasks." };
     }
 };
@@ -590,7 +589,7 @@ export const getWorkerBidDetailsService = async (bidId, workerId) => {
         };
 
     } catch (error) {
-        console.error("getWorkerBidDetailsService error:", error.message);
+        logger.error("getWorkerBidDetailsService error:", error.message);
         return { error: "Something went wrong while fetching bid details." };
     }
 }
@@ -605,7 +604,7 @@ export const withdrawBidService = async (bidId) => {
         }
         return { message: "Bid withdrawn successfully" }
     } catch (error) {
-        console.error("withdrawBidService error:", error.message);
+        logger.error("withdrawBidService error:", error.message);
         return { error: "Something went wrong while withdrawing bid." };
     }
 }
@@ -632,7 +631,7 @@ export const cancelTaskByPosterService = async (taskId) => {
 
         return { message: "Task cancelled successfully" }
     } catch (error) {
-        console.error("cancelTaskByPosterService error:", error.message);
+        logger.error("cancelTaskByPosterService error:", error.message);
         return { error: "Something went wrong while cancelling task." };
     }
 }
@@ -718,7 +717,6 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
         const taskGeoHash = ngeohash.encode(task_lat, task_lng, 4);
 
         const neighbors = ngeohash.neighbors(taskGeoHash);
-        console.log(neighbors, "neighbours");
 
         const zonesToNotiffy = [taskGeoHash, ...neighbors];
 
@@ -729,7 +727,7 @@ export const updateTaskService = async (taskId, posterId, body, newFiles) => {
 
         return { task: updatedTask };
     } catch (error) {
-        console.error("updateTaskService error:", error.message);
+        logger.error("updateTaskService error:", error.message);
         return { error: error.message };
     }
 };
@@ -786,7 +784,7 @@ export const getWorkerActiveJobService = async (taskId, workerId) => {
 
         return result[0];
     } catch (error) {
-        console.error("getWorkerActiveJobService error:", error.message);
+        logger.error("getWorkerActiveJobService error:", error.message);
         return { error: error.message };
     }
 };
@@ -822,7 +820,7 @@ export const updateJobProgressService = async (taskId, workerId, update) => {
 
         return { message: "Progress updated successfully", update: task.update };
     } catch (error) {
-        console.error("updateJobProgressService error:", error.message);
+        logger.error("updateJobProgressService error:", error.message);
         return { error: error.message };
     }
 };
@@ -846,7 +844,7 @@ export const getWorkerCurrentActiveJobService = async (workerId) => {
             title: task.title,
         };
     } catch (error) {
-        console.error("getWorkerCurrentActiveJobService error:", error.message);
+        logger.error("getWorkerCurrentActiveJobService error:", error.message);
         return { error: error.message };
     }
 };
@@ -927,7 +925,7 @@ export const getCompletedTaskWorkerSideService = async (taskId, workerId) => {
 
         return { data: result[0] };
     } catch (error) {
-        console.error('getCompletedTaskWorkerSideService error:', error.message);
+        logger.error('getCompletedTaskWorkerSideService error:', error.message);
         return { error: error.message };
     }
 };

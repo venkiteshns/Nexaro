@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 import WorkerNotification from "../models/workerNotificationSchema.js";
 import Transaction from "../models/transactionSchema.js";
 import Review from "../models/reviewSchema.js";
 import User from "../models/userSchema.js";
 import Announcement from "../models/announcementSchema.js";
 import { getIo } from "../socket.js";
+import logger from "../utils/logger.js";
 
 export const recordWorkerAlert = async ({
   workerId,
@@ -75,12 +76,12 @@ export const recordWorkerAlert = async ({
         });
       }
     } catch (err) {
-      console.error("Socket emit worker notification error:", err.message);
+      logger.error("Socket emit worker notification error:", err.message);
     }
 
     return alert;
   } catch (err) {
-    console.error("Error recording worker alert:", err.message);
+    logger.error("Error recording worker alert:", err.message);
     return null;
   }
 };
@@ -129,7 +130,7 @@ export const syncWorkerNotifications = async (workerId) => {
         });
       }
     } catch (txErr) {
-      console.error("Error processing transactions in syncWorkerNotifications:", txErr.message);
+      logger.error("Error processing transactions in syncWorkerNotifications:", txErr.message);
     }
 
     try {
@@ -157,7 +158,7 @@ export const syncWorkerNotifications = async (workerId) => {
         });
       }
     } catch (revErr) {
-      console.error("Error processing reviews in syncWorkerNotifications:", revErr.message);
+      logger.error("Error processing reviews in syncWorkerNotifications:", revErr.message);
     }
 
     try {
@@ -184,7 +185,7 @@ export const syncWorkerNotifications = async (workerId) => {
         });
       }
     } catch (annErr) {
-      console.error("Error processing announcements in syncWorkerNotifications:", annErr.message);
+      logger.error("Error processing announcements in syncWorkerNotifications:", annErr.message);
     }
 
     if (alertsToUpsert.length > 0) {
@@ -206,6 +207,6 @@ export const syncWorkerNotifications = async (workerId) => {
       await WorkerNotification.bulkWrite(operations, { ordered: false, timestamps: false });
     }
   } catch (err) {
-    console.error("Error in syncWorkerNotifications:", err.message);
+    logger.error("Error in syncWorkerNotifications:", err.message);
   }
 };

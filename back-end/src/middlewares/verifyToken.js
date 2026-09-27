@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import STATUS_CODES from "../constants/statusCodes.js";
 import MESSAGES from "../constants/messages.js";
+import logger from "../utils/logger.js";
 
 const verifyToken = (req, res, next) => {
     try {
@@ -28,7 +29,7 @@ const verifyToken = (req, res, next) => {
             });
         }
 
-        console.error("Token verification error:", error.message);
+        logger.error("Token verification error:", { message: error.message });
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

@@ -9,7 +9,7 @@ export default function DirectionsCard({ address, location }) {
 
     return (
         <div className="bg-white border border-gray-200/80 rounded-xl shadow-xs overflow-hidden">
-            <div className="h-1 bg-linear-to-r from-[#0A6E5C] to-emerald-400" />
+            <div className="h-1 bg-gradient-to-r from-[#0A6E5C] to-emerald-400" />
             <div className="p-3.5 sm:p-4">
                 <div className="flex items-center gap-1.5 mb-2">
                     <Navigation size={14} className="text-[#0A6E5C]" />

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 const WorkerProposalSidebar = ({ proposals = [] }) => {
   const navigate = useNavigate();
 
+  const displayedProposals = proposals.slice(0, 3);
+
   return (
     <aside className="w-full">
       {/* Header */}
@@ -26,7 +28,7 @@ const WorkerProposalSidebar = ({ proposals = [] }) => {
       </div>
 
       {/* Proposals List */}
-      {proposals.length === 0 ? (
+      {displayedProposals.length === 0 ? (
         <div className="bg-white border border-gray-200/80 rounded-xl p-5 text-center shadow-2xs">
           <div className="w-10 h-10 rounded-full bg-emerald-50 text-[#0A6E5C] flex items-center justify-center mx-auto mb-2">
             <Briefcase size={18} />
@@ -44,7 +46,7 @@ const WorkerProposalSidebar = ({ proposals = [] }) => {
         </div>
       ) : (
         <div className="space-y-2">
-          {proposals.map((proposal) => (
+          {displayedProposals.map((proposal) => (
             <div
               key={proposal._id}
               onClick={() => {

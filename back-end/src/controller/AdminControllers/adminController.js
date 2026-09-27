@@ -1,4 +1,4 @@
-import {
+﻿import {
     getAllUsersService,
     suspendUserService,
     unsuspendUserService,
@@ -23,6 +23,7 @@ import {
 } from "../../services/adminServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
+import logger from "../../utils/logger.js";
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -48,7 +49,7 @@ export const getAllUsers = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("Get all users error:", error.message);
+        logger.error("Get all users error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -67,7 +68,7 @@ export const suspendUser = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Suspend user error:", error.message);
+        logger.error("Suspend user error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -86,7 +87,7 @@ export const unsuspendUser = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Unsuspend user error:", error.message);
+        logger.error("Unsuspend user error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -115,7 +116,7 @@ export const getPendingVerificationUsers = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("Get pending verification users error:", error.message);
+        logger.error("Get pending verification users error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -134,7 +135,7 @@ export const approveUser = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Approve user error:", error.message);
+        logger.error("Approve user error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -153,7 +154,7 @@ export const rejectUser = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Reject user error:", error.message);
+        logger.error("Reject user error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -186,7 +187,7 @@ export const getAllTasks = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.FAILED_TO_FETCH_TASKS });
         }
     } catch (error) {
-        console.error("Get all tasks error:", error.message);
+        logger.error("Get all tasks error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -205,7 +206,7 @@ export const cancelTaskByAdmin = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.message });
         }
     } catch (error) {
-        console.error("Cancel task by admin error:", error.message);
+        logger.error("Cancel task by admin error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -225,7 +226,7 @@ export const getAdminTaskDetails = async (req, res) => {
 
         return res.status(STATUS_CODES.OK).json({ success: true, task: response.task });
     } catch (error) {
-        console.error('Get admin task details error:', error.message);
+        logger.error('Get admin task details error:', error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -236,7 +237,7 @@ export const getAdminFinanceStats = async (req, res) => {
         const response = await getAdminFinanceStatsService(range);
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin finance stats error:", error.message);
+        logger.error("Get admin finance stats error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -248,7 +249,7 @@ export const getAdminFinanceChart = async (req, res) => {
         const response = await getAdminFinanceChartService(timeframe, metric);
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin finance chart error:", error.message);
+        logger.error("Get admin finance chart error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -271,7 +272,7 @@ export const getAdminFinanceTransactions = async (req, res) => {
 
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin finance transactions error:", error.message);
+        logger.error("Get admin finance transactions error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -281,7 +282,7 @@ export const getAdminDailyRevenueReport = async (req, res) => {
         const response = await getAdminDailyRevenueReportService();
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin daily revenue report error:", error.message);
+        logger.error("Get admin daily revenue report error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -292,7 +293,7 @@ export const getAdminMonthlyPlReport = async (req, res) => {
         const response = await getAdminMonthlyPlReportService(year, month, fromDate, toDate);
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin monthly P&L report error:", error.message);
+        logger.error("Get admin monthly P&L report error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -302,7 +303,7 @@ export const getAdminPlatformFeeSummary = async (req, res) => {
         const response = await getAdminPlatformFeeSummaryService();
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin platform fee summary error:", error.message);
+        logger.error("Get admin platform fee summary error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -316,7 +317,7 @@ export const getAdminNotifications = async (req, res) => {
         const response = await getAdminNotificationsService(page, limit, filter);
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin notifications error:", error.message);
+        logger.error("Get admin notifications error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -329,7 +330,7 @@ export const markAllAdminNotificationsRead = async (req, res) => {
         const response = await markAllNotificationsReadService();
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Mark all notifications read error:", error.message);
+        logger.error("Mark all notifications read error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -346,7 +347,7 @@ export const markAdminNotificationRead = async (req, res) => {
         }
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Mark notification read error:", error.message);
+        logger.error("Mark notification read error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -374,7 +375,7 @@ export const sendAdminAnnouncement = async (req, res) => {
 
         return res.status(STATUS_CODES.CREATED).json(response);
     } catch (error) {
-        console.error("Send admin announcement error:", error.message);
+        logger.error("Send admin announcement error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -388,7 +389,7 @@ export const getAdminRecentAnnouncements = async (req, res) => {
         const response = await getRecentAnnouncementsService(limit);
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get recent announcements error:", error.message);
+        logger.error("Get recent announcements error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -401,7 +402,7 @@ export const getAdminDashboard = async (req, res) => {
         const response = await getAdminDashboardService();
         return res.status(STATUS_CODES.OK).json(response);
     } catch (error) {
-        console.error("Get admin dashboard error:", error.message);
+        logger.error("Get admin dashboard error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

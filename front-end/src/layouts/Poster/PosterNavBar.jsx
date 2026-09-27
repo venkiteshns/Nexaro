@@ -194,21 +194,21 @@ const PosterNavBar = () => {
     <>
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-3 left-4 z-50 w-10 h-10 rounded-full  flex items-center justify-center text-gray-600 hover:text-[#0A6E5C] transition-colors"
+        className="md:hidden fixed top-2.5 left-3 z-50 w-9 h-9 rounded-xl flex items-center justify-center text-gray-700 bg-white/95 backdrop-blur-xs border border-gray-200/80 shadow-2xs hover:text-[#0A6E5C] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer"
         aria-label="Open navigation"
       >
-        <Menu size={20} />
+        <Menu size={19} />
       </button>
 
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-[998] bg-black/40 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       <div
-        className={`md:hidden fixed top-0 left-0 h-full z-50 w-[220px] bg-white border-r border-gray-200 shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`md:hidden fixed top-0 left-0 h-full z-[999] w-[220px] bg-white border-r border-gray-200 shadow-2xl transition-transform duration-300 ease-in-out ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

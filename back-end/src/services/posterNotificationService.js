@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 import PosterNotification from "../models/posterNotificationSchema.js";
 import Task from "../models/taskSchema.js";
 import Transaction from "../models/transactionSchema.js";
@@ -6,6 +6,7 @@ import Review from "../models/reviewSchema.js";
 import User from "../models/userSchema.js";
 import Announcement from "../models/announcementSchema.js";
 import { getIo } from "../socket.js";
+import logger from "../utils/logger.js";
 
 export const recordPosterAlert = async ({
   posterId,
@@ -77,12 +78,12 @@ export const recordPosterAlert = async ({
         });
       }
     } catch (err) {
-      console.error("Socket emit poster notification error:", err.message);
+      logger.error("Socket emit poster notification error:", err.message);
     }
 
     return alert;
   } catch (err) {
-    console.error("Error recording poster alert:", err.message);
+    logger.error("Error recording poster alert:", err.message);
     return null;
   }
 };
@@ -127,7 +128,7 @@ export const syncPosterNotifications = async (posterId) => {
         });
       }
     } catch (txErr) {
-      console.error("Error processing escrow transactions in syncPosterNotifications:", txErr.message);
+      logger.error("Error processing escrow transactions in syncPosterNotifications:", txErr.message);
     }
 
     try {
@@ -157,7 +158,7 @@ export const syncPosterNotifications = async (posterId) => {
         });
       }
     } catch (taskErr) {
-      console.error("Error processing completed tasks in syncPosterNotifications:", taskErr.message);
+      logger.error("Error processing completed tasks in syncPosterNotifications:", taskErr.message);
     }
 
     try {
@@ -182,7 +183,7 @@ export const syncPosterNotifications = async (posterId) => {
         });
       }
     } catch (revErr) {
-      console.error("Error processing reviews in syncPosterNotifications:", revErr.message);
+      logger.error("Error processing reviews in syncPosterNotifications:", revErr.message);
     }
 
     try {
@@ -207,7 +208,7 @@ export const syncPosterNotifications = async (posterId) => {
         });
       }
     } catch (annErr) {
-      console.error("Error processing announcements in syncPosterNotifications:", annErr.message);
+      logger.error("Error processing announcements in syncPosterNotifications:", annErr.message);
     }
 
     if (alertsToUpsert.length > 0) {
@@ -229,6 +230,6 @@ export const syncPosterNotifications = async (posterId) => {
       await PosterNotification.bulkWrite(operations, { ordered: false, timestamps: false });
     }
   } catch (err) {
-    console.error("Error in syncPosterNotifications:", err.message);
+    logger.error("Error in syncPosterNotifications:", err.message);
   }
 };

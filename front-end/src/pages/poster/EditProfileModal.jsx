@@ -11,6 +11,7 @@ import {
   KeyRound,
   Mail,
   CheckCircle2,
+  Info,
 } from "lucide-react";
 
 import { showError, showSuccess } from "../../utils/toast";
@@ -198,7 +199,7 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
           </div>
 
           <div className="px-7 pb-7">
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-2 gap-3 mb-3 items-start">
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">
                   Full Name
@@ -241,6 +242,12 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
                     {errors.email.message}
                   </p>
                 )}
+                <p className="text-[10px] text-blue-800 bg-blue-50/80 border border-blue-200/70 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 mt-1.5 leading-normal">
+                  <Info size={12} className="shrink-0 mt-0.5 text-[#0070BA]" />
+                  <span>
+                    Ensure this is a <strong className="font-semibold text-[#003087]">PayPal-linked email ID</strong> for smooth payment transactions.
+                  </span>
+                </p>
               </div>
             </div>
 

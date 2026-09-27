@@ -1,4 +1,6 @@
 /* eslint-disable no-await-in-loop */
+import logger from "./logger.js";
+
 export async function generateAccessToken(retries = 2) {
   const auth = Buffer.from(
     `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
@@ -23,7 +25,7 @@ export async function generateAccessToken(retries = 2) {
       return data.access_token;
     } catch (err) {
       if (attempt === retries) throw err;
-      console.warn(`generateAccessToken attempt ${attempt} failed (${err.message}). Retrying...`);
+      logger.warn(`generateAccessToken attempt ${attempt} failed (${err.message}). Retrying...`);
       await new Promise(r => setTimeout(r, 500));
     }
   }

@@ -2,6 +2,7 @@ import { getTasksService } from "../../services/posterServices.js";
 import { createTaskService, handleNewBid, cancelTaskByPosterService, updateTaskService } from "../../services/taskServices.js";
 import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
+import logger from "../../utils/logger.js";
 
 export const createTask = async (req, res) => {
     try {
@@ -23,7 +24,7 @@ export const createTask = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("createTask controller error:", error.message);
+        logger.error("createTask controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -32,7 +33,6 @@ export const createTask = async (req, res) => {
 };
 
 export const getMyTasks = async (req, res) => {
-    console.log(req.query);
     try {
         const posterId = req.user._id;
 
@@ -52,7 +52,7 @@ export const getMyTasks = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("getMyTasks controller error:", error.message);
+        logger.error("getMyTasks controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -75,7 +75,7 @@ export const addNewBid = async (req, res) => {
             message: response,
         });
     } catch (error) {
-        console.error("addnewbid controller error:", error.message);
+        logger.error("addnewbid controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -98,7 +98,7 @@ export const cancelTaskByPoster = async (req, res) => {
             message: res.message,
         });
     } catch (error) {
-        console.error("cancelTaskByPoster controller error:", error.message);
+        logger.error("cancelTaskByPoster controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -126,7 +126,7 @@ export const updateTask = async (req, res) => {
             task: response.task,
         });
     } catch (error) {
-        console.error("updateTask controller error:", error.message);
+        logger.error("updateTask controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

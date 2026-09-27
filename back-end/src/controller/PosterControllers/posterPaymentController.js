@@ -1,10 +1,11 @@
-import STATUS_CODES from "../../constants/statusCodes.js";
+﻿import STATUS_CODES from "../../constants/statusCodes.js";
 import MESSAGES from "../../constants/messages.js";
 import {
   getPosterPaymentOverviewService,
   getPosterPaymentHistoryService,
   getPosterSpendingChartService,
 } from "../../services/posterPaymentServices.js";
+import logger from "../../utils/logger.js";
 
 export const getPosterPaymentOverview = async (req, res) => {
   try {
@@ -23,7 +24,7 @@ export const getPosterPaymentOverview = async (req, res) => {
       data: result.stats,
     });
   } catch (error) {
-    console.error("getPosterPaymentOverview error:", error.message);
+    logger.error("getPosterPaymentOverview error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -57,7 +58,7 @@ export const getPosterPaymentHistory = async (req, res) => {
       pagination: result.pagination,
     });
   } catch (error) {
-    console.error("getPosterPaymentHistory error:", error.message);
+    logger.error("getPosterPaymentHistory error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -89,7 +90,7 @@ export const getPosterSpendingChart = async (req, res) => {
       chartData: result.chartData,
     });
   } catch (error) {
-    console.error("getPosterSpendingChart error:", error.message);
+    logger.error("getPosterSpendingChart error:", error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: MESSAGES.INTERNAL_SERVER_ERROR,

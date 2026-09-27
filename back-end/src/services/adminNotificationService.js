@@ -1,9 +1,10 @@
-import AdminNotification from "../models/adminNotificationSchema.js";
+﻿import AdminNotification from "../models/adminNotificationSchema.js";
 import Task from "../models/taskSchema.js";
 import Transaction from "../models/transactionSchema.js";
 import Review from "../models/reviewSchema.js";
 import User from "../models/userSchema.js";
 import { getIo } from "../socket.js";
+import logger from "../utils/logger.js";
 
 export const recordAdminAlert = async ({
     type,
@@ -56,12 +57,12 @@ export const recordAdminAlert = async ({
           });
         }
       } catch (err) {
-        console.error("Socket emit admin notification error:", err.message);
+        logger.error("Socket emit admin notification error:", err.message);
       }
 
       return alert;
     } catch (error) {
-      console.error("Error recording admin alert:", error.message);
+      logger.error("Error recording admin alert:", error.message);
       return null;
     }
   };
@@ -292,7 +293,7 @@ export const syncRealPlatformNotifications = async (force = false) => {
       await AdminNotification.bulkWrite(operations, { ordered: false });
     }
   } catch (err) {
-    console.error("Error syncing real platform notifications:", err.message);
+    logger.error("Error syncing real platform notifications:", err.message);
   } finally {
     isSyncing = false;
     lastSyncTime = Date.now();

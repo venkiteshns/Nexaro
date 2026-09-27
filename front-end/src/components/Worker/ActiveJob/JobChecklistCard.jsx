@@ -42,13 +42,13 @@ export default function JobChecklistCard({
                                         : 'bg-gray-50/70 border-gray-100'
                                 }`}
                         >
-                            <div className="flex items-center gap-2.5">
+                            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                                 {itemDone ? (
                                     <CheckCircle size={15} className="text-[#0A6E5C] shrink-0" />
                                 ) : (
                                     <Circle size={15} className="text-gray-300 shrink-0" />
                                 )}
-                                <span className={`text-xs font-semibold ${itemDone ? 'text-[#0A6E5C]' : 'text-gray-600'}`}>
+                                <span className={`text-xs font-semibold truncate ${itemDone ? 'text-[#0A6E5C]' : 'text-gray-600'}`}>
                                     {item.label}
                                 </span>
                             </div>

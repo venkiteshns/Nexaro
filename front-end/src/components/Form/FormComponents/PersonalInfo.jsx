@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import ReferralInput from "./ReferralInput";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Info } from "lucide-react";
 
 const PersonalInfo = (props) => {
   const {
@@ -37,7 +37,7 @@ const PersonalInfo = (props) => {
         )}
       </div>
 }
-      <div className="flex flex-col md:flex-row gap-3">
+      <div className="flex flex-col md:flex-row gap-3 items-start">
         <div className="w-full" >
           <div className="flex items-center justify-between mb-1">
             <label className="block text-xs font-medium" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
@@ -88,9 +88,18 @@ const PersonalInfo = (props) => {
               Use a different email
             </button>
           )}
+
+          {!login && (
+            <div className="mt-2 p-2.5 rounded-xl bg-blue-50/80 border border-blue-200/80 text-blue-950 flex items-start gap-2 shadow-2xs">
+              <Info className="w-4 h-4 text-[#0070BA] shrink-0 mt-0.5" />
+              <p className="text-[11px] leading-relaxed text-gray-700">
+                <strong className="font-semibold text-[#003087]">PayPal Notice:</strong> Please enter your PayPal-linked email ID to ensure smooth payment transactions. If you don't have a PayPal account, you can sign up with any email, but make sure to update it later in your profile with a PayPal-linked email ID—otherwise payments cannot be received.
+              </p>
+            </div>
+          )}
         </div>
 
-        {!login &&  <div>
+        {!login &&  <div className="w-full">
           <label className="text-xs text-gray-700/80">
             Phone <span className="text-red-500">*</span>
           </label>

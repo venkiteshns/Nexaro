@@ -19,6 +19,7 @@ import {
   getWorkerDashboardService
 } from "../../services/workerServices.js";
 import { getTaskForBidService, getWorkerBidsService, getNearbyTasksService, getWorkerBidDetailsService, withdrawBidService, getWorkerActiveJobService, getWorkerCurrentActiveJobService, updateJobProgressService, getCompletedTaskWorkerSideService } from "../../services/taskServices.js";
+import logger from "../../utils/logger.js";
 
 
 export const workerSignup = async (req, res) => {
@@ -26,8 +27,6 @@ export const workerSignup = async (req, res) => {
     try {
 
         const result = await workerSignupService({ data: req.body, files: req.files });
-
-        console.log("result from worker controller", result);
 
         if (result?.error) {
             throw new Error(result.error);
@@ -79,7 +78,7 @@ export const getNearbyTasks = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("getNearbyTasks controller error:", error.message);
+        logger.error("getNearbyTasks controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -98,7 +97,6 @@ export const getTaskForBid = async (req, res) => {
                 message: result.error,
             });
         }
-        console.log("task data", result);
 
         return res.status(STATUS_CODES.OK).json({
             success: true,
@@ -106,7 +104,7 @@ export const getTaskForBid = async (req, res) => {
             task: result,
         });
     } catch (error) {
-        console.error("getTaskForBid controller error:", error.message);
+        logger.error("getTaskForBid controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -144,7 +142,7 @@ export const getWorkerBids = async (req, res) => {
             counts: result.counts,
         });
     } catch (error) {
-        console.error("getWorkerBids controller error:", error);
+        logger.error("getWorkerBids controller error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -176,7 +174,7 @@ export const getWorkerBidDetails = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("getWorkerBidDetails controller error:", error.message);
+        logger.error("getWorkerBidDetails controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -198,7 +196,7 @@ export const withdrawBid = async (req, res) => {
             message: result.message,
         })
     } catch (error) {
-        console.error("withdrawBid controller error:", error.message);
+        logger.error("withdrawBid controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -221,7 +219,7 @@ export const getWorkerActiveJob = async (req, res) => {
             data: result,
         });
     } catch (error) {
-        console.error("getWorkerActiveJob controller error:", error.message);
+        logger.error("getWorkerActiveJob controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -241,7 +239,7 @@ export const updateJobProgress = async (req, res) => {
             update: result.update,
         });
     } catch (error) {
-        console.error("updateJobProgress controller error:", error.message);
+        logger.error("updateJobProgress controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -260,7 +258,7 @@ export const getWorkerCurrentActiveJob = async (req, res) => {
             title: result.title ?? null,
         });
     } catch (error) {
-        console.error("getWorkerCurrentActiveJob controller error:", error.message);
+        logger.error("getWorkerCurrentActiveJob controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.INTERNAL_SERVER_ERROR });
     }
 };
@@ -275,7 +273,6 @@ export const getWorkerProfile = async (req, res) => {
 
 export const updateWorkerProfile = async (req, res) => {
     const response = await updateWorkerProfileService({ user: req.user, data: req.body, avatar: req.files })
-    console.log(response);
     if (response.unauthorized) {
         return res.status(STATUS_CODES.FORBIDDEN).json({ success: false, message: response.unauthorized })
     }
@@ -341,7 +338,7 @@ export const getEarningHeroData = async (req, res) => {
             earningsData: result.earningsData,
         });
     } catch (error) {
-        console.error("getEarningHeroData controller error:", error.message);
+        logger.error("getEarningHeroData controller error:", error.message);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -386,7 +383,7 @@ export const getWorkerEarningsChart = async (req, res) => {
             chartData: response.chartData,
         });
     } catch (error) {
-        console.error("getWorkerEarningsChart error:", error);
+        logger.error("getWorkerEarningsChart error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -416,7 +413,7 @@ export const withdrawWorkerEarnings = async (req, res) => {
             transaction: response.transaction,
         });
     } catch (error) {
-        console.error("withdrawWorkerEarnings error:", error);
+        logger.error("withdrawWorkerEarnings error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -434,7 +431,7 @@ export const getWorkerNotifications = async (req, res) => {
         const result = await getWorkerNotificationsService(workerId, { page, limit, filter });
         return res.status(STATUS_CODES.OK).json(result);
     } catch (error) {
-        console.error("getWorkerNotifications error:", error);
+        logger.error("getWorkerNotifications error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -448,7 +445,7 @@ export const markAllWorkerNotificationsRead = async (req, res) => {
         const result = await markAllWorkerNotificationsReadService(workerId);
         return res.status(STATUS_CODES.OK).json(result);
     } catch (error) {
-        console.error("markAllWorkerNotificationsRead error:", error);
+        logger.error("markAllWorkerNotificationsRead error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -466,7 +463,7 @@ export const markWorkerNotificationRead = async (req, res) => {
         }
         return res.status(STATUS_CODES.OK).json(result);
     } catch (error) {
-        console.error("markWorkerNotificationRead error:", error);
+        logger.error("markWorkerNotificationRead error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -480,7 +477,7 @@ export const getWorkerUnreadCount = async (req, res) => {
         const result = await getWorkerUnreadCountService(workerId);
         return res.status(STATUS_CODES.OK).json(result);
     } catch (error) {
-        console.error("getWorkerUnreadCount error:", error);
+        logger.error("getWorkerUnreadCount error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -503,7 +500,7 @@ export const getWorkerHeaderStatus = async (req, res) => {
             ...result,
         });
     } catch (error) {
-        console.error("getWorkerHeaderStatus error:", error);
+        logger.error("getWorkerHeaderStatus error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -527,7 +524,7 @@ export const toggleWorkerLiveStatus = async (req, res) => {
             ...result,
         });
     } catch (error) {
-        console.error("toggleWorkerLiveStatus error:", error);
+        logger.error("toggleWorkerLiveStatus error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,
@@ -552,7 +549,7 @@ export const getWorkerDashboard = async (req, res) => {
             data: result,
         });
     } catch (error) {
-        console.error("getWorkerDashboard controller error:", error);
+        logger.error("getWorkerDashboard controller error:", error);
         return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: MESSAGES.INTERNAL_SERVER_ERROR,

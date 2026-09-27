@@ -6,6 +6,7 @@ import WorkerStatCards from "../../components/Worker/Dashboard/WorkerStatCards";
 import WorkerCategoryTabs from "../../components/Worker/Dashboard/WorkerCategoryTabs";
 import WorkerJobCard from "../../components/Worker/Dashboard/WorkerJobCard";
 import WorkerProposalSidebar from "../../components/Worker/Dashboard/WorkerProposalSidebar";
+import WorkerCompletedTasks from "../../components/Worker/Dashboard/WorkerCompletedTasks";
 import WorkerDashboardFooter from "../../components/Worker/Dashboard/WorkerDashboardFooter";
 import EarningsChart from "../../components/Worker/Earnings/EarningsChart";
 import { useGetWorkerDashboardQuery } from "../../store/services/workerApi";
@@ -34,6 +35,7 @@ const WorkerDashboard = () => {
   ];
   const availableJobs = dashboardData.availableJobs || [];
   const recentBids = dashboardData.recentBids || [];
+  const completedTasks = dashboardData.completedTasks || [];
   const userName = dashboardData.userName || "";
   const walletAmount = dashboardData.walletAmount || 0;
   const isLive = dashboardData.isLive ?? true;
@@ -86,10 +88,10 @@ const WorkerDashboard = () => {
               </div>
             )}
 
-            {/* Two Column Layout matching screenshot */}
+            {/* Content Layout: Available Opportunities on Left, Proposals & Completed Tasks Side-by-Side on Right */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-start">
-              {/* Left Column (8 cols): Available Opportunities / Jobs */}
-              <div className="lg:col-span-8">
+              {/* Left Column (5 cols): Available Opportunities / Jobs */}
+              <div className="lg:col-span-5">
                 {/* Category Pills & View More link */}
                 <WorkerCategoryTabs
                   categories={categories}
@@ -153,9 +155,10 @@ const WorkerDashboard = () => {
                 )}
               </div>
 
-              {/* Right Column (4 cols): Proposals Status Sidebar */}
-              <div className="lg:col-span-4">
+              {/* Right Area (7 cols): Proposals & Completed Tasks Side-by-Side */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                 <WorkerProposalSidebar proposals={recentBids} />
+                <WorkerCompletedTasks completedTasks={completedTasks} />
               </div>
             </div>
 

@@ -44,7 +44,7 @@ const Map = ({ position: externalPosition, setPosition: externalSetPosition, hei
     const setPosition = externalSetPosition ?? setInternalPosition;
 
     return (
-        <div>
+        <div className="relative z-0 isolate">
             {showButton && (
                 <button
                     type="button"
@@ -54,7 +54,7 @@ const Map = ({ position: externalPosition, setPosition: externalSetPosition, hei
                     Get Current Location
                 </button>
             )}
-            <MapContainer center={[position.lat, position.lng]} zoom={13} style={{ height, width: "100%" }}>
+            <MapContainer center={[position.lat, position.lng]} zoom={13} style={{ height, width: "100%", zIndex: 0 }}>
                 <TileLayer attribution='&copy; OpenStreetMap contributors' url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
                 <FlyToLocation position={position} />
                 <MapClickHandler setPosition={setPosition} />

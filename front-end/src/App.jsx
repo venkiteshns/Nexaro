@@ -123,6 +123,7 @@ function AppInner() {
 
           <Route element={<PrivateRoute allowedRoles="admin" />}>
             <Route path="/admin">
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="users/verification" element={<UserVerificationPanel />} />

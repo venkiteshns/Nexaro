@@ -19,7 +19,7 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
     "bg-indigo-100 text-indigo-700 border-indigo-200",
   ];
 
-  const items = signups || [];
+  const items = (signups || []).slice(0, 3);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/90 p-4 sm:p-5 shadow-2xs h-full flex flex-col justify-between">
@@ -43,7 +43,7 @@ const RecentSignupsCard = ({ signups = [], isLoading = false }) => {
 
       {isLoading ? (
         <div className="divide-y divide-gray-50 animate-pulse">
-          {[...Array(5)].map((_, i) => (
+          {[...Array(3)].map((_, i) => (
             <div key={i} className="py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gray-200" />

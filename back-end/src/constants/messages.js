@@ -13,7 +13,7 @@ const MESSAGES = {
     LOGIN_SUCCESS: "Login successful",
     LOGGED_OUT: "Logged out successfully",
     REFRESH_TOKEN_REQUIRED: "Invalid Access Token - Refresh token is required",
-    INVALID_REFRESH_TOKEN: "Invalid or expired refresh token",
+    INVALID_REFRESH_TOKEN: "Invalid or expired token",
 
     FAILED_TO_SEND_OTP: "Failed to send OTP",
 
@@ -85,6 +85,13 @@ const MESSAGES = {
     REVIEW_TOO_LONG: "Review must not exceed 1000 characters",
     REVIEWEE_MISMATCH: "The reviewee does not match the worker assigned to this task",
     REVIEW_REQUIRED: "Review text is required",
+
+    FILE_NAME_AND_TYPE_REQUIRED: "fileName and fileType are required.",
+    PRESIGNED_URL_GENERATED: "Presigned URL generated successfully",
+    FAILED_TO_GENERATE_PRESIGNED_URL: "Failed to generate presigned URL.",
+    NO_FILE_PROVIDED: "No file provided for upload.",
+    FILE_UPLOAD_SUCCESS: "File uploaded successfully",
+    FAILED_TO_UPLOAD_FILE: "Failed to upload file to S3.",
 
 };
 

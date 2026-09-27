@@ -1,9 +1,10 @@
-import Task from "../models/taskSchema.js";
+﻿import Task from "../models/taskSchema.js";
 import Review from "../models/reviewSchema.js";
 import mongoose from "mongoose";
 import MESSAGES from "../constants/messages.js";
 import User from "../models/userSchema.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
+import logger from "../utils/logger.js";
 
 export const createReviewService = async ({ taskId, reviewee, rating, review }, reviewerId) => {
   try {
@@ -100,7 +101,7 @@ export const createReviewService = async ({ taskId, reviewee, rating, review }, 
 
     return { review: newReview };
   } catch (error) {
-    console.error("createReviewService error:", error.message);
+    logger.error("createReviewService error:", error.message);
     return { error: MESSAGES.INTERNAL_SERVER_ERROR };
   }
 };

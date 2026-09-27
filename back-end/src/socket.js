@@ -1,23 +1,29 @@
 import jwt from 'jsonwebtoken';
 import User from './models/userSchema.js';
 import ngeohash from 'ngeohash';
+import logger from './utils/logger.js';
 
 let io;
 
 const initSocket = (socketIo) => {
     io = socketIo;
 
+    // Low-level: fires for every transport connection attempt
+    io.engine.on('connection', (rawSocket) => {
+        logger.info(`Engine connection from ${rawSocket.remoteAddress}`);
+    });
+
     io.on('connection', async (socket) => {
-        console.log(`User connected : ${socket.id}`);
+        logger.info(`Socket connected : ${socket.id}`);
 
         socket.on('disconnect', () => {
-            console.log(`User disconnected : ${socket.id}`);
+            logger.info(`Socket disconnected : ${socket.id}`);
         });
 
         try {
             const token = socket.handshake.auth?.token;
             if (!token) {
-                console.log(`Socket ${socket.id} — no token, skipping room join`);
+                logger.info(`Socket ${socket.id} — no token, skipping room join`);
                 return;
             }
 
@@ -33,7 +39,7 @@ const initSocket = (socketIo) => {
                 if (role) {
                     socket.join(`role:${role}`);
                 }
-                console.log(`User ${userId} (${role}) joined rooms`);
+                logger.info(`User ${userId} (${role}) joined rooms`);
             }
 
             if (decoded.activeRole !== 'worker') {
@@ -43,7 +49,7 @@ const initSocket = (socketIo) => {
             const user = await User.findOne({ _id: decoded._id, activeRole: 'worker' }).select('serviceArea');
 
             if (!user?.serviceArea?.coordinates?.length) {
-                console.log(`Worker ${socket.id} — no serviceArea set, skipping room join`);
+                logger.info(`Worker ${socket.id} — no serviceArea set, skipping room join`);
                 return;
             }
 
@@ -51,10 +57,10 @@ const initSocket = (socketIo) => {
             const geohash = ngeohash.encode(lat, lng, 4); 
             
             socket.join(`zone:${geohash}`);
-            console.log(`Worker ${socket.id} joined zone:${geohash}`);
+            logger.info(`Worker ${socket.id} joined zone:${geohash}`);
 
         } catch (err) {
-            console.log(`Socket auth error for ${socket.id}:`, err.message);
+            logger.warn(`Socket auth error for ${socket.id}: ${err.message}`);
         }
     });
 };
