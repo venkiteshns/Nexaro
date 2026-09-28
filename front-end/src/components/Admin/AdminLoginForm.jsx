@@ -106,7 +106,7 @@ const AdminLoginForm = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={` w-60 mt- rounded-xl  py-2 font-semibold text-white transition  
+                  className={`w-60 mt-4 rounded-xl py-2 font-semibold text-white transition  
                     ${isLoading ? "bg-[#0a6e5c]/70 cursor-not-allowed" : "bg-[#0a6e5c] hover:opacity-90"}`}
                 >
                   {isLoading ? "Processing " : "Login to Admin Panel"}

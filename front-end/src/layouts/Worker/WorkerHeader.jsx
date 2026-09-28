@@ -8,6 +8,7 @@ import {
 } from "../../store/services/workerApi";
 import { updateUserLiveStatus } from "../../store/Slices/UserSlice";
 import { showSuccess, showWarning, showError } from "../../utils/toast";
+import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
 const WorkerHeader = () => {
   const navigate = useNavigate();
@@ -105,9 +106,7 @@ const WorkerHeader = () => {
             {user?.name || ""}
           </p>
         </div>
-        <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs shrink-0">
-          {user?.name ? user.name.charAt(0).toUpperCase() : "W"}
-        </div>
+        <UserAvatar user={user} className="w-7 h-7" textClassName="text-xs" defaultInitial="W" />
       </div>
     </div>
   );

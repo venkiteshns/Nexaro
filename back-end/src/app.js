@@ -13,10 +13,6 @@ app.use(cookieParser());
 
 app.use('/api', router);
 
-app.get('/check', (req, res) => {
-    res.status(200).json({ success: true, message: "Check Call Successfull" })
-})
-
 app.use(errorHandler);
 
 export default app;

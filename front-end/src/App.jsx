@@ -83,12 +83,9 @@ function AppInner() {
       >
         <Routes>
 
-          <Route element={<PublicRoute user={"admin"} />}>
+          <Route element={<PublicRoute />}>
+            <Route path="/" element={<Landing />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-          </Route>
-
-          <Route path="/" element={<Landing />} />
-          <Route element={<PublicRoute user={"user"} />}>
             <Route path="/map" element={<Map />} />
             <Route path="/signup/poster" element={<PosterSignup />} />
             <Route path="/signup/worker" element={<WorkerSignup />} />

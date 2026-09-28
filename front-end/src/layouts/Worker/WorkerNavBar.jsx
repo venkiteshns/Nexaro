@@ -19,6 +19,7 @@ import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
 import { useGetWorkerUnreadCountQuery } from "../../store/services/workerApi";
 import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmModal";
+import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
 const workerNav = [
   {
@@ -100,12 +101,10 @@ const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user, unreadCo
           </button>
         </div>
 
-        {isExpanded && (
-          <div className="px-4 py-4 flex items-center gap-3 border-b border-gray-100">
-            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
-              {user?.name ? user.name.charAt(0).toUpperCase() : "W"}
-            </div>
-            <div className="overflow-hidden">
+        <div className={`px-4 py-3.5 flex items-center border-b border-gray-100 ${isExpanded ? "gap-3" : "justify-center"}`}>
+          <UserAvatar user={user} className="w-9 h-9" textClassName="text-sm" defaultInitial="W" />
+          {isExpanded && (
+            <div className="overflow-hidden min-w-0">
               <p className="text-[#111827] text-sm font-semibold truncate">
                 {user?.name || "Worker"}
               </p>
@@ -113,8 +112,8 @@ const NavContent = ({ isExpanded, onToggle, onNavClick, onLogout, user, unreadCo
                 Elite Contractor
               </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="p-3 space-y-1 mt-1">
           {workerNav.map((item, index) => {

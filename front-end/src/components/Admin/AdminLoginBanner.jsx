@@ -27,7 +27,7 @@ const AdminLoginBanner = () => {
             enterprise-grade security and operational intelligence.
           </p>
 
-          <div className=" w-100 mt-12 bg-white/70 border border-[#E2ECE7] rounded-3xl p-8 ">
+          <div className="w-full mt-12 bg-white/70 border border-[#E2ECE7] rounded-3xl p-8">
             <div className="flex items-start gap-5">
               <div className="p-2 rounded-2xl bg-[#0A6E5C]/10 flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6 text-[#0a6e5c]" />
