@@ -9,7 +9,7 @@ redisClient.on('error', (err) => logger.error("Redis Client error ", err));
 
 (async () => {
     await redisClient.connect();
-    logger.info("Connected Redis client", { name: "redis-server in Docker" });
+    logger.info("Connected Redis client", { name: "redis-server" });
 })();
 
 export default redisClient;

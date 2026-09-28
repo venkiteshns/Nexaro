@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
@@ -5,45 +6,48 @@ import ErrorBoundary from "./components/routes/ErrorBoundary.jsx";
 import PublicRoute from "./components/routes/PublicRoute.jsx";
 import PrivateRoute from "./components/routes/PrivateRoute.jsx";
 import useSocketNotification from "./customHooks/useSocketNotification.js";
+import PageLoader from "./components/sharedComponents/PageLoader.jsx";
 
-import Landing from "./pages/Landing/Landing.jsx";
-import Map from "./components/Maps/Map.jsx";
-import PosterSignup from "./pages/auth/PosterSignup.jsx";
-import WorkerSignup from "./pages/auth/WorkerSignup.jsx";
-import UserLogin from "./pages/auth/UserLogin.jsx";
-import PostTask from "./pages/poster/PostTask.jsx";
-import MyTasks from "./pages/poster/MyTasks.jsx";
-import ReviewBids from "./pages/poster/ReviewBids.jsx";
-import WorkProgress from "./pages/poster/WorkProgress.jsx";
-import CompletedTaskDetails from "./pages/poster/CompletedTaskDetails.jsx";
-import PosterProfile from "./pages/poster/PosterProfile.jsx";
-import ReviewPage from "./pages/poster/ReviewPage.jsx";
-import PosterNotifications from "./pages/poster/PosterNotifications.jsx";
-import PosterPayments from "./pages/poster/PosterPayments.jsx";
+// Lazy load route pages for code-splitting
+const Landing = lazy(() => import("./pages/Landing/Landing.jsx"));
+const Map = lazy(() => import("./components/Maps/Map.jsx"));
+const PosterSignup = lazy(() => import("./pages/auth/PosterSignup.jsx"));
+const WorkerSignup = lazy(() => import("./pages/auth/WorkerSignup.jsx"));
+const UserLogin = lazy(() => import("./pages/auth/UserLogin.jsx"));
 
-import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
-import NearbyTasks from "./pages/worker/NearbyTasks.jsx";
-import PlaceBid from "./pages/worker/PlaceBid.jsx";
-import MyBids from "./pages/worker/MyBids.jsx";
-import TaskBidDetails from './pages/worker/TaskBidDetails.jsx'
-import ActiveJob from './pages/worker/ActiveJob.jsx'
-import ActiveJobEntry from './pages/worker/ActiveJobEntry.jsx'
-import WorkerProfile from './pages/worker/WorkerProfile.jsx'
-import WorkerAllReviews from './pages/worker/WorkerAllReviews.jsx'
-import WorkerEarnings from './pages/worker/WorkerEarnings.jsx'
-import WorkerCompletedTaskDetails from './pages/worker/CompletedTaskDetails.jsx'
-import WorkerNotifications from './pages/worker/WorkerNotifications.jsx'
+const PostTask = lazy(() => import("./pages/poster/PostTask.jsx"));
+const MyTasks = lazy(() => import("./pages/poster/MyTasks.jsx"));
+const ReviewBids = lazy(() => import("./pages/poster/ReviewBids.jsx"));
+const WorkProgress = lazy(() => import("./pages/poster/WorkProgress.jsx"));
+const CompletedTaskDetails = lazy(() => import("./pages/poster/CompletedTaskDetails.jsx"));
+const PosterProfile = lazy(() => import("./pages/poster/PosterProfile.jsx"));
+const ReviewPage = lazy(() => import("./pages/poster/ReviewPage.jsx"));
+const PosterNotifications = lazy(() => import("./pages/poster/PosterNotifications.jsx"));
+const PosterPayments = lazy(() => import("./pages/poster/PosterPayments.jsx"));
 
-import AdminLogin from "./pages/auth/AdminLogin.jsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
-import UserManagement from "./pages/admin/UserMangement.jsx";
-import UserVerificationPanel from './pages/admin/UserVerificationPanel.jsx'
-import AdminTaskManagement from './pages/admin/AdminTaskManagement.jsx'
-import AdminTaskDetails from './pages/admin/AdminTaskDetails.jsx'
-import AdminPayments from './pages/admin/AdminPayments.jsx'
-import AdminFinancialReports from './pages/admin/AdminFinancialReports.jsx'
-import AdminNotifications from './pages/admin/AdminNotifications.jsx'
-import PaymentReceivedModal from './components/Worker/PaymentReceivedModal.jsx';
+const WorkerDashboard = lazy(() => import("./pages/worker/WorkerDashboard.jsx"));
+const NearbyTasks = lazy(() => import("./pages/worker/NearbyTasks.jsx"));
+const PlaceBid = lazy(() => import("./pages/worker/PlaceBid.jsx"));
+const MyBids = lazy(() => import("./pages/worker/MyBids.jsx"));
+const TaskBidDetails = lazy(() => import("./pages/worker/TaskBidDetails.jsx"));
+const ActiveJob = lazy(() => import("./pages/worker/ActiveJob.jsx"));
+const ActiveJobEntry = lazy(() => import("./pages/worker/ActiveJobEntry.jsx"));
+const WorkerProfile = lazy(() => import("./pages/worker/WorkerProfile.jsx"));
+const WorkerAllReviews = lazy(() => import("./pages/worker/WorkerAllReviews.jsx"));
+const WorkerEarnings = lazy(() => import("./pages/worker/WorkerEarnings.jsx"));
+const WorkerCompletedTaskDetails = lazy(() => import("./pages/worker/CompletedTaskDetails.jsx"));
+const WorkerNotifications = lazy(() => import("./pages/worker/WorkerNotifications.jsx"));
+
+const AdminLogin = lazy(() => import("./pages/auth/AdminLogin.jsx"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.jsx"));
+const UserManagement = lazy(() => import("./pages/admin/UserMangement.jsx"));
+const UserVerificationPanel = lazy(() => import("./pages/admin/UserVerificationPanel.jsx"));
+const AdminTaskManagement = lazy(() => import("./pages/admin/AdminTaskManagement.jsx"));
+const AdminTaskDetails = lazy(() => import("./pages/admin/AdminTaskDetails.jsx"));
+const AdminPayments = lazy(() => import("./pages/admin/AdminPayments.jsx"));
+const AdminFinancialReports = lazy(() => import("./pages/admin/AdminFinancialReports.jsx"));
+const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications.jsx"));
+const PaymentReceivedModal = lazy(() => import("./components/Worker/PaymentReceivedModal.jsx"));
 
 
 function AppInner() {
@@ -70,7 +74,14 @@ function AppInner() {
           onViewTask={handleCloseModal}
         />
       )}
-      <Routes>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+            <PageLoader title="Loading" text="Please wait..." />
+          </div>
+        }
+      >
+        <Routes>
 
           <Route element={<PublicRoute user={"admin"} />}>
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -136,6 +147,7 @@ function AppInner() {
           </Route>
 
         </Routes>
+      </Suspense>
     </>
   );
 }

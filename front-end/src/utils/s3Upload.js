@@ -8,7 +8,7 @@ const getApiBaseUrl = () => {
     return "http://localhost:8000/api";
 };
 
-export const uploadFileToS3 = async (file, folder = "uploads", onProgress = null) => {
+export const uploadFileToS3 = async (file, folder = "uploads") => {
     if (!file) {
         throw new Error("No file provided for upload");
     }
@@ -16,7 +16,7 @@ export const uploadFileToS3 = async (file, folder = "uploads", onProgress = null
     const apiUrl = getApiBaseUrl();
 
     // 1. Request presigned URL from backend
-    let presignedData = null;
+    let presignedData;
     try {
         const presignRes = await fetch(`${apiUrl}/upload/presign`, {
             method: "POST",
@@ -56,7 +56,6 @@ export const uploadFileToS3 = async (file, folder = "uploads", onProgress = null
                 `S3 upload failed with status ${s3Response.status}`
             );
         }
-        console.log("S3 Uploaded file URL :", presignedData.fileUrl);
         return {
             url: presignedData.fileUrl,
             key: presignedData.key,

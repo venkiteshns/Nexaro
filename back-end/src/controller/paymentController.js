@@ -1,6 +1,5 @@
 import { captureOrderService, createOrderService, orderPayoutService } from "../services/paymentServices.js";
 import STATUS_CODES from "../constants/statusCodes.js";
-import logger from "../utils/logger.js";
 
 export const createOrder = async (req, res) => {
     const response = await createOrderService(req.body);

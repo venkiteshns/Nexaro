@@ -506,6 +506,11 @@ export const getPosterProfileService = async (posterId) => {
       "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea isVerified",
     );
 
+    const isWorkerActive = Boolean(
+      posterUser?.skills?.length > 0 &&
+      posterUser?.languages?.length > 0 &&
+      posterUser?.serviceArea?.coordinates?.length === 2
+    );
 
     const stats = {
       totalPosted: taskStats?.totalPosted || 0,
