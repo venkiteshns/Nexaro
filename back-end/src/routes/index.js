@@ -13,8 +13,12 @@ router.use('/auth', authRouter);
 router.use('/admin', adminRouter);
 router.use('/poster', posterRouter);
 router.use('/worker', workerRouter);
-router.use('/payment', paymentRouter); 
+router.use('/payment', paymentRouter);
 router.use('/referral', referralRouter);
 router.use('/upload', uploadRouter);
+
+router.get('/health', (req, res) => {
+    res.status(200).json({ success: true, message: "Server Alive" })
+})
 
 export default router;

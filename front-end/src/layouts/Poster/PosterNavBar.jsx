@@ -17,6 +17,7 @@ import { logOut } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
 import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
 import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmModal";
+import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
 
   const posterNav = [
@@ -78,12 +79,10 @@ import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmM
           </button>
         </div>
 
-        {isExpanded && (
-          <div className="px-4 py-4 flex items-center gap-3 border-b border-gray-100">
-            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-sm shrink-0">
-              {user?.name ? user.name.charAt(0).toUpperCase() : "R"}
-            </div>
-            <div className="overflow-hidden">
+        <div className={`px-4 py-3.5 flex items-center border-b border-gray-100 ${isExpanded ? "gap-3" : "justify-center"}`}>
+          <UserAvatar user={user} className="w-9 h-9" textClassName="text-sm" defaultInitial="P" />
+          {isExpanded && (
+            <div className="overflow-hidden min-w-0">
               <p className="text-[#111827] text-sm font-semibold truncate">
                 {user?.name || "Poster"}
               </p>
@@ -91,8 +90,8 @@ import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmM
                 Premium Poster
               </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="p-3 space-y-1 mt-1">
           {posterNav.map((item, index) => {

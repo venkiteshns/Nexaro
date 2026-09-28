@@ -2,6 +2,7 @@ import { Bell } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
+import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
 const PosterHeader = () => {
   const navigate = useNavigate();
@@ -26,16 +27,18 @@ const PosterHeader = () => {
         )}
       </button>
 
-      <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full sm:rounded-xl p-1 sm:px-3 sm:py-1 shadow-xs shrink-0">
+      <div
+        onClick={() => navigate("/poster/profile")}
+        className="flex items-center gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-full sm:rounded-xl p-1 sm:px-3 sm:py-1 shadow-xs shrink-0 cursor-pointer transition-colors"
+        title="View Profile"
+      >
         <div className="hidden sm:block text-right">
           <p className="text-xs font-semibold text-[#111827]">Poster</p>
           <p className="text-xs text-[#0A6E5C] font-semibold truncate max-w-[120px]">
             {user?.name || ""}
           </p>
         </div>
-        <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs shrink-0">
-          {user?.name ? user.name.charAt(0).toUpperCase() : "R"}
-        </div>
+        <UserAvatar user={user} className="w-7 h-7" textClassName="text-xs" defaultInitial="P" />
       </div>
     </div>
   );

@@ -133,3 +133,27 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     @apply font-sans;
     }
 }
+
+:root {
+  --logo: #0a6e5c;
+  --green-primary: #0a6e5c;
+}
+
+.lh-logo {
+  max-width: 30px;
+  width: 30px;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-name {
+  color: var(--logo);
+  font-weight: 700;
+  font-size: 20px;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+.banner-text {
+  font-family: "DM Serif Display", serif;
+}
