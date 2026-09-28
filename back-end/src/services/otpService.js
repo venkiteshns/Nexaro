@@ -3,7 +3,6 @@ import crypto from "crypto";
 import MESSAGES from "../constants/messages.js";
 import { compareHash, hashData } from "../utils/hasing.js";
 import { sendOtp } from "./authServices.js";
-import logger from "../utils/logger.js";
 
 const OTP_PREFIX = "otp:";
 const OTP_TTL_MS = 10 * 60 * 1000;
