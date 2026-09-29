@@ -97,7 +97,22 @@ export const posterSignupService = async (data) => {
 
     return { responseUser, accessToken, refreshToken };
   } catch (error) {
-    logger.error("posterSignupService error:", error.message);
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      if (field === 'email') return { error: MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL };
+      if (field === 'phone') return { error: MESSAGES.PHONE_ALREADY_IN_USE };
+      return { error: "An account with this information already exists." };
+    }
+    // Log unexpected errors only; validation throws are expected business logic
+    const isValidationError = [
+      MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL,
+      MESSAGES.PHONE_ALREADY_IN_USE,
+    ].includes(error.message);
+    if (isValidationError) {
+      logger.warn(`posterSignupService validation: ${error.message}`);
+    } else {
+      logger.error(`posterSignupService error: ${error.message}`);
+    }
     return { error: error.message };
   }
 };

@@ -97,7 +97,7 @@ export const createOtp = async (email, phone, resendFlag) => {
 
       return {
         success: false,
-        message: messages.USER_NOT_EXIST_WITH_EMAIL_MOBILE,
+        message: "An account with this email or phone number already exists.",
       };
     }
   }
