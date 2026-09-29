@@ -66,7 +66,7 @@ function AppInner() {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer limit={2} />
       {paymentModalData && (
         <PaymentReceivedModal
           data={paymentModalData}

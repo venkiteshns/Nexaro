@@ -11,6 +11,7 @@ const Password = (props) => {
 
   const login = props?.login;
   const forgot = props?.forgotPassword;
+  const noBox = props?.noBox;
 
   const password = watch("password");
 
@@ -19,14 +20,14 @@ const Password = (props) => {
 
   return (
     <div
-      className={`${login ? "" : "mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}
+      className={`${login || noBox ? "" : "mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}
     >
       <div
-        className={` ${login ? "grid-cols-2 gap-5" : "grid grid-cols-1 md:grid-cols-2 gap-5 "} `}
+        className={`${login ? "grid-cols-2 gap-5" : noBox ? "grid grid-cols-1 gap-3 sm:gap-3.5" : "grid grid-cols-1 md:grid-cols-2 gap-5"}`}
       >
         <div className="relative">
           <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
-            Password <span className="text-red-400">*</span>
+            {noBox ? "New Password" : "Password"} <span className="text-red-400">*</span>
           </label>
 
           <input

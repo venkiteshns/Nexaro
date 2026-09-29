@@ -15,13 +15,13 @@ export default function AdminFinancialReports() {
   }, [dispatch]);
 
   return (
-    <div className="min-h-screen bg-[#F6FAF8] flex">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       <AdminNavBar />
 
-      <div className="flex-1 min-w-0 overflow-y-auto flex flex-col">
+      <div className="flex-1 min-w-0 md:overflow-hidden flex flex-col">
         <AdminHeader />
 
-        <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
+        <main className="flex-1 md:overflow-y-auto p-4 sm:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] w-full space-y-4 sm:space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight">

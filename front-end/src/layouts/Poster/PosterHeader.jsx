@@ -1,18 +1,42 @@
 import { Bell } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
+import { useEffect } from "react";
+import {
+  useGetPosterUnreadCountQuery,
+  useGetPosterProfileQuery,
+} from "../../store/services/posterApi";
+import { updateUser } from "../../store/Slices/UserSlice";
 import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
 const PosterHeader = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
   const { data: unreadData } = useGetPosterUnreadCountQuery();
   const unreadCount = unreadData?.unreadCount || 0;
 
+  const { data: profileData } = useGetPosterProfileQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+  });
+  const posterProfile = profileData?.data?.poster;
+
+  useEffect(() => {
+    if (posterProfile?.selfie && posterProfile.selfie !== user?.selfie) {
+      dispatch(updateUser({ selfie: posterProfile.selfie }));
+    }
+  }, [posterProfile?.selfie, user?.selfie, dispatch]);
+
+  const displayUser = {
+    ...user,
+    ...(posterProfile || {}),
+    name: posterProfile?.name || user?.name || "",
+    selfie: posterProfile?.selfie || user?.selfie,
+  };
+
   return (
-    <div className="shrink-0 h-14 z-10 bg-white border-b border-gray-200 pl-13 sm:pl-16 pr-3 sm:pr-6 flex items-center justify-end gap-2 sm:gap-4 shadow-xs">
+    <div className="shrink-0 h-14 sticky top-0 z-20 w-full bg-white border-b border-gray-200 pl-13 sm:pl-16 pr-3 sm:pr-6 flex items-center justify-end gap-2 sm:gap-4 shadow-xs">
       <button
         type="button"
         onClick={() => navigate("/poster/notifications")}
@@ -35,10 +59,10 @@ const PosterHeader = () => {
         <div className="hidden sm:block text-right">
           <p className="text-xs font-semibold text-[#111827]">Poster</p>
           <p className="text-xs text-[#0A6E5C] font-semibold truncate max-w-[120px]">
-            {user?.name || ""}
+            {displayUser?.name || ""}
           </p>
         </div>
-        <UserAvatar user={user} className="w-7 h-7" textClassName="text-xs" defaultInitial="P" />
+        <UserAvatar user={displayUser} className="w-7 h-7" textClassName="text-xs" defaultInitial="P" />
       </div>
     </div>
   );

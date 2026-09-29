@@ -113,85 +113,85 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-3.5 relative">
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2.5 sm:p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-gray-500 mb-0.5">
-            <Users size={13} className="text-[#0A6E5C]" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">
+      <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-3 relative">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2 sm:p-3 shadow-xs">
+          <div className="flex items-center gap-1 text-gray-500 mb-0.5">
+            <Users size={12} className="text-[#0A6E5C] sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate">
               Invited
             </span>
           </div>
-          <p className="text-base sm:text-lg font-extrabold text-gray-900">
+          <p className="text-sm sm:text-lg font-extrabold text-gray-900 truncate">
             {stats.totalReferred}
           </p>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2.5 sm:p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-gray-500 mb-0.5">
-            <Coins size={13} className="text-amber-500" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2 sm:p-3 shadow-xs">
+          <div className="flex items-center gap-1 text-gray-500 mb-0.5">
+            <Coins size={12} className="text-amber-500 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate">
               Earned
             </span>
           </div>
-          <p className="text-base sm:text-lg font-extrabold text-emerald-600">
+          <p className="text-sm sm:text-lg font-extrabold text-emerald-600 truncate">
             ₹{stats.totalEarnings.toLocaleString("en-IN")}
           </p>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2.5 sm:p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-gray-500 mb-0.5">
-            <Clock size={13} className="text-amber-500" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl p-2 sm:p-3 shadow-xs">
+          <div className="flex items-center gap-1 text-gray-500 mb-0.5">
+            <Clock size={12} className="text-amber-500 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider truncate">
               Pending
             </span>
           </div>
-          <p className="text-base sm:text-lg font-extrabold text-gray-900">
+          <p className="text-sm sm:text-lg font-extrabold text-gray-900 truncate">
             {stats.pendingCount}
           </p>
         </div>
       </div>
 
       {/* Code & Share Hub */}
-      <div className="bg-white rounded-xl border border-gray-200/80 p-3 sm:p-3.5 shadow-xs relative mb-2.5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-white rounded-xl border border-gray-200/80 p-2.5 sm:p-3.5 shadow-xs relative mb-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
           {/* Referral Code Box */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center justify-between sm:justify-start gap-2">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-gray-500 uppercase tracking-wider shrink-0">
               Your Code:
             </span>
-            <div className="inline-flex items-center justify-between gap-2.5 bg-emerald-50/70 border border-emerald-200/60 rounded-lg px-3 py-1.5">
-              <span className="text-sm sm:text-base font-black tracking-widest text-[#0A6E5C] font-mono select-all">
+            <div className="inline-flex items-center justify-between gap-2 bg-emerald-50/70 border border-emerald-200/60 rounded-lg px-2.5 sm:px-3 py-1">
+              <span className="text-xs sm:text-sm font-black tracking-widest text-[#0A6E5C] font-mono select-all">
                 {code}
               </span>
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="text-gray-500 hover:text-[#0A6E5C] transition p-0.5"
+                className="text-gray-500 hover:text-[#0A6E5C] transition p-0.5 cursor-pointer"
                 title="Copy Referral Code"
               >
                 {copiedCode ? (
-                  <Check size={14} className="text-emerald-600" />
+                  <Check size={13} className="text-emerald-600" />
                 ) : (
-                  <Copy size={14} />
+                  <Copy size={13} />
                 )}
               </button>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-1.5 text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition duration-150 cursor-pointer"
+              className="inline-flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 sm:px-3 py-1.5 rounded-lg transition duration-150 cursor-pointer truncate"
             >
               {copiedLink ? (
                 <>
-                  <Check size={14} className="text-emerald-600" /> Link Copied!
+                  <Check size={13} className="text-emerald-600 shrink-0" /> <span className="truncate">Copied!</span>
                 </>
               ) : (
                 <>
-                  <Copy size={14} /> Copy Invite Link
+                  <Copy size={13} className="shrink-0" /> <span className="truncate">Copy Link</span>
                 </>
               )}
             </button>
@@ -199,9 +199,9 @@ const ReferAndEarnCard = ({ role = "worker" }) => {
             <button
               type="button"
               onClick={handleWhatsAppShare}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#25D366] hover:bg-[#20ba59] text-white px-3 py-1.5 rounded-lg transition shadow-xs duration-150 cursor-pointer"
+              className="inline-flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold bg-[#25D366] hover:bg-[#20ba59] text-white px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-xs duration-150 cursor-pointer truncate"
             >
-              <Share2 size={14} /> Share on WhatsApp
+              <Share2 size={13} className="shrink-0" /> <span className="truncate">WhatsApp</span>
             </button>
           </div>
         </div>

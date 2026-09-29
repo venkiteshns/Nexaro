@@ -56,13 +56,13 @@ const CompletedTaskDetails = () => {
     } : null;
 
     return (
-        <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+        <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
             <PosterNavBar />
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
                 <PosterHeader />
 
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 md:overflow-y-auto pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
                     {isLoading && <PageLoader />}
                     {isError && <PageError onBack={() => navigate('/poster/my-tasks')} />}
 

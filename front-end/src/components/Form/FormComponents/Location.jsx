@@ -198,7 +198,7 @@ const Location = ({ worker }) => {
     "focus:ring-1 focus:ring-red-400 focus:border-transparent transition text-sm text-gray-800";
 
   return (
-    <div className="space-y-5">
+    <div id="location-section" data-field="location" className="space-y-5 scroll-mt-24">
       <div className="mt-5 w-full flex flex-col items-center text-center rounded-[24px] sm:rounded-[28px] border border-[rgba(10,110,92,0.15)] bg-white p-5 sm:p-8 shadow-sm">
         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#0A6E5C]/10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 text-[#0A6E5C]">
           <MapPin size={20} className="sm:w-6 sm:h-6" strokeWidth={1.5} />

@@ -38,7 +38,7 @@ function getStatusConfig(status) {
 function StatusBadge({ status }) {
     const config = getStatusConfig(status);
     return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${config.badge}`}>
+        <span className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${config.badge}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
             {config.label}
         </span>
@@ -47,9 +47,9 @@ function StatusBadge({ status }) {
 
 function StatsSec({ icon, count, label, color }) {
     return (
-        <div className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-full border text-xs md:text-sm font-semibold ${color}`}>
+        <div className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border text-[11px] sm:text-xs font-semibold shadow-2xs ${color}`}>
             {icon}
-            <span>{count} {label}</span>
+            <span className="whitespace-nowrap">{count} {label}</span>
         </div>
     );
 }
@@ -123,8 +123,10 @@ function MobileTaskCard({ task }) {
         }
     };
 
+    const canCancel = !['completed', 'in_progress', 'assigned', 'cancelled'].includes(task.status);
+
     return (
-        <div className="p-4 hover:bg-[#F6FAF8] transition-colors">
+        <div className="p-3 sm:p-4 hover:bg-[#F6FAF8] transition-colors">
             {showConfirm && (
                 <ConfirmModal
                     taskTitle={task.title}
@@ -134,34 +136,34 @@ function MobileTaskCard({ task }) {
                 />
             )}
 
-            <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-start gap-2.5 min-w-0">
+            <div className="flex items-start justify-between gap-2.5 mb-2 sm:mb-3">
+                <div className="flex items-start gap-2 min-w-0">
                     <div className={`w-1 self-stretch rounded-full shrink-0 ${config.dot}`} />
                     <div className="min-w-0">
-                        <p className="font-semibold text-[#111827] text-sm leading-snug truncate">{task.title}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{task.category}</p>
+                        <p className="font-semibold text-[#111827] text-xs sm:text-sm leading-snug truncate">{task.title}</p>
+                        <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">{task.category}</p>
                     </div>
                 </div>
-                <span className="text-sm font-bold text-gray-900 shrink-0">
+                <span className="text-xs sm:text-sm font-bold text-gray-900 shrink-0">
                     ₹{Number(task.amount || 0).toLocaleString('en-IN')}
                 </span>
             </div>
 
-            <div className="flex items-center justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-xs shrink-0">
+            <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-[10px] sm:text-xs shrink-0">
                         {posterName.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-xs text-gray-600">{posterName}</span>
+                    <span className="text-[11px] sm:text-xs text-gray-600 truncate">{posterName}</span>
                 </div>
                 <StatusBadge status={task.status} />
             </div>
 
             <div className="flex items-center gap-2">
-                {task.status !== 'cancelled' && (
+                {canCancel && (
                     <button
                         onClick={() => setShowConfirm(true)}
-                        className="flex-1 py-2 rounded-xl text-xs font-semibold bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-semibold bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                         <Trash2 size={12} />
                         Delete Task
@@ -169,7 +171,7 @@ function MobileTaskCard({ task }) {
                 )}
                 <button
                     onClick={() => navigate(`/admin/tasks/${task._id}`)}
-                    className="flex-1 py-2 rounded-xl text-xs font-semibold bg-emerald-50 text-[#0A6E5C] hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1">
+                    className="flex-1 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-semibold bg-emerald-50 text-[#0A6E5C] hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1 cursor-pointer">
                     <Eye size={12} />
                     View Task
                 </button>
@@ -245,7 +247,7 @@ function TaskRow({ task }) {
                     />
                 )}
                 <div className="flex items-center gap-2">
-                    {task.status !== 'cancelled' && (
+                    {!['completed', 'in_progress', 'assigned', 'cancelled'].includes(task.status) && (
                         <button
                             onClick={() => setShowConfirm(true)}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center gap-1"
@@ -310,82 +312,82 @@ const AdminTaskManagement = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F6FAF8] flex">
+        <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
             <AdminNavBar />
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
                 <AdminHeader />
 
-                <div className="p-6 flex flex-col gap-4">
+                <div className="flex-1 md:overflow-y-auto p-3 sm:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-3 sm:gap-4">
                     <div>
-                        <h1 className="text-xl font-bold text-[#111827]">Task Management</h1>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <h1 className="text-lg sm:text-xl font-bold text-[#111827]">Task Management</h1>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
                             Monitor and moderate all platform tasks with precision authority.
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 py-0.5">
                         <StatsSec
-                            icon={<ClipboardList size={14} />}
+                            icon={<ClipboardList size={13} className="sm:w-3.5 sm:h-3.5" />}
                             count={totalTasks}
                             label="Total"
                             color="border-gray-200 text-gray-600 bg-white"
                         />
                         <StatsSec
-                            icon={<span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />}
+                            icon={<span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 inline-block" />}
                             count={counts.open}
                             label="Open"
                             color="border-blue-200 text-blue-600 bg-blue-50"
                         />
                         <StatsSec
-                            icon={<span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" />}
+                            icon={<span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-400 inline-block" />}
                             count={counts.assigned}
                             label="Assigned"
                             color="border-yellow-200 text-yellow-600 bg-yellow-50"
                         />
                         <StatsSec
-                            icon={<span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />}
+                            icon={<span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-purple-500 inline-block" />}
                             count={counts.in_progress}
                             label="In Progress"
                             color="border-purple-200 text-purple-600 bg-purple-50"
                         />
                         <StatsSec
-                            icon={<CheckCircle2 size={14} />}
+                            icon={<CheckCircle2 size={13} className="sm:w-3.5 sm:h-3.5" />}
                             count={counts.completed}
                             label="Completed"
                             color="border-emerald-200 text-emerald-600 bg-emerald-50"
                         />
                         <StatsSec
-                            icon={<XCircle size={14} />}
+                            icon={<XCircle size={13} className="sm:w-3.5 sm:h-3.5" />}
                             count={counts.cancelled}
                             label="Cancelled"
                             color="border-red-200 text-red-500 bg-red-50"
                         />
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white border border-gray-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-xs">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3.5">
 
-                            <div className="md:col-span-1">
-                                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1.5">Global Search</p>
-                                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5">
-                                    <Search size={15} className="text-gray-400 shrink-0" />
+                            <div className="col-span-2 md:col-span-1">
+                                <p className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 sm:mb-1.5">Global Search</p>
+                                <div className="flex items-center gap-1.5 sm:gap-2 bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2.5">
+                                    <Search size={14} className="text-gray-400 shrink-0 sm:w-4 sm:h-4" />
                                     <input
                                         type="text"
-                                        placeholder="Task title, poster, or worker..."
+                                        placeholder="Task title, poster, worker..."
                                         value={searchText}
                                         onChange={(e) => setSearchText(e.target.value)}
-                                        className="bg-transparent outline-none text-sm text-gray-700 w-full placeholder-gray-400"
+                                        className="bg-transparent outline-none text-xs sm:text-sm text-gray-700 w-full placeholder-gray-400"
                                     />
                                 </div>
                             </div>
 
-                            <div>
-                                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1.5">Status</p>
+                            <div className="col-span-1">
+                                <p className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 sm:mb-1.5">Status</p>
                                 <select
                                     value={statusFilter}
                                     onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none cursor-pointer"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl px-2 sm:px-4 py-1.5 sm:py-2.5 text-xs sm:text-sm text-gray-700 outline-none cursor-pointer"
                                 >
                                     <option value="all">All Statuses</option>
                                     <option value="open">Open</option>
@@ -396,12 +398,12 @@ const AdminTaskManagement = () => {
                                 </select>
                             </div>
 
-                            <div>
-                                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1.5">Category</p>
+                            <div className="col-span-1">
+                                <p className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 sm:mb-1.5">Category</p>
                                 <select
                                     value={categoryFilter}
                                     onChange={(e) => setCategoryFilter(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none cursor-pointer"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl px-2 sm:px-4 py-1.5 sm:py-2.5 text-xs sm:text-sm text-gray-700 outline-none cursor-pointer"
                                 >
                                     <option value="all">All Categories</option>
                                     {
@@ -477,27 +479,27 @@ const AdminTaskManagement = () => {
                             </table>
                         </div>
 
-                        <div className="px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
-                            <p className="text-sm text-gray-500 order-2 sm:order-1">
+                        <div className="px-3 sm:px-6 py-2.5 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 border-t border-gray-100">
+                            <p className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1 text-center sm:text-left">
                                 Showing page {currentPage} of {totalPages} · {totalTasks} total tasks
                             </p>
-                            <div className="flex items-center gap-2 order-1 sm:order-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2 order-1 sm:order-2">
                                 <button
                                     onClick={handlePrevPage}
                                     disabled={currentPage === 1}
-                                    className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                    className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <ChevronLeft size={18} />
+                                    <ChevronLeft size={15} className="sm:w-4.5 sm:h-4.5" />
                                 </button>
-                                <span className="text-sm font-medium text-gray-700 px-2">
+                                <span className="text-xs sm:text-sm font-medium text-gray-700 px-1.5 sm:px-2">
                                     {currentPage}
                                 </span>
                                 <button
                                     onClick={handleNextPage}
                                     disabled={currentPage === totalPages}
-                                    className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                    className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <ChevronRight size={18} />
+                                    <ChevronRight size={15} className="sm:w-4.5 sm:h-4.5" />
                                 </button>
                             </div>
                         </div>

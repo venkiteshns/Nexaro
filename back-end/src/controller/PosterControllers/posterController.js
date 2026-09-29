@@ -1,4 +1,4 @@
-﻿import {
+import {
   posterSignupService,
   getPosterBidsService,
   acceptBidService,
@@ -136,9 +136,10 @@ export const updateUserProfile = async (req, res) => {
       .status(STATUS_CODES.BAD_REQUEST)
       .json({ success: false, message: response.error });
   }
-  return res.status(STATUS_CODES.CREATED).json({
+  return res.status(STATUS_CODES.OK).json({
     success: true,
     message: response.message,
+    data: response,
   });
 };
 

@@ -23,7 +23,8 @@ const WorkerDashboard = () => {
     activeBids: 0,
     jobsCompleted: 0,
     totalEarned: 0,
-    rating: 4.8,
+    rating: 0,
+    totalReviews: 0,
   };
   const categories = dashboardData.categories || [
     "All",
@@ -45,21 +46,22 @@ const WorkerDashboard = () => {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       {/* Sidebar Navigation */}
       <WorkerNavBar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
         {/* Dashboard Top Header matching screenshot */}
         <WorkerDashboardHeader
           userName={userName}
           walletAmount={walletAmount}
           isLive={isLive}
+          avatar={dashboardData.avatar}
         />
 
         {/* Scrollable Dashboard Body */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-6 py-4">
+        <div className="flex-1 md:overflow-y-auto px-3 sm:px-5 lg:px-6 py-4 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
           <div className="max-w-7xl mx-auto">
             {/* 4 KPI Stats Cards Row */}
             <WorkerStatCards stats={stats} />

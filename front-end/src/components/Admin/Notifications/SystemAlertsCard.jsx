@@ -15,16 +15,16 @@ const SystemAlertsCard = ({
   isMarkingAll = false,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-4 sm:p-5 flex flex-col">
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-3 sm:p-5 flex flex-col">
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2.5">
-            <span className="w-1.5 h-5 bg-[#0A6E5C] rounded-full" aria-hidden="true" />
-            <h2 className="text-lg font-bold text-[#111827] tracking-tight">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 pb-2.5 sm:pb-3 border-b border-gray-100">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-1.5 h-4 sm:h-5 bg-[#0A6E5C] rounded-full shrink-0" aria-hidden="true" />
+            <h2 className="text-base sm:text-lg font-bold text-[#111827] tracking-tight whitespace-nowrap">
               System Alerts
             </h2>
             {unreadCount > 0 && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-[#0A6E5C] border border-emerald-200/70">
+              <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-50 text-[#0A6E5C] border border-emerald-200/70 whitespace-nowrap">
                 {unreadCount} unread
               </span>
             )}
@@ -34,18 +34,20 @@ const SystemAlertsCard = ({
             type="button"
             onClick={onMarkAllAsRead}
             disabled={unreadCount === 0 || isMarkingAll || isLoading}
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0A6E5C] hover:text-[#085849] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#0A6E5C] hover:text-[#085849] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shrink-0"
           >
             {isMarkingAll ? (
-              <Loader2 size={13} className="animate-spin" />
+              <Loader2 size={12} className="animate-spin" />
             ) : (
-              <CheckCheck size={14} />
+              <CheckCheck size={13} className="sm:w-3.5 sm:h-3.5" />
             )}
-            <span>Mark All As Read</span>
+            <span className="whitespace-nowrap">
+              Mark All <span className="hidden min-[380px]:inline">As </span>Read
+            </span>
           </button>
         </div>
 
-        <div className="mt-3 space-y-2">
+        <div className="mt-2.5 sm:mt-3 space-y-1.5 sm:space-y-2">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, idx) => (
               <div

@@ -65,12 +65,20 @@ export const googleLoginService = async (accessToken) => {
   await existingUser.save({ validateBeforeSave: false });
 
   const { _id, name: userName, email: userEmail, activeRole } = existingUser;
+  const selfie =
+    existingUser?.verificationDocuments?.selfie?.url ||
+    (typeof existingUser?.verificationDocuments?.selfie === "string"
+      ? existingUser.verificationDocuments.selfie
+      : null) ||
+    process.env.DEFAULT_AVATAR_URL ||
+    null;
+
   const responseUser = {
     id: _id,
     name: userName,
     email: userEmail,
     role: activeRole,
-    selfie: existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON,
+    selfie,
   };
 
   return {
@@ -223,7 +231,13 @@ export const loginService = async (userData = {}, isAdmin) => {
 
   existingUser.refreshToken = refreshToken;
   await existingUser.save({ validateBeforeSave: false });
-  const selfie = existingUser?.verificationDocuments?.selfie.url || process.env.USER_ICON;
+  const selfie =
+    existingUser?.verificationDocuments?.selfie?.url ||
+    (typeof existingUser?.verificationDocuments?.selfie === "string"
+      ? existingUser.verificationDocuments.selfie
+      : null) ||
+    process.env.DEFAULT_AVATAR_URL ||
+    null;
 
   const { _id, name, email: userEmail, activeRole } = existingUser;
   const responseUser = {

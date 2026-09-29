@@ -2,13 +2,13 @@ import { Calendar, Clock, Tag, AlertTriangle, DollarSign, Layers } from 'lucide-
 
 function InfoRow({ icon, label, value }) {
     return (
-        <div className="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
-            <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+        <div className="flex items-start gap-2.5 sm:gap-3 py-2 sm:py-3 border-b border-gray-50 last:border-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
                 {icon}
             </div>
             <div className="min-w-0">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
-                <p className="text-sm font-semibold text-gray-800 mt-0.5 break-words">{value}</p>
+                <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
+                <p className="text-xs sm:text-sm font-semibold text-gray-800 mt-0.5 break-words">{value}</p>
             </div>
         </div>
     );
@@ -30,32 +30,32 @@ const TaskInfoCard = ({ task }) => {
     const urgency = task.urgencyLevel || 'normal';
 
     return (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-            <p className="font-extrabold text-gray-900 text-base mb-2">Task Information</p>
+        <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-xs p-3.5 sm:p-5">
+            <p className="font-extrabold text-gray-900 text-sm sm:text-base mb-1.5 sm:mb-2">Task Information</p>
 
             {task.description && (
-                <p className="text-sm text-gray-500 leading-relaxed mb-4 border-l-2 border-emerald-200 pl-3">
+                <p className="text-xs sm:text-sm text-gray-500 leading-relaxed mb-3 sm:mb-4 border-l-2 border-emerald-300 pl-2.5 sm:pl-3">
                     {task.description}
                 </p>
             )}
 
-            <InfoRow icon={<Tag size={14} className="text-[#0A6E5C]" />} label="Category" value={task.category} />
-            <InfoRow icon={<DollarSign size={14} className="text-[#0A6E5C]" />} label="Budget" value={`₹${Number(task.amount || 0).toLocaleString('en-IN')}`} />
-            <InfoRow icon={<Calendar size={14} className="text-gray-400" />} label="Deadline" value={deadline} />
-            <InfoRow icon={<Clock size={14} className="text-gray-400" />} label="Created On" value={createdAt} />
+            <InfoRow icon={<Tag size={13} className="text-[#0A6E5C]" />} label="Category" value={task.category} />
+            <InfoRow icon={<DollarSign size={13} className="text-[#0A6E5C]" />} label="Budget" value={`₹${Number(task.amount || 0).toLocaleString('en-IN')}`} />
+            <InfoRow icon={<Calendar size={13} className="text-gray-400" />} label="Deadline" value={deadline} />
+            <InfoRow icon={<Clock size={13} className="text-gray-400" />} label="Created On" value={createdAt} />
             <InfoRow
-                icon={<Layers size={14} className="text-gray-400" />}
+                icon={<Layers size={13} className="text-gray-400" />}
                 label="Address"
                 value={[task.address?.area, task.address?.city, task.address?.district, task.address?.state].filter(Boolean).join(', ')}
             />
 
-            <div className="flex items-center gap-3 pt-3 mt-1">
-                <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
-                    <AlertTriangle size={14} className="text-gray-400" />
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-2.5 sm:pt-3 mt-0.5 border-t border-gray-50">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                    <AlertTriangle size={13} className="text-gray-400" />
                 </div>
                 <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Urgency</p>
-                    <span className={`mt-0.5 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border capitalize ${urgencyColors[urgency]}`}>
+                    <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Urgency</p>
+                    <span className={`mt-0.5 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold border capitalize ${urgencyColors[urgency]}`}>
                         {urgency}
                     </span>
                 </div>

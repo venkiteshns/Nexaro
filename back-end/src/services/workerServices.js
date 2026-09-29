@@ -1185,7 +1185,7 @@ export const toggleWorkerLiveStatusService = async (userId, isLive = null) => {
 export const getWorkerDashboardService = async ({ userId, category }) => {
     try {
         const workerId = new mongoose.Types.ObjectId(userId);
-        const user = await User.findById(userId).select("name email worker serviceArea").lean();
+        const user = await User.findById(userId).select("name email worker serviceArea verificationDocuments").lean();
         if (!user) {
             return { error: MESSAGES.USER_NOT_FOUND };
         }
@@ -1209,9 +1209,10 @@ export const getWorkerDashboardService = async ({ userId, category }) => {
             { $match: { reviewee: workerId } },
             { $group: { _id: null, avgRating: { $avg: "$rating" }, totalReviews: { $sum: 1 } } },
         ]);
+        const totalReviews = reviewAggregation[0]?.totalReviews || 0;
         const avgRating = reviewAggregation[0]?.avgRating
             ? Number(reviewAggregation[0].avgRating.toFixed(1))
-            : (user.worker?.rating || 4.8);
+            : (user.worker?.rating || 0);
 
         // 2. Recent Bids (Proposals status - show recent 3 bids)
         const recentBidsRaw = await Bid.find({ workerId })
@@ -1353,10 +1354,12 @@ export const getWorkerDashboardService = async ({ userId, category }) => {
                 jobsCompleted: jobsCompletedCount,
                 totalEarned,
                 rating: avgRating,
+                totalReviews,
             },
             isLive: user.worker?.isLive ?? true,
             walletAmount,
             userName: user.name,
+            avatar: user.verificationDocuments?.selfie?.url || null,
             categories: ["All", ...combinedCategories],
             recentBids,
             completedTasks,

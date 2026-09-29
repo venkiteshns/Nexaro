@@ -686,10 +686,32 @@ export const getAdminFinanceTransactionsService = async ({
                 localField: "bid.taskId",
                 foreignField: "_id",
                 as: "task",
-                pipeline: [{ $project: { title: 1, category: 1 } }],
+                pipeline: [{ $project: { title: 1, category: 1, address: 1, posterId: 1, workerId: 1 } }],
             },
         },
         { $unwind: { path: "$task", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "task.posterId",
+                foreignField: "_id",
+                as: "taskPoster",
+                pipeline: [{ $project: { name: 1, email: 1 } }],
+            },
+        },
+        { $unwind: { path: "$taskPoster", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "users",
+                let: { workerId: { $ifNull: ["$bid.workerId", "$task.workerId"] } },
+                pipeline: [
+                    { $match: { $expr: { $eq: ["$_id", "$$workerId"] } } },
+                    { $project: { name: 1, email: 1 } },
+                ],
+                as: "taskWorker",
+            },
+        },
+        { $unwind: { path: "$taskWorker", preserveNullAndEmptyArrays: true } },
         ...(searchRegex
             ? [
                 {
@@ -700,6 +722,10 @@ export const getAdminFinanceTransactionsService = async ({
                             { "sender.email": { $regex: searchRegex } },
                             { "receiver.name": { $regex: searchRegex } },
                             { "receiver.email": { $regex: searchRegex } },
+                            { "taskPoster.name": { $regex: searchRegex } },
+                            { "taskPoster.email": { $regex: searchRegex } },
+                            { "taskWorker.name": { $regex: searchRegex } },
+                            { "taskWorker.email": { $regex: searchRegex } },
                             { "task.title": { $regex: searchRegex } },
                             { payoutEmail: { $regex: searchRegex } },
                             { transactionType: { $regex: searchRegex } },
@@ -723,8 +749,28 @@ export const getAdminFinanceTransactionsService = async ({
     const [result] = await Transaction.aggregate(pipeline);
 
     const transactions = (result?.transactions || []).map((tx) => {
-        const user = tx.sender || tx.receiver || { name: "Platform User", email: "" };
-        const initials = user.name
+        const isCommission = tx.transactionType === "platform_fee";
+
+        const posterUser = tx.taskPoster || (tx.transactionType !== "to_worker" ? tx.sender : null);
+        const workerUser = tx.taskWorker || (tx.transactionType === "to_worker" ? tx.receiver : tx.receiver);
+
+        const posterName = posterUser?.name || "Poster";
+        const workerName = workerUser?.name || "Worker";
+
+        let user = tx.sender;
+        if (isCommission) {
+            user = tx.taskPoster || tx.sender || tx.receiver || { name: "Platform User", email: "" };
+        } else if (tx.transactionType === "to_worker") {
+            user = tx.receiver || { name: workerName, email: tx.payoutEmail || "" };
+        } else if (tx.transactionType === "to_worker_wallet" || tx.transactionType === "to_escrow") {
+            user = tx.sender || tx.taskPoster || { name: posterName, email: "" };
+        } else if (tx.transactionType === "referral_reward") {
+            user = tx.receiver || tx.sender || { name: "User", email: "" };
+        } else {
+            user = tx.sender || tx.receiver || { name: "Platform User", email: "" };
+        }
+
+        const initials = user?.name
             ? user.name
                 .split(" ")
                 .map((n) => n[0])
@@ -733,21 +779,52 @@ export const getAdminFinanceTransactionsService = async ({
                 .toUpperCase()
             : "NA";
 
-        let taskTitle = tx.task?.title;
-        if (!taskTitle) {
-            if (tx.transactionType === "to_worker") taskTitle = `Worker Payout (${tx.payoutEmail || "PayPal"})`;
-            else if (tx.transactionType === "platform_fee") taskTitle = "Platform Commission Fee";
-            else if (tx.transactionType === "to_worker_wallet") taskTitle = "Wallet Credit";
-            else taskTitle = "Service Booking";
+        // Build location string
+        let locationStr = "";
+        if (tx.task?.address) {
+            const addr = tx.task.address;
+            if (addr.landmark) {
+                const lm = addr.landmark.trim();
+                const hasDistrict = addr.district && lm.toLowerCase().includes(addr.district.toLowerCase());
+                const hasState = addr.state && lm.toLowerCase().includes(addr.state.toLowerCase());
+                if (hasDistrict || hasState) {
+                    locationStr = lm;
+                } else {
+                    locationStr = [lm, addr.district, addr.state].filter(Boolean).join(", ");
+                }
+            } else {
+                locationStr = [addr.district, addr.state].filter(Boolean).join(", ");
+            }
+        }
+
+        const rawTaskTitle = tx.task?.title?.trim();
+
+        let taskDescription = "";
+        if (isCommission) {
+            const taskPart = rawTaskTitle ? `task "${rawTaskTitle}"` : "task";
+            const posterPart = posterName ? ` by ${posterName}` : "";
+            const locPart = locationStr ? ` at ${locationStr}` : "";
+            taskDescription = `Commission for the ${taskPart}${posterPart}${locPart}`;
+        } else if (tx.transactionType === "to_worker_wallet") {
+            const taskPart = rawTaskTitle ? ` for "${rawTaskTitle}"` : "";
+            taskDescription = `${posterName} released payment to ${workerName}${taskPart}`;
+        } else if (tx.transactionType === "to_worker") {
+            const emailPart = tx.payoutEmail ? ` (${tx.payoutEmail})` : "";
+            taskDescription = `Worker wallet withdrawal by ${workerName}${emailPart}`;
+        } else if (tx.transactionType === "to_escrow") {
+            const taskPart = rawTaskTitle ? ` for "${rawTaskTitle}"` : "";
+            taskDescription = `${posterName} deposited escrow payment${taskPart}`;
+        } else if (tx.transactionType === "referral_reward") {
+            taskDescription = `Referral reward credited to ${tx.receiver?.name || "User"}`;
+        } else {
+            taskDescription = rawTaskTitle || "Service Booking";
         }
 
         const rawAmount = tx.amount || 0;
-        const rawCommission =
-            tx.transactionType === "platform_fee"
-                ? rawAmount
-                : tx.transactionType === "to_escrow"
-                    ? Math.round(rawAmount * 0.05 * 100) / 100
-                    : 0;
+        const rawCommission = isCommission ? rawAmount : 0;
+        const commissionFormatted = isCommission
+            ? `₹${rawAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            : null;
 
         const d = new Date(tx.createdAt);
         const dateFormatted = d.toLocaleDateString("en-US", {
@@ -761,16 +838,17 @@ export const getAdminFinanceTransactionsService = async ({
             rawId: tx._id.toString(),
             transactionType: tx.transactionType,
             user: {
-                name: user.name || "Unknown",
+                name: user?.name || "Unknown",
                 initials,
-                email: user.email || "",
+                email: user?.email || "",
             },
-            task: taskTitle,
-            category: tx.task?.category || "General",
+            task: taskDescription,
+            category: tx.task?.category || (isCommission ? "Commission" : "General"),
             amount: `₹${rawAmount.toLocaleString("en-IN")}`,
             rawAmount,
-            commission: `₹${rawCommission.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            commission: commissionFormatted,
             rawCommission,
+            hasCommission: isCommission,
             status: (tx.status || "COMPLETED").toUpperCase(),
             date: dateFormatted,
             createdAt: tx.createdAt,

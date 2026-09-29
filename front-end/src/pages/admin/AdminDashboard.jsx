@@ -27,13 +27,13 @@ const AdminDashboard = () => {
   const platformHealth = data?.platformHealth || {};
 
   return (
-    <div className="min-h-screen bg-[#F6FAF8] flex">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       <AdminNavBar />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
         <AdminHeader />
 
-        <main className="flex-1 p-4 sm:p-6 w-full space-y-4 sm:space-y-5">
+        <main className="flex-1 md:overflow-y-auto p-4 sm:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] w-full space-y-4 sm:space-y-5">
           <DashboardHeader subtitle="Platform overview" />
 
             <DashboardStatsGrid stats={stats} isLoading={isLoading} />

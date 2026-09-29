@@ -6,6 +6,31 @@ import Location from "./FormComponents/Location";
 import IdentityVerification from "./FormComponents/IdentityVerification";
 import CustomSelector from "./CustomSelector";
 
+const FIELD_ORDER = [
+  "name",
+  "email",
+  "phone",
+  "bio",
+  "country",
+  "state",
+  "district",
+  "city",
+  "locationLat",
+  "locationlng",
+  "workPlace",
+  "workPlacelat",
+  "workPlacelng",
+  "language",
+  "skill",
+  "id_type",
+  "id_front",
+  "id_back",
+  "selfie",
+  "password",
+  "confirmPassword",
+  "terms",
+];
+
 const WorkerSignupForm = ({
   onSubmitForm,
   isOtpError,
@@ -19,6 +44,71 @@ const WorkerSignupForm = ({
   onSwitchRole,
 }) => {
   const { handleSubmit } = useFormContext();
+
+  const handleFormError = (errors) => {
+    const firstErrorField =
+      FIELD_ORDER.find((field) => errors[field]) || Object.keys(errors)[0];
+
+    if (!firstErrorField) return;
+
+    setTimeout(() => {
+      let targetElement = null;
+
+      // 1. Direct match by name
+      targetElement = document.querySelector(`[name="${firstErrorField}"]`);
+
+      // 2. Custom selector or section match
+      if (!targetElement) {
+        targetElement =
+          document.querySelector(`[data-field="${firstErrorField}"]`) ||
+          document.getElementById(`field-${firstErrorField}`) ||
+          document.getElementById(firstErrorField);
+      }
+
+      // 3. Location coordinates fallback
+      if (
+        !targetElement &&
+        (firstErrorField === "locationLat" || firstErrorField === "locationlng")
+      ) {
+        targetElement =
+          document.querySelector(`[name="city"]`) ||
+          document.getElementById("location-section");
+      }
+      if (
+        !targetElement &&
+        (firstErrorField === "workPlacelat" || firstErrorField === "workPlacelng")
+      ) {
+        targetElement = document.querySelector(`[name="workPlace"]`);
+      }
+
+      // 4. Fallback: find any visible error text in the form
+      if (!targetElement) {
+        targetElement = document.querySelector(
+          ".italic.text-red-400, .italic.text-red-500, .italic.text-red-600"
+        );
+      }
+
+      if (targetElement) {
+        const scrollTarget =
+          targetElement.offsetParent === null && targetElement.parentElement
+            ? targetElement.closest("label") || targetElement.parentElement
+            : targetElement;
+
+        scrollTarget.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        if (
+          typeof targetElement.focus === "function" &&
+          !targetElement.classList.contains("hidden") &&
+          targetElement.offsetParent !== null
+        ) {
+          targetElement.focus({ preventScroll: true });
+        }
+      }
+    }, 50);
+  };
   return (
     <div className="bg-white flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl shadow-xl p-8 md:p-10">
@@ -89,7 +179,7 @@ const WorkerSignupForm = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmitForm)}>
+        <form onSubmit={handleSubmit(onSubmitForm, handleFormError)} noValidate>
           <PersonalInfo
             worker={true}
             isGoogleVerified={isGoogleVerified}

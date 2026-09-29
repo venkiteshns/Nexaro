@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Bell, ToggleLeft, ToggleRight, Loader2, Wallet, Menu } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -5,24 +6,50 @@ import {
   useGetWorkerUnreadCountQuery,
   useGetWorkerHeaderStatusQuery,
   useToggleWorkerLiveStatusMutation,
+  useGetWorkerProfileQuery,
 } from "../../../store/services/workerApi";
-import { updateUserLiveStatus } from "../../../store/Slices/UserSlice";
+import { updateUserLiveStatus, updateUser } from "../../../store/Slices/UserSlice";
 import { showSuccess, showWarning, showError } from "../../../utils/toast";
+import UserAvatar from "../../sharedComponents/UserAvatar";
 
-const WorkerDashboardHeader = ({ onMenuClick, userName: propUserName, walletAmount: propWalletAmount, isLive: propIsLive }) => {
+const WorkerDashboardHeader = ({ onMenuClick, userName: propUserName, walletAmount: propWalletAmount, isLive: propIsLive, avatar: propAvatar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
-  const { data: unreadData } = useGetWorkerUnreadCountQuery();
+  const { data: profileData } = useGetWorkerProfileQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+  });
+  const workerProfile = profileData?.profileData;
+
+  const { data: unreadData } = useGetWorkerUnreadCountQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const unreadCount = unreadData?.unreadCount || 0;
 
-  const { data: headerStatus } = useGetWorkerHeaderStatusQuery();
+  const { data: headerStatus } = useGetWorkerHeaderStatusQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [toggleLive, { isLoading: isToggling }] = useToggleWorkerLiveStatusMutation();
 
   const isLive = headerStatus?.isLive ?? propIsLive ?? user?.worker?.isLive ?? true;
   const walletAmount = headerStatus?.walletAmount ?? propWalletAmount ?? 0;
-  const displayName = propUserName || user?.name || "Alex";
+  const displayName = propUserName || workerProfile?.name || user?.name || "Alex";
+
+  useEffect(() => {
+    const avatarUrl = workerProfile?.avatar || workerProfile?.selfie || propAvatar;
+    if (avatarUrl && avatarUrl !== user?.avatar && avatarUrl !== user?.selfie) {
+      dispatch(updateUser({ avatar: avatarUrl, selfie: avatarUrl }));
+    }
+  }, [workerProfile?.avatar, workerProfile?.selfie, propAvatar, user?.avatar, user?.selfie, dispatch]);
+
+  const displayUser = {
+    ...user,
+    ...(workerProfile || {}),
+    name: displayName,
+    avatar: propAvatar || workerProfile?.avatar || user?.avatar || user?.selfie,
+    selfie: propAvatar || workerProfile?.avatar || user?.selfie || user?.avatar,
+  };
 
   const handleToggleLive = async () => {
     if (isToggling) return;
@@ -130,9 +157,7 @@ const WorkerDashboardHeader = ({ onMenuClick, userName: propUserName, walletAmou
             className="flex items-center gap-1.5 bg-white border border-gray-200 hover:border-[#0A6E5C] rounded-full p-0.5 sm:px-2 sm:py-0.5 shadow-2xs cursor-pointer transition-colors shrink-0"
             title="View Profile"
           >
-            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[#0A6E5C] font-bold text-[11px] shrink-0">
-              {displayName ? displayName.charAt(0).toUpperCase() : "W"}
-            </div>
+            <UserAvatar user={displayUser} className="w-6 h-6" textClassName="text-[11px]" defaultInitial="W" />
             <span className="hidden sm:inline text-xs font-semibold text-gray-800 truncate max-w-[80px]">
               {displayName}
             </span>

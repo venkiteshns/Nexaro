@@ -35,13 +35,13 @@ export default function WorkerEarnings() {
 
 
   return (
-    <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       <WorkerNavBar />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
         <WorkerHeader />
 
-        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+        <main className="flex-1 md:overflow-y-auto p-3 sm:p-5 lg:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
           <div className="max-w-7xl w-full mx-auto space-y-3.5 sm:space-y-4">
             <div>
               <h1 className="text-lg sm:text-xl font-extrabold text-[#111827] tracking-tight">
@@ -55,15 +55,15 @@ export default function WorkerEarnings() {
             <section aria-label="Available Balance and Summary">
               <EarningsHeroCard
                 availableBalance={availableBalance}
-                totalEarned={totalEarned}
-                totalJobs={totalJobs}
-                sinceDate={sinceDate}
                 onWithdrawClick={() => setIsWithdrawOpen(true)}
               />
             </section>
 
             <section aria-label="Quick Performance Stats">
               <EarningsStatCards
+                totalEarned={totalEarned}
+                totalJobs={totalJobs}
+                sinceDate={sinceDate}
                 avgPerJob={averageAmount}
                 highestPaidJob={highestPaidAmount}
                 earnedThisWeek={earnedLast7Days}

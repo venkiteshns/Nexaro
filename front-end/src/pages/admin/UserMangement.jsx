@@ -204,13 +204,13 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6FAF8] flex">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       <AdminNavBar />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
         <AdminHeader />
 
-        <div className="p-4 sm:p-6 flex flex-col gap-4">
+        <div className="flex-1 md:overflow-y-auto p-4 sm:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-4">
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <h2 className="font-bold text-xl text-[#111827] flex-1">User Management</h2>
@@ -379,25 +379,25 @@ const UserManagement = () => {
                 </table>
               </div>
 
-              <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
-                <p className="text-sm text-gray-500 order-2 sm:order-1">
+              <div className="px-3 sm:px-6 py-2.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 border-t border-gray-100">
+                <p className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1 text-center sm:text-left">
                   Showing page {currentPage} of {totalPages} · {totalUsers} total users
                 </p>
-                <div className="flex items-center gap-2 order-1 sm:order-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 order-1 sm:order-2">
                   <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
-                    <ChevronLeft size={18} />
+                    <ChevronLeft size={15} className="sm:w-4.5 sm:h-4.5" />
                   </button>
-                  <span className="text-sm font-medium text-gray-700 px-2">{currentPage}</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700 px-1.5 sm:px-2">{currentPage}</span>
                   <button
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
-                    className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={15} className="sm:w-4.5 sm:h-4.5" />
                   </button>
                 </div>
               </div>

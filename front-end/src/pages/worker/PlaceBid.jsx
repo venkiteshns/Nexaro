@@ -552,14 +552,14 @@ const PlaceBid = () => {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       <WorkerNavBar />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col md:overflow-hidden min-w-0">
         <WorkerHeader />
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-xs border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div className="flex-1 md:overflow-y-auto">
+          <div className="sticky top-14 md:top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-xs border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
               className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-500 hover:text-[#0A6E5C] transition-colors font-semibold cursor-pointer"
@@ -647,7 +647,7 @@ const PlaceBid = () => {
           )}
 
           {!isLoading && !isError && task && !bidSuccess && (
-            <div className="p-3 sm:p-5 w-full space-y-3.5 pb-12">
+            <div className="p-3 sm:p-5 w-full space-y-3.5 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
               <TaskStatusBanner
                 task={task}
                 canPlaceBid={canPlaceBid}

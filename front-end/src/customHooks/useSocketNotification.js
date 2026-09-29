@@ -91,14 +91,27 @@ const useSocketNotification = () => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'worker' && activeUser?.role !== 'worker')) return;
 
             setPaymentModalData(data);
-            dispatch(api.util.invalidateTags(['Active_Job', 'Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart', 'Worker_Wallet', 'Worker_Bids', 'Worker_Notifications']));
+            dispatch(api.util.invalidateTags([
+                'Active_Job',
+                'Earning_Hero_Data',
+                'Transaction_History',
+                'Worker_Earnings_Chart',
+                'Worker_Bids',
+                'Worker_Notifications',
+                'Worker_Header_Status',
+            ]));
         });
 
         socket.on('withdrawal-initiated', (data) => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'worker' && activeUser?.role !== 'worker')) return;
 
             showSuccess(data.message || "Your payment has been initiated and will reflect in your account within 48 hours.", { autoClose: 7000 });
-            dispatch(api.util.invalidateTags(['Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart']));
+            dispatch(api.util.invalidateTags([
+                'Earning_Hero_Data',
+                'Transaction_History',
+                'Worker_Earnings_Chart',
+                'Worker_Header_Status',
+            ]));
         });
 
         socket.on('withdrawal-status-updated', (data) => {
@@ -109,7 +122,12 @@ const useSocketNotification = () => {
             } else if (data.status === 'failed') {
                 showError(data.message || "Your withdrawal failed and the balance was refunded.");
             }
-            dispatch(api.util.invalidateTags(['Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart']));
+            dispatch(api.util.invalidateTags([
+                'Earning_Hero_Data',
+                'Transaction_History',
+                'Worker_Earnings_Chart',
+                'Worker_Header_Status',
+            ]));
         });
 
         socket.on('worker-notification', (data) => {
@@ -118,7 +136,15 @@ const useSocketNotification = () => {
                 if (data.notification?.type !== 'referral_reward') {
                     showInfo(data.message || `${data.notification?.title}: ${data.notification?.description}`, { autoClose: 6000 });
                 }
-                dispatch(api.util.invalidateTags(['Worker_Notifications']));
+                const tagsToInvalidate = ['Worker_Notifications'];
+                if (
+                    data.notification?.type === 'referral_reward' ||
+                    data.notification?.type === 'payout_initiated' ||
+                    data.notification?.type === 'payout_failed'
+                ) {
+                    tagsToInvalidate.push('Worker_Header_Status', 'Earning_Hero_Data', 'Transaction_History', 'Worker_Earnings_Chart');
+                }
+                dispatch(api.util.invalidateTags(tagsToInvalidate));
             }
         });
 
@@ -182,7 +208,7 @@ const useSocketNotification = () => {
                 'Transaction_History',
                 'Worker_Notifications',
                 'Poster_Notifications',
-                'Worker_Wallet',
+                'Worker_Header_Status',
             ]));
         });
 

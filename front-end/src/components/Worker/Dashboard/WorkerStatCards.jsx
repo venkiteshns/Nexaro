@@ -4,7 +4,10 @@ const WorkerStatCards = ({ stats = {} }) => {
   const activeBids = stats.activeBids ?? 0;
   const jobsCompleted = stats.jobsCompleted ?? 0;
   const totalEarned = stats.totalEarned ?? 0;
-  const rating = Number(stats.rating || 4.8).toFixed(1);
+  const rawRating = Number(stats.rating || 0);
+  const totalReviews = Number(stats.totalReviews || 0);
+  const hasRating = rawRating > 0;
+  const ratingFormatted = hasRating ? rawRating.toFixed(1) : "0.0";
 
   const cards = [
     {
@@ -40,17 +43,24 @@ const WorkerStatCards = ({ stats = {} }) => {
     {
       id: "your-rating",
       label: "YOUR RATING",
-      value: (
+      value: hasRating ? (
         <span className="flex items-center gap-1">
-          {rating}
+          {ratingFormatted}
           <Star size={17} className="text-amber-400 fill-amber-400 drop-shadow-2xs" />
         </span>
+      ) : (
+        <span className="flex items-center gap-1 text-gray-400 font-bold">
+          0.0
+          <Star size={17} className="text-gray-300 stroke-gray-300" />
+        </span>
       ),
-      topBorder: "from-amber-400 to-yellow-500",
-      textColor: "text-gray-900",
-      accentBg: "bg-amber-50 text-amber-700",
+      topBorder: hasRating ? "from-amber-400 to-yellow-500" : "from-gray-300 to-gray-400",
+      textColor: hasRating ? "text-gray-900" : "text-gray-500",
+      accentBg: hasRating ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-500",
       icon: <Award size={14} />,
-      hint: "Based on poster ratings",
+      hint: hasRating
+        ? (totalReviews > 0 ? `Based on ${totalReviews} review${totalReviews > 1 ? "s" : ""}` : "Based on poster ratings")
+        : "No ratings yet",
     },
   ];
 
