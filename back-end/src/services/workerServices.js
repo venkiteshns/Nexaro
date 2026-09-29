@@ -153,7 +153,21 @@ export const workerSignupService = async ({ files, data }) => {
 
         return { responseUser, accessToken, refreshToken };
     } catch (error) {
-        logger.error("workerSignupService error:", error);
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern || {})[0];
+            if (field === 'email') return { error: MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL };
+            if (field === 'phone') return { error: MESSAGES.PHONE_ALREADY_IN_USE };
+            return { error: "An account with this information already exists." };
+        }
+        const isValidationError = [
+            MESSAGES.USER_ALREADY_EXIST_WITH_EMAIL,
+            MESSAGES.PHONE_ALREADY_IN_USE,
+        ].includes(error.message);
+        if (isValidationError) {
+            logger.warn(`workerSignupService validation: ${error.message}`);
+        } else {
+            logger.error(`workerSignupService error: ${error.message}`);
+        }
         return { error: error.message || MESSAGES.UNEXPECTED_ERROR };
     }
 }

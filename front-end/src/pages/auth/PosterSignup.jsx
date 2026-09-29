@@ -3,6 +3,7 @@ import PosterSignUpBanner from "../../components/Poster/PosterSignUpBanner";
 import PosterSignupForm from "../../components/Form/PosterSignupForm";
 import Logo from "../../components/Logo/Logo";
 import Header from "../../components/Landing/Header";
+import { showWarning } from '../../utils/toast.js';
 import OtpModal from "../../components/OtpModal/OtpModal";
 import {
   usePosterSignUpMutation,
@@ -23,6 +24,7 @@ const PosterSignup = () => {
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
   const [isVerified, setIsVerified] = useState(false);
+  const [signupError, setSignupError] = useState("");
 
   const [googleUser, setGoogleUser] = useState(location.state?.googleUser || null);
   const [isGoogleVerified, setIsGoogleVerified] = useState(
@@ -117,6 +119,7 @@ const PosterSignup = () => {
     if (isGoogleVerified) {
       // Google verified: directly sign up without OTP!
       try {
+        setSignupError("");
         const res = await posterSignUp({ ...data, isGoogleAuth: true }).unwrap();
         dispatch(
           setCredentials({
@@ -126,8 +129,10 @@ const PosterSignup = () => {
           }),
         );
         navigate("/poster/my-tasks");
-      } catch {
-        // ignore
+      } catch (err) {
+        const msg = err?.data?.message || "Signup failed. Please try again.";
+        setSignupError(msg);
+        showWarning(msg);
       }
       return;
     }
@@ -148,6 +153,7 @@ const PosterSignup = () => {
   const sendDataToBackend = useCallback(async () => {
     if (!isVerified) return;
     try {
+      setSignupError("");
       let res = await posterSignUp(formData).unwrap();
       dispatch(
         setCredentials({
@@ -157,8 +163,11 @@ const PosterSignup = () => {
         }),
       );
       navigate("/poster/my-tasks");
-    } catch {
-      // ignore
+    } catch (err) {
+      const msg = err?.data?.message || "Signup failed. Please try again.";
+      setSignupError(msg);
+      showWarning(msg);
+      setIsVerified(false);
     }
   }, [isVerified, navigate, dispatch, posterSignUp, formData]);
 
@@ -192,6 +201,7 @@ const PosterSignup = () => {
           isGoogleLoading={isGoogleLoading}
           googleError={googleError}
           onSwitchRole={handleSwitchToWorker}
+          signupError={signupError}
           otpStatus={{ isLoading, isSuccess, isError, error, data }}
           formStatus={{
             signUpLoading,

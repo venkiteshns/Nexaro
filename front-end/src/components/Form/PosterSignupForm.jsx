@@ -19,6 +19,7 @@ const PosterSignupForm = ({
   isGoogleLoading = false,
   googleError = "",
   onSwitchRole,
+  signupError = "",
 }) => {
   const { isLoading, isError, error } = otpStatus;
   const { isSignUpError, signUpError } = formStatus;
@@ -135,10 +136,10 @@ const PosterSignupForm = ({
               </div>
             )}
 
-            {isSignUpError && (
-              <div className="text-center">
+            {(isSignUpError || signupError) && (
+              <div className="text-center my-4">
                 <span className="italic text-red-600/90 text-sm bg-red-500/10 py-1.5 px-10 rounded-xl">
-                  {signUpError?.data?.message || signUpError?.message}
+                  {signupError || signUpError?.data?.message || signUpError?.message}
                 </span>
               </div>
             )}
