@@ -17,7 +17,7 @@ const AdminHeader = () => {
   };
 
   return (
-    <div className="sticky top-0 z-40 py-1 bg-white border-b border-gray-200 px-6 flex items-center justify-end shadow-sm">
+    <div className="shrink-0 h-14 z-40 bg-white border-b border-gray-200 pl-14 md:pl-6 pr-4 sm:pr-6 flex items-center justify-end shadow-xs sticky top-0 w-full">
       <div className="flex items-center gap-4">
         <button
           onClick={handleGoToNotifications}

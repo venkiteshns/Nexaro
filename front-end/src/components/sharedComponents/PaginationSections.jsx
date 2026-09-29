@@ -30,25 +30,25 @@ const PaginationSections = ({
   };
 
   return (
-    <div className={`flex items-center justify-center gap-2 ${className}`}>
+    <div className={`flex items-center justify-center gap-1 sm:gap-2 ${className}`}>
       <button
         onClick={() => onPageChange(activePage - 1)}
         disabled={activePage <= 1}
-        className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-1 sm:p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={14} className="sm:w-4 sm:h-4" />
       </button>
 
       {getPages().map((p, i) =>
         p === "..." ? (
-          <span key={`ellipsis-${i}`} className="w-8 text-center text-gray-400 text-sm">
+          <span key={`ellipsis-${i}`} className="w-5 sm:w-8 text-center text-gray-400 text-xs sm:text-sm">
             …
           </span>
         ) : (
           <button
             key={i}
             onClick={() => onPageChange(p)}
-            className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
               p === activePage
                 ? "bg-[#0A6E5C] text-white"
                 : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
@@ -62,9 +62,9 @@ const PaginationSections = ({
       <button
         onClick={() => onPageChange(activePage + 1)}
         disabled={activePage >= count}
-        className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-1 sm:p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        <ChevronRight size={16} />
+        <ChevronRight size={14} className="sm:w-4 sm:h-4" />
       </button>
     </div>
   );

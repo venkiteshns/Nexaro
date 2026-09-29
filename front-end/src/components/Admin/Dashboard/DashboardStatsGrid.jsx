@@ -45,7 +45,7 @@ const DashboardStatsGrid = ({ stats = {}, isLoading = false }) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
@@ -63,7 +63,7 @@ const DashboardStatsGrid = ({ stats = {}, isLoading = false }) => {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
       {cards.map((card) => (
         <div
           key={card.id}
@@ -78,11 +78,11 @@ const DashboardStatsGrid = ({ stats = {}, isLoading = false }) => {
           </div>
 
           <div className="min-w-0">
-            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 truncate mb-0.5">
+            <p className="text-xs font-semibold text-gray-500 truncate mb-0.5">
               {card.label}
             </p>
             <h3
-              className={`text-base sm:text-xl lg:text-2xl font-bold tracking-tight truncate ${card.valueColor}`}
+              className={`text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate ${card.valueColor}`}
             >
               {card.value}
             </h3>

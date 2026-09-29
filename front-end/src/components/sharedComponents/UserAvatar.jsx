@@ -1,4 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const resolveImageUrl = (val) => {
+  if (!val) return null;
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+  if (typeof val === "object") {
+    const candidate = val.url || val.secure_url || val.src || val.image;
+    if (typeof candidate === "string" && candidate.trim().length > 0) {
+      return candidate.trim();
+    }
+  }
+  return null;
+};
 
 const UserAvatar = ({
   user,
@@ -9,14 +24,22 @@ const UserAvatar = ({
   const [imageError, setImageError] = useState(false);
 
   const profileImage =
-    user?.selfie ||
-    user?.avatar ||
-    (typeof user?.verificationDocuments?.selfie === "string"
-      ? user?.verificationDocuments?.selfie
-      : user?.verificationDocuments?.selfie?.url) ||
-    user?.profileImage;
+    resolveImageUrl(user?.selfie) ||
+    resolveImageUrl(user?.avatar) ||
+    resolveImageUrl(user?.profileImage) ||
+    resolveImageUrl(user?.picture) ||
+    resolveImageUrl(user?.verificationDocuments?.selfie) ||
+    resolveImageUrl(user?.worker?.selfie) ||
+    (typeof user === "string" ? resolveImageUrl(user) : null);
 
-  const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : defaultInitial;
+  useEffect(() => {
+    setImageError(false);
+  }, [profileImage]);
+
+  const initial =
+    user?.name && typeof user.name === "string"
+      ? user.name.trim().charAt(0).toUpperCase()
+      : defaultInitial;
 
   if (profileImage && !imageError) {
     return (

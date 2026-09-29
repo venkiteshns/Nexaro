@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Bell, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -5,8 +6,9 @@ import {
   useGetWorkerUnreadCountQuery,
   useGetWorkerHeaderStatusQuery,
   useToggleWorkerLiveStatusMutation,
+  useGetWorkerProfileQuery,
 } from "../../store/services/workerApi";
-import { updateUserLiveStatus } from "../../store/Slices/UserSlice";
+import { updateUserLiveStatus, updateUser } from "../../store/Slices/UserSlice";
 import { showSuccess, showWarning, showError } from "../../utils/toast";
 import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
@@ -15,14 +17,38 @@ const WorkerHeader = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
-  const { data: unreadData } = useGetWorkerUnreadCountQuery();
+  const { data: profileData } = useGetWorkerProfileQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+  });
+  const workerProfile = profileData?.profileData;
+
+  const { data: unreadData } = useGetWorkerUnreadCountQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const unreadCount = unreadData?.unreadCount || 0;
 
-  const { data: headerStatus } = useGetWorkerHeaderStatusQuery();
+  const { data: headerStatus } = useGetWorkerHeaderStatusQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [toggleLive, { isLoading: isToggling }] = useToggleWorkerLiveStatusMutation();
 
   const isLive = headerStatus?.isLive ?? user?.worker?.isLive ?? true;
   const walletAmount = headerStatus?.walletAmount ?? 0;
+
+  useEffect(() => {
+    const avatarUrl = workerProfile?.avatar || workerProfile?.selfie;
+    if (avatarUrl && avatarUrl !== user?.avatar && avatarUrl !== user?.selfie) {
+      dispatch(updateUser({ avatar: avatarUrl, selfie: avatarUrl }));
+    }
+  }, [workerProfile?.avatar, workerProfile?.selfie, user?.avatar, user?.selfie, dispatch]);
+
+  const displayUser = {
+    ...user,
+    ...(workerProfile || {}),
+    name: workerProfile?.name || user?.name || "",
+    avatar: workerProfile?.avatar || user?.avatar || user?.selfie,
+    selfie: workerProfile?.avatar || user?.selfie || user?.avatar,
+  };
 
   const handleToggleLive = async () => {
     if (isToggling) return;
@@ -41,7 +67,7 @@ const WorkerHeader = () => {
   };
 
   return (
-    <div className="shrink-0 h-14 z-10 bg-white border-b border-gray-200 pl-13 sm:pl-16 pr-2.5 sm:pr-6 flex items-center justify-end gap-1.5 sm:gap-3 shadow-xs">
+    <div className="shrink-0 h-14 sticky top-0 z-20 w-full bg-white border-b border-gray-200 pl-13 sm:pl-16 pr-2.5 sm:pr-6 flex items-center justify-end gap-1.5 sm:gap-3 shadow-xs">
       <button
         type="button"
         onClick={handleToggleLive}
@@ -103,10 +129,10 @@ const WorkerHeader = () => {
         <div className="hidden sm:block text-right">
           <p className="text-xs font-semibold text-[#111827]">Worker</p>
           <p className="text-xs text-[#0A6E5C] font-semibold truncate max-w-[110px]">
-            {user?.name || ""}
+            {displayUser?.name || ""}
           </p>
         </div>
-        <UserAvatar user={user} className="w-7 h-7" textClassName="text-xs" defaultInitial="W" />
+        <UserAvatar user={displayUser} className="w-7 h-7" textClassName="text-xs" defaultInitial="W" />
       </div>
     </div>
   );

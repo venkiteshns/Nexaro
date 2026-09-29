@@ -13,36 +13,36 @@ function PaymentStatusBadge({ status }) {
     case "COMPLETED":
     case "SUCCESS":
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-[#0A6E5C] border border-emerald-200/70">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-50 text-[#0A6E5C] border border-emerald-200/70 whitespace-nowrap shrink-0">
+          <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           COMPLETED
         </span>
       );
     case "PENDING":
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/70">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+        <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/70 whitespace-nowrap shrink-0">
+          <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-amber-500" />
           PENDING
         </span>
       );
     case "REFUNDED":
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/70">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+        <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/70 whitespace-nowrap shrink-0">
+          <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-rose-500" />
           REFUNDED
         </span>
       );
     case "FAILED":
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200/70">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+        <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-red-50 text-red-700 border border-red-200/70 whitespace-nowrap shrink-0">
+          <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-red-500" />
           FAILED
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+        <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200 whitespace-nowrap shrink-0">
+          <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-gray-400" />
           {normalized || "UNKNOWN"}
         </span>
       );
@@ -100,10 +100,6 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
   const transactions = data?.transactions || [];
   const totalTransactionsCount = data?.totalTransactions || 0;
   const totalPages = data?.totalPages || 1;
-
-  const handleCopyId = (id) => {
-    navigator.clipboard?.writeText(id);
-  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -224,15 +220,23 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                     </td>
 
                     <td className="py-4 px-6">
-                      <span className="font-bold text-gray-900">
-                        {item.amount}
-                      </span>
+                      {item.hasCommission ? (
+                        <span className="text-gray-300 font-medium">—</span>
+                      ) : (
+                        <span className="font-bold text-gray-900">
+                          {item.amount}
+                        </span>
+                      )}
                     </td>
 
                     <td className="py-4 px-6">
-                      <span className="font-semibold text-[#0A6E5C]">
-                        {item.commission}
-                      </span>
+                      {item.hasCommission ? (
+                        <span className="font-semibold text-[#0A6E5C]">
+                          {item.commission}
+                        </span>
+                      ) : (
+                        <span className="text-gray-300 font-medium">—</span>
+                      )}
                     </td>
 
                     <td className="py-4 px-6">
@@ -290,34 +294,34 @@ export default function PaymentsTable({ dateRange = "All Time" }) {
                       <p className="font-semibold text-gray-900 text-sm truncate">
                         {item.user.name}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyId(item.rawId || item.id)}
-                        className="text-xs font-mono text-[#0A6E5C] hover:underline cursor-pointer"
-                      >
-                        {item.id}
-                      </button>
+                      {item.user.email && (
+                        <p className="text-xs text-gray-400 truncate">
+                          {item.user.email}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <PaymentStatusBadge status={item.status} />
                 </div>
 
-                <div className="bg-[#F8FBFA] px-3 py-2 rounded-xl text-xs text-gray-700 font-medium">
-                  <span className="text-gray-400 mr-1.5 font-normal">Task:</span>
+                <div className="bg-[#F8FBFA] px-3 py-2 rounded-xl text-xs text-gray-700 font-medium leading-relaxed">
+                  <span className="text-gray-400 mr-1.5 font-normal">
+                    {item.hasCommission ? "Purpose:" : "Type:"}
+                  </span>
                   {item.task}
                 </div>
 
                 <div className="flex items-center justify-between text-xs pt-1">
                   <div>
-                    <span className="text-gray-400 block text-[11px]">Amount</span>
-                    <span className="font-bold text-gray-900 text-sm">
-                      {item.amount}
+                    <span className="text-gray-400 block text-[11px]">
+                      {item.hasCommission ? "Commission" : "Amount"}
                     </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 block text-[11px]">Commission</span>
-                    <span className="font-bold text-[#0A6E5C] text-sm">
-                      {item.commission}
+                    <span
+                      className={`font-bold text-sm ${
+                        item.hasCommission ? "text-[#0A6E5C]" : "text-gray-900"
+                      }`}
+                    >
+                      {item.hasCommission ? item.commission : item.amount}
                     </span>
                   </div>
                   <div className="text-right">

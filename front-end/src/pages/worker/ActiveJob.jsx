@@ -49,10 +49,10 @@ const ActiveJob = () => {
     };
 
     return (
-        <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+        <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
             <WorkerNavBar />
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
                 <WorkerHeader />
 
                 {isLoading && (
@@ -71,10 +71,10 @@ const ActiveJob = () => {
                 )}
 
                 {!isLoading && !isError && mainData && (
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 md:overflow-y-auto">
                         <ActiveJobHeader onBack={() => navigate('/worker/my-bids', { replace: true })} />
 
-                        <div className="p-3 sm:p-5 max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5">
+                        <div className="p-3 sm:p-5 lg:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] max-w-5xl mx-auto w-full space-y-3 sm:space-y-3.5">
                             <TaskOverviewHeader mainData={mainData} bid={bid} />
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-3.5">

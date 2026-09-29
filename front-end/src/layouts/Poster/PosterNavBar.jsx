@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ClipboardList,
   Wallet,
@@ -13,9 +13,12 @@ import Logo from "../../components/Logo/Logo";
 import logo from "../../assets/Nex_Logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { logOut } from "../../store/Slices/UserSlice";
+import { logOut, updateUser } from "../../store/Slices/UserSlice";
 import { useUserLogoutMutation } from "../../store/services/authApi";
-import { useGetPosterUnreadCountQuery } from "../../store/services/posterApi";
+import {
+  useGetPosterUnreadCountQuery,
+  useGetPosterProfileQuery,
+} from "../../store/services/posterApi";
 import LogoutConfirmModal from "../../components/sharedComponents/LogoutConfirmModal";
 import UserAvatar from "../../components/sharedComponents/UserAvatar";
 
@@ -163,6 +166,24 @@ const PosterNavBar = () => {
   const { data: unreadData } = useGetPosterUnreadCountQuery();
   const unreadCount = unreadData?.unreadCount || 0;
 
+  const { data: profileData } = useGetPosterProfileQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+  });
+  const posterProfile = profileData?.data?.poster;
+
+  useEffect(() => {
+    if (posterProfile?.selfie && posterProfile.selfie !== user?.selfie) {
+      dispatch(updateUser({ selfie: posterProfile.selfie }));
+    }
+  }, [posterProfile?.selfie, user?.selfie, dispatch]);
+
+  const displayUser = {
+    ...user,
+    ...(posterProfile || {}),
+    name: posterProfile?.name || user?.name || "Poster",
+    selfie: posterProfile?.selfie || user?.selfie,
+  };
+
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -212,7 +233,7 @@ const PosterNavBar = () => {
         }`}
       >
         <NavContent
-          user={user}
+          user={displayUser}
           unreadCount={unreadCount}
           isExpanded={true}
           onToggle={() => setMobileOpen(false)}
@@ -227,7 +248,7 @@ const PosterNavBar = () => {
         }`}
       >
         <NavContent
-          user={user}
+          user={displayUser}
           unreadCount={unreadCount}
           isExpanded={desktopOpen}
           onToggle={() => setDesktopOpen(!desktopOpen)}

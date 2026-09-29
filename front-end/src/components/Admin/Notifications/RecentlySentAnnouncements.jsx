@@ -24,22 +24,22 @@ const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) =>
   };
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 px-1">
+    <div className="space-y-1 sm:space-y-1.5">
+      <h3 className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-400 px-1">
         Recently Sent
       </h3>
 
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-xs space-y-2 animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/2" />
+        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200/80 p-2.5 sm:p-4 shadow-xs space-y-2 animate-pulse">
+          <div className="h-3.5 bg-gray-200 rounded w-1/2" />
           <div className="h-3 bg-gray-200 rounded w-1/3" />
         </div>
       ) : announcements.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-200/80 p-4 text-center text-gray-400 text-xs shadow-xs">
+        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200/80 py-2.5 px-3 sm:p-4 text-center text-gray-400 text-[11px] sm:text-xs shadow-xs">
           No announcements sent recently
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-2 sm:space-y-2.5">
           {announcements.map((announcement) => {
             const id = announcement._id || announcement.id;
             const isExpanded = expandedId === id;
@@ -48,16 +48,16 @@ const RecentlySentAnnouncements = ({ announcements = [], isLoading = false }) =>
               <div
                 key={id}
                 onClick={() => toggleExpand(id)}
-                className="group relative bg-white rounded-2xl border border-gray-200/80 p-4 shadow-2xs hover:shadow-xs transition-all cursor-pointer overflow-hidden"
+                className="group relative bg-white rounded-xl sm:rounded-2xl border border-gray-200/80 p-3 sm:p-4 shadow-2xs hover:shadow-xs transition-all cursor-pointer overflow-hidden"
               >
                 <span
-                  className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A6E5C] rounded-l-2xl"
+                  className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A6E5C] rounded-l-xl sm:rounded-l-2xl"
                   aria-hidden="true"
                 />
 
-                <div className="pl-2">
+                <div className="pl-1.5 sm:pl-2">
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-sm font-bold text-[#111827] group-hover:text-[#0A6E5C] transition-colors">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#111827] group-hover:text-[#0A6E5C] transition-colors truncate">
                       {announcement.title}
                     </h4>
                     <ChevronDown

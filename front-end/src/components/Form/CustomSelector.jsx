@@ -31,7 +31,7 @@ const CustomSelector = ( props ) => {
   };
 
   return (
-    <div className="mt-5 ">
+    <div data-field={section} id={`field-${section}`} className="mt-5 scroll-mt-24">
       <label className="text-xs text-gray-600/70">
         {section === 'skill' ? "Select your elite skills" : "Select Languages you are comfortable to communicate"} <span className="text-red-600">*</span>
       </label>

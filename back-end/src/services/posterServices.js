@@ -76,7 +76,14 @@ export const posterSignupService = async (data) => {
     await createdUser.save({ validateBeforeSave: false });
 
     const { _id, name, email, activeRole, referralCode } = createdUser;
-    const responseUser = { id: _id, name, email, role: activeRole, referralCode };
+    const responseUser = {
+      id: _id,
+      name,
+      email,
+      role: activeRole,
+      referralCode,
+      selfie: process.env.DEFAULT_AVATAR_URL || null,
+    };
 
     await recordAdminAlert({
       uniqueKey: `user_signup_${_id}`,
@@ -477,7 +484,26 @@ export const updateUserProfileService = async ({ userId, body, avatar }) => {
     }
     await user.save();
 
-    return ({ message: "user profile updated successfully" })
+    const selfieUrl =
+      user?.verificationDocuments?.selfie?.url ||
+      (typeof user?.verificationDocuments?.selfie === "string"
+        ? user.verificationDocuments.selfie
+        : null) ||
+      process.env.DEFAULT_AVATAR_URL ||
+      null;
+
+    return {
+      message: "user profile updated successfully",
+      selfie: selfieUrl,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        selfie: selfieUrl,
+        role: user.activeRole,
+      },
+    };
   } catch (error) {
     logger.error("updateUserProfileService error:", error);
 
@@ -503,7 +529,7 @@ export const getPosterProfileService = async (posterId) => {
     ]);
 
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
-      "poster.spent verificationDocuments.selfie.url name email phone city createdAt languages skills serviceArea isVerified",
+      "poster.spent verificationDocuments.selfie name email phone city createdAt languages skills serviceArea isVerified",
     );
 
     const isWorkerActive = Boolean(
@@ -571,7 +597,13 @@ export const getPosterProfileService = async (posterId) => {
         isVerified: Boolean(posterUser?.isVerified),
         city: posterUser?.city || null,
         createdAt: posterUser?.createdAt || null,
-        selfie: posterUser?.verificationDocuments?.selfie?.url || process.env.DEFAULT_AVATAR_URL,
+        selfie:
+          posterUser?.verificationDocuments?.selfie?.url ||
+          (typeof posterUser?.verificationDocuments?.selfie === "string"
+            ? posterUser.verificationDocuments.selfie
+            : null) ||
+          process.env.DEFAULT_AVATAR_URL ||
+          null,
       },
     };
   } catch (error) {

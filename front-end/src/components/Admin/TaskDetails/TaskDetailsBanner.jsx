@@ -23,22 +23,22 @@ const TaskHeaderBanner = ({ task }) => {
     const isActive = ['assigned', 'in_progress', 'completed'].includes(task.status);
 
     return (
-        <div className={`relative overflow-hidden rounded-2xl p-6 sm:p-8 ${isActive ? 'bg-[#0A6E5C]' : task.status === 'cancelled' ? 'bg-red-800/90' : 'bg-gray-800'}`}>
+        <div className={`relative shrink-0 w-full rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 pb-5 sm:pb-6 ${isActive ? 'bg-[#0A6E5C]' : task.status === 'cancelled' ? 'bg-red-800/90' : 'bg-gray-800'}`}>
 
-            <div className="relative">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border mb-4 ${config.badge}`}>
+            <div className="relative flex flex-col items-start">
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold border mb-2 sm:mb-3 ${config.badge}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
                     {config.label}
                 </span>
 
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white leading-snug mb-1">
+                <h1 className="text-base sm:text-xl md:text-2xl font-bold sm:font-extrabold text-white leading-snug mb-0.5 sm:mb-1 break-words w-full">
                     {task.title}
                 </h1>
-                <p className="text-sm text-white/60">{task.category}</p>
+                <p className="text-xs sm:text-sm text-white/70">{task.category}</p>
 
-                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
-                    <ClipboardList size={13} className="text-white/70" />
-                    <span className="text-xs font-semibold text-white/80">
+                <div className="mt-3 sm:mt-4 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-white/10 border border-white/20">
+                    <ClipboardList size={12} className="sm:w-3.5 sm:h-3.5 text-white/70" />
+                    <span className="text-[11px] sm:text-xs font-semibold text-white/80">
                         {task.bidCount ?? 0} bid{task.bidCount !== 1 ? 's' : ''} placed
                     </span>
                 </div>

@@ -51,13 +51,13 @@ const NearbyTasks = () => {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+    <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
       <WorkerNavBar />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 md:overflow-hidden">
         <WorkerHeader />
 
-        <div className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+        <div className="flex-1 md:overflow-y-auto p-3 sm:p-5 lg:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))]">
 
           <div className="mb-3.5">
             <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 tracking-tight">Nearby Tasks</h1>

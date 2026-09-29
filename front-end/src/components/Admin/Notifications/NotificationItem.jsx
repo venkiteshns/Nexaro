@@ -138,7 +138,7 @@ const NotificationItem = ({ notification, onMarkRead }) => {
   return (
     <div
       onClick={() => !isRead && onMarkRead && onMarkRead(_id)}
-      className={`group relative flex items-start sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-xl border transition-all duration-200 ${
+      className={`group relative flex items-start sm:items-center justify-between gap-2.5 sm:gap-4 p-2.5 sm:p-3.5 md:p-4 rounded-xl border transition-all duration-200 ${
         isRead
           ? "bg-white border-gray-100 hover:bg-gray-50/70 opacity-80 hover:opacity-100"
           : "bg-emerald-50/20 border-emerald-100/70 hover:bg-emerald-50/40 shadow-2xs"
@@ -146,22 +146,22 @@ const NotificationItem = ({ notification, onMarkRead }) => {
     >
       {!isRead && (
         <span
-          className={`absolute left-0 top-3 bottom-3 w-1 rounded-r-full ${config.barColor}`}
+          className={`absolute left-0 top-2.5 bottom-2.5 sm:top-3 sm:bottom-3 w-1 rounded-r-full ${config.barColor}`}
           aria-hidden="true"
         />
       )}
 
-      <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1 pl-1">
+      <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 pl-1">
         <div
-          className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 border ${config.bg} shadow-2xs transition-transform group-hover:scale-105`}
+          className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 border ${config.bg} shadow-2xs transition-transform group-hover:scale-105 [&>svg]:w-3.5 [&>svg]:h-3.5 sm:[&>svg]:w-[18px] sm:[&>svg]:h-[18px]`}
         >
           {config.icon}
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <h4
-              className={`text-sm font-semibold truncate ${
+              className={`text-xs sm:text-sm font-semibold truncate ${
                 isRead ? "text-gray-700" : "text-[#111827] font-bold"
               }`}
             >
@@ -169,33 +169,33 @@ const NotificationItem = ({ notification, onMarkRead }) => {
             </h4>
 
             {priority === "urgent" && !isRead && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200/70 uppercase">
+              <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded bg-rose-50 text-rose-600 border border-rose-200/70 uppercase">
                 Urgent
               </span>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 leading-snug line-clamp-2">
+          <p className="text-[11px] sm:text-xs md:text-sm text-gray-500 mt-0.5 leading-snug line-clamp-2">
             {description}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-center pt-0.5 sm:pt-0">
-        <span className="text-xs font-medium text-gray-400 whitespace-nowrap">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 self-start sm:self-center pt-0.5 sm:pt-0">
+        <span className="text-[11px] sm:text-xs font-medium text-gray-400 whitespace-nowrap">
           {formatTimeAgo(createdAt)}
         </span>
 
         {!isRead ? (
           <span
             title="Unread alert"
-            className={`w-2.5 h-2.5 rounded-full ring-4 ${activeDotClass}`}
+            className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ring-2 sm:ring-4 ${activeDotClass}`}
           />
         ) : (
           <span
             title="Read"
-            className="w-4 h-4 rounded-full flex items-center justify-center text-gray-300 group-hover:text-emerald-600 transition-colors"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center text-gray-300 group-hover:text-emerald-600 transition-colors"
           >
-            <Check size={13} strokeWidth={2.5} />
+            <Check size={12} strokeWidth={2.5} />
           </span>
         )}
       </div>

@@ -81,15 +81,15 @@ const ReviewBids = () => {
     }, [isSuccessAcceptBid, navigate, taskData?._id]);
 
     return (
-        <div className="h-screen flex overflow-hidden bg-[#F6FAF8]">
+        <div className="min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden bg-[#F6FAF8]">
             <PosterNavBar />
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col md:overflow-hidden min-w-0">
                 <PosterHeader />
 
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 md:overflow-y-auto">
 
-                    <div className="sticky top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200
+                    <div className="sticky top-14 md:top-0 z-10 bg-[#F6FAF8]/95 backdrop-blur-sm border-b border-gray-200
                                     px-3.5 sm:px-5 py-2 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2.5 min-w-0">
                             <button
@@ -114,7 +114,7 @@ const ReviewBids = () => {
                         </span>
                     </div>
 
-                    <div className="p-3 sm:p-5 lg:p-6 max-w-5xl mx-auto w-full">
+                    <div className="p-3 sm:p-5 lg:p-6 pb-28 sm:pb-6 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] max-w-5xl mx-auto w-full">
 
                         <div className="bg-white border border-gray-200 rounded-xl shadow-xs px-3.5 sm:px-4 py-3 mb-3.5
                                         grid grid-cols-2 sm:grid-cols-4 gap-3">
