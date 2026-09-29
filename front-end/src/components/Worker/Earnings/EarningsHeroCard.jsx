@@ -1,4 +1,4 @@
-import { ArrowUpRight, Clock, Wallet } from "lucide-react";
+import { ArrowUpRight, Clock } from "lucide-react";
 
 export default function EarningsHeroCard({
   availableBalance = 0,
