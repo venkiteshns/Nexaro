@@ -181,13 +181,15 @@ const AdminNavBar = () => {
   const active = useSelector((state) => state.adminAuth.activePage);
 
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   const [adminLogoutApi] = useAdminLogoutMutation();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
 
   const handleConfirmLogout = async () => {
     setIsLoggingOut(true);

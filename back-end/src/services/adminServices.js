@@ -757,7 +757,7 @@ export const getAdminFinanceTransactionsService = async ({
         const posterName = posterUser?.name || "Poster";
         const workerName = workerUser?.name || "Worker";
 
-        let user = tx.sender;
+        let user;
         if (isCommission) {
             user = tx.taskPoster || tx.sender || tx.receiver || { name: "Platform User", email: "" };
         } else if (tx.transactionType === "to_worker") {
@@ -799,7 +799,7 @@ export const getAdminFinanceTransactionsService = async ({
 
         const rawTaskTitle = tx.task?.title?.trim();
 
-        let taskDescription = "";
+        let taskDescription;
         if (isCommission) {
             const taskPart = rawTaskTitle ? `task "${rawTaskTitle}"` : "task";
             const posterPart = posterName ? ` by ${posterName}` : "";

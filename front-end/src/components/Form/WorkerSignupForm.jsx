@@ -52,10 +52,8 @@ const WorkerSignupForm = ({
     if (!firstErrorField) return;
 
     setTimeout(() => {
-      let targetElement = null;
-
       // 1. Direct match by name
-      targetElement = document.querySelector(`[name="${firstErrorField}"]`);
+      let targetElement = document.querySelector(`[name="${firstErrorField}"]`);
 
       // 2. Custom selector or section match
       if (!targetElement) {

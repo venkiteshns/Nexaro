@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const resolveImageUrl = (val) => {
   if (!val) return null;
@@ -32,10 +32,6 @@ const UserAvatar = ({
     resolveImageUrl(user?.worker?.selfie) ||
     (typeof user === "string" ? resolveImageUrl(user) : null);
 
-  useEffect(() => {
-    setImageError(false);
-  }, [profileImage]);
-
   const initial =
     user?.name && typeof user.name === "string"
       ? user.name.trim().charAt(0).toUpperCase()
@@ -44,6 +40,7 @@ const UserAvatar = ({
   if (profileImage && !imageError) {
     return (
       <img
+        key={profileImage}
         src={profileImage}
         alt={user?.name || "Profile avatar"}
         onError={() => setImageError(true)}
