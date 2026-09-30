@@ -46,14 +46,18 @@ const WorkerSignup = () => {
   const [showOtp, setShowOtp] = useState(false);
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState();
-  const [, setIsVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState("idle"); // "idle" | "sending_otp" | "uploading_docs" | "creating_account" | "created"
 
   const [
     sendOtp,
-    { isSuccess: isOtpSuccess, isError: isOtpError, error: otpError },
+    { isLoading: isOtpLoading, isSuccess: isOtpSuccess, isError: isOtpError, error: otpError },
   ] = useSendOtpMutation();
 
-  const [workerSignUp] = useWorkerSignUpMutation();
+  const [
+    workerSignUp,
+    { isLoading: isSignUpLoading, isSuccess: isSignUpSuccess, isError: isSignUpError, error: signUpError }
+  ] = useWorkerSignUpMutation();
   const [googleLogin, { isLoading: isGoogleLoading }] = useGoogleLoginMutation();
 
   const handleGoogleSuccess = async (tokenResponse) => {
@@ -154,6 +158,17 @@ const WorkerSignup = () => {
     const uploadedDocs = {};
     const uploadPromises = [];
 
+    const hasDocsToUpload =
+      (data.id_front?.[0] instanceof File) ||
+      (data.id_back?.[0] instanceof File) ||
+      (data.selfie?.[0] instanceof File);
+
+    if (hasDocsToUpload) {
+      setSubmissionStatus("uploading_docs");
+    } else {
+      setSubmissionStatus("creating_account");
+    }
+
     if (data.id_front?.[0] instanceof File) {
       uploadPromises.push(
         uploadFileToS3(data.id_front[0], `user/${data.email}/verification`).then((res) => {
@@ -193,8 +208,11 @@ const WorkerSignup = () => {
       }
     }
 
+    setSubmissionStatus("creating_account");
+
     try {
       const res = await workerSignUp(fd).unwrap();
+      setSubmissionStatus("created");
       dispatch(
         setCredentials({
           user: res.user,
@@ -202,9 +220,12 @@ const WorkerSignup = () => {
           refreshToken: res.refreshToken,
         }),
       );
-      navigate("/worker/dashboard");
+      setTimeout(() => {
+        navigate("/worker/dashboard");
+      }, 1200);
     } catch (err) {
-      showWarning(err.data?.message);
+      setSubmissionStatus("idle");
+      showWarning(err?.data?.message || "Worker registration failed. Please try again.");
       setIsVerified(false);
     }
   }, [formData, workerSignUp, navigate, dispatch]);
@@ -222,22 +243,25 @@ const WorkerSignup = () => {
   };
 
   const handleFormSubmit = async (data) => {
-    if (isGoogleVerified) {
-      // Google verified: directly submit without OTP!
-      await sendDataToBackend({ ...data, isGoogleAuth: true });
+    if (isGoogleVerified || isVerified) {
+      // Google verified or OTP already verified: directly submit without resending OTP!
+      await sendDataToBackend({ ...data, isGoogleAuth: isGoogleVerified });
       return;
     }
 
     try {
       setEmail(data.email);
       setFormData(data);
+      setSubmissionStatus("sending_otp");
       await sendOtp({
         email: data.email,
         phone: data.phone,
       }).unwrap();
+      setSubmissionStatus("idle");
       setShowOtp(true);
-    } catch {
-      // ignore
+    } catch (err) {
+      setSubmissionStatus("idle");
+      showWarning(err?.data?.message || err?.message || "Failed to send verification code. Please check your email/phone and try again.");
     }
   };
 
@@ -250,12 +274,18 @@ const WorkerSignup = () => {
           isOtpError={isOtpError}
           otpError={otpError}
           isOtpSuccess={isOtpSuccess}
+          isOtpLoading={isOtpLoading || submissionStatus === "sending_otp"}
           isGoogleVerified={isGoogleVerified}
+          isVerified={isVerified}
           onClearGoogle={handleClearGoogle}
           onGoogleSignUp={signInWithGoogle}
           isGoogleLoading={isGoogleLoading}
           googleError={googleError}
           onSwitchRole={handleSwitchToPoster}
+          submissionStatus={submissionStatus}
+          isSubmitting={submissionStatus !== "idle" && submissionStatus !== "created"}
+          isSignUpSuccess={submissionStatus === "created" || isSignUpSuccess}
+          signUpError={signUpError}
         />
       </FormProvider>
       {showOtp && (

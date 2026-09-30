@@ -5,6 +5,8 @@ import TermsAndConditions from "./FormComponents/TermsAndConditions";
 import Location from "./FormComponents/Location";
 import IdentityVerification from "./FormComponents/IdentityVerification";
 import CustomSelector from "./CustomSelector";
+import { Loader2, CheckCircle2 } from "lucide-react";
+import { showWarning } from "../../utils/toast";
 
 const FIELD_ORDER = [
   "name",
@@ -36,16 +38,33 @@ const WorkerSignupForm = ({
   isOtpError,
   otpError,
   isOtpSuccess,
+  isOtpLoading = false,
   isGoogleVerified = false,
   onClearGoogle,
   onGoogleSignUp,
   isGoogleLoading = false,
   googleError = "",
   onSwitchRole,
+  submissionStatus = "idle",
+  isSubmitting = false,
+  isSignUpSuccess = false,
+  signUpError,
 }) => {
-  const { handleSubmit } = useFormContext();
+  const {
+    handleSubmit,
+    formState: { isSubmitting: isFormSubmitting },
+  } = useFormContext();
+
+  const isAnyLoading = isSubmitting || isOtpLoading || isFormSubmitting;
+  const isButtonDisabled = isAnyLoading || isSignUpSuccess;
 
   const handleFormError = (errors) => {
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      const firstField = FIELD_ORDER.find((f) => errors[f]) || errorKeys[0];
+      const message = errors[firstField]?.message || `Please check the ${firstField} field`;
+      showWarning(message);
+    }
     const firstErrorField =
       FIELD_ORDER.find((field) => errors[field]) || Object.keys(errors)[0];
 
@@ -205,13 +224,63 @@ const WorkerSignupForm = ({
                 </span>
               </div>
             }
-          <button
-            type="submit"
-            className="w-full bg-[#0a6e5c] hover:bg-green-900/90 transition text-white font-semibold py-2.5 sm:py-3.5 text-sm sm:text-base rounded-xl cursor-pointer"
-          >
-            Create Account
-          </button>
-        </form>
+            {isAnyLoading && !isSignUpSuccess && (
+              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#0A6E5C] bg-[#0A6E5C]/10 border border-[#0A6E5C]/20 py-2.5 px-3.5 rounded-xl animate-pulse my-3">
+                <Loader2 size={15} className="animate-spin shrink-0 text-[#0A6E5C]" />
+                <span>
+                  {submissionStatus === "uploading_docs"
+                    ? "Uploading verification documents to secure storage..."
+                    : submissionStatus === "creating_account"
+                    ? "Verifying credentials and creating your worker account..."
+                    : "Sending verification code to your email..."}
+                </span>
+              </div>
+            )}
+
+            {isSignUpSuccess && (
+              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 py-2.5 px-3.5 rounded-xl shadow-xs my-3">
+                <CheckCircle2 size={16} className="shrink-0 text-emerald-600" />
+                <span>Worker account created successfully! Redirecting...</span>
+              </div>
+            )}
+
+            <button
+              id="worker-signup-submit-btn"
+              type="submit"
+              disabled={isButtonDisabled}
+              className={`w-full py-2.5 sm:py-3.5 text-sm sm:text-base font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md ${
+                isSignUpSuccess
+                  ? "bg-emerald-600 text-white cursor-default shadow-emerald-600/20"
+                  : isButtonDisabled
+                  ? "bg-[#0a6e5c]/80 text-white cursor-not-allowed opacity-90 shadow-[#0a6e5c]/10"
+                  : "bg-[#0a6e5c] hover:bg-green-800 transition text-white active:scale-[0.99] shadow-[#0a6e5c]/20 cursor-pointer"
+              }`}
+            >
+              {submissionStatus === "uploading_docs" ? (
+                <>
+                  <Loader2 size={18} className="animate-spin shrink-0" />
+                  <span>Uploading Documents...</span>
+                </>
+              ) : submissionStatus === "creating_account" ? (
+                <>
+                  <Loader2 size={18} className="animate-spin shrink-0" />
+                  <span>Creating Worker Account...</span>
+                </>
+              ) : isSignUpSuccess ? (
+                <>
+                  <CheckCircle2 size={18} className="shrink-0" />
+                  <span>Account Created!</span>
+                </>
+              ) : isAnyLoading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin shrink-0" />
+                  <span>Sending Verification Code...</span>
+                </>
+              ) : (
+                <span>Create Account</span>
+              )}
+            </button>
+          </form>
 
         {onSwitchRole && (
           <div className="mt-6 text-center text-xs text-gray-500">
