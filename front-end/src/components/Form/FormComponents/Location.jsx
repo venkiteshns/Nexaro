@@ -79,13 +79,14 @@ const Location = ({ worker }) => {
   const districtAreas = district && DISTRICT_AREAS[district] ? DISTRICT_AREAS[district] : [];
 
   useEffect(() => {
-    register("locationLat", { required: "Location latitude is required" });
-    register("locationlng", { required: "Location longitude is required" });
+    register("locationLat", { required: "Please confirm the location" });
+    register("locationlng", { required: "Please confirm the location" });
     if (worker) {
-      register("workPlacelat", { required: "Service area latitude is required" });
-      register("workPlacelng", { required: "Service area longitude is required" });
+      register("workPlacelat", { required: "Please confirm the service location" });
+      register("workPlacelng", { required: "Please confirm the service location" });
     }
   }, [register, worker]);
+  const isFormVisible = showForm;
 
   const handleCountryChange = (e) => {
     const countryName = e.target.value;
@@ -192,7 +193,7 @@ const Location = ({ worker }) => {
     <div id="location-section" data-field="location" className="space-y-3 sm:space-y-5 scroll-mt-24">
 
       {/* Auto-detect card */}
-      {!showForm && (
+      {!isFormVisible && (
         <div className="mt-3 sm:mt-5 w-full flex flex-col items-center text-center rounded-2xl sm:rounded-[28px] border border-[rgba(10,110,92,0.15)] bg-white p-4 sm:p-7 md:p-9 shadow-sm">
           <div className={"w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-2.5 sm:mb-3.5 transition-colors duration-300 " + (isFetchingGPS ? "bg-[#0a6e5c]/20" : "bg-[#0A6E5C]/10")}>
             {isFetchingGPS
@@ -213,30 +214,39 @@ const Location = ({ worker }) => {
             }
           </p>
 
-          {/* GPS Button — hidden while fetching or if failed */}
+          {/* GPS Button — initially show only Get Current Location */}
           {!isFetchingGPS && locationFetchState !== "failed" && (
-            <button
-              type="button"
-              onClick={handleGetLocation}
-              className="group inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl text-white text-xs sm:text-sm font-semibold transition-all duration-300 bg-[#0A6E5C] hover:bg-[#085a4a] hover:shadow-lg hover:shadow-[#0a6e5c]/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0a6e5c] focus:ring-offset-2"
-            >
-              <LocateFixed size={16} className="text-white/90 group-hover:rotate-12 transition-transform duration-300" />
-              <span>Get Current Location</span>
-            </button>
+            <div className="flex flex-col items-center justify-center">
+              <button
+                type="button"
+                onClick={handleGetLocation}
+                className="group inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:px-7 sm:py-3 rounded-xl sm:rounded-2xl text-white text-xs sm:text-sm font-semibold transition-all duration-300 bg-[#0A6E5C] hover:bg-[#085a4a] hover:shadow-lg hover:shadow-[#0a6e5c]/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0a6e5c] focus:ring-offset-2 cursor-pointer"
+              >
+                <LocateFixed size={16} className="text-white/90 group-hover:rotate-12 transition-transform duration-300" />
+                <span>Get Current Location</span>
+              </button>
+              {isSubmitted && !showForm && (
+                <p className="italic text-red-500 text-xs mt-2.5">
+                  Please click Get Current Location to continue
+                </p>
+              )}
+            </div>
           )}
 
-          {/* Failed feedback */}
+          {/* Failed feedback — tell them to enter manually */}
           {locationFetchState === "failed" && (
             <div className="w-full max-w-sm">
               <div className="flex items-start gap-2.5 p-3 sm:p-3.5 bg-red-50 border border-red-200 rounded-xl text-left mb-3 sm:mb-4">
                 <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
-                <p className="text-[11px] sm:text-xs text-red-700 leading-relaxed">{locationError}</p>
+                <p className="text-[11px] sm:text-xs text-red-700 leading-relaxed">
+                  {locationError || "Could not detect your location automatically. Please enter your location details manually."}
+                </p>
               </div>
               <div className="flex flex-row gap-2 sm:gap-3 justify-center w-full">
                 <button
                   type="button"
                   onClick={handleGetLocation}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold border border-[#0a6e5c] text-[#0a6e5c] hover:bg-[#0a6e5c]/5 transition-all duration-200 active:scale-95"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold border border-[#0a6e5c] text-[#0a6e5c] hover:bg-[#0a6e5c]/5 transition-all duration-200 active:scale-95 cursor-pointer"
                 >
                   <LocateFixed size={14} />
                   Try Again
@@ -244,10 +254,10 @@ const Location = ({ worker }) => {
                 <button
                   type="button"
                   onClick={() => { setShowForm(true); setLocationFetchState("manual"); }}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#0a6e5c] text-white hover:bg-[#085a4a] transition-all duration-200 active:scale-95 shadow-sm"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#0a6e5c] text-white hover:bg-[#085a4a] transition-all duration-200 active:scale-95 shadow-sm cursor-pointer"
                 >
                   <PencilLine size={14} />
-                  Fill Manually
+                  Enter Manually
                 </button>
               </div>
             </div>
@@ -256,7 +266,7 @@ const Location = ({ worker }) => {
       )}
 
       {/* Location Form */}
-      {showForm && (
+      {isFormVisible && (
         <div
           className="w-full rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-3.5 sm:p-6 md:p-8 shadow-sm space-y-3 sm:space-y-4 md:space-y-5"
           style={{ animation: "locationFadeIn 0.3s ease both" }}
@@ -362,34 +372,34 @@ const Location = ({ worker }) => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] sm:text-xs font-medium text-gray-600">Preferred Work Area <span className="text-red-500">*</span></label>
+                <label className="text-[11px] sm:text-xs font-medium text-gray-600">Preferred Service Location <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <select
-                    {...register("workPlace", { required: "Please select your preferred work area" })}
+                    {...register("workPlace", { required: "Please select your preferred service location" })}
                     onChange={handleWorkPlaceChange}
                     defaultValue=""
                     className={errors.workPlace ? errorFieldClass : fieldClass}
                     disabled={!selectedDistrict}
                   >
-                    <option value="" disabled>{!selectedDistrict ? "Select a district first" : "Select Work Area"}</option>
+                    <option value="" disabled>{!selectedDistrict ? "Select a district first" : "Select Preferred Service Location"}</option>
                     {districtAreas.map((a) => (<option key={a} value={a}>{a}</option>))}
                   </select>
                   <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
                 {errors.workPlace && (
                   <p className="italic text-red-400/90 text-[11px] sm:text-xs mt-1">
-                    {errors.workPlace.message || "Please select your preferred work area"}
+                    {errors.workPlace.message || "Please select your preferred service location"}
                   </p>
                 )}
                 {!errors.workPlace && selectedWorkPlace && (workConfirmNeeded || afterChangeWorkPlace === "changed" || (isSubmitted && (!selectedWorkLat || !selectedWorkLng || errors.workPlacelat || errors.workPlacelng))) && (
                   <p className="italic text-red-400/90 text-[11px] sm:text-xs mt-1">
-                    Please confirm the work area
+                    Please confirm the service location
                   </p>
                 )}
               </div>
 
               {afterChangeWorkPlace === "changed" && (
-                <ConfirmLocationButton status={WFetchCords} onConfirm={() => handleLocationCoords("workPlace")} label="Confirm Service Area" />
+                <ConfirmLocationButton status={WFetchCords} onConfirm={() => handleLocationCoords("workPlace")} label="Confirm Service Location" />
               )}
             </div>
           )}

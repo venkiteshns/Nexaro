@@ -544,14 +544,18 @@ export const getPosterProfileService = async (posterId) => {
     ]);
 
     const posterUser = await User.findOne({ _id: posterObjectId, activeRole: "poster" }).select(
-      "poster.spent verificationDocuments.selfie name email phone city createdAt languages skills serviceArea isVerified",
+      "poster.spent verificationDocuments.selfie name email phone city district state createdAt languages skills serviceArea isVerified",
     );
 
-    const isWorkerActive = Boolean(
+    const hasWorkerData = Boolean(
       posterUser?.skills?.length > 0 &&
       posterUser?.languages?.length > 0 &&
-      posterUser?.serviceArea?.coordinates?.length === 2
+      (posterUser?.serviceArea?.coordinates?.length === 2 ||
+       Boolean(posterUser?.serviceArea?.area) ||
+       Boolean(posterUser?.city))
     );
+
+    const isWorkerActive = hasWorkerData;
 
     const stats = {
       totalPosted: taskStats?.totalPosted || 0,
@@ -609,8 +613,14 @@ export const getPosterProfileService = async (posterId) => {
         email: posterUser?.email || null,
         phone: posterUser?.phone || null,
         isWorkerActive,
+        hasWorkerData,
+        skills: posterUser?.skills || [],
+        languages: posterUser?.languages || [],
+        serviceArea: posterUser?.serviceArea || null,
         isVerified: Boolean(posterUser?.isVerified),
         city: posterUser?.city || null,
+        district: posterUser?.district || null,
+        state: posterUser?.state || null,
         createdAt: posterUser?.createdAt || null,
         selfie:
           posterUser?.verificationDocuments?.selfie?.url ||
@@ -709,7 +719,9 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
   if (!user._id) {
     return { forbidden: "Access Restricted!" }
   }
-  if (!data.state || !data.country || !data.city || !data.state || !data.lat || !data.lng) {
+  const lat = data.lat || data.workPlacelat;
+  const lng = data.lng || data.workPlacelng;
+  if (!lat || !lng) {
     return { error: "Service Area Details are required!" };
   }
   if (!data.skills) {
@@ -751,9 +763,20 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
     userData.activeRole = "worker";
     userData.skills = parsedSkills;
     userData.languages = parsedLanguages;
+    if (!userData.serviceArea) {
+      userData.serviceArea = { type: "Point", coordinates: [] };
+    }
     userData.serviceArea.type = "Point";
     userData.isVerified = false;
-    userData.serviceArea.coordinates = [data.lng, data.lat];
+
+    const lng = parseFloat(data.lng);
+    const lat = parseFloat(data.lat);
+    if (!isNaN(lng) && !isNaN(lat)) {
+      userData.serviceArea.coordinates = [lng, lat];
+    }
+    if (data.workPlace || data.city || data.district) {
+      userData.serviceArea.area = data.workPlace || data.city || data.district;
+    }
 
     if (data.uploadedDocuments) {
       const docs = typeof data.uploadedDocuments === "string"
@@ -795,6 +818,16 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
     const isUser = await User.findOne({ _id: new mongoose.Types.ObjectId(user._id), activeRole: "poster" });
     if (!isUser) {
       return { error: MESSAGES.USER_NOT_FOUND }
+    }
+
+    const hasWorkerData = Boolean(
+      isUser.skills?.length > 0 &&
+      isUser.languages?.length > 0 &&
+      (isUser.serviceArea?.coordinates?.length === 2 || isUser.serviceArea?.area || isUser.city)
+    );
+
+    if (!hasWorkerData) {
+      return { error: "Worker profile data is missing. Please complete the registration form." };
     }
 
     isUser.activeRole = 'worker';
