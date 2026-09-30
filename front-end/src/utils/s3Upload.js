@@ -1,3 +1,5 @@
+import { validateImageFile } from "./fileValidation";
+
 // uploading files directly to AWS S3 using Presigned Signed URLs.
 
 const getApiBaseUrl = () => {
@@ -9,8 +11,9 @@ const getApiBaseUrl = () => {
 };
 
 export const uploadFileToS3 = async (file, folder = "uploads") => {
-    if (!file) {
-        throw new Error("No file provided for upload");
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+        throw new Error(validation.message);
     }
 
     const apiUrl = getApiBaseUrl();

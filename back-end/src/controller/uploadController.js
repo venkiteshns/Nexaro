@@ -24,6 +24,13 @@ export const getPresignedUrlController = async (req, res) => {
             });
         }
 
+        if (!fileType.startsWith("image/")) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.INVALID_FILE_FORMAT,
+            });
+        }
+
         const data = await generatePresignedUploadUrl({
             fileName,
             fileType,
@@ -57,6 +64,20 @@ export const directS3ProxyFallbackController = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
                 message: MESSAGES.NO_FILE_PROVIDED,
+            });
+        }
+
+        if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.INVALID_FILE_FORMAT,
+            });
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: MESSAGES.FILE_TOO_LARGE,
             });
         }
 

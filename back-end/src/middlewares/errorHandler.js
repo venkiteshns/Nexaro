@@ -43,9 +43,22 @@ const errorHandler = (err, req, res, _next) => {
     }
 
     if (err.name === 'MulterError') {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: 'File too large. Maximum file size is 10 MB per file.',
+            });
+        }
         return res.status(STATUS_CODES.BAD_REQUEST).json({
             success: false,
             message: `File upload error: ${err.message}`,
+        });
+    }
+
+    if (err.message && err.message.includes('Invalid file format')) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: err.message,
         });
     }
 

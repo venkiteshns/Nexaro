@@ -1,18 +1,33 @@
 import { Camera, Image, Upload, X } from 'lucide-react'
 import { useFormContext } from 'react-hook-form';
 import FormError from '../FormComponents/FormError';
+import { showError } from '../../../utils/toast';
+import { validateImageFile } from '../../../utils/fileValidation';
 
 const TaskPhotos = () => {
     const { register, watch, setValue, getValues, formState: { errors } } = useFormContext();
     const photos = watch('photos') || [];
 
     const handlePhotoUpload = (e) => {
-        const files = Array.from(e.target.files);
-        const currentPhotos = getValues('photos') || [];
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
 
-        const newPhotos = [...currentPhotos, ...files].slice(0, 5);
+        const validFiles = [];
+        for (const file of files) {
+            const validation = validateImageFile(file);
+            if (!validation.isValid) {
+                showError(validation.message);
+                continue;
+            }
+            validFiles.push(file);
+        }
 
-        setValue('photos', newPhotos, { shouldValidate: true });
+        if (validFiles.length > 0) {
+            const currentPhotos = getValues('photos') || [];
+            const newPhotos = [...currentPhotos, ...validFiles].slice(0, 5);
+            setValue('photos', newPhotos, { shouldValidate: true });
+        }
+        e.target.value = "";
     };
 
     const handleRemovePhoto = (indexToRemove) => {

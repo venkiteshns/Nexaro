@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useUpdateTaskMutation } from "../../store/services/posterApi";
 import { showError, showSuccess } from "../../utils/toast";
+import { validateImageFile } from "../../utils/fileValidation";
 
 const CATEGORIES = [
   { label: "Cleaning Services", value: "Cleaning" },
@@ -63,10 +64,24 @@ const EditTaskModal = ({ task, onClose, onUpdated }) => {
   }, []);
 
   const handleAddNewPhotos = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const validFiles = [];
+    for (const file of files) {
+      const validation = validateImageFile(file);
+      if (!validation.isValid) {
+        showError(validation.message);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
     const remaining = 5 - totalImageCount;
-    const toAdd = files.slice(0, remaining);
-    setNewPhotos((prev) => [...prev, ...toAdd]);
+    const toAdd = validFiles.slice(0, remaining);
+    if (toAdd.length > 0) {
+      setNewPhotos((prev) => [...prev, ...toAdd]);
+    }
     e.target.value = "";
   };
 

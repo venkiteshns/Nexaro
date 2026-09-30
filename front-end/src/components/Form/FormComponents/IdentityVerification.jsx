@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Upload } from "lucide-react";
 import { ID_TYPES } from "../../../utils/constants";
 import { useFormContext } from "react-hook-form";
+import { showError } from "../../../utils/toast";
+import { validateImageFile } from "../../../utils/fileValidation";
 
 const IdentityVerification = () => {
   const {
@@ -78,6 +80,7 @@ const UploadCard = ({ title, subtitle, type }) => {
 
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext();
 
@@ -90,20 +93,28 @@ const UploadCard = ({ title, subtitle, type }) => {
   };
 
   const handleimage = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files?.[0];
     if (!file) return;
 
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+      showError(validation.message);
+      e.target.value = "";
+      setPreview("");
+      setValue(type, null, { shouldValidate: true });
+      return;
+    }
+
     const url = URL.createObjectURL(file);
-
     setPreview(url);
-
-  }
+  };
 
   return (
     <div>
       <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed border-gray-300 bg-gray-50/40 p-4 sm:p-6 text-center hover:border-green-800 hover:bg-green-50/30">
         <input
           type="file"
+          accept="image/*"
           className="hidden"
           {...register(type, {
             required: `Please upload ${uploadMessage[type]}`,
