@@ -164,35 +164,42 @@ export const posterApi = api.injectEndpoints({
     switchtoworker: builder.mutation({
       query: (data) => {
         const roleData = new FormData();
-        roleData.append('city', data.city);
-        roleData.append('country', data.country);
-        roleData.append('district', data.district);
+        roleData.append('city', data.city || data.workPlace || '');
+        roleData.append('country', data.country || 'India');
+        roleData.append('district', data.district || '');
         if (data.uploadedDocuments) {
           roleData.append('uploadedDocuments', JSON.stringify(data.uploadedDocuments));
         }
         if (data.id_back && data.id_back.length > 0) roleData.append('id_back', data.id_back[0]);
         if (data.id_front && data.id_front.length > 0) roleData.append('id_front', data.id_front[0]);
         roleData.append('languages', JSON.stringify(data.languages));
-        roleData.append('lat', data.locationLat);
-        roleData.append('lng', data.locationlng);
+        const lat = data.workPlacelat || data.locationLat || "";
+        const lng = data.workPlacelng || data.locationlng || "";
+        roleData.append('lat', lat);
+        roleData.append('lng', lng);
+        if (data.workPlace) {
+          roleData.append('workPlace', data.workPlace);
+        }
         roleData.append('password', data.password);
         if (data.selfie && data.selfie.length > 0) roleData.append('selfie', data.selfie[0]);
         roleData.append('skills', JSON.stringify(data.skills));
-        roleData.append('state', data.state);
+        roleData.append('state', data.state || 'Kerala');
         return {
           url: POSTER.ROLE_SWITCH,
           method: "PATCH",
           body: roleData,
           formData: true
         }
-      }
+      },
+      invalidatesTags: ["Poster_Profile", "Worker_Profile"],
     }),
     
     switchRoleActiveWorker: builder.mutation ({
       query:() => ({
         url: POSTER.ROLE_SWITCH_ACTIVE_WORKER,
         method: "PATCH",
-      })
+      }),
+      invalidatesTags: ["Poster_Profile", "Worker_Profile"],
     }),
 
     getPosterNotifications: builder.query({

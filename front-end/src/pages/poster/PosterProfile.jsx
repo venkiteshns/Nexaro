@@ -26,7 +26,9 @@ import { useNavigate } from "react-router-dom";
 import { uploadFileToS3 } from "../../utils/s3Upload";
 
 const PosterProfile = () => {
-  const { data, isLoading } = useGetPosterProfileQuery();
+  const { data, isLoading } = useGetPosterProfileQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
 
   const [reviewPage, setReviewPage] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -44,13 +46,19 @@ const PosterProfile = () => {
   const reviews = profileData.reviews || [];
   const posterInfo = profileData.poster || {};
 
-  const [switchRole, { isLoading: isSubmitting }] = useSwitchtoworkerMutation();
+  const [switchRole, { isLoading: isApiLoading }] = useSwitchtoworkerMutation();
+  const [isUploading, setIsUploading] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState("");
+  const isSubmitting = isUploading || isApiLoading || submissionStatus === "switching";
+
   const [roleSwitch] = useSwitchRoleActiveWorkerMutation();
   const { user, accessToken, refreshToken } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleRoleSwitchSubmission = async (data) => {
+    setIsUploading(true);
+    setSubmissionStatus("uploading");
     try {
       const uploadedDocs = {};
       const uploadPromises = [];
@@ -86,7 +94,11 @@ const PosterProfile = () => {
         }
       }
 
+      setIsUploading(false);
+      setSubmissionStatus("submitting");
       await switchRole(data).unwrap();
+
+      setSubmissionStatus("switching");
       const updatedUser = { ...user, role: 'worker' };
       showSuccess("Switching to Worker Mode");
       setTimeout(() => {
@@ -96,14 +108,24 @@ const PosterProfile = () => {
           accessToken
         }));
         navigate('/worker/dashboard', { replace: true });
-      }, 2600);
+      }, 2000);
     } catch (error) {
+      setIsUploading(false);
+      setSubmissionStatus("");
       showError(error?.data?.message || "Couldn't switch role now ! Try later..");
     }
   };
 
   const handleRoleSwitch = async () => {
-    if (posterInfo.isWorkerActive) {
+    const hasWorkerData = Boolean(
+      posterInfo.hasWorkerData ||
+      posterInfo.isWorkerActive ||
+      (posterInfo.skills?.length > 0 &&
+        posterInfo.languages?.length > 0 &&
+        (posterInfo.serviceArea?.coordinates?.length === 2 || posterInfo.serviceArea?.area || posterInfo.city))
+    );
+
+    if (hasWorkerData) {
       try {
         await roleSwitch().unwrap();
         const updatedUser = { ...user, role: 'worker' };
@@ -113,17 +135,18 @@ const PosterProfile = () => {
             user: updatedUser,
             refreshToken,
             accessToken
-          }))
+          }));
           navigate('/worker/dashboard', { replace: true });
         }, 2600);
         return;
       } catch (error) {
-        showWarning(error.data.message || "Unable to switch role ! Try again later...");
+        showWarning(error?.data?.message || "Unable to switch role ! Try again later...");
+        return;
       }
-
     }
+
     setShowRoleSwitchModal(true);
-  }
+  };
 
   const closeDeleteModal = useCallback(() => {
     setShowDeleteModal(false);
@@ -209,9 +232,11 @@ const PosterProfile = () => {
       {showRoleSwitchModal && (
         <SwitchToWorkerModal
           isOpen={showRoleSwitchModal}
-          onClose={() => setShowRoleSwitchModal(false)}
+          onClose={() => !isSubmitting && setShowRoleSwitchModal(false)}
           onSwitch={handleRoleSwitchSubmission}
           isSubmitting={isSubmitting}
+          submissionStatus={submissionStatus}
+          posterInfo={posterInfo}
         />
       )}
       {showDeleteModal && (

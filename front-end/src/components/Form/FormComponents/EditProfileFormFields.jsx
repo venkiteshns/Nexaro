@@ -247,15 +247,15 @@ export const ProfessionalSkillsField = ({section}) => {
   return (
     <div className="flex flex-col gap-1">
       <div
-        className={`flex flex-wrap items-center gap-2 rounded-xl border ${
+        className={`flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl border ${
           hasError ? "border-red-300 bg-red-50/50" : "border-[rgba(10,110,92,0.2)] bg-white"
-        } px-3 py-2.5 sm:px-4 sm:py-3 min-h-[44px] sm:min-h-[50px] focus-within:border-[#0A6E5C]/60 focus-within:ring-2 focus-within:ring-[#0A6E5C]/10 transition-all duration-200 cursor-text`}
+        } px-2.5 py-1.5 sm:px-4 sm:py-2.5 min-h-[36px] sm:min-h-[46px] focus-within:border-[#0A6E5C]/60 focus-within:ring-2 focus-within:ring-[#0A6E5C]/10 transition-all duration-200 cursor-text`}
         onClick={() => inputRef.current?.focus()}
       >
         {skills.map((skill) => (
           <span
             key={skill}
-            className="flex items-center gap-1 px-2.5 py-1 sm:px-3 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] sm:text-xs font-bold text-[#0A6E5C] uppercase tracking-wide"
+            className="flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[9px] sm:text-xs font-bold text-[#0A6E5C] uppercase tracking-wide"
           >
             {skill}
             <button
@@ -279,7 +279,7 @@ export const ProfessionalSkillsField = ({section}) => {
           onKeyDown={handleKeyDown}
           onBlur={() => input && addSkill(input)}
           placeholder={section === "skills" ? "Type skill..." : "Type language..."}
-          className="flex-1 min-w-[80px] text-xs sm:text-sm text-gray-700 outline-none placeholder:text-gray-400 bg-transparent"
+          className="flex-1 min-w-[70px] text-[11px] sm:text-sm text-gray-700 outline-none placeholder:text-gray-400 bg-transparent py-0.5"
         />
       </div>
       {hasError && <FormError error={errors[section] || { message: localError }} />}

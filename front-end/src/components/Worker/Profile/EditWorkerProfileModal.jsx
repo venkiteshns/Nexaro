@@ -90,7 +90,6 @@ const EditWorkerProfileModal = ({ loading, isOpen, onClose, worker, onSave, }) =
         backgroundColor: "rgba(0,0,0,0.45)",
         backdropFilter: "blur(6px)",
       }}
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-profile-title"

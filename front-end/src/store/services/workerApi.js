@@ -137,7 +137,8 @@ export const workerApi = api.injectEndpoints({
       query: () => ({
         url: WORKER.SWITCH_ROLE,
         method: "PATCH",
-      })
+      }),
+      invalidatesTags: ["Poster_Profile", "Worker_Profile"],
     }),
 
     getReviewsWorker: builder.query({

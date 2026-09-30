@@ -119,7 +119,6 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
         backgroundColor: "rgba(0,0,0,0.45)",
         backdropFilter: "blur(8px)",
       }}
-      onClick={onClose}
     >
       <div
         className="w-full max-w-md sm:max-w-lg rounded-2xl overflow-hidden shadow-2xl bg-white my-auto max-h-[92vh] flex flex-col"
