@@ -42,6 +42,10 @@ const useSocketNotification = () => {
         socket.on('new-task-nearby', (data) => {
             if (isCurrentAdmin || (activeUser?.activeRole !== 'worker' && activeUser?.role !== 'worker')) return;
 
+            // Only notify the worker if they are currently marked as live
+            const isLive = activeUser?.worker?.isLive ?? true;
+            if (!isLive) return;
+
             if (data.urgencyLevel === 'urgent') {
                 showWarning(`NEW URGENT task nearby: ${data.taskTitle} at ${data.city} for ${data.amount} rupees`, { autoClose: 6000 });
             } else {
