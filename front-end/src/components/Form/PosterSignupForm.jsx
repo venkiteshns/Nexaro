@@ -51,14 +51,14 @@ const PosterSignupForm = ({
   }, [initialName, methods]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl shadow-xl p-8 md:p-10">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">
+    <div className="min-h-screen bg-white flex items-center justify-center px-3 sm:px-4 py-6 sm:py-10">
+      <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8 md:p-10">
+        <div className="mb-4 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Create Your <span className="text-green-800">Poster</span> Account
           </h2>
 
-          <p className="text-gray-500 mt-2">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
             Join India's most trusted hyperlocal task marketplace.
           </p>
         </div>
@@ -146,7 +146,7 @@ const PosterSignupForm = ({
 
             <button
               type="submit"
-              className={`w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-3.5 rounded-xl ${(isLoading || isVerified) ? "cursor-not-allowed opacity-50" : ""}`}
+              className={`w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-2.5 sm:py-3.5 text-sm sm:text-base rounded-xl ${(isLoading || isVerified) ? "cursor-not-allowed opacity-50" : ""}`}
             >
               {isVerified ? "Submitting Registration..." : isLoading ? "Validating Data..." : "Create Account"}
             </button>

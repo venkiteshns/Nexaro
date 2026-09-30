@@ -67,17 +67,18 @@ const ReferralInput = () => {
   };
 
   return (
-    <div className="mt-3">
-      <div className="flex items-center justify-between mb-1">
+    <div className="mt-2.5 sm:mt-3">
+      <div className="flex items-center justify-between gap-1.5 mb-1">
         <label
-          className="flex items-center gap-1.5 text-xs font-medium"
-          style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}
+          className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-medium text-gray-700 truncate"
+          style={{ fontFamily: '"DM Sans", sans-serif' }}
         >
-          <Gift size={14} className="text-[#0A6E5C]" />
-          Referral Code <span className="text-gray-400 font-normal">(Optional)</span>
+          <Gift size={13} className="text-[#0A6E5C] shrink-0" />
+          <span className="whitespace-nowrap">Referral Code</span>
+          <span className="text-gray-400 font-normal text-[10px] sm:text-[11px] whitespace-nowrap">(Optional)</span>
         </label>
-        <span className="text-[11px] text-[#0A6E5C] font-medium">
-          Get ₹50 Welcome Bonus
+        <span className="text-[10px] sm:text-[11px] text-[#0A6E5C] font-semibold bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md whitespace-nowrap shrink-0">
+          Get ₹50<span className="hidden sm:inline"> Welcome</span> Bonus
         </span>
       </div>
 
@@ -88,7 +89,7 @@ const ReferralInput = () => {
           type="text"
           maxLength={15}
           placeholder="e.g. NEX7A3B19"
-          className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 pr-10 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm tracking-wider uppercase font-medium text-gray-800"
+          className="placeholder:text-xs sm:placeholder:text-sm placeholder:text-gray-400 w-full rounded-lg sm:rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 pr-9 sm:pr-10 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-xs sm:text-sm tracking-wider uppercase font-medium text-gray-800"
           style={{
             borderColor: validationState.checked
               ? validationState.valid
@@ -100,14 +101,14 @@ const ReferralInput = () => {
           }}
         />
 
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center">
+        <div className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center">
           {isFetching ? (
-            <Loader2 size={16} className="animate-spin text-gray-400" />
+            <Loader2 size={15} className="animate-spin text-gray-400" />
           ) : validationState.checked ? (
             validationState.valid ? (
-              <CheckCircle2 size={18} className="text-emerald-500" />
+              <CheckCircle2 size={16} className="text-emerald-500" />
             ) : (
-              <XCircle size={18} className="text-rose-500" />
+              <XCircle size={16} className="text-rose-500" />
             )
           ) : null}
         </div>

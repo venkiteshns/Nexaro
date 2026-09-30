@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import HeaderWorkerSignup from "../../components/Worker/HeaderWorkerSignup";
 import Header from "../../components/Landing/Header";
 import WorkerSignupForm from "../../components/Form/WorkerSignupForm";
 import OtpModal from "../../components/OtpModal/OtpModal";
@@ -243,9 +242,8 @@ const WorkerSignup = () => {
   };
 
   return (
-    <div>
+    <div className="pt-14 sm:pt-16">
       <Header landing={false} />
-      <HeaderWorkerSignup />
       <FormProvider {...methods}>
         <WorkerSignupForm
           onSubmitForm={handleFormSubmit}

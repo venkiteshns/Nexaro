@@ -20,13 +20,13 @@ const Password = (props) => {
 
   return (
     <div
-      className={`${login || noBox ? "" : "mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}
+      className={`${login || noBox ? "" : "mt-3 sm:mt-5 w-full rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-3.5 sm:p-6 md:p-10 shadow-sm"}`}
     >
       <div
-        className={`${login ? "grid-cols-2 gap-5" : noBox ? "grid grid-cols-1 gap-3 sm:gap-3.5" : "grid grid-cols-1 md:grid-cols-2 gap-5"}`}
+        className={`${login ? "grid-cols-2 gap-5" : noBox ? "grid grid-cols-1 gap-2.5 sm:gap-3.5" : "grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-5"}`}
       >
         <div className="relative">
-          <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
+          <label className="block text-[11px] sm:text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
             {noBox ? "New Password" : "Password"} <span className="text-red-400">*</span>
           </label>
 
@@ -53,7 +53,7 @@ const Password = (props) => {
             type={showPassword ? "text" : "password"}
             placeholder="••••••••••••"
             autoComplete={login ? "current-password" : "new-password"}
-            className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+            className="placeholder:text-xs sm:placeholder:text-sm placeholder:text-gray-400 w-full rounded-lg sm:rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-xs sm:text-sm"
             style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
           />
 
@@ -61,9 +61,9 @@ const Password = (props) => {
             onClick={() => {
               setShowPassword(!showPassword);
             }}
-            className="absolute right-3 top-[35px] text-gray-500 cursor-pointer"
+            className="absolute right-3 top-[28px] sm:top-[33px] text-gray-500 cursor-pointer"
           >
-            {showPassword ? <Eye size={18} /> : <EyeClosed size={18} />}
+            {showPassword ? <Eye size={17} /> : <EyeClosed size={17} />}
           </span>
           {errors.password && (
             <span className="italic text-red-400/90 text-xs">
@@ -72,7 +72,7 @@ const Password = (props) => {
           )}
         </div>
         {login && (
-          <div className="flex mt-4 items-center justify-end gap-4">
+          <div className="flex mt-3 sm:mt-4 items-center justify-end gap-4">
             <button
               onClick={() => {
                 forgot(true);
@@ -88,7 +88,7 @@ const Password = (props) => {
 
         {!login && (
           <div className="relative">
-            <label className="text-xs text-gray-700/80">
+            <label className="block text-[11px] sm:text-xs font-medium mb-1 text-gray-700/80">
               Confirm Password <span className="text-red-500">*</span>
             </label>
 
@@ -101,19 +101,19 @@ const Password = (props) => {
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm password"
               autoComplete="new-password"
-              className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+              className="placeholder:text-xs sm:placeholder:text-sm placeholder:text-gray-400 w-full rounded-lg sm:rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-xs sm:text-sm"
             style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
             />
             <span
               onClick={() => {
                 setShowConfirmPassword(!showConfirmPassword);
               }}
-              className="absolute right-3 top-[35px] text-gray-500 cursor-pointer"
+              className="absolute right-3 top-[28px] sm:top-[33px] text-gray-500 cursor-pointer"
             >
               {showConfirmPassword ? (
-                <Eye size={18} />
+                <Eye size={17} />
               ) : (
-                <EyeClosed size={18} />
+                <EyeClosed size={17} />
               )}
             </span>
 

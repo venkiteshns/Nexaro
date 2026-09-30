@@ -21,6 +21,9 @@
 .header-c {
   font-family: "PT Serif", serif;
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 999;
   backdrop-filter: blur(18px) saturate(1.6);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
@@ -56,8 +59,8 @@
 }
 
 .title-text {
-  font-size: clamp(44px, 5.5vw, 72px);
-  line-height: 1.05;
+  font-size: clamp(35px, 8.5vw, 72px);
+  line-height: 1.08;
   letter-spacing: -0.025em;
   color: var(--text-dark);
   font-weight: 400;
@@ -75,27 +78,63 @@
 .hero p {
   color: var(--text-muted);
   font-family: "DM Sans", sans-serif;
-  font-size: 1rem;
-  line-height: 1.75;
+  font-size: 0.8rem;
+  line-height: 1.6;
   font-weight: 400;
+}
+
+@media (min-width: 640px) {
+  .hero p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero p {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
 }
 
 /* Hero cards */
 .hero-cards {
   font-family: "PT Serif", serif;
-  height: 500px;
+  min-height: 380px;
+  height: auto;
   width: 100%;
   position: relative;
 }
 
+@media (min-width: 768px) {
+  .hero-cards {
+    height: 500px;
+  }
+}
+
 .card-com {
-  max-width: 350px;
+  width: 100%;
+  max-width: 270px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 640px) {
+  .card-com {
+    max-width: 320px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-com {
+    max-width: 350px;
+  }
 }
 
 .card-profile {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(16, 185, 129, 0.2);
-  transform: rotate(3deg);
+  transform: rotate(1.5deg);
   z-index: 1;
   box-shadow: 0 8px 32px rgba(10, 110, 92, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(8px);
@@ -103,18 +142,34 @@
 }
 
 .card-profile:hover {
-  transform: rotate(1deg) translateY(-4px);
+  transform: rotate(0.5deg) translateY(-4px);
   box-shadow: 0 16px 48px rgba(10, 110, 92, 0.18);
 }
 
+@media (min-width: 640px) {
+  .card-profile {
+    transform: rotate(3deg);
+  }
+  .card-profile:hover {
+    transform: rotate(1deg) translateY(-4px);
+  }
+}
+
 .hero-avatar {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(135deg, #0a6e5c 0%, #10b981 100%);
   font-family: "DM Serif Display", serif;
   font-weight: 700;
   box-shadow: 0 4px 14px rgba(10, 110, 92, 0.35);
+}
+
+@media (min-width: 640px) {
+  .hero-avatar {
+    width: 52px;
+    height: 52px;
+  }
 }
 
 .hero-name {
@@ -155,7 +210,7 @@
 
 .hero-bid {
   background: rgba(255, 255, 255, 0.97);
-  transform: rotate(-3deg);
+  transform: rotate(-1.5deg);
   border: 1px solid rgba(16, 185, 129, 0.18);
   box-shadow: 0 12px 40px rgba(10, 110, 92, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(8px);
@@ -163,8 +218,17 @@
 }
 
 .hero-bid:hover {
-  transform: rotate(-1deg) translateY(-4px);
+  transform: rotate(-0.5deg) translateY(-4px);
   box-shadow: 0 20px 56px rgba(10, 110, 92, 0.2);
+}
+
+@media (min-width: 640px) {
+  .hero-bid {
+    transform: rotate(-3deg);
+  }
+  .hero-bid:hover {
+    transform: rotate(-1deg) translateY(-4px);
+  }
 }
 
 .bid-head {
@@ -205,11 +269,11 @@
 }
 
 .stats-value {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 400;
+  font-size: clamp(1.35rem, 4vw, 2.2rem);
+  font-weight: 500;
   color: var(--text-dark);
   letter-spacing: -0.025em;
-  line-height: 1;
+  line-height: 1.1;
   background: linear-gradient(135deg, #0a6e5c, #10b981);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -218,12 +282,12 @@
 
 .stats-label {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.78rem;
+  font-size: clamp(0.68rem, 2vw, 0.78rem);
   color: var(--text-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   font-weight: 500;
-  margin-top: 0.3rem;
+  margin-top: 0.25rem;
 }
 
 /* ============================================
@@ -257,26 +321,26 @@
 .flow-step-num {
   font-family: "DM Serif Display", serif;
   font-style: italic;
-  font-size: 4rem;
+  font-size: clamp(2.4rem, 6vw, 4rem);
   line-height: 1;
   color: transparent;
   -webkit-text-stroke: 1.5px rgba(10, 110, 92, 0.2);
   display: block;
-  margin-bottom: -0.5rem;
+  margin-bottom: -0.25rem;
 }
 
 .flow-title {
-  font-size: 1.35rem;
+  font-size: clamp(1.1rem, 3.5vw, 1.35rem);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--text-dark);
   font-family: "DM Serif Display", serif;
 }
 
 .flow-desc {
-  font-size: 0.82rem;
+  font-size: clamp(0.78rem, 2vw, 0.85rem);
   color: var(--text-muted);
-  line-height: 1.7;
+  line-height: 1.6;
   font-family: "DM Sans", sans-serif;
 }
 
@@ -329,8 +393,8 @@
   color: #ffffff;
   font-family: "DM Sans", sans-serif;
   font-weight: 600;
-  font-size: 0.88rem;
-  padding: 0.65rem 1.5rem;
+  font-size: clamp(0.78rem, 2.5vw, 0.88rem);
+  padding: clamp(0.5rem, 2vw, 0.65rem) clamp(1rem, 3vw, 1.5rem);
   border-radius: 0.75rem;
   border: none;
   cursor: pointer;
@@ -353,8 +417,8 @@
   color: #ffffff;
   font-family: "DM Sans", sans-serif;
   font-weight: 600;
-  font-size: 0.88rem;
-  padding: 0.65rem 1.5rem;
+  font-size: clamp(0.78rem, 2.5vw, 0.88rem);
+  padding: clamp(0.5rem, 2vw, 0.65rem) clamp(1rem, 3vw, 1.5rem);
   border-radius: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
