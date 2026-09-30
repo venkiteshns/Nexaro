@@ -18,16 +18,17 @@ const Status = () => {
         {STATS.map((stat, i) => (
           <div
             key={stat.label}
-            className="stats-cont py-10 text-center flex flex-col items-center justify-center relative"
+            className={`stats-cont py-5 sm:py-8 md:py-10 text-center flex flex-col items-center justify-center relative ${
+              i % 2 === 0 ? "border-r md:border-r-0" : ""
+            } ${i < STATS.length - 1 ? "md:border-r" : ""} ${
+              i < 2 ? "border-b md:border-b-0" : ""
+            }`}
             style={{
-              borderRight:
-                i < STATS.length - 1
-                  ? "1px solid rgba(10,110,92,0.1)"
-                  : "none",
+              borderColor: "rgba(10,110,92,0.1)",
             }}
           >
             <div
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 rounded-full"
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-8 sm:w-10 h-0.5 rounded-full"
               style={{
                 background: "linear-gradient(90deg, #0a6e5c, #10b981)",
                 opacity: 0.5,

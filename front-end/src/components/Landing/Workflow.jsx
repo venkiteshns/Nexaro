@@ -131,23 +131,23 @@ const Workflow = () => {
       }}
       className="pb-12"
     >
-      <div className="w-head grid grid-cols-1 sm:grid-cols-3 mb-5 p-10 pt-14">
-        <h2 className="text-5xl col-span-2 mt-3">
+      <div className="w-head grid grid-cols-1 sm:grid-cols-3 mb-3 sm:mb-5 p-4 pt-8 sm:p-8 sm:pt-12 md:p-10 md:pt-14">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl col-span-2 mt-2 sm:mt-3 leading-tight">
           Built for those who value <br />
           <span className="italic" style={{ color: "#0a6e5c" }}>
             time{" "}
           </span>
           over everything.
         </h2>
-        <p className="text-sm p-10 sm:justify-self-center justify-self-end">
-          We've re-engineered the marketplace <br /> experience. No endless
-          searching, <br />
+        <p className="text-xs sm:text-sm p-0 sm:p-6 md:p-10 mt-2 sm:mt-0 sm:justify-self-center justify-self-start sm:justify-self-end">
+          We've re-engineered the marketplace <br className="hidden sm:inline" /> experience. No endless
+          searching, <br className="hidden sm:inline" />
           no ghosting, just results.
         </p>
       </div>
 
       <div
-        className="work-flow max-w-6xl mx-auto p-6 rounded-3xl"
+        className="work-flow max-w-6xl mx-3 sm:mx-6 md:mx-auto p-4 sm:p-6 rounded-2xl sm:rounded-3xl"
         style={{
           background: "rgba(255,255,255,0.7)",
           border: "1px solid rgba(10,110,92,0.1)",
@@ -159,10 +159,10 @@ const Workflow = () => {
           {flows.map((flow, i) => (
             <div key={i}>
               {flow.side === "left" && (
-                <div className="grid grid-cols-3 mt-10 items-center justify-items-center">
-                  <div className="ps-5 col-span-3 md:col-span-2 lg:col-span-1">
+                <div className="grid grid-cols-3 mt-6 sm:mt-10 items-center justify-items-center">
+                  <div className="ps-2 sm:ps-5 col-span-3 md:col-span-2 lg:col-span-1">
                     <span className="flow-step-num">{`${i + 1}`}</span>
-                    <h2 className="flow-title mb-3">{flow.title}</h2>
+                    <h2 className="flow-title mb-2 sm:mb-3">{flow.title}</h2>
                     <p className="flow-desc">{flow.description}</p>
                   </div>
 
@@ -184,16 +184,16 @@ const Workflow = () => {
               )}
 
               {flow.side === "right" && (
-                <div className="grid grid-cols-3 mt-10 items-center justify-items-center">
+                <div className="grid grid-cols-3 mt-6 sm:mt-10 items-center justify-items-center">
                   <div>
                     <WorkerSearchCard />
                   </div>
                   <div className="hidden lg:block icon-box p-3 rounded-2xl">
                     <Search className="w-7 h-7 text-green-700/70" />
                   </div>
-                  <div className="pe-5 col-span-3 md:col-span-2 lg:col-span-1">
+                  <div className="pe-2 sm:pe-5 col-span-3 md:col-span-2 lg:col-span-1">
                     <span className="flow-step-num">{`${i + 1}`}</span>
-                    <h2 className="flow-title mb-3">{flow.title}</h2>
+                    <h2 className="flow-title mb-2 sm:mb-3">{flow.title}</h2>
                     <p className="flow-desc">{flow.description}</p>
                   </div>
                 </div>

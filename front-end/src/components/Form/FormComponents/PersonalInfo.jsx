@@ -14,9 +14,9 @@ const PersonalInfo = (props) => {
   const onClearGoogle = props?.onClearGoogle;
 
   return (
-    <div className={`${login ? "w-full" :"mt-5 w-full rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm"}`}>
-      {!login && <div >
-        <label className="block text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
+    <div className={`${login ? "w-full" : "mt-3 sm:mt-5 w-full rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-3.5 sm:p-6 md:p-10 shadow-sm"}`}>
+      {!login && <div className="mb-2.5 sm:mb-3">
+        <label className="block text-[11px] sm:text-xs font-medium mb-1" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
           Name <span className="text-red-400">*</span>
         </label>
 
@@ -27,7 +27,7 @@ const PersonalInfo = (props) => {
           type="text"
           autoComplete="name"
           placeholder="Enter your name"
-          className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+          className="placeholder:text-xs sm:placeholder:text-sm placeholder:text-gray-400 w-full rounded-lg sm:rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-xs sm:text-sm"
           style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
         />
         {errors.name && (
@@ -37,10 +37,10 @@ const PersonalInfo = (props) => {
         )}
       </div>
 }
-      <div className="flex flex-col md:flex-row gap-3 items-start">
+      <div className="flex flex-col md:flex-row gap-2.5 sm:gap-3 items-start">
         <div className="w-full" >
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
+            <label className="block text-[11px] sm:text-xs font-medium" style={{ color: "#374151", fontFamily: '"DM Sans", sans-serif' }}>
               Email <span className="text-red-400">*</span>
             </label>
             {isGoogleVerified && (
@@ -63,7 +63,7 @@ const PersonalInfo = (props) => {
             readOnly={isGoogleVerified}
             autoComplete="email"
             placeholder="Enter your email"
-            className={`placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 text-sm ${
+            className={`placeholder:text-xs sm:placeholder:text-sm placeholder:text-gray-400 w-full rounded-lg sm:rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 outline-none transition-all duration-200 text-xs sm:text-sm ${
               isGoogleVerified
                 ? "bg-emerald-50/50 text-gray-700 cursor-not-allowed border-emerald-300/60"
                 : "focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40"
@@ -92,7 +92,7 @@ const PersonalInfo = (props) => {
 
         {!login && (
           <div className="w-full">
-            <label className="text-xs text-gray-700/80">
+            <label className="block text-[11px] sm:text-xs font-medium mb-1 text-gray-700/80">
               Phone <span className="text-red-500">*</span>
             </label>
 
@@ -107,7 +107,7 @@ const PersonalInfo = (props) => {
               type="tel"
               autoComplete="tel"
               placeholder="Enter your phone number"
-              className="placeholder:text-sm placeholder:text-gray-400 w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-sm"
+              className="placeholder:text-xs sm:placeholder:text-sm placeholder:text-gray-400 w-full rounded-lg sm:rounded-xl border px-3 py-2 sm:px-4 sm:py-2.5 outline-none transition-all duration-200 focus:ring-2 focus:ring-green-700/20 focus:border-green-700/40 text-xs sm:text-sm"
               style={{ borderColor: "rgba(10,110,92,0.18)", background: "rgba(255,255,255,0.9)", boxShadow: "0 1px 4px rgba(10,110,92,0.05)" }}
             />
             {errors.phone && (
@@ -120,10 +120,10 @@ const PersonalInfo = (props) => {
       </div>
 
       {!login && (
-        <div className="mt-3 p-3 rounded-xl bg-blue-50/80 border border-blue-200/80 text-blue-950 flex items-start gap-2.5 shadow-2xs">
-          <Info className="w-4 h-4 text-[#0070BA] shrink-0 mt-0.5" />
+        <div className="mt-2.5 sm:mt-3 p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-blue-50/80 border border-blue-200/80 text-blue-950 flex items-start gap-2 sm:gap-2.5 shadow-2xs">
+          <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0070BA] shrink-0 mt-0.5" />
           <p className="text-[11px] sm:text-xs leading-relaxed text-gray-700">
-            <strong className="font-semibold text-[#003087]">PayPal Notice:</strong> Please enter your PayPal-linked email ID to ensure smooth payment transactions. If you don't have a PayPal account, you can sign up with any email, but make sure to update it later in your profile with a PayPal-linked email ID—otherwise payments cannot be received.
+            <strong className="font-semibold text-[#003087]">PayPal Notice:</strong> Use your PayPal email to receive payments. You can sign up with any email now and update it later in your profile.
           </p>
         </div>
       )}
@@ -131,8 +131,8 @@ const PersonalInfo = (props) => {
       {!login && <ReferralInput />}
 
       {worker && (
-        <div>
-          <label className="text-xs text-gray-700/80">Bio</label>
+        <div className="mt-2.5 sm:mt-3">
+          <label className="block text-[11px] sm:text-xs font-medium mb-1 text-gray-700/80">Bio</label>
           <textarea
             placeholder="Write something..."
             {...register("bio", {
@@ -142,22 +142,8 @@ const PersonalInfo = (props) => {
                   "No special characters are allowded. Please enter atleast 2 / more letters.",
               },
             })}
-            rows={5}
-            className="
-                w-full
-                rounded-xl
-                border
-                border-gray-300
-                bg-white
-                px-4
-                py-3
-                text-sm
-                text-gray-800
-               outline-none
-                focus:border-green-600
-                focus:ring-1 focus:ring-green-800
-                placeholder:text-gray-400
-              "
+            rows={3}
+            className="w-full rounded-lg sm:rounded-xl border border-gray-300 bg-white px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm text-gray-800 outline-none focus:border-green-600 focus:ring-1 focus:ring-green-800 placeholder:text-gray-400 placeholder:text-xs sm:placeholder:text-sm"
           />
           {errors.bio && (
             <span className="italic text-red-400/90 text-xs">

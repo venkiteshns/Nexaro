@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import PosterSignUpBanner from "../../components/Poster/PosterSignUpBanner";
 import PosterSignupForm from "../../components/Form/PosterSignupForm";
 import Logo from "../../components/Logo/Logo";
@@ -150,30 +150,35 @@ const PosterSignup = () => {
     }
   };
 
-  const sendDataToBackend = useCallback(async () => {
-    if (!isVerified) return;
-    try {
-      setSignupError("");
-      let res = await posterSignUp(formData).unwrap();
-      dispatch(
-        setCredentials({
-          user: res.user,
-          accessToken: res.accessToken,
-          refreshToken: res.refreshToken,
-        }),
-      );
-      navigate("/poster/my-tasks");
-    } catch (err) {
-      const msg = err?.data?.message || "Signup failed. Please try again.";
-      setSignupError(msg);
-      showWarning(msg);
-      setIsVerified(false);
-    }
-  }, [isVerified, navigate, dispatch, posterSignUp, formData]);
+  const sendDataToBackend = useCallback(
+    async (overrideData) => {
+      const dataToSubmit = overrideData || formData;
+      if (!dataToSubmit) return;
+      try {
+        setSignupError("");
+        let res = await posterSignUp(dataToSubmit).unwrap();
+        dispatch(
+          setCredentials({
+            user: res.user,
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          }),
+        );
+        navigate("/poster/my-tasks");
+      } catch (err) {
+        const msg = err?.data?.message || "Signup failed. Please try again.";
+        setSignupError(msg);
+        showWarning(msg);
+        setIsVerified(false);
+      }
+    },
+    [navigate, dispatch, posterSignUp, formData],
+  );
 
-  useEffect(() => {
+  const handleOtpVerified = () => {
+    setIsVerified(true);
     sendDataToBackend();
-  }, [isVerified, sendDataToBackend]);
+  };
 
   return (
     <div className="grid grid-cols-16">
@@ -217,7 +222,7 @@ const PosterSignup = () => {
           show={setShowOtp}
           email={email}
           reSendOtp={resendOtp}
-          isVerified={setIsVerified}
+          isVerified={handleOtpVerified}
         />
       )}
     </div>

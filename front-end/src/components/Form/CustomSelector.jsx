@@ -31,19 +31,19 @@ const CustomSelector = ( props ) => {
   };
 
   return (
-    <div data-field={section} id={`field-${section}`} className="mt-5 scroll-mt-24">
-      <label className="text-xs text-gray-600/70">
+    <div data-field={section} id={`field-${section}`} className="mt-3 sm:mt-5 scroll-mt-24">
+      <label className="text-[11px] sm:text-xs text-gray-600/70">
         {section === 'skill' ? "Select your elite skills" : "Select Languages you are comfortable to communicate"} <span className="text-red-600">*</span>
       </label>
-      <div className="mt-1 w-full rounded-3xl border border-gray-200 p-4 shadow-sm">
-        <div className="flex flex-wrap gap-3">
+      <div className="mt-1 w-full rounded-2xl sm:rounded-3xl border border-gray-200 p-3 sm:p-4 shadow-sm">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2.5">
           {DATA.map((item) => (
             <button
               type="button"
               key={item}
               onClick={() => toggle(item)}
               className={`
-              px-5 py-2 text-sm rounded-full border
+              px-3.5 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm rounded-full border transition-all duration-200 active:scale-95
               ${
                 selected.includes(item)
                   ? "bg-[#0a6e5c] text-white border-[#0a6e5c]"
