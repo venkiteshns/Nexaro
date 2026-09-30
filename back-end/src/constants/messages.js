@@ -92,6 +92,8 @@ const MESSAGES = {
     NO_FILE_PROVIDED: "No file provided for upload.",
     FILE_UPLOAD_SUCCESS: "File uploaded successfully",
     FAILED_TO_UPLOAD_FILE: "Failed to upload file to S3.",
+    INVALID_FILE_FORMAT: "Invalid file format. Only image files are allowed.",
+    FILE_TOO_LARGE: "File too large. Maximum file size is 10 MB per file.",
 
 };
 

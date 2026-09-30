@@ -19,6 +19,7 @@ import {
 import { showError, showSuccess } from "../../utils/toast";
 import UpdatePasswordModal from "../../components/sharedComponents/UpdatePasswordModal";
 import { uploadFileToS3 } from "../../utils/s3Upload";
+import { validateImageFile } from "../../utils/fileValidation";
 
 const EditProfileModal = ({ onClose, posterInfo }) => {
   const dispatch = useDispatch();
@@ -189,7 +190,15 @@ const EditProfileModal = ({ onClose, posterInfo }) => {
               accept="image/*"
               className="hidden"
               onChange={(e) => {
-                setSelectedAvatar(e.target.files[0]);
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const validation = validateImageFile(file);
+                if (!validation.isValid) {
+                  showError(validation.message);
+                  e.target.value = "";
+                  return;
+                }
+                setSelectedAvatar(file);
               }}
               ref={(el) => {
                 avatarInputRef.current = el;

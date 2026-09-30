@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { Camera, X, BadgeCheck, LockKeyhole, Info } from "lucide-react";
 import FormError from "./FormError";
+import { showError } from "../../../utils/toast";
+import { validateImageFile } from "../../../utils/fileValidation";
 
 export const AvatarUploadField = ({ initials = "AV", currentAvatar, onDirty }) => {
   const { setValue } = useFormContext();
@@ -12,9 +14,16 @@ export const AvatarUploadField = ({ initials = "AV", currentAvatar, onDirty }) =
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+      showError(validation.message);
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+
     setValue("avatar", file, { shouldDirty: true });
 
-    if (fileRef.current.value) {
+    if (fileRef.current?.value) {
       onDirty(true);
     }
     const url = URL.createObjectURL(file);
@@ -53,7 +62,7 @@ export const AvatarUploadField = ({ initials = "AV", currentAvatar, onDirty }) =
         <input
           ref={fileRef}
           type="file"
-          accept="image/png,image/jpeg,image/gif"
+          accept="image/*"
           className="hidden"
           onChange={handleFile}
         />
