@@ -128,12 +128,19 @@ const PosterSignup = () => {
             refreshToken: res.refreshToken,
           }),
         );
-        navigate("/poster/my-tasks");
+        setTimeout(() => {
+          navigate("/poster/my-tasks");
+        }, 1200);
       } catch (err) {
         const msg = err?.data?.message || "Signup failed. Please try again.";
         setSignupError(msg);
         showWarning(msg);
       }
+      return;
+    }
+
+    if (isVerified) {
+      sendDataToBackend(data);
       return;
     }
 
@@ -145,8 +152,8 @@ const PosterSignup = () => {
         phone: data.phone,
       }).unwrap();
       setShowOtp(true);
-    } catch {
-      // ignore
+    } catch (err) {
+      showWarning(err?.data?.message || err?.message || "Failed to send verification code. Please check your email/phone and try again.");
     }
   };
 
@@ -164,7 +171,9 @@ const PosterSignup = () => {
             refreshToken: res.refreshToken,
           }),
         );
-        navigate("/poster/my-tasks");
+        setTimeout(() => {
+          navigate("/poster/my-tasks");
+        }, 1200);
       } catch (err) {
         const msg = err?.data?.message || "Signup failed. Please try again.";
         setSignupError(msg);

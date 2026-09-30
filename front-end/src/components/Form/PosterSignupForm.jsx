@@ -4,6 +4,8 @@ import PersonalInfo from "./FormComponents/PersonalInfo";
 import Password from "./FormComponents/Password";
 import Location from "./FormComponents/Location";
 import TermsAndConditions from "./FormComponents/TermsAndConditions";
+import { Loader2, CheckCircle2 } from "lucide-react";
+import { showWarning } from "../../utils/toast";
 
 const PosterSignupForm = ({
   onSubmitForm,
@@ -21,8 +23,11 @@ const PosterSignupForm = ({
   onSwitchRole,
   signupError = "",
 }) => {
-  const { isLoading, isError, error } = otpStatus;
-  const { isSignUpError, signUpError } = formStatus;
+  const { isLoading, isError, error } = otpStatus || {};
+  const { signUpLoading, isSignUpSuccess, isSignUpError, signUpError } = formStatus || {};
+
+  const isSubmitting = isLoading || signUpLoading || isVerified;
+  const isButtonDisabled = isSubmitting || isSignUpSuccess;
 
   const methods = useForm({
     defaultValues: {
@@ -31,6 +36,14 @@ const PosterSignupForm = ({
       name: initialName,
     },
   });
+
+  const handleFormError = (errors) => {
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      const firstError = errors[errorKeys[0]];
+      showWarning(firstError?.message || "Please complete all required fields");
+    }
+  };
 
   useEffect(() => {
     if (initialReferralCode) {
@@ -122,7 +135,7 @@ const PosterSignupForm = ({
         )}
 
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmitForm)}>
+          <form onSubmit={methods.handleSubmit(onSubmitForm, handleFormError)}>
             <PersonalInfo isGoogleVerified={isGoogleVerified} onClearGoogle={onClearGoogle} />
             <Location worker={false} />
             <Password login={false} />
@@ -144,11 +157,56 @@ const PosterSignupForm = ({
               </div>
             )}
 
+            {isSubmitting && (
+              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#0A6E5C] bg-[#0A6E5C]/10 border border-[#0A6E5C]/20 py-2.5 px-3.5 rounded-xl animate-pulse my-3">
+                <Loader2 size={15} className="animate-spin shrink-0 text-[#0A6E5C]" />
+                <span>
+                  {isLoading && "Sending verification code to your email..."}
+                  {(signUpLoading || isVerified) && "Setting up your poster profile & credentials..."}
+                </span>
+              </div>
+            )}
+
+            {isSignUpSuccess && (
+              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 py-2.5 px-3.5 rounded-xl shadow-xs my-3">
+                <CheckCircle2 size={16} className="shrink-0 text-emerald-600" />
+                <span>Account created successfully! Redirecting...</span>
+              </div>
+            )}
+
             <button
+              id="poster-signup-submit-btn"
               type="submit"
-              className={`w-full bg-[#0a6e5c] hover:bg-green-800/90 transition text-white font-semibold py-2.5 sm:py-3.5 text-sm sm:text-base rounded-xl ${(isLoading || isVerified) ? "cursor-not-allowed opacity-50" : ""}`}
+              disabled={isButtonDisabled}
+              className={`w-full py-2.5 sm:py-3.5 text-sm sm:text-base font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md ${
+                isSignUpSuccess
+                  ? "bg-emerald-600 text-white cursor-default shadow-emerald-600/20"
+                  : isButtonDisabled
+                  ? "bg-[#0a6e5c]/80 text-white cursor-not-allowed opacity-90 shadow-[#0a6e5c]/10"
+                  : "bg-[#0a6e5c] hover:bg-green-800 transition text-white active:scale-[0.99] shadow-[#0a6e5c]/20 cursor-pointer"
+              }`}
             >
-              {isVerified ? "Submitting Registration..." : isLoading ? "Validating Data..." : "Create Account"}
+              {isLoading && (
+                <>
+                  <Loader2 size={18} className="animate-spin shrink-0" />
+                  <span>Sending Verification Code...</span>
+                </>
+              )}
+              {(signUpLoading || (isVerified && !isSignUpSuccess)) && (
+                <>
+                  <Loader2 size={18} className="animate-spin shrink-0" />
+                  <span>Creating Poster Account...</span>
+                </>
+              )}
+              {isSignUpSuccess && (
+                <>
+                  <CheckCircle2 size={18} className="shrink-0" />
+                  <span>Account Created!</span>
+                </>
+              )}
+              {!isButtonDisabled && !isSignUpSuccess && (
+                <span>Create Account</span>
+              )}
             </button>
           </form>
         </FormProvider>
