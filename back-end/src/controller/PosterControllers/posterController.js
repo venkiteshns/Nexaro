@@ -197,7 +197,12 @@ export const switchRoleToWorker = async (req, res) => {
     return res.status(STATUS_CODES.BAD_REQUEST).json({success: false, message: response.error});
   }
 
-  return res.status(STATUS_CODES.OK).json({success: true, message: response.message})
+  return res.status(STATUS_CODES.OK).json({
+    success: true,
+    message: response.message,
+    accessToken: response.accessToken,
+    user: response.user
+  });
 }
 
 export const posterRoleSwitchAlreadyDataUploaded = async (req, res) => {
@@ -210,7 +215,12 @@ export const posterRoleSwitchAlreadyDataUploaded = async (req, res) => {
     return res.status(STATUS_CODES.BAD_REQUEST).json({success:false, message: response.error});
   }
 
-  return res.status(STATUS_CODES.OK).json({success:true, message: response.message})
+  return res.status(STATUS_CODES.OK).json({
+    success: true,
+    message: response.message,
+    accessToken: response.accessToken,
+    user: response.user
+  });
 }
 
 export const getPosterNotifications = async (req, res) => {

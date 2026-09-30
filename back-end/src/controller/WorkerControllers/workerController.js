@@ -294,7 +294,7 @@ export const switchRoleToPoster = async (req, res) => {
         return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: response.error });
     }
 
-    return res.status(STATUS_CODES.OK).json({ success: true, message: response.message })
+    return res.status(STATUS_CODES.OK).json({ success: true, message: response.message, accessToken: response.accessToken, user: response.user });
 }
 
 export const getAllReviews = async (req, res) => {

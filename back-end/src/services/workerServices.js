@@ -11,7 +11,7 @@ import mongoose from "mongoose";
 import Transaction from "../models/transactionSchema.js";
 import { payoutTransferService, getPayoutStatus } from "./paymentServices.js";
 import { convertInrToUsd } from "../utils/currency.js";
-import { getIo } from "../socket.js";
+import { getIo, updateUserRoleAndZoneRooms } from "../socket.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
 import WorkerNotification from "../models/workerNotificationSchema.js";
 import { syncWorkerNotifications } from "./workerNotificationService.js";
@@ -400,7 +400,24 @@ export const switchRoleToPosterService = async ({ user }) => {
         isUser.activeRole = 'poster';
         await isUser.save();
 
-        return { success: true, message: "Role Updated" }
+        await updateUserRoleAndZoneRooms(isUser._id);
+        const newAccessToken = generateAccessToken(isUser);
+
+        return {
+            success: true,
+            message: "Role Updated",
+            accessToken: newAccessToken,
+            user: {
+                _id: isUser._id,
+                name: isUser.name,
+                email: isUser.email,
+                phone: isUser.phone,
+                role: isUser.role,
+                activeRole: isUser.activeRole,
+                profile_image: isUser.profile_image,
+                serviceArea: isUser.serviceArea,
+            },
+        };
     } catch (error) {
         logger.error("Role switch to poster without Data service error:", error);
         return { error: MESSAGES.UNEXPECTED_ERROR }
