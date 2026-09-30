@@ -3,6 +3,13 @@ import { Link } from "react-router-dom";
 import "./Landing.css";
 
 const GetStarted = () => {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div className="get-start grid grid-cols-1 md:grid-cols-2">
       <div
@@ -36,7 +43,7 @@ const GetStarted = () => {
           Access a curated network of the top 1% local professionals. Get your
           projects done right, the first time.
         </p>
-        <Link to="/signup/poster">
+        <Link to="/signup/poster" onClick={scrollToTop}>
           <span className="gs-btn-light">
             Register as a Poster
             <MoveRight strokeWidth={1.8} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -70,7 +77,7 @@ const GetStarted = () => {
           Join the most prestigious network of skilled workers. Earn more, work
           smarter, and build your editorial reputation.
         </p>
-        <Link to="/signup/worker">
+        <Link to="/signup/worker" onClick={scrollToTop}>
           <span className="gs-btn-dark">
             Register as a Worker
             <MoveRight strokeWidth={1.8} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
