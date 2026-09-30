@@ -8,7 +8,7 @@ import Task from "../models/taskSchema.js";
 import mongoose from "mongoose";
 import Bid from "../models/bidsSchema.js";
 import Review from "../models/reviewSchema.js";
-import { getIo } from "../socket.js";
+import { getIo, updateUserRoleAndZoneRooms } from "../socket.js";
 import { uploadManyFiles } from "../utils/uploadUtils.js";
 import { recordAdminAlert } from "./adminNotificationService.js";
 import PosterNotification from "../models/posterNotificationSchema.js";
@@ -802,7 +802,24 @@ export const switchRoleToWorkerService = async ({ user, data, files }) => {
 
     await userData.save();
 
-    return { success: true, message: "Data uploaded Successfully" }
+    await updateUserRoleAndZoneRooms(userData._id);
+    const newAccessToken = generateAccessToken(userData);
+
+    return {
+      success: true,
+      message: "Data uploaded Successfully",
+      accessToken: newAccessToken,
+      user: {
+        _id: userData._id,
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        role: userData.role,
+        activeRole: userData.activeRole,
+        profile_image: userData.profile_image,
+        serviceArea: userData.serviceArea,
+      },
+    };
   } catch (error) {
     logger.error("switchRoleToWorkerService error:", error);
 
@@ -832,7 +849,25 @@ export const posterRoleSwitchAlreadyDataUploadedService = async ({ user }) => {
 
     isUser.activeRole = 'worker';
     await isUser.save();
-    return { success: true, message: "Role Updated" }
+
+    await updateUserRoleAndZoneRooms(isUser._id);
+    const newAccessToken = generateAccessToken(isUser);
+
+    return {
+      success: true,
+      message: "Role Updated",
+      accessToken: newAccessToken,
+      user: {
+        _id: isUser._id,
+        name: isUser.name,
+        email: isUser.email,
+        phone: isUser.phone,
+        role: isUser.role,
+        activeRole: isUser.activeRole,
+        profile_image: isUser.profile_image,
+        serviceArea: isUser.serviceArea,
+      },
+    };
   } catch (error) {
     logger.error("posterRoleSwitchAlreadyDataUploadedService error:", error);
     return { error: MESSAGES.UNEXPECTED_ERROR }

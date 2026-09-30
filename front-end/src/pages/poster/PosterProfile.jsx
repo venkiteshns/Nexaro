@@ -96,16 +96,22 @@ const PosterProfile = () => {
 
       setIsUploading(false);
       setSubmissionStatus("submitting");
-      await switchRole(data).unwrap();
+      const res = await switchRole(data).unwrap();
 
       setSubmissionStatus("switching");
-      const updatedUser = { ...user, role: 'worker' };
+      const newAccessToken = res?.accessToken || accessToken;
+      const updatedUser = {
+        ...user,
+        ...(res?.user || {}),
+        activeRole: 'worker',
+        role: 'worker'
+      };
       showSuccess("Switching to Worker Mode");
       setTimeout(() => {
         dispatch(setCredentials({
           user: updatedUser,
           refreshToken,
-          accessToken
+          accessToken: newAccessToken
         }));
         navigate('/worker/dashboard', { replace: true });
       }, 2000);
@@ -127,14 +133,20 @@ const PosterProfile = () => {
 
     if (hasWorkerData) {
       try {
-        await roleSwitch().unwrap();
-        const updatedUser = { ...user, role: 'worker' };
+        const res = await roleSwitch().unwrap();
+        const newAccessToken = res?.accessToken || accessToken;
+        const updatedUser = {
+          ...user,
+          ...(res?.user || {}),
+          activeRole: 'worker',
+          role: 'worker'
+        };
         showSuccess("Switching to Worker Mode");
         setTimeout(() => {
           dispatch(setCredentials({
             user: updatedUser,
             refreshToken,
-            accessToken
+            accessToken: newAccessToken
           }));
           navigate('/worker/dashboard', { replace: true });
         }, 2600);

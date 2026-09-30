@@ -51,22 +51,25 @@ const WorkerProfile = () => {
 
     const handleRoleChange = async() => {
         try {
-            await switchRole().unwrap();
+            const res = await switchRole().unwrap();
+            const newAccessToken = res?.accessToken || accessToken;
             const updatedUser = {
                 ...user,
-                role:'poster'
-            }
-             showSuccess("Switching to Poster Mode");
-                  setTimeout(() => {
-                    dispatch(setCredentials({
-                      user: updatedUser,
-                      refreshToken,
-                      accessToken
-                    }))
-                    navigate('/poster/my-tasks', { replace: true });
-                  }, 2600);
+                ...(res?.user || {}),
+                activeRole: 'poster',
+                role: 'poster'
+            };
+            showSuccess("Switching to Poster Mode");
+            setTimeout(() => {
+                dispatch(setCredentials({
+                    user: updatedUser,
+                    refreshToken,
+                    accessToken: newAccessToken
+                }));
+                navigate('/poster/my-tasks', { replace: true });
+            }, 2600);
         } catch (error) {
-            showError(error.data.message || "Unable to switch role, try again later !")
+            showError(error?.data?.message || "Unable to switch role, try again later !");
         }
     }
 
