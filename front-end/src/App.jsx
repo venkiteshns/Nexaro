@@ -7,6 +7,7 @@ import PublicRoute from "./components/routes/PublicRoute.jsx";
 import PrivateRoute from "./components/routes/PrivateRoute.jsx";
 import useSocketNotification from "./customHooks/useSocketNotification.js";
 import PageLoader from "./components/sharedComponents/PageLoader.jsx";
+import { Ceo } from "./pages/Landing/Ceo.jsx";
 
 // Lazy load route pages for code-splitting
 const Landing = lazy(() => import("./pages/Landing/Landing.jsx"));
@@ -85,6 +86,7 @@ function AppInner() {
 
           <Route element={<PublicRoute />}>
             <Route path="/" element={<Landing />} />
+            <Route path="/ceo" element={<Ceo />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/map" element={<Map />} />
             <Route path="/signup/poster" element={<PosterSignup />} />
